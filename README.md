@@ -1,36 +1,100 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GPTiti
+Here front gptiti.com We use Next.js 15
 
-## Getting Started
+## Структура Git
+##### Вітка dev — для розробки (тільки тут писати код).
+```
+Порядок роботи з GitHub
+1. Створюєте нову гілку від dev:
+git checkout dev
+git pull origin dev
+git checkout -b feature/abc123
 
-First, run the development server:
+2. Робите зміни у своїй гілці
+git add .
+git commit -m "Короткий опис змін (ТЗ, задача тощо)"
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+3. Перед відправкою оновлюєте dev і робите rebase:
+git checkout dev
+git pull origin dev
+git checkout feature/abc123
+git rebase dev
+
+4. Перевіряєте, що все працює:
+- Код компілюється / білд збирається
+- Зміни на місці
+
+5. Відправляєте свою гілку в репозиторій:
+git push --force-with-lease origin feature/abc123
+
+6. Створюєте Merge Request (Pull Request) у dev
+- У полі “Merge method” вибираєте “Squash and merge”
+Перейди на GitHub
+- Відкрий репозиторій → вкладка Pull Requests (GitHub) або Merge Requests (GitLab)
+- Натисни “New Pull Request” або “Create Merge Request”
+
+- Після мерджу можна видалити свою гілку
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Структура проекту
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **api/** 
+- **app/** 
+- **assets/** 
+  - `image/`
+  - `svg/`
+  - `animation/`
+- **components/** 
+- **config/** 
+- **hooks/** 
+- **locales/** 
+- **navigation/**
+- **providers/** -
+- **redux/** 
+- **styles/** 
+- **types/** 
+- **utils/** 
+- **public/** 
+- **middleware.ts** - Файл для middleware функцій Next.js.
+- **i18n.ts** - Файл конфігурації для i18n (локалізації).
+- **tsconfig.json** - Конфігураційний файл TypeScript.
+- **next.config.js** - Конфігураційний файл Next.js.
+- **package.json** - Файл з залежностями та скриптами для проекту.
+- **README.md** - Цей файл, що описує структуру проекту.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Інструкції по встановленню
+##### 1. Встановіть залежності: ``` npm install ```
+##### 1. Запустіть проект: ``` npm run dev ```
+##### 3. Відвідайте http://localhost:3000 у вашому браузері, щоб побачити проект.
 
-## Learn More
+## Локалізація
+###### Проект підтримує кілька мов, які зберігаються у файлах locales/*.json. Можна додавати або змінювати переклади відповідно до потреб.
 
-To learn more about Next.js, take a look at the following resources:
+## Створення власних компонентів
+###### Щоб створити новий компонент, додайте папку з назвою компонента у папку components/ і створіть у ній файл [Назва компоненту/папки].tsx.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Redux
+###### Проект використовує Redux для управління станом. Основні файли з логікою Redux знаходяться у папці redux/. Зазвичай, стан редукується за допомогою slice.
 
- You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🧩 Інструкція для команди розробників: стандартизація API-запитів
 
- ## Deploy on Vercel
+На даний момент у кодовій базі використовуються різні підходи для роботи з API — зокрема, **Axios**, частково **React Query**, і вже є кілька реалізацій на **RTK Query**.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Щоб привести проект до єдиного стандарту та спростити підтримку, основним інструментом для роботи з API ми обираємо **RTK Query (Redux Toolkit Query)**.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### ✅ Що робимо далі:
+
+1. **Нові запити реалізовуємо виключно через RTK Query.**  
+2. **Існуючі запити**, написані на Axios або React Query, **поступово переписуємо під RTK Query.**  
+3. **Axios** можемо залишити як допоміжну бібліотеку **всередині RTK Query** для базового транспорту  
+   (наприклад, якщо потрібна кастомна конфігурація інстансу чи інтерцептори).  
+4. Усі приклади нових запитів і шаблони зберігатимемо у відповідному розділі  
+   `/services/api` для уніфікації.
+
+---
+
+🎯 **Ціль:** єдиний підхід до роботи з API, централізоване кешування, менше дублювання логіки  
+та повна інтеграція з Redux.
+ 
+## Ліцензія
+###### Цей проект є приватним та не підлягає розповсюдженню без дозволу авторів.
