@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Link from "next/link";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,9 +33,11 @@ export default function RootLayout({
         {/* 🔥 Глобальний footer */}
         <footer className="text-center text-gray-500 text-sm mt-16 space-y-2 p-6">
           <nav className="flex justify-center gap-6">
-            <a href="#" className="hover:text-gray-700">Our Mission</a>
+            <Link href = "/">Home</Link>
+            <Link href = '/our-mission'>Our Mission</Link>
             <a href="#" className="hover:text-gray-700">Terms & Conditions</a>
             <a href="#" className="hover:text-gray-700">Privacy Policy</a>
+            <Link href = '/sign-in'>Sign in</Link>
           </nav>
           <p>© 2025 Your Price Booking. All rights reserved.</p>
         </footer>
