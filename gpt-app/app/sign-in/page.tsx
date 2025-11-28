@@ -1,6 +1,19 @@
+'use client';
+
+import { useState } from "react";
 import Head from "next/head";
+import Checkbox from '@mui/material/Checkbox';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+
+import Link from "next/link";
 
 export default function LoginPage() {
+   const [checked, setChecked] = useState(false);
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setChecked(event.target.checked);
+  };
   return (
     <>
       <Head>
@@ -21,9 +34,37 @@ export default function LoginPage() {
             No subscriptions. No monthly fees. Enjoy free test access to the world’s most powerful AI chat models.
           </p>
 
-          <button className="w-full py-3 rounded-xl bg-blue-600 text-white font-semibold text-lg transition-all hover:bg-blue-700 active:bg-blue-800 focus:ring-4 focus:ring-blue-300">
+          <button className={`w-full py-3 rounded-xl text-white font-semibold text-lg transition-all focus:ring-4 ${
+          checked
+      ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800 focus:ring-blue-300'
+      : 'bg-gray-400 cursor-not-allowed'
+  }`}
+  disabled={!checked}>
             Sign in with Google
           </button>
+
+          <div className="w-full flex justify-start items-center mt-2">
+            <Checkbox
+              checked={checked}
+              onChange={handleChange}
+              icon={<CheckCircleOutlineIcon sx={{ color: '#00e676' }} />}
+              checkedIcon={<CheckCircleIcon sx={{ color: '#00e676' }} />}
+              sx={{ padding: 0,
+                opacity: checked ? 1 : 0.25,
+                transition: 'opacity 0.3s ease-in-out'
+               }}
+            />
+            <span className="ml-2 text-gray-500 hover:text-gray-700">
+  I have read and agree to the{' '}
+  <Link href="/terms-conditions" className="text-blue-600 hover:underline hover:text-blue-800">
+    Terms & Conditions
+  </Link>{' '}
+  and{' '}
+  <Link href="/privacy-policy" className="text-blue-600 hover:underline hover:text-blue-800">
+    Privacy Policy
+  </Link>
+</span>
+          </div>
 
           {/* sections with models */}
           <div className="text-left space-y-6 mt-10">
