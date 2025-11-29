@@ -1,0 +1,266 @@
+.container {
+    min-height: 100vh;
+    max-width: 383px;
+    width: 100%;
+    background: var(--foreground);
+    padding: 38px 13px 90px 23px;
+}
+
+.gptTokens {
+    padding-left: 28px;
+}
+.titleContainer{
+    display: flex;
+    align-items: end;
+    gap: 18px;
+}
+
+.title {
+    font-family: var(--font-family);
+    font-weight: 700;
+    font-size: 24px;
+    color: var(--main-white)
+}
+
+.paragraph {
+    padding-top: 7px;
+    font-family: var(--font-family);
+    font-weight: 700;
+    font-size: 11px;
+    color: var(--main-white);
+}
+.gptBalance{
+    margin-top: 18px;
+    display: flex;
+    gap: 27px;
+}
+.title2 {
+    font-family: var(--font-family);
+    font-weight: 700;
+    font-size: 20px;
+    color: var(--main-white);
+}
+.balanceContainer {
+    padding: 0 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 0.20px solid var(--background);
+    border-radius: 7px;
+    width: 100%;
+    width: 150px;
+    min-height: 31px;
+}
+.gptSpan1{
+    font-family: var(--font-family);
+    font-weight: 700;
+    font-size: 20px;
+    color: var(--main-white);
+}
+
+.btnContainer{
+    margin-top: 19px;
+    }
+
+.btn{
+    display: flex;
+    gap: 23px;
+    justify-content: center;
+    align-items: center;
+
+    border-radius: 7px;
+    max-width: 302px;
+    width: 100%;
+    min-height: 40px;
+    background: #265ed9;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    cursor: pointer;
+    background: #1b4bb8;
+}
+
+.btn:focus{
+    cursor: pointer;
+    background: #07266b;
+}
+
+.iconWrapper {
+  position: relative;
+  width: 33px;
+  height: 33px;
+}
+
+.innerIcon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.btnSpan1 {
+    font-family: var(--font-family);
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--main-white);
+}
+
+.gptChats {
+    margin-top: 24px;
+}
+
+.yourChats {
+    display: flex;
+    gap: 13px;
+    align-items: center;
+    padding-left: 28px;
+}
+
+.span {
+    font-family: var(--font-family);
+    font-weight: 300;
+    font-size: 14px;
+    color: var(--main-white);
+    padding-bottom: 4px ;
+    }
+
+.labelWrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+ }
+
+.icon {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%);
+  right: -33px;
+  }
+  .chatsList {
+  display: flex;
+  flex-direction: column;
+  gap: 23px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.chatsListItem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  min-height: 42px;
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--main-white);
+  border-radius: 11px;
+  transition: background 0.3s ease;
+}
+
+.chatsListItem:hover {
+  background: #3e3d40;
+  cursor: pointer;
+}
+
+.dotsIcon {
+  width: 28px;
+  height: 42px;
+  background-image: url('/icons/threePoints.svg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.chatsListItem:hover .dotsIcon {
+  opacity: 1;
+}
+.gptUser{
+  margin-top: 30px;
+  padding-left: 28px;
+}
+.userInfo {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    }
+
+.gptUserEmail {
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: 16px;
+    color: var(--main-white);
+}
+
+.logoutBtn {
+    margin-top: 20px;
+    border: 1px solid #265ed9;
+    border-radius: 11px;
+    width: 263px;
+    height: 46px;
+    background: var(--main-white);
+}
+
+.logoutBtnSpan {
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: 20px;
+    color: #265ed9;
+}
+
+.logoutBtn:hover {
+    cursor: pointer;
+    background: #e5eeff;
+}
+.logoutBtn:focus{
+    cursor: pointer;
+    background: #c2d2f0;
+}
+.footerList{
+    margin-top: 30px;
+}
+.footerList,
+.footerList1 {
+    display: flex;
+    justify-content: space-around;
+}
+
+.footerList1 {
+    margin-top: 15px;
+}
+
+.footerItem {
+    font-family: var(--font-family);
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--main-white);
+}
+
+.footerSection {
+    margin-top: 24px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 24px;
+    text-align: center;
+}
+.footerSpan{
+  width: 290px;
+  font-weight: 400;
+  font-size: 11px;
+}
+.footerSpan, .footerParagraph {
+    font-family: var(--font-family);
+    
+  
+    color: var(--main-white);
+}
+.footerParagraph{
+    font-weight: 500;
+    font-size: 13px;
+}
