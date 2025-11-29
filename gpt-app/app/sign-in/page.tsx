@@ -43,28 +43,30 @@ export default function LoginPage() {
             Sign in with Google
           </button>
 
-          <div className="w-full flex justify-start items-center mt-2">
-            <Checkbox
-              checked={checked}
-              onChange={handleChange}
-              icon={<CheckCircleOutlineIcon sx={{ color: '#00e676' }} />}
-              checkedIcon={<CheckCircleIcon sx={{ color: '#00e676' }} />}
-              sx={{ padding: 0,
-                opacity: checked ? 1 : 0.25,
-                transition: 'opacity 0.3s ease-in-out'
-               }}
-            />
-            <span className="ml-2 text-gray-500 hover:text-gray-700">
-  I have read and agree to the{' '}
-  <Link href="/terms-conditions" className="text-blue-600 hover:underline hover:text-blue-800">
-    Terms & Conditions
-  </Link>{' '}
-  and{' '}
-  <Link href="/privacy-policy" className="text-blue-600 hover:underline hover:text-blue-800">
-    Privacy Policy
-  </Link>
-</span>
-          </div>
+         <div className="w-full flex items-start gap-2 mt-2 flex-wrap sm:flex-nowrap">
+  <Checkbox
+    checked={checked}
+    onChange={handleChange}
+    icon={<CheckCircleOutlineIcon sx={{ color: '#00e676' }} />}
+    checkedIcon={<CheckCircleIcon sx={{ color: '#00e676' }} />}
+    sx={{
+      padding: 0,
+      opacity: checked ? 1 : 0.25,
+      transition: 'opacity 0.3s ease-in-out',
+      alignSelf: 'flex-start',
+    }}
+  />
+  <span className="text-gray-500 hover:text-gray-700 text-sm leading-snug">
+    I have read and agree to the{' '}
+    <Link href="/terms-conditions" className="text-blue-600 hover:underline hover:text-blue-800">
+      Terms & Conditions
+    </Link>{' '}
+    and{' '}
+    <Link href="/privacy-policy" className="text-blue-600 hover:underline hover:text-blue-800">
+      Privacy Policy
+    </Link>
+  </span>
+</div>
 
           {/* sections with models */}
           <div className="text-left space-y-6 mt-10">
