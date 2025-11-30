@@ -140,7 +140,7 @@
   .chatsList {
   display: flex;
   flex-direction: column;
-  gap: 23px;
+  gap: 21px;
   padding: 0;
   margin: 0;
   list-style: none;
@@ -238,6 +238,22 @@
     font-weight: 700;
     font-size: 12px;
     color: var(--main-white);
+    }
+
+   .footerLink:hover {
+    font-family: var(--font-family);
+    font-weight: 700;
+    font-size: 12px;
+    text-decoration: underline;
+    text-decoration-skip-ink: none;
+    color: var(--main-white);
+}
+
+.footerLink:focus {
+    font-family: var(--font-family);
+    font-weight: 700;
+    font-size: 12px;
+    color: #c2c5cc;
 }
 
 .footerSection {
