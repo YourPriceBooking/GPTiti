@@ -121,3 +121,9 @@
   content: "Use voice model";
   top: 58px;
 }
+.disabledHover:hover::after,
+.disabledHover:focus::before,
+.disabledHover:active::before {
+  opacity: 0 !important;
+  visibility: hidden !important;
+}

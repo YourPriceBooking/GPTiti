@@ -1,5 +1,7 @@
+import CustomScrollbar from '@/components/CustomScrollBar/CustomScrollBar';
 import styles from './LeftSide.module.css';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function LeftSide() {
   return (
@@ -46,9 +48,13 @@ export default function LeftSide() {
             </button>
           </article>
         </section>
-        <section className={styles.gptChats}>
+         <section className={styles.gptChats}>
+          <article className={styles.gptNewChat}>
+           <Image width={36} height={36} src='/icons/newChat.svg' alt='new chat'></Image>
+            <span className={styles.chatsSpan}>Start New Chat</span>
+            </article>
           <article className={styles.yourChats}>
-            <svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+           <svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M11 12H26.8333M11 18.3333H20.5" stroke="#FCFDFF" strokeWidth="1.83333" strokeLinecap="round" />
               <path d="M6.3335 7.91665C6.3335 7.0422 7.04239 6.33331 7.91683 6.33331H30.0835C30.958 6.33331 31.6668 7.0422 31.6668 7.91665V22.1666C31.6668 23.0411 30.958 23.75 30.0835 23.75H12.6668L7.91683 28.5V23.75C7.04239 23.75 6.3335 23.0411 6.3335 22.1666V7.91665Z" stroke="#FCFDFF" strokeWidth="1.83333" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
@@ -57,18 +63,18 @@ export default function LeftSide() {
               <svg className={styles.icon} width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M3.75 5.625L7.5 9.375L11.25 5.625" stroke="#FCFDFF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-            </div>
+                 </div>
+                 <CustomScrollbar scrollTargetClass={styles.chatsScrollArea} />
           </article>
           <ul className={styles.chatsList}>
             {Array.from({ length: 8 }).map((_, i) => (
               <li key={i} className={styles.chatsListItem}>
-                <span>My chat number {i + 1} and more text...</span>
+                <span>My chat number {i + 1} and more ...</span>
                 <span className={styles.dotsIcon}></span>
               </li>
             ))}
           </ul>
-
-        </section>
+       </section>
         <section className={styles.gptUser}>
           <article className={styles.userInfo}>
               <svg

@@ -1,9 +1,9 @@
 .container {
     min-height: 100vh;
-    max-width: 383px;
+    max-width: 330px;
     width: 100%;
     background: var(--foreground);
-    padding: 38px 13px 90px 23px;
+    padding: 38px 3px 90px 24px;
 }
 
 .gptTokens {
@@ -69,7 +69,7 @@
     align-items: center;
 
     border-radius: 7px;
-    max-width: 302px;
+    max-width: 261px;
     width: 100%;
     min-height: 40px;
     background: #265ed9;
@@ -107,10 +107,11 @@
 }
 
 .gptChats {
+    position: relative;
     margin-top: 24px;
-}
+    }
 
-.yourChats {
+.yourChats, .gptNewChat {
     display: flex;
     gap: 13px;
     align-items: center;
@@ -122,14 +123,21 @@
     font-weight: 300;
     font-size: 14px;
     color: var(--main-white);
-    padding-bottom: 4px ;
-    }
+    padding-bottom: 4px;
+}
+
+.chatsSpan {
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--main-white);
+}
 
 .labelWrapper {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
- }
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
 
 .icon {
   position: absolute;
@@ -137,14 +145,11 @@
   transform: translate(-50%);
   right: -33px;
   }
-  .chatsList {
+  
+ .chatsList {
   display: flex;
   flex-direction: column;
-  gap: 21px;
-  padding: 0;
-  margin: 0;
-  list-style: none;
-}
+  }
 
 .chatsListItem {
   position: relative;
@@ -180,7 +185,7 @@
   opacity: 1;
 }
 .gptUser{
-  margin-top: 30px;
+  margin-top: 119px;
   padding-left: 28px;
 }
 .userInfo {
@@ -272,11 +277,10 @@
 }
 .footerSpan, .footerParagraph {
     font-family: var(--font-family);
-    
-  
     color: var(--main-white);
 }
 .footerParagraph{
     font-weight: 500;
     font-size: 13px;
 }
+
