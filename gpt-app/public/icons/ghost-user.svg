@@ -1,0 +1,47 @@
+<svg
+  width="27.11"
+  height="35.65"
+  viewBox="0 0 27.11 35.65"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <style>
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-2px); }
+    }
+    .ghost { animation: float 2.2s ease-in-out infinite; }
+  </style>
+
+  <g class="ghost">
+    <path
+      d="M13.55 0C6.07 0 0 6.07 0 13.55v11.2c0 3.2 2.6 5.8 5.8 5.8 2 0 3.8-.98 4.9-2.47 1.1 1.49 2.9 2.47 4.9 2.47s3.8-.98 4.9-2.47c1.1 1.49 2.9 2.47 4.9 2.47 3.2 0 5.8-2.6 5.8-5.8v-11.2C27.11 6.07 21.04 0 13.55 0z"
+      fill="#AEE1FF"
+    />
+
+    <circle cx="9.5" cy="13" r="2.3" fill="#000" />
+    <circle cx="17.5" cy="13" r="2.3" fill="#000" />
+
+    <circle cx="10.1" cy="12.4" r="0.6" fill="white" />
+    <circle cx="18.1" cy="12.4" r="0.6" fill="white" />
+
+    <path
+      class="smile"
+      d="M9 19c1.2 1.4 3 2.1 4.6 2.1s3.4-.7 4.6-2.1"
+      stroke="#000"
+      stroke-width="2"
+      stroke-linecap="round"
+    >
+      <animate
+        attributeName="d"
+        dur="1.8s"
+        repeatCount="indefinite"
+        values="
+          M9 19c1.2 1.4 3 2.1 4.6 2.1s3.4-.7 4.6-2.1;
+          M9 19c1.4 2 3.2 2.8 4.6 2.8s3.2-.8 4.6-2.8;
+          M9 19c1.2 1.4 3 2.1 4.6 2.1s3.4-.7 4.6-2.1
+        "
+      />
+    </path>
+  </g>
+</svg>
