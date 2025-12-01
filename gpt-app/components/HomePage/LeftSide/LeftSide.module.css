@@ -27,7 +27,7 @@
     font-family: var(--font-family);
     font-weight: 700;
     font-size: 11px;
-    color: var(--main-white);
+    color: #B8BBC0;
 }
 .gptBalance{
     margin-top: 18px;
@@ -48,7 +48,7 @@
     border: 0.20px solid var(--background);
     border-radius: 7px;
     width: 100%;
-    width: 150px;
+    max-width: 150px;
     min-height: 31px;
 }
 .gptSpan1{
@@ -111,17 +111,17 @@
     gap: 13px;
     align-items: center;
     padding-left: 28px;
-}
 
-.gptNewChat{
+    border-radius: 11px;
+    max-width: 288px;
+    width: 100%;
+    min-height: 40px;
     transition: background 1s ease-in;
 }
 
 .gptNewChat:hover, .gptNewChat:focus {
-    border-radius: 11px;
-    width: 288px;
-    height: 40px;
     background: var(--main-gray);
+    cursor: pointer;
 }
 
 .span {
@@ -165,7 +165,7 @@
   padding: 0 16px;
   min-height: 42px;
   font-family: var(--font-family);
-  font-weight: 700;
+  font-weight: 500;
   font-size: 16px;
   color: var(--main-white);
   border-radius: 11px;
@@ -261,19 +261,19 @@
     color: var(--main-white);
     }
 
-   .footerLink:hover {
+    .footerLink {
     font-family: var(--font-family);
-    font-weight: 700;
+    font-weight: 400;
     font-size: 12px;
+    }
+
+   .footerLink:hover {
     text-decoration: underline;
     text-decoration-skip-ink: none;
     color: var(--main-white);
 }
 
 .footerLink:focus {
-    font-family: var(--font-family);
-    font-weight: 700;
-    font-size: 12px;
     color: #c2c5cc;
 }
 
@@ -287,7 +287,8 @@
     text-align: center;
 }
 .footerSpan{
-  width: 290px;
+  max-width: 290px;
+  width: 100%;
   font-weight: 400;
   font-size: 11px;
 }
@@ -297,6 +298,8 @@
 }
 .footerParagraph{
     font-weight: 500;
-    font-size: 13px;
+    font-size: 12px;
 }
+
+
 

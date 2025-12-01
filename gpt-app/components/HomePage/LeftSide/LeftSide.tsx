@@ -37,14 +37,14 @@ export default function LeftSide() {
             <span className={styles.chatsSpan}>Start New Chat</span>
             </article>
           <article className={styles.yourChats}>
-           <Image width={38} height={38} src='/icons/chat-bubble.svg' alt='chat-bubble'></Image>
+            <Image width={38} height={38} src='/icons/chat-bubble.svg' alt='chat-bubble'></Image>
             <div className={styles.labelWrapper}>
               <span className={styles.span}>Your Chats</span>
-            <div className={styles.icon}>
-                  <Image width={15} height={15} src='/icons/chevron-down.svg' alt='chevron-down'></Image>
-                  </div>
-                 </div>
-                 <CustomScrollbar scrollTargetClass={styles.chatsScrollArea} />
+              <div className={styles.icon}>
+                <Image width={15} height={15} src='/icons/chevron-down.svg' alt='chevron-down'></Image>
+              </div>
+            </div>
+            <CustomScrollbar scrollTargetClass={styles.chatsScrollArea} />
           </article>
           <ul className={styles.chatsList}>
             {Array.from({ length: 6 }).map((_, i) => (
