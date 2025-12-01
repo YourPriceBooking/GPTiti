@@ -1,0 +1,24 @@
+.scrollTrack {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 8px;
+  height: 100%;
+  background: transparent;
+  z-index: 1;
+}
+
+.scrollThumb {
+  position: absolute;
+  width: 8px;
+  height: 69px;
+  border-radius: 22px;
+  background: #3e3d40;
+  cursor: grab;
+  transition: background 0.15s ease;
+}
+
+.scrollThumb:active {
+  cursor: grabbing;
+  background: #525157;
+}

@@ -25,12 +25,12 @@ function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     <div className={styles.iconWrapper1} tabIndex={0}>
       <Image width={35} height={35} src="/icons/microphone.svg" alt="microphone" />
     </div>
-    {hasInput ? (
-  <div className={styles.iconWrapper2}>
+  {hasInput ? (
+  <div className={`${styles.iconWrapper2} ${hasInput ? styles.disabledHover : ""}`}>
     <Image src="/icons/send.svg" width={35} height={35} alt="send" />
   </div>
 ) : (
-  <div className={styles.iconWrapper2}>
+  <div className={`${styles.iconWrapper2}`} tabIndex={0}>
     <Image src="/icons/voice.svg" width={35} height={35} alt="voice" />
   </div>
 )}
