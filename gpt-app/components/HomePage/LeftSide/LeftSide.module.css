@@ -60,6 +60,7 @@
 
 .btnContainer{
     margin-top: 19px;
+    padding-right: 40px;
     }
 
 .btn{
@@ -211,12 +212,17 @@
     color: var(--main-white);
 }
 
+.logoutBtnContainer{
+    padding-right: 40px;
+  }
+
 .logoutBtn {
     margin-top: 20px;
     border: 1px solid #265ed9;
     border-radius: 11px;
-    width: 263px;
-    height: 46px;
+    max-width: 263px;
+    width: 100%;
+    min-height: 46px;
     background: var(--main-white);
 }
 

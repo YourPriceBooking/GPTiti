@@ -22,14 +22,14 @@ export default function LeftSide() {
              <Image width={24} height={24} src='/icons/badge.svg' alt='badge'></Image>
             </div>
           </article>
-          <article className={styles.btnContainer}>
+          <div className={styles.btnContainer}>
             <button className={styles.btn}>
               <div className={styles.iconWrapper}>
                 <Image width={33} height={33} src='/icons/circle-icon.svg' alt='circle-icon'></Image>
               </div>
               <span className={styles.btnSpan1}>Top up tokens</span>
             </button>
-          </article>
+          </div>
         </section>
          <section className={styles.gptChats}>
           <article className={styles.gptNewChat} tabIndex={0}>
@@ -60,10 +60,12 @@ export default function LeftSide() {
               <Image width={27.11} height={35.65} src='/icons/ghost-user.svg' alt='ghost-user'></Image>
             <span className={styles.gptUserEmail}>henrinkwinta@gmail.com</span>
           </article>
-          <button className={styles.logoutBtn}>
+          <div className={styles.logoutBtnContainer}>
+            <button className={styles.logoutBtn}>
             <span className={styles.logoutBtnSpan}> Log out </span>
             </button>
-        </section>
+          </div>
+          </section>
         <footer>
           <ul className={styles.footerList}>
             <li className={styles.footerItem}><Link href='/' className={styles.footerLink}>Home</Link></li>
