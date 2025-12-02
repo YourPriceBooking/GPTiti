@@ -151,7 +151,18 @@
   transform: translate(-50%);
   right: -33px;
   }
-  
+  .chatsScrollArea {
+  position: relative;
+  max-height: 252px; 
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.chatsScrollArea::-webkit-scrollbar {
+  display: none;
+}
  .chatsList {
   display: flex;
   flex-direction: column;
@@ -200,6 +211,7 @@
   padding-left: 28px;
 }
 .userInfo {
+    margin-right: 39px;
     display: flex;
     gap: 12px;
     align-items: center;
