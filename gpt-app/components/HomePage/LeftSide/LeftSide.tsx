@@ -46,14 +46,14 @@ export default function LeftSide() {
                  </div>
                  <CustomScrollbar scrollTargetClass={styles.chatsScrollArea} />
           </article>
-          <ul className={styles.chatsList}>
+          {/* <ul className={styles.chatsList}>
             {Array.from({ length: 6 }).map((_, i) => (
               <li key={i} className={styles.chatsListItem} tabIndex={0}>
                 <span>My chat number {i + 1} and more ...</span>
                 <span className={styles.dotsIcon}></span>
               </li>
             ))}
-          </ul>
+          </ul> */}
        </section>
         <section className={styles.gptUser}>
           <article className={styles.userInfo}>
