@@ -1,0 +1,32 @@
+.messagesContainer {
+  width: 100%;
+  max-width: 816px;
+  margin-bottom: 20px; 
+  flex-shrink: 0; 
+}
+
+.userMessageContainer{
+  display: flex;
+  justify-content: flex-end;
+}
+
+.userMessage {
+  display: flex;
+  margin-top: 80px;
+  margin-bottom: 41px;
+  background: #f4f4f4;
+  border-radius: 22px;
+  max-width: 613px;
+  width: 100%;
+  height: auto;
+}
+
+.userText {
+  padding: 16px 15px 8px 22px;
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 157%;
+  color: #555;
+  word-break: break-word;      
+}

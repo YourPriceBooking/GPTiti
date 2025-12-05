@@ -2,8 +2,17 @@ import CustomScrollbar from '@/components/CustomScrollBar/CustomScrollBar';
 import styles from './LeftSide.module.css';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Chat } from '@/types/types';
 
-export default function LeftSide() {
+export default function LeftSide({
+  onNewChat,
+  chatList,
+  setActiveChatId
+}: {
+  onNewChat: () => void;
+  chatList: Chat[];
+  setActiveChatId: (id: string) => void;
+})  {
   return (
     <>
       <div className={styles.container}>
@@ -34,26 +43,37 @@ export default function LeftSide() {
          <section className={styles.gptChats}>
           <article className={styles.gptNewChat} tabIndex={0}>
            <Image width={36} height={36} src='/icons/new-chat.svg' alt='new-chat'></Image>
-            <span className={styles.chatsSpan}>Start New Chat</span>
+            <button className={styles.chatsSpan} onClick={onNewChat}>Start New Chat</button>
             </article>
           <article className={styles.yourChats}>
            <Image width={38} height={38} src='/icons/chat-bubble.svg' alt='chat-bubble'></Image>
             <div className={styles.labelWrapper}>
-              <span className={styles.span}>Your Chats</span>
+              <button className={styles.span}>Your Chats</button>
             <div className={styles.icon}>
                   <Image width={15} height={15} src='/icons/chevron-down.svg' alt='chevron-down'></Image>
                   </div>
                  </div>
                  <CustomScrollbar scrollTargetClass={styles.chatsScrollArea} />
           </article>
-          {/* <ul className={styles.chatsList}>
-            {Array.from({ length: 6 }).map((_, i) => (
-              <li key={i} className={styles.chatsListItem} tabIndex={0}>
-                <span>My chat number {i + 1} and more ...</span>
+        <ul className={styles.chatsList}>
+          {chatList
+            .filter(chat => chat.title !== null) 
+            .map(chat => (
+              <li
+                key={chat.id}
+                className={styles.chatsListItem}
+                tabIndex={0}
+                onClick={() => setActiveChatId(chat.id)}
+              >
+                <span>
+                  {chat.title && chat.title.length > 24
+                    ? chat.title.slice(0, 24) + '...'
+                    : chat.title}
+                </span>
                 <span className={styles.dotsIcon}></span>
               </li>
             ))}
-          </ul> */}
+        </ul>
        </section>
         <section className={styles.gptUser}>
           <article className={styles.userInfo}>
