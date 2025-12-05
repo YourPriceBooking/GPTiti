@@ -1,14 +1,19 @@
 .container {
-    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
     max-width: 330px;
     width: 100%;
     background: var(--foreground);
-    padding: 38px 3px 90px 24px;
+    padding: 38px 3px 20px 24px;
 }
 
 .gptTokens {
+    flex-shrink: 0;
     padding-left: 28px;
 }
+
 .titleContainer{
     display: flex;
     align-items: end;
@@ -29,17 +34,20 @@
     font-size: 11px;
     color: var(--main-gray2);
 }
+
 .gptBalance{
     margin-top: 18px;
     display: flex;
     gap: 27px;
 }
+
 .title2 {
     font-family: var(--font-family);
     font-weight: 700;
     font-size: 20px;
     color: var(--main-gray2);
 }
+
 .balanceContainer {
     padding: 0 4px;
     display: flex;
@@ -51,6 +59,7 @@
     max-width: 150px;
     min-height: 31px;
 }
+
 .gptSpan1{
     font-family: var(--font-family);
     font-weight: 700;
@@ -61,14 +70,13 @@
 .btnContainer{
     margin-top: 19px;
     padding-right: 40px;
-    }
+}
 
 .btn{
     display: flex;
     gap: 23px;
     justify-content: center;
     align-items: center;
-
     border-radius: 7px;
     max-width: 261px;
     width: 100%;
@@ -101,17 +109,21 @@
 }
 
 .gptChats {
-    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
     margin-top: 24px;
-    }
+    min-height: 0;
+    overflow: hidden;
+}
 
 .yourChats,
 .gptNewChat {
+    flex-shrink: 0;
     display: flex;
     gap: 13px;
     align-items: center;
     padding-left: 28px;
-
     border-radius: 11px;
     max-width: 288px;
     width: 100%;
@@ -150,23 +162,27 @@
   top: 50%;
   transform: translate(-50%);
   right: -33px;
-  }
-  .chatsScrollArea {
+}
+
+.chatsScrollArea {
   position: relative;
-  max-height: 252px; 
+  flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  min-height: 0;
+  margin-top: 10px;
 }
 
 .chatsScrollArea::-webkit-scrollbar {
   display: none;
 }
- .chatsList {
+
+.chatsList {
   display: flex;
   flex-direction: column;
-  }
+}
 
 .chatsListItem {
   position: relative;
@@ -206,16 +222,19 @@
 .chatsListItem:hover .dotsIcon {
   opacity: 1;
 }
+
 .gptUser{
+  flex-shrink: 0;
   margin-top: 24px;
   padding-left: 28px;
 }
+
 .userInfo {
     margin-right: 39px;
     display: flex;
     gap: 12px;
     align-items: center;
-    }
+}
 
 .gptUserEmail {
     font-family: var(--font-family);
@@ -226,7 +245,7 @@
 
 .logoutBtnContainer{
     padding-right: 40px;
-  }
+}
 
 .logoutBtn {
     margin-top: 20px;
@@ -249,13 +268,21 @@
     cursor: pointer;
     background: #e5eeff;
 }
+
 .logoutBtn:focus{
     cursor: pointer;
     background: #c2d2f0;
 }
+
+.footer {
+    flex-shrink: 0;
+    padding-bottom: 20px;
+}
+
 .footerList{
     margin-top: 30px;
 }
+
 .footerList,
 .footerList1 {
     display: flex;
@@ -271,15 +298,15 @@
     font-weight: 400;
     font-size: 12px;
     color: var(--main-white);
-    }
+}
 
-    .footerLink {
+.footerLink {
     font-family: var(--font-family);
     font-weight: 400;
     font-size: 12px;
-    }
+}
 
-   .footerLink:hover {
+.footerLink:hover {
     text-decoration: underline;
     text-decoration-skip-ink: none;
     color: var(--main-white);
@@ -298,23 +325,20 @@
     gap: 24px;
     text-align: center;
 }
+
 .footerSpan{
   max-width: 290px;
   width: 100%;
   font-weight: 400;
   font-size: 11px;
 }
-.footerSpan{
-    color: #b8bbc0
-}
+
 .footerSpan, .footerParagraph {
     font-family: var(--font-family);
-    }
+    color: #b8bbc0
+}
+
 .footerParagraph{
-    color: var(--main-white);
     font-weight: 500;
     font-size: 12px;
 }
-
-
-

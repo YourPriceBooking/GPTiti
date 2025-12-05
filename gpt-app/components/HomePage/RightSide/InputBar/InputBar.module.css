@@ -12,9 +12,9 @@
   border: 0.2px solid #3e3d40;
   border-radius: 33px;
   width: 100%;
-  min-height: 68px;
-  max-height: 240px;
-  padding: 16px 100px 17px 60px;
+  max-height: 68px;
+  /* max-height: 240px; */
+  padding: 19px 100px 17px 60px;
   box-sizing: border-box;
   box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.25);
   background: var(--main-white);
@@ -33,7 +33,7 @@
   font-weight: 400;
   font-size: 20px;
   color: #bebebe;
-  padding-top: 10px;
+  /* padding-top: 10px; */
 }
 .iconWrapper,
 .iconWrapper1,

@@ -1,9 +1,12 @@
 .appContainer {
   display: flex;
   width: 100%;
+  height: 100vh;
+  overflow: hidden;
   }
 
 .rightSection {
+  overflow-y: auto;
   position: relative; 
   flex: 1;
   display: flex;
@@ -14,8 +17,8 @@
 
 .inputWrapper {
   position: absolute;
-  top: 39%;
-  transform: translateY(-39%);
+  top: 38%;
+  transform: translateY(-38%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -24,8 +27,10 @@
 }
 
 .inputBottom {
+  position: fixed;
   width: 100%;
   max-width: 816px;
+  bottom: 0;
 }
 
 .spanContainer{
