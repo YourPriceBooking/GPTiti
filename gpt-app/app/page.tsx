@@ -93,7 +93,7 @@ const activeChat = chatList.find(chat => chat.id === activeChatId);
         setActiveChatId={setActiveChatId} />
       <div className={styles.rightSection}>
         {activeChat && activeChat.messages.length > 0 && (
-          <MessageList messages={activeChat.messages} />
+         <MessageList messages={activeChat.messages}/>
         )}
          <div className={inputSent ? styles.inputBottom : styles.inputWrapper}>
         <InputBar hasInput={hasInput} onChange={handleChange} onSend={handleSendClick} inputRef={inputRef} />
@@ -105,8 +105,8 @@ const activeChat = chatList.find(chat => chat.id === activeChatId);
           </div>
         )}
         </div>
-        <div ref={messagesEndRef} />
-      </div>
+         <div ref={messagesEndRef} />
+        </div>
     </div>
   );
 }

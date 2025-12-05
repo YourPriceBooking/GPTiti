@@ -40,6 +40,7 @@ export default function LeftSide({
             </button>
           </div>
         </section>
+        <div className={styles.chatsScrollArea}>
          <section className={styles.gptChats}>
           <article className={styles.gptNewChat} tabIndex={0}>
            <Image width={36} height={36} src='/icons/new-chat.svg' alt='new-chat'></Image>
@@ -53,7 +54,7 @@ export default function LeftSide({
                   <Image width={15} height={15} src='/icons/chevron-down.svg' alt='chevron-down'></Image>
                   </div>
                  </div>
-                 <CustomScrollbar scrollTargetClass={styles.chatsScrollArea} />
+                 
           </article>
         <ul className={styles.chatsList}>
           {chatList
@@ -74,7 +75,9 @@ export default function LeftSide({
               </li>
             ))}
         </ul>
+        <CustomScrollbar scrollTargetClass={styles.chatsScrollArea} />
        </section>
+       </div>
         <section className={styles.gptUser}>
           <article className={styles.userInfo}>
               <Image width={27.11} height={35.65} src='/icons/ghost-user.svg' alt='ghost-user'></Image>
@@ -86,7 +89,7 @@ export default function LeftSide({
             </button>
           </div>
           </section>
-        <footer>
+        <footer className={styles.footer}>
           <ul className={styles.footerList}>
             <li className={styles.footerItem}><Link href='/' className={styles.footerLink}>Home</Link></li>
             <li className={styles.footerItem}><Link href='/our-mission' className={styles.footerLink}>Our Mission</Link></li>

@@ -11,7 +11,7 @@
 .scrollThumb {
   position: absolute;
   width: 8px;
-  height: 69px;
+  max-height: 69px;
   border-radius: 22px;
   background: #3e3d40;
   cursor: grab;
