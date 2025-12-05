@@ -8,3 +8,9 @@ export type Message = {
   user: string;
   ai: ReactElement;
 };
+
+export type Chat = {
+  id: string;
+  title: string | null;   
+  messages: Message[];
+};

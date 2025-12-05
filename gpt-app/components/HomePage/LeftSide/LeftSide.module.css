@@ -304,11 +304,14 @@
   font-weight: 400;
   font-size: 11px;
 }
+.footerSpan{
+    color: #b8bbc0
+}
 .footerSpan, .footerParagraph {
     font-family: var(--font-family);
-    color: var(--main-white);
-}
+    }
 .footerParagraph{
+    color: var(--main-white);
     font-weight: 500;
     font-size: 12px;
 }
