@@ -1,6 +1,6 @@
 .inputContainer {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   position: relative;
   max-width: 816px;
   min-width: 380px;
@@ -12,14 +12,14 @@
   border: 0.2px solid #3e3d40;
   border-radius: 33px;
   width: 100%;
-  max-height: 68px;
-  /* max-height: 240px; */
-  padding: 19px 100px 17px 60px;
+  min-height: 68px;
+  max-height: 240px;
+  padding: 20px 100px 20px 60px;
   box-sizing: border-box;
   box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.25);
   background: var(--main-white);
   resize: none; 
-  overflow-y: auto;
+  overflow-y: hidden;
   line-height: 1.4;
   font-size: 18px;
   }
@@ -33,8 +33,15 @@
   font-weight: 400;
   font-size: 20px;
   color: #bebebe;
-  /* padding-top: 10px; */
+  }
+  
+.multiline .input {
+  padding-bottom: 50px;
 }
+.scrollable .input {
+  overflow-y: auto;
+}
+
 .iconWrapper,
 .iconWrapper1,
 .iconWrapper2 {
@@ -46,6 +53,17 @@
   justify-content: center;
   outline: none;
   cursor: pointer;
+  transition: top 0.2s ease, bottom 0.2s ease, transform 0.2s ease;
+  z-index: 1;
+}
+
+
+.multiline .iconWrapper,
+.multiline .iconWrapper1,
+.multiline .iconWrapper2 {
+  top: auto;
+  bottom: 14px;
+  transform: translateY(0);
 }
 
 
@@ -118,6 +136,17 @@
 .iconWrapper2::after {
   content: "Use voice model";
   top: 58px;
+}
+
+.expanded .input {
+  padding: 20px 20px 60px 20px !important;
+}
+
+.multiline .iconWrapper::after,
+.multiline .iconWrapper1::after,
+.multiline .iconWrapper2::after {
+  top: auto;
+  bottom: 45px;
 }
 .disabledHover:hover::after,
 .disabledHover:focus::before,
