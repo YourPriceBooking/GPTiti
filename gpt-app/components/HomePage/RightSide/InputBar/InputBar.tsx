@@ -10,64 +10,73 @@ export default function InputBar({
 }: {
   hasInput: boolean;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-  onSend: () => void;
+  onSend: (message: string) => void;   
   inputRef: React.RefObject<HTMLTextAreaElement | null>;
 }) {
   const [isMultiline, setIsMultiline] = useState(false);
-  const [, setInitialHeight] = useState<number>(0);
   const [shouldScroll, setShouldScroll] = useState(false);
 
   useEffect(() => {
-   
     if (inputRef.current) {
-      setInitialHeight(inputRef.current.scrollHeight);
       inputRef.current.style.height = "68px"; 
     }
   }, [inputRef]);
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-  onChange(e);
+    onChange(e);
 
-  if (inputRef.current) {
-    const textarea = inputRef.current;
+    if (inputRef.current) {
+      const textarea = inputRef.current;
 
-    textarea.style.height = 'auto'; 
-    const currentHeight = textarea.scrollHeight;
+      textarea.style.height = 'auto'; 
+      const currentHeight = textarea.scrollHeight;
 
-    const baseHeight = 68; 
-    const lineHeight = 25; // твій розрахунок з font-size 18px і line-height 1.4
-    const maxHeightBeforeScroll = 240;
+      const baseHeight = 68; 
+      const lineHeight = 25; 
+      const maxHeightBeforeScroll = 240;
 
-    if (textarea.value === '') {
-      textarea.style.height = `${baseHeight}px`;
-      setIsMultiline(false);
-      setShouldScroll(false);
-    } 
-    // момент переходу з 1-го на 2-й рядок
-    else if (currentHeight > baseHeight && currentHeight <= baseHeight + lineHeight) {
-      textarea.style.height = `${currentHeight}px`;
-      setIsMultiline(true);
-      setShouldScroll(false);
-    }
-    // всі інші випадки (3-й рядок і далі)
-    else if (currentHeight > baseHeight + lineHeight) {
-      if (currentHeight > maxHeightBeforeScroll) {
-        textarea.style.height = `${maxHeightBeforeScroll}px`;
-        setIsMultiline(true);
-        setShouldScroll(true);
-      } else {
+      if (textarea.value === '') {
+        textarea.style.height = `${baseHeight}px`;
+        setIsMultiline(false);
+        setShouldScroll(false);
+      } 
+      else if (currentHeight > baseHeight && currentHeight <= baseHeight + lineHeight) {
         textarea.style.height = `${currentHeight}px`;
         setIsMultiline(true);
         setShouldScroll(false);
+      } 
+      else if (currentHeight > baseHeight + lineHeight) {
+        if (currentHeight > maxHeightBeforeScroll) {
+          textarea.style.height = `${maxHeightBeforeScroll}px`;
+          setIsMultiline(true);
+          setShouldScroll(true);
+        } else {
+          textarea.style.height = `${currentHeight}px`;
+          setIsMultiline(true);
+          setShouldScroll(false);
+        }
+      } else {
+        textarea.style.height = `${baseHeight}px`;
+        setIsMultiline(false);
+        setShouldScroll(false);
       }
-    } else {
-      textarea.style.height = `${baseHeight}px`;
+    }
+  };
+
+  const handleSend = () => {
+    if (inputRef.current) {
+      const message = inputRef.current.value; 
+      if (message.trim() !== "") {
+        onSend(message);                      
+      }
+      inputRef.current.value = "";            
+      inputRef.current.style.height = "68px"; 
       setIsMultiline(false);
       setShouldScroll(false);
     }
-  }
-};
-    return (
+  };
+
+  return (
     <div
       className={`
         ${styles.inputContainer} 
@@ -95,7 +104,7 @@ export default function InputBar({
       {hasInput ? (
         <div
           className={`${styles.iconWrapper2} ${styles.disabledHover}`}
-          onClick={onSend}
+          onClick={handleSend}   
         >
           <Image src="/icons/send.svg" width={35} height={35} alt="send" />
         </div>
