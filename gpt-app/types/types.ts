@@ -14,3 +14,15 @@ export type Chat = {
   title: string | null;   
   messages: Message[];
 };
+
+export type ModelType = 'GPT-4o' | 'GPT-5.1' | '0-Series';
+
+export type ModelItem = {
+  title: string;
+  tokens: number;
+  desc: string;
+};
+
+export type ModelConfig = {
+  list: ModelItem[];
+};
