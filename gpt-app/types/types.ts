@@ -26,3 +26,5 @@ export type ModelItem = {
 export type ModelConfig = {
   list: ModelItem[];
 };
+
+export type ModelMode = 'idle' | 'hover' | 'click';

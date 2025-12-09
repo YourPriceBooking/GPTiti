@@ -2,18 +2,18 @@ import CustomScrollbar from '@/components/CustomScrollBar/CustomScrollBar';
 import styles from './LeftSide.module.css';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Chat, ModelType } from '@/types/types';
-import { useRef } from 'react';
+import { Chat, ModelType, ModelMode } from '@/types/types';
 import ModalWindow from './ModalWindow/ModalWindow';
 
 type Props = {
   onNewChat: () => void;
   chatList: Chat[];
   setActiveChatId: (id: string) => void;
-  openModelPopup: () => void;
-  closeModelPopup: () => void;
 
-  isModelPopupOpen: boolean;
+  modelRef: React.RefObject<HTMLDivElement | null>;
+  modelMode: ModelMode;
+  setModelMode: React.Dispatch<React.SetStateAction<ModelMode>>;
+
   selectedModel: ModelType;
   setSelectedModel: (model: ModelType) => void;
 };
@@ -22,40 +22,36 @@ export default function LeftSide({
   onNewChat,
   chatList,
   setActiveChatId,
-  openModelPopup,
-  closeModelPopup,
-   isModelPopupOpen,
+  modelRef,
+  modelMode,
+  setModelMode,
   selectedModel,
   setSelectedModel
 }: Props) {
 
-  // timeout живе всередині компонента
-  const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const handleMouseEnter = () => {
-    if (closeTimeoutRef.current) {
-      clearTimeout(closeTimeoutRef.current);
-    }
-    openModelPopup();
-  };
-
-  const handleMouseLeave = () => {
-    closeTimeoutRef.current = setTimeout(() => {
-      closeModelPopup();
-    }, 150);
-  };
 
   return (
     <div className={styles.container}>
       <section className={styles.gptTokens}>
         <article className={styles.gptMini}>
           <div
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-            onFocus={handleMouseEnter}
-            onBlur={handleMouseLeave}
-            tabIndex={0}
+            ref={modelRef}
             className={styles.modelHoverWrapper}
+            tabIndex={0}
+
+            onMouseEnter={() => {
+              if (modelMode !== 'click') setModelMode('hover');
+            }}
+
+            onMouseLeave={() => {
+              if (modelMode !== 'click') setModelMode('idle');
+            }}
+
+            onClick={(e) => {
+              e.stopPropagation();
+              setModelMode(prev => (prev === 'click' ? 'idle' : 'click'));
+            }}
           >
             <article className={styles.titleContainer}>
               <h2 className={styles.title}>GPT-4o-mini</h2>
@@ -66,14 +62,25 @@ export default function LeftSide({
                 alt="chevron-small"
               />
             </article>
-            {isModelPopupOpen && (
-    <div className={styles.modalWrapper}>
-      <ModalWindow 
-        selectedModel={selectedModel}
-        setSelectedModel={setSelectedModel}
-      />
-    </div>
-  )}
+            {modelMode !== 'idle' && (
+              <div
+                className={styles.modalWrapper}
+                style={{
+                  top: modelMode === 'click' ? '0px' : '40px'
+                }}
+                onMouseDown={(e) => {
+                  e.stopPropagation();
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+              >
+                <ModalWindow
+                  selectedModel={selectedModel}
+                  setSelectedModel={setSelectedModel}
+                />
+              </div>
+            )}
           </div>
 
           <p className={styles.paragraph}>
