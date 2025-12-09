@@ -78,12 +78,12 @@
 
     display: flex;
     flex-direction: column;
-    border: 1px solid var(--main-gray2);
+    border: 1px solid #494a4b;
     background: #202328;
     transition: all 0.5ms ease-out;
 }
 .btn2:hover {
-    border: 2px solid var(--main-gray2);
+    border: 1px solid var(--main-gray2);
 }
 
 .btn2:focus {
