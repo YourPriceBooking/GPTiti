@@ -24,7 +24,14 @@
     font-family: var(--font-family);
     font-weight: 700;
     font-size: 24px;
-    color: var(--main-white)
+    color: var(--main-white);
+    transition: all 0.5s ease-out;
+}
+
+.title:hover {
+    text-decoration: underline;
+    text-decoration-skip-ink: none;
+    cursor: pointer;
 }
 
 .paragraph {
@@ -335,10 +342,22 @@
 
 .footerSpan, .footerParagraph {
     font-family: var(--font-family);
-    color: #b8bbc0
+    color: var(--main-gray2);
 }
 
 .footerParagraph{
     font-weight: 500;
     font-size: 12px;
+}
+
+.modelHoverWrapper {
+  position: relative;
+}
+
+.modalWrapper {
+  width: 100%;
+  position: absolute;
+  top: 0px;
+  left: 0;
+  z-index: 9999;
 }
