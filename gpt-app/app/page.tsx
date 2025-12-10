@@ -13,8 +13,8 @@ type ModelMode = 'idle' | 'hover' | 'click';
 export default function Home() {
   const [hasInput, setHasInput] = useState(false);
   const [inputSent, setInputSent] = useState(false);
-
-  const [selectedModel, setSelectedModel] = useState<ModelType>('GPT-4o');
+  const [selectedModelGroup, setSelectedModelGroup] = useState<ModelType>('GPT-4o');
+  const [selectedModel, setSelectedModel] = useState<string>('gpt-4o-mini');
   const [modelMode, setModelMode] = useState<ModelMode>('idle');
 
   const initialChatId = crypto.randomUUID();
@@ -31,7 +31,7 @@ export default function Home() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatList, activeChatId]);
 
-  // close popup on outside click
+  // Close modal on outside click
   useEffect(() => {
     function handleOutsideClick(e: MouseEvent) {
       if (
@@ -42,9 +42,25 @@ export default function Home() {
       }
     }
 
-    document.addEventListener('mousedown', handleOutsideClick);
+    if (modelMode === 'click') {
+      document.addEventListener('mousedown', handleOutsideClick);
+    }
+
     return () => document.removeEventListener('mousedown', handleOutsideClick);
-  }, []);
+  }, [modelMode]);
+
+  // Block scroll when modal is open
+  useEffect(() => {
+    if (modelMode === 'click') {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [modelMode]);
 
   function handleChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
     setHasInput(e.target.value.trim().length > 0);
@@ -81,60 +97,66 @@ export default function Home() {
 
   function handleNewChat() {
     const newChatId = crypto.randomUUID();
-    const newChat: Chat = {
-      id: newChatId,
-      title: null,
-      messages: []
-    };
+    const newChat: Chat = { id: newChatId, title: null, messages: [] };
 
     setChatList(prev => [...prev, newChat]);
     setActiveChatId(newChatId);
     setHasInput(false);
     setInputSent(false);
+
     if (inputRef.current) inputRef.current.value = '';
   }
 
   const activeChat = chatList.find(chat => chat.id === activeChatId);
 
   return (
-    <div className={styles.appContainer}>
-      <LeftSide
-        onNewChat={handleNewChat}
-        chatList={chatList}
-        setActiveChatId={setActiveChatId}
+    <>
+      {modelMode === 'click' && (
+        <div 
+          className={styles.backdrop} 
+          onClick={() => setModelMode('idle')}
+        />
+      )}
 
-        modelRef={modelRef}
-        modelMode={modelMode}
-        setModelMode={setModelMode}
+      <div className={styles.appContainer}>
+        <LeftSide
+          onNewChat={handleNewChat}
+          chatList={chatList}
+          setActiveChatId={setActiveChatId}
+          modelRef={modelRef}
+          modelMode={modelMode}
+          setModelMode={setModelMode}
+          selectedModel={selectedModel}
+          setSelectedModel={setSelectedModel}
+          selectedModelGroup={selectedModelGroup}
+          setSelectedModelGroup={setSelectedModelGroup}
+        />
 
-        selectedModel={selectedModel}
-        setSelectedModel={setSelectedModel}
-      />
-
-      <div className={styles.rightSection}>
-        {activeChat && activeChat.messages.length > 0 && (
-          <MessageList messages={activeChat.messages} />
-        )}
-
-        <div className={inputSent ? styles.inputBottom : styles.inputWrapper}>
-          <InputBar
-            hasInput={hasInput}
-            onChange={handleChange}
-            onSend={handleSendClick}
-            inputRef={inputRef}
-          />
-
-          {inputSent && (
-            <div className={styles.spanContainer}>
-              <span className={styles.inputSpan}>
-                AI systems may make mistakes, so we recommend verifying important information.
-              </span>
-            </div>
+        <div className={styles.rightSection}>
+          {activeChat && activeChat.messages.length > 0 && (
+            <MessageList messages={activeChat.messages} />
           )}
-        </div>
 
-        <div ref={messagesEndRef} />
+          <div className={inputSent ? styles.inputBottom : styles.inputWrapper}>
+            <InputBar
+              hasInput={hasInput}
+              onChange={handleChange}
+              onSend={handleSendClick}
+              inputRef={inputRef}
+            />
+
+            {inputSent && (
+              <div className={styles.spanContainer}>
+                <span className={styles.inputSpan}>
+                  AI systems may make mistakes, so we recommend verifying important information.
+                </span>
+              </div>
+            )}
+          </div>
+
+          <div ref={messagesEndRef} />
+        </div>
       </div>
-    </div>
+    </>
   );
 }

@@ -6,13 +6,22 @@
   overflow: hidden;
   }
 
- .leftOverlay {
+  .backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 998; 
+  background: rgba(159, 152, 152, 0.3);
+ }
+
+.leftOverlay {
   position: absolute;
   top: 0px;
   left: 20px;
   z-index: 1;
-  /* pointer-events: none; */
-}
+ }
 
 .leftOverlay > * {
   pointer-events: auto;
@@ -25,7 +34,6 @@
   display: flex;
   flex-direction: column; 
   align-items: center;
-  /* justify-content: center; */
  }
 
 .inputWrapper {
