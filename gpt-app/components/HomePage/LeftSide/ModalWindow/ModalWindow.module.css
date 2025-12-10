@@ -1,9 +1,9 @@
 .modalContainer {
     max-width: 284px;
     width: 100%;
-    max-height: 482px;
+    min-height: 482px;
     border-radius: 22px;
-    background: #1d212a;
+    background: var(--foreground);
    }
 
 .header{
@@ -45,7 +45,7 @@
 .btn:hover {
       border-color: var(--main-white);
     }
-    .btn:focus {
+    .btn:focus, .btn.active {
         background-color: #265ed9;
         color: var(--main-white);
 }
@@ -86,11 +86,11 @@
     border: 1px solid var(--main-gray2);
 }
 
-.btn2:focus {
+.btn2:focus, .btn2.active {
     background: #265ed9;
 }
 
-.headerbtn2{
+.headerbtn2{ 
     display: flex;
 }
 

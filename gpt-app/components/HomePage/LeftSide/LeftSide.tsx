@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Chat, ModelType, ModelMode } from '@/types/types';
 import ModalWindow from './ModalWindow/ModalWindow';
+import { modelConfig } from '@/config/models.config';
 
 type Props = {
   onNewChat: () => void;
@@ -14,8 +15,11 @@ type Props = {
   modelMode: ModelMode;
   setModelMode: React.Dispatch<React.SetStateAction<ModelMode>>;
 
-  selectedModel: ModelType;
-  setSelectedModel: (model: ModelType) => void;
+  selectedModel: string;
+  setSelectedModel: (model: string) => void;
+
+  selectedModelGroup: ModelType;
+  setSelectedModelGroup: (group: ModelType) => void;
 };
 
 export default function LeftSide({
@@ -26,10 +30,24 @@ export default function LeftSide({
   modelMode,
   setModelMode,
   selectedModel,
-  setSelectedModel
+  setSelectedModel,
+  selectedModelGroup,
+  setSelectedModelGroup,
 }: Props) {
 
-
+const getModelGroupAndItem = (selectedModel: string) => {
+  for (const [group, config] of Object.entries(modelConfig)) {
+    const found = config.list.find(item => item.title === selectedModel);
+    if (found) {
+      return { group: group as ModelType, model: found };
+    }
+  }
+  return null;
+};
+const result = getModelGroupAndItem(selectedModel);
+const capitalizeFirstThree = (text: string) => {
+  return text.slice(0, 3).toUpperCase() + text.slice(3);
+};
 
   return (
     <div className={styles.container}>
@@ -39,22 +57,15 @@ export default function LeftSide({
             ref={modelRef}
             className={styles.modelHoverWrapper}
             tabIndex={0}
-
-            onMouseEnter={() => {
-              if (modelMode !== 'click') setModelMode('hover');
-            }}
-
-            onMouseLeave={() => {
-              if (modelMode !== 'click') setModelMode('idle');
-            }}
-
             onClick={(e) => {
               e.stopPropagation();
               setModelMode(prev => (prev === 'click' ? 'idle' : 'click'));
             }}
           >
             <article className={styles.titleContainer}>
-              <h2 className={styles.title}>GPT-4o-mini</h2>
+       <h2 className={styles.title}>
+  {result ? capitalizeFirstThree(result.model.title) : capitalizeFirstThree(selectedModel)}
+</h2>
               <Image
                 width={11}
                 height={6}
@@ -62,22 +73,17 @@ export default function LeftSide({
                 alt="chevron-small"
               />
             </article>
-            {modelMode !== 'idle' && (
+            {modelMode === 'click' && (
               <div
                 className={styles.modalWrapper}
-                style={{
-                  top: modelMode === 'click' ? '0px' : '40px'
-                }}
-                onMouseDown={(e) => {
-                  e.stopPropagation();
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
+                onMouseDown={(e) => e.stopPropagation()}
+                onClick={(e) => e.stopPropagation()}
               >
                 <ModalWindow
-                  selectedModel={selectedModel}
-                  setSelectedModel={setSelectedModel}
+                 selectedModelGroup={selectedModelGroup}
+                 setSelectedModelGroup={setSelectedModelGroup}
+                 selectedModel={selectedModel}
+                 setSelectedModel={setSelectedModel}
                 />
               </div>
             )}

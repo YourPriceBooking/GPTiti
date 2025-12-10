@@ -357,6 +357,7 @@
 .modalWrapper {
   width: 100%;
   position: absolute;
-  left: -5px;
+  top: -10px;
+  left: -15px;
   z-index: 9999;
 }

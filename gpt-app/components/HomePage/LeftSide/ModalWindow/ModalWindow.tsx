@@ -5,42 +5,53 @@ import { ModelType } from '@/types/types';
 import { modelConfig, TOKENS_SUFFIX } from '@/config/models.config';
 
 type Props = {
-  selectedModel: ModelType;
-  setSelectedModel: (model: ModelType) => void;
+  selectedModelGroup: ModelType;
+  setSelectedModelGroup: (group: ModelType) => void;
+  selectedModel: string;
+  setSelectedModel: (model: string) => void;
 };
 
-export default function ModalWindow({selectedModel, setSelectedModel}:Props) {
+export default function ModalWindow({selectedModelGroup,
+  setSelectedModelGroup,
+  selectedModel,
+  setSelectedModel}:Props) {
   return (
     <div className={styles.modalContainer}>
-        <header className={styles.header}>
-            <h2 className={styles.title}>Chat</h2>
-            <div className={styles.btnsContainer}>
-                <button 
-                className={styles.btn}
-                 onClick={() => setSelectedModel('GPT-5.1')}>GPT-5.1</button>
-                <button 
-                className={styles.btn}
-                onClick={() => setSelectedModel('GPT-4o')}>GPT-4o</button>
-                <button className={styles.btn}
-                onClick={() => setSelectedModel('0-Series')}>0-Series</button>
-            </div>
-        </header>
-        <section className={styles.mainSection}>
-            <h5 className={styles.title2}>Choose a model</h5>
-           <div className={styles.btnsContainer2}>
-       {modelConfig[selectedModel].list.map((item) => (
-        <button key={item.title} className={styles.btn2}>
-            <div className={styles.mainContainerbtn2}>
-        <p className={styles.btn2Paragraph}>{item.title}</p>
-        <span className={styles.btn2Span1}>
-          {item.tokens} {TOKENS_SUFFIX}
-        </span>
-      </div>
-      <span className={styles.btn2Span2}>{item.desc}</span>
-        </button>
-       ))}
-            </div>
-        </section>
+      <header className={styles.header}>
+        <h2 className={styles.title}>Chat</h2>
+        <div className={styles.btnsContainer}>
+          {Object.keys(modelConfig).map((group) => (
+            <button
+              key={group}
+              className={`${styles.btn} ${selectedModelGroup === group ? styles.active : ''}`}
+              onClick={() => setSelectedModelGroup(group as ModelType)}
+            >
+              {group}
+            </button>
+          ))}
+        </div>
+      </header>
+
+      <section className={styles.mainSection}>
+        <h5 className={styles.title2}>Choose a model</h5>
+        <div className={styles.btnsContainer2}>
+          {modelConfig[selectedModelGroup].list.map((item) => (
+            <button
+              key={item.title}
+              className={`${styles.btn2} ${selectedModel === item.title ? styles.active : ''}`}
+              onClick={() => setSelectedModel(item.title)}
+            >
+              <div className={styles.mainContainerbtn2}>
+                <p className={styles.btn2Paragraph}>{item.title}</p>
+                <span className={styles.btn2Span1}>
+                  {item.tokens} {TOKENS_SUFFIX}
+                </span>
+              </div>
+              <span className={styles.btn2Span2}>{item.desc}</span>
+            </button>
+          ))}
+        </div>
+      </section>
         <footer>
             <article className={styles.gptBalance}>
             <h2 className={styles.title3}>Balance</h2>
