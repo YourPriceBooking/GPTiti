@@ -1,0 +1,50 @@
+.gptUser{
+  flex-shrink: 0;
+  margin-top: 24px;
+  padding-left: 28px;
+}
+
+.userInfo {
+    margin-right: 39px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.gptUserEmail {
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: 16px;
+    color: var(--main-white);
+}
+
+.logoutBtnContainer{
+    padding-right: 40px;
+}
+
+.logoutBtn {
+    margin-top: 20px;
+    border: 1px solid #265ed9;
+    border-radius: 11px;
+    max-width: 263px;
+    width: 100%;
+    min-height: 46px;
+    background: var(--main-white);
+}
+
+.logoutBtnSpan {
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: 20px;
+    color: #265ed9;
+}
+
+.logoutBtn:hover {
+    cursor: pointer;
+    background: #e5eeff;
+}
+
+.logoutBtn:focus{
+    cursor: pointer;
+    background: #c2d2f0;
+}
