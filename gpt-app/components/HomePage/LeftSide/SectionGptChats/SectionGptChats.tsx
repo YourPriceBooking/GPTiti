@@ -45,11 +45,11 @@ export default function SectionGptChats({onNewChat,
                 </li>
               ))}
           </ul>
-          {chatList.filter(chat => chat.title !== null).length > 0 && (
+
+               {chatList.filter(chat => chat.title !== null).length > 0 && (
     <CustomScrollbar scrollTargetClass={styles.chatsScrollArea} />
   )}
-              </div>
-          
+          </div>
         </section>
       
   )
