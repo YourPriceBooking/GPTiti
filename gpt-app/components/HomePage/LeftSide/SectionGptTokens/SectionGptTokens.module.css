@@ -11,6 +11,12 @@
   top: -10px;
   left: -15px;
   z-index: 9999;
+  transition: border 0.3s ease;
+}
+.modalWrapper:hover{
+    cursor: pointer;
+    border: 2px solid var(--button-background);
+    border-radius: 22px;
 }
 .titleContainer{
     display: flex;

@@ -7,7 +7,7 @@ export default function SectionGptChats({onNewChat,
   chatList,
   setActiveChatId}: SectionGptChatsProps) {
   return (
-    <div className={styles.chatsScrollArea}>
+    
         <section className={styles.gptChats}>
           <article className={styles.gptNewChat} tabIndex={0}>
             <Image width={36} height={36} src="/icons/new-chat.svg" alt="new-chat" />
@@ -25,7 +25,7 @@ export default function SectionGptChats({onNewChat,
               </div>
             </div>
           </article>
-
+          <div className={styles.chatsScrollArea}>
           <ul className={styles.chatsList}>
             {chatList
               .filter(chat => chat.title !== null)
@@ -45,9 +45,12 @@ export default function SectionGptChats({onNewChat,
                 </li>
               ))}
           </ul>
-
-          <CustomScrollbar scrollTargetClass={styles.chatsScrollArea} />
+          {chatList.filter(chat => chat.title !== null).length > 0 && (
+    <CustomScrollbar scrollTargetClass={styles.chatsScrollArea} />
+  )}
+              </div>
+          
         </section>
-      </div>
+      
   )
 }
