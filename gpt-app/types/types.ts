@@ -28,3 +28,35 @@ export type ModelConfig = {
 };
 
 export type ModelMode = 'idle' | 'hover' | 'click';
+
+export type LeftSideProps = {
+  onNewChat: () => void;
+  chatList: Chat[];
+  setActiveChatId: (id: string) => void;
+
+  modelRef: React.RefObject<HTMLDivElement | null>;
+  modelMode: ModelMode;
+  setModelMode: React.Dispatch<React.SetStateAction<ModelMode>>;
+
+  selectedModel: string;
+  setSelectedModel: (model: string) => void;
+
+  selectedModelGroup: ModelType;
+  setSelectedModelGroup: (group: ModelType) => void;
+};
+
+export type SectionGptChatsProps = Pick<
+  LeftSideProps,
+  'onNewChat' | 'chatList' | 'setActiveChatId'
+>;
+
+export type SectionGptTokensProps = Pick<
+  LeftSideProps,
+  | 'modelRef'
+  | 'modelMode'
+  | 'setModelMode'
+  | 'selectedModel'
+  | 'setSelectedModel'
+  | 'selectedModelGroup'
+  | 'setSelectedModelGroup'
+>;
