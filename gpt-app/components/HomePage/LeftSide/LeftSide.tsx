@@ -5,6 +5,7 @@ import SectionGptUser from './SectionGptUser/SectionGptUser';
 import SectionGptChats from './SectionGptChats/SectionGptChats';
 import SectionGptTokens from './SectionGptTokens/SectionGptTokens';
 
+
 export default function LeftSide({onNewChat,
   chatList,
   setActiveChatId,
@@ -34,6 +35,6 @@ return (
       setActiveChatId={setActiveChatId}/>
     <SectionGptUser/>
     <FooterLeftSide/>
-    </div>
+</div>
   );
 }
