@@ -69,13 +69,13 @@ export default function CustomScrollbar({ scrollTargetClass }: Props) {
 
     updateThumb();
     scrollArea.addEventListener('scroll', onScroll);
-    thumb.addEventListener('wheel', onWheel, { passive: false });
+    scrollArea.addEventListener('wheel', onWheel, { passive: false });
     thumb.addEventListener('mousedown', onMouseDown);
     window.addEventListener('resize', updateThumb);
 
     return () => {
       scrollArea.removeEventListener('scroll', onScroll);
-      thumb.removeEventListener('wheel', onWheel);
+      scrollArea.removeEventListener('wheel', onWheel);
       thumb.removeEventListener('mousedown', onMouseDown);
       window.removeEventListener('resize', updateThumb);
       document.removeEventListener('mousemove', onMouseMove);

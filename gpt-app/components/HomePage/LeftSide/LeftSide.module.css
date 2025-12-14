@@ -1,4 +1,4 @@
-.container {
+/* .container {
     display: flex;
     flex-direction: column;
     height: 100vh;
@@ -7,6 +7,25 @@
     width: 100%;
     background: var(--foreground);
     padding: 38px 3px 20px 24px;
+} */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  max-width: 330px;
+  width: 100%;
+  background: var(--foreground);
+  padding: 38px 3px 20px 24px;
+
+  height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  scrollbar-width: none;
+}
+
+.container::-webkit-scrollbar {
+  display: none;
 }
 
 

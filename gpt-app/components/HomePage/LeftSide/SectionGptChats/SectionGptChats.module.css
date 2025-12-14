@@ -1,4 +1,4 @@
-.chatsScrollArea {
+/* .chatsScrollArea {
   position: relative;
   flex: 1;
   overflow-y: auto;
@@ -7,18 +7,32 @@
   -ms-overflow-style: none;
   min-height: 0;
   margin-top: 10px;
+} */
+ .chatsScrollArea {
+  position: relative;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin-top: 10px;
+   min-height: 0;
 }
 
 .chatsScrollArea::-webkit-scrollbar {
   display: none;
 }
-.gptChats {
+/* .gptChats {
     flex: 1;
     display: flex;
     flex-direction: column;
     margin-top: 24px;
     min-height: 0;
     overflow: hidden;
+} */
+ .gptChats {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;   /* важливо */
 }
 .yourChats,
 .gptNewChat {
