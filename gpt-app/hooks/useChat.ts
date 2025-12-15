@@ -57,6 +57,21 @@ export function useChat() {
 
     if (inputRef.current) inputRef.current.value = '';
   }
+  function deleteChat(chatId: string) {
+    setChatList(prev => prev.filter(chat => chat.id !== chatId));
+    if (activeChatId === chatId) {
+      setActiveChatId(null); 
+    }
+  }
+
+  
+  function renameChat(chatId: string, newTitle: string) {
+    setChatList(prev =>
+      prev.map(chat =>
+        chat.id === chatId ? { ...chat, title: newTitle } : chat
+      )
+    );
+  }
 
   const activeChat = chatList.find(chat => chat.id === activeChatId);
 
@@ -71,5 +86,7 @@ export function useChat() {
     handleChange,
     handleSendClick,
     handleNewChat,
+    deleteChat,
+    renameChat,
   };
 }

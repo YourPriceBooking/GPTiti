@@ -34,6 +34,9 @@ export type LeftSideProps = {
   chatList: Chat[];
   setActiveChatId: (id: string) => void;
 
+  deleteChat: (id: string) => void;             
+  renameChat: (id: string, newTitle: string) => void; 
+
   modelRef: React.RefObject<HTMLDivElement | null>;
   modelMode: ModelMode;
   setModelMode: React.Dispatch<React.SetStateAction<ModelMode>>;
@@ -47,9 +50,8 @@ export type LeftSideProps = {
 
 export type SectionGptChatsProps = Pick<
   LeftSideProps,
-  'onNewChat' | 'chatList' | 'setActiveChatId'
+  'onNewChat' | 'chatList' | 'setActiveChatId' | 'deleteChat' | 'renameChat'
 >;
-
 export type SectionGptTokensProps = Pick<
   LeftSideProps,
   | 'modelRef'
@@ -60,3 +62,4 @@ export type SectionGptTokensProps = Pick<
   | 'selectedModelGroup'
   | 'setSelectedModelGroup'
 >;
+

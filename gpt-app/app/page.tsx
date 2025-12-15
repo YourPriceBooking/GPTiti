@@ -9,6 +9,7 @@ import { useModelMode } from '@/hooks/useModelMode';
 import { useState, useRef, useEffect } from 'react';
 import { ModelType } from '@/types/types';
 
+
 export default function Home() {
   const {
     chatList,
@@ -20,6 +21,8 @@ export default function Home() {
     handleChange,
     handleSendClick,
     handleNewChat,
+    deleteChat,
+    renameChat,
   } = useChat();
 
   const { modelMode, setModelMode, modelRef } = useModelMode();
@@ -44,6 +47,8 @@ export default function Home() {
           onNewChat={handleNewChat}
           chatList={chatList}
           setActiveChatId={setActiveChatId}
+          deleteChat={deleteChat}
+          renameChat={renameChat}
           modelRef={modelRef}
           modelMode={modelMode}
           setModelMode={setModelMode}
@@ -74,10 +79,9 @@ export default function Home() {
               </div>
             )}
           </div>
-
           <div ref={messagesEndRef} />
+          </div>
         </div>
-      </div>
-    </>
+      </>
   );
 }
