@@ -21,7 +21,7 @@
   overflow-x: hidden;
   overflow-y: auto;
 
-  scrollbar-width: none;
+  /* scrollbar-width: none; */
 }
 
 .container::-webkit-scrollbar {

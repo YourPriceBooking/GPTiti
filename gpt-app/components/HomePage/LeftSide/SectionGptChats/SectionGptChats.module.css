@@ -14,11 +14,27 @@
   overflow-y: auto;
   overflow-x: hidden;
   margin-top: 10px;
-   min-height: 0;
+  max-height: 125px;
+
+   scrollbar-width: thin;
+  scrollbar-color: #3e3d40 transparent;
 }
 
+
 .chatsScrollArea::-webkit-scrollbar {
-  display: none;
+    width: 8px;
+   }
+.chatsScrollArea::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chatsScrollArea::-webkit-scrollbar-thumb {
+  background: #3e3d40;
+  border-radius: 22px;
+}
+
+.chatsScrollArea::-webkit-scrollbar-thumb:hover {
+  background: #525157;
 }
 /* .gptChats {
     flex: 1;
@@ -33,7 +49,10 @@
   display: flex;
   flex-direction: column;
   flex-shrink: 0;   /* важливо */
+    min-height: 0; 
+   overflow: hidden; 
 }
+
 .yourChats,
 .gptNewChat {
     flex-shrink: 0;
@@ -96,7 +115,9 @@
   font-size: 16px;
   color: var(--main-white);
   border-radius: 11px;
+  background: transparent;
   transition: background 0.3s ease;
+  overflow: visible;
 }
 
 .chatsListItem:hover {
@@ -111,14 +132,35 @@
 
 .dotsIcon {
   width: 28px;
-  height: 42px;
+  height: 24px;
   background-image: url('/icons/three-points.svg');
   background-size: contain;
   background-repeat: no-repeat;
   opacity: 0;
   transition: opacity 0.2s ease;
 }
-
+.chatsListItem:has(.dotsIcon:hover) {
+  background: transparent;
+}
 .chatsListItem:hover .dotsIcon {
   opacity: 1;
+  }
+
+.menuContainer {
+  position: fixed; 
+  transform: translateY(-50%); 
+  z-index: 1000;
+}
+.chatTitle {
+  font-family: var(--font-family);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--main-white);
+}
+.chatTitle[contenteditable="true"] {
+  outline: none;
+  background-color: #007bff;
+  border-radius: 6px;
+  padding: 2px 4px;
+  cursor: text;
 }
