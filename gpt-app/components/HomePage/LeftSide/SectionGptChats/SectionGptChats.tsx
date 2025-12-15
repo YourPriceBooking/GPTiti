@@ -1,25 +1,39 @@
-// import CustomScrollbar from '@/components/CustomScrollBar/CustomScrollBar';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import styles from './SectionGptChats.module.css';
 import Image from 'next/image';
 import { SectionGptChatsProps } from '@/types/types';
 import ChatsMenu from '../ChatsMenu/ChatsMenu';
+import DeleteModalWindow from '../DeleteModalWindow/DeleteModalWindow';
 
-export default function SectionGptChats({ onNewChat,
+export default function SectionGptChats({
+  onNewChat,
   chatList,
-  setActiveChatId }: SectionGptChatsProps) {
+  setActiveChatId,
+  deleteChat,
+  renameChat,   
+}: SectionGptChatsProps) {
   const [openMenuChatId, setOpenMenuChatId] = useState<string | null>(null);
   const [menuPosition, setMenuPosition] = useState<{ top: number; left: number } | null>(null);
   const [renamingChatId, setRenamingChatId] = useState<string | null>(null);
-  const handleRenameChat = (chatId: string, newTitle: string) => {
-  const updatedList = chatList.map(chat =>
-    chat.id === chatId ? { ...chat, title: newTitle } : chat
-  );
-  // Якщо chatList приходить з useChat — виклич метод оновлення
-  // updateChatList(updatedList);
-};
-  return (
+  const [deletingChatId, setDeletingChatId] = useState<string | null>(null);
+  const menuRef = useRef<HTMLDivElement | null>(null);
 
+  // Закриття меню/модалки при кліку поза ними
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (menuRef.current && !menuRef.current.contains(target)) {
+        setOpenMenuChatId(null);
+        setDeletingChatId(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  return (
     <section className={styles.gptChats}>
       <article className={styles.gptNewChat} tabIndex={0}>
         <Image width={36} height={36} src="/icons/new-chat.svg" alt="new-chat" />
@@ -48,7 +62,6 @@ export default function SectionGptChats({ onNewChat,
                 className={styles.chatsListItem}
                 tabIndex={0}
                 onClick={() => setActiveChatId(chat.id)}
-                // onBlur={() => setOpenMenuChatId(null)}
               >
                 <span
                   contentEditable={renamingChatId === chat.id}
@@ -57,7 +70,7 @@ export default function SectionGptChats({ onNewChat,
                   onBlur={(e) => {
                     const newTitle = e.currentTarget.textContent?.trim();
                     if (newTitle && newTitle !== chat.title) {
-                      handleRenameChat(chat.id, newTitle);
+                      renameChat(chat.id, newTitle);   
                     }
                     setRenamingChatId(null);
                     setOpenMenuChatId(null);
@@ -83,18 +96,41 @@ export default function SectionGptChats({ onNewChat,
             ))}
         </ul>
       </div>
+
       {openMenuChatId && menuPosition && (
         <div
+          ref={menuRef}
           className={styles.menuContainer}
           style={{ top: menuPosition.top, left: menuPosition.left }}
         >
-          <ChatsMenu onRenameRequest={() => {
-    setRenamingChatId(openMenuChatId); 
-    setOpenMenuChatId(null);           
-  }} />
+          <ChatsMenu
+            onRenameRequest={() => {
+              setRenamingChatId(openMenuChatId);
+              setOpenMenuChatId(null);
+            }}
+            onDeleteRequest={() => {
+              setDeletingChatId(openMenuChatId);
+              setOpenMenuChatId(null);
+            }}
+          />
+        </div>
+      )}
+
+      {deletingChatId && menuPosition && (
+        <div
+          ref={menuRef}
+          className={styles.menuContainer}
+          style={{ top: menuPosition.top, left: menuPosition.left }}
+        >
+          <DeleteModalWindow
+            onCancel={() => setDeletingChatId(null)}
+            onConfirm={() => {
+              deleteChat(deletingChatId);   
+              setDeletingChatId(null);
+            }}
+          />
         </div>
       )}
     </section>
-
-  )
+  );
 }

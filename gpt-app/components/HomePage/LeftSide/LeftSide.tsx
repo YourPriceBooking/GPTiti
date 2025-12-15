@@ -9,6 +9,8 @@ import SectionGptTokens from './SectionGptTokens/SectionGptTokens';
 export default function LeftSide({onNewChat,
   chatList,
   setActiveChatId,
+  deleteChat,
+  renameChat,
   modelRef,
   modelMode,
   setModelMode,
@@ -32,7 +34,10 @@ return (
     <SectionGptChats 
       onNewChat={onNewChat} 
       chatList={chatList} 
-      setActiveChatId={setActiveChatId}/>
+      setActiveChatId={setActiveChatId}
+      deleteChat={deleteChat}       
+      renameChat={renameChat}
+      />
     <SectionGptUser/>
     <FooterLeftSide/>
 </div>
