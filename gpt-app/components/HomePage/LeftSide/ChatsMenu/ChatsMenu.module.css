@@ -1,0 +1,46 @@
+.container {
+    max-width: 200px;
+    width: 100%;
+    min-height: 98px;
+    background-color: #0f172a;
+    border-radius: 22px;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.label1, .label2 {
+    font-family: var(--font-family);
+    font-style: italic;
+    font-weight: 700;
+    font-size: 14px;
+   
+}
+.label1{
+    color: #e5e7eb;
+}
+
+.label2 {
+   color: #f87171;
+}
+
+.button {
+    min-height: 44px;
+    padding: 14px 94px 13px 13px;
+    margin: 4px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    transition: all 0.3s ease;
+}
+
+.button:hover {
+    background-color: #0B1220;
+    cursor: pointer;
+    border-radius: 12px;
+}
+
+.separator {
+    margin: 0 auto;
+}
