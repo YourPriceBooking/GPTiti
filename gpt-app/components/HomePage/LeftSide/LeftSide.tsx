@@ -21,6 +21,7 @@ export default function LeftSide({onNewChat,
 }: LeftSideProps) {
 
 return (
+  <div className={styles.chatsScrollArea}>
     <div className={styles.container}>
     <SectionGptTokens
       modelRef={modelRef}
@@ -40,6 +41,7 @@ return (
       />
     <SectionGptUser/>
     <FooterLeftSide/>
+</div>
 </div>
   );
 }

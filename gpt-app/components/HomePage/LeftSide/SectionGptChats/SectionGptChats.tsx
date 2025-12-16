@@ -10,13 +10,14 @@ export default function SectionGptChats({
   chatList,
   setActiveChatId,
   deleteChat,
-  renameChat,   
+  renameChat,
 }: SectionGptChatsProps) {
   const [openMenuChatId, setOpenMenuChatId] = useState<string | null>(null);
   const [menuPosition, setMenuPosition] = useState<{ top: number; left: number } | null>(null);
   const [renamingChatId, setRenamingChatId] = useState<string | null>(null);
   const [deletingChatId, setDeletingChatId] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
+  const titleRefs = useRef<Record<string, HTMLSpanElement | null>>({});
 
   // Закриття меню/модалки при кліку поза ними
   useEffect(() => {
@@ -32,6 +33,24 @@ export default function SectionGptChats({
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+  useEffect(() => {
+  if (!renamingChatId) return;
+
+  const el = titleRefs.current[renamingChatId];
+  if (!el) return;
+
+  el.focus();
+
+  // 🧠 курсор в кінець тексту (як у GPT)
+  const range = document.createRange();
+  const selection = window.getSelection();
+
+  range.selectNodeContents(el);
+  range.collapse(false);
+
+  selection?.removeAllRanges();
+  selection?.addRange(range);
+}, [renamingChatId]);
 
   return (
     <section className={styles.gptChats}>
@@ -64,13 +83,16 @@ export default function SectionGptChats({
                 onClick={() => setActiveChatId(chat.id)}
               >
                 <span
+                  ref={(el) => {
+                    if (el) titleRefs.current[chat.id] = el;
+                  }}
                   contentEditable={renamingChatId === chat.id}
-                  suppressContentEditableWarning={true}
+                  suppressContentEditableWarning
                   className={styles.chatTitle}
                   onBlur={(e) => {
                     const newTitle = e.currentTarget.textContent?.trim();
                     if (newTitle && newTitle !== chat.title) {
-                      renameChat(chat.id, newTitle);   
+                      renameChat(chat.id, newTitle);
                     }
                     setRenamingChatId(null);
                     setOpenMenuChatId(null);
@@ -125,7 +147,7 @@ export default function SectionGptChats({
           <DeleteModalWindow
             onCancel={() => setDeletingChatId(null)}
             onConfirm={() => {
-              deleteChat(deletingChatId);   
+              deleteChat(deletingChatId);
               setDeletingChatId(null);
             }}
           />
