@@ -1,33 +1,40 @@
-/* .container {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    overflow: hidden;
-    max-width: 330px;
-    width: 100%;
-    background: var(--foreground);
-    padding: 38px 3px 20px 24px;
-} */
-
 .container {
   display: flex;
   flex-direction: column;
+  height: 100vh;
   max-width: 330px;
   width: 100%;
   background: var(--foreground);
   padding: 38px 3px 20px 24px;
 
-  height: 100vh;
-  overflow-x: hidden;
+ 
   overflow-y: auto;
+  overflow-x: hidden;
 
-  /* scrollbar-width: none; */
+
+  min-height: 0;
+
+
+  scrollbar-width: thin;
+  scrollbar-color: #3e3d40 transparent;
 }
 
 .container::-webkit-scrollbar {
-  display: none;
+  width: 8px;
 }
 
+.container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.container::-webkit-scrollbar-thumb {
+  background: #3e3d40;
+  border-radius: 22px;
+}
+
+.container::-webkit-scrollbar-thumb:hover {
+  cursor: pointer;
+}
 
 
 

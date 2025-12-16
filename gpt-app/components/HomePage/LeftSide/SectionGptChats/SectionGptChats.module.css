@@ -1,49 +1,4 @@
-/* .chatsScrollArea {
-  position: relative;
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  min-height: 0;
-  margin-top: 10px;
-} */
- .chatsScrollArea {
-  position: relative;
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-  margin-top: 10px;
-  max-height: 125px;
 
-   scrollbar-width: thin;
-  scrollbar-color: #3e3d40 transparent;
-}
-
-
-.chatsScrollArea::-webkit-scrollbar {
-    width: 8px;
-   }
-.chatsScrollArea::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.chatsScrollArea::-webkit-scrollbar-thumb {
-  background: #3e3d40;
-  border-radius: 22px;
-}
-
-.chatsScrollArea::-webkit-scrollbar-thumb:hover {
-  background: #525157;
-}
-/* .gptChats {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    margin-top: 24px;
-    min-height: 0;
-    overflow: hidden;
-} */
  .gptChats {
   margin-top: 24px;
   display: flex;

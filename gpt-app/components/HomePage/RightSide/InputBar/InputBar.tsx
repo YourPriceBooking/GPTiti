@@ -23,45 +23,45 @@ export default function InputBar({
   }, [inputRef]);
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    onChange(e);
+  onChange(e);
 
-    if (inputRef.current) {
-      const textarea = inputRef.current;
+  const textarea = inputRef.current;
+  if (!textarea) return;
 
-      textarea.style.height = 'auto'; 
-      const currentHeight = textarea.scrollHeight;
+  const baseHeight = 68;
+  const maxHeight = 240;
 
-      const baseHeight = 68; 
-      const lineHeight = 25; 
-      const maxHeightBeforeScroll = 240;
+  textarea.style.height = `${baseHeight}px`;
+  textarea.style.overflowY = 'hidden';
 
-      if (textarea.value === '') {
-        textarea.style.height = `${baseHeight}px`;
-        setIsMultiline(false);
-        setShouldScroll(false);
-      } 
-      else if (currentHeight > baseHeight && currentHeight <= baseHeight + lineHeight) {
-        textarea.style.height = `${currentHeight}px`;
-        setIsMultiline(true);
-        setShouldScroll(false);
-      } 
-      else if (currentHeight > baseHeight + lineHeight) {
-        if (currentHeight > maxHeightBeforeScroll) {
-          textarea.style.height = `${maxHeightBeforeScroll}px`;
-          setIsMultiline(true);
-          setShouldScroll(true);
-        } else {
-          textarea.style.height = `${currentHeight}px`;
-          setIsMultiline(true);
-          setShouldScroll(false);
-        }
-      } else {
-        textarea.style.height = `${baseHeight}px`;
-        setIsMultiline(false);
-        setShouldScroll(false);
-      }
-    }
-  };
+  
+  const hasWrappedLine = textarea.scrollHeight > textarea.clientHeight;
+
+  if (!textarea.value.trim()) {
+    setIsMultiline(false);
+    setShouldScroll(false);
+    return;
+  }
+
+  if (!hasWrappedLine) {
+    
+    setIsMultiline(false);
+    setShouldScroll(false);
+    return;
+  }
+
+  
+  if (textarea.scrollHeight > maxHeight) {
+    textarea.style.height = `${maxHeight}px`;
+    textarea.style.overflowY = 'auto';
+    setShouldScroll(true);
+  } else {
+    textarea.style.height = `${textarea.scrollHeight}px`;
+    setShouldScroll(false);
+  }
+
+  setIsMultiline(true);
+};
 
   const handleSend = () => {
     if (inputRef.current) {
