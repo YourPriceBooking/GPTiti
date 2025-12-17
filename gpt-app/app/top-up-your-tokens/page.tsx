@@ -1,0 +1,117 @@
+import React from 'react';
+import styles from './page.module.css';
+import Image from 'next/image';
+
+export default function page() {
+  return (
+    <div className={styles.container}>
+        <header className={styles.topUpHeader}>
+            <section>
+        <h1 className={styles.title}>Top up your token balance</h1>
+        <h1 className={styles.mobTitle}>Top up tokens</h1>
+        <p className={styles.fullparagraph}>No subscriptions. Tokens never expire. Use them anytime.</p>
+        <p className={styles.notFullparagraph}>No subscriptions. Tokens never expire</p>
+        </section>
+        <button className={styles.balanceButton}>
+          <p className={styles.balanceInfo}>
+  <span className={styles.span2}>
+    Balance tokens
+  </span>
+  <span className={styles.strong}>10,000</span>
+  </p>
+            <Image className={styles.balanceIcon} width={30} height={30} src="/icons/circle-icon2.svg" alt="balance-circle" />
+            <Image className={styles.mobileBalanceIcon} width={26} height={26} src="/icons/blue-circle2.svg" alt="balance-circle" />
+        </button>
+        </header>
+        <section className={styles.plansContainer}>
+            <article className={styles.plansCard1}>
+                <p className={styles.plansParagraph1}>PACKAGE</p>
+                <h2 className={styles.tokensTitle}>500,000 tokens</h2>
+                <p className={styles.plansParagraph2}>Good for regular chat</p>
+                <h2 className={styles.priceTitle}>$4</h2>
+                <button className={styles.buyButton}>
+                    <div className={styles.buyButtonContent}>
+                    <span className={styles.buyButtonSpan}>Buy tokens</span>
+                    <Image className={styles.buyButtonIcon} width={26} height={26} src="/icons/blue-circle.svg" alt="blue-circle"/>
+                    </div>
+                </button>
+            </article>
+            <article className={styles.plansCard2}>
+                <div className={styles.recommendedContainer}>
+                 <span className={styles.plansSpan2}>RECOMMENDED</span>
+                 </div>
+                 <p className={styles.plansParagraph1}>PACKAGE</p>
+                <h2 className={styles.tokensTitle}>1,000,000 tokens</h2>
+                <p className={styles.plansParagraph2}>Best everyday value</p>
+                <h2 className={styles.priceTitle}>
+                    <span>$6</span>
+                    <span className={styles.saveSpan1}>Save 25%</span>
+                    </h2>
+                <button className={styles.buyButton2}>
+                    <div className={styles.buyButtonContent}>
+                    <span className={styles.buyButtonSpan}>Buy tokens</span>
+                    <Image className={styles.buyButtonIcon} width={26} height={26} src="/icons/blue-circle.svg" alt="blue-circle"/>
+                    </div>
+                </button>
+            </article>
+            <article className={styles.plansCard3}>
+                <div className={styles.bestValueContainer}>
+                <span className={styles.plansSpan3}>BEST VALUE</span>
+                </div>
+                 <p className={styles.plansParagraph1}>PACKAGE</p>
+                <h2 className={styles.tokensTitle}>3,000,000 tokens</h2>
+                <p className={styles.plansParagraph2}>For power users</p>
+                <h2 className={styles.priceTitle}>
+                    <span>$12</span>
+                    <span className={styles.saveSpan2}>Save 50%</span>
+                    </h2>
+                <button className={styles.buyButton3}>
+                    <div className={styles.buyButtonContent}>
+                    <span className={styles.buyButtonSpan}>Buy tokens</span>
+                    <Image className={styles.buyButtonIcon} width={26} height={26} src="/icons/blue-circle.svg" alt="blue-circle"/>
+                    </div>
+                </button>
+            </article>
+        </section>
+        <hr className={styles.horizontalLine}/>
+        <section className={styles.freeTokens}>
+            <div className={styles.freeTokensInfo}>
+            <p className={styles.freeTokensParagraph}>
+                <Image src='/icons/present.svg' alt='present' width={20} height={30}/>
+                <span>Free weekly tokens</span>
+                </p>
+            <span className={styles.freeTokensSpan}>Claim 10,000 tokens once per week.</span>
+            </div>
+            <article className={styles.weeklyClaim}>
+                
+                <div className={styles.claimTextContainer}>
+                <h5 className={styles.claimTitle}>WEEKLY CLAIM</h5>
+                   <button className={styles.claimButton}>
+                    <div className={styles.buyButtonContent}>
+                    <span className={styles.buyButtonSpan}>Claim 10K Tokens</span>
+                    <Image className={styles.claimButtonIcon} width={26} height={26} src="/icons/blue-circle.svg" alt="blue-circle"/>
+                    </div>
+                  </button>
+                <p className={styles.claimParagraph}> Next claim in: 7 days 00:00</p>
+                </div>
+                </article>
+        </section>
+        <footer className={styles.footer}>
+            <span className={styles.footerSpan}>
+                * We show an approximate request cost based on a 
+                typical 30-word message. Actual token usage depends on how much you write. 
+                </span>
+                <span className={styles.adaptiveFooterSpan}>* Approximate request price 
+                    is based on a typical 30-word message. 
+                </span>
+            <span className={styles.footerSpan}>* Different models may 
+                consume tokens at different rates. 
+                Your balance is shared across all models. 
+                </span>
+                <span className={styles.adaptiveFooterSpan}>
+                    * Different models consume tokens at different rates. 
+                    </span>
+        </footer>
+    </div>
+  )
+}

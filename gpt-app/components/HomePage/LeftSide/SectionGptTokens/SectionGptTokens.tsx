@@ -4,6 +4,7 @@ import styles from './SectionGptTokens.module.css';
 import ModalWindow from '../ModalWindow/ModalWindow';
 import { SectionGptTokensProps } from '@/types/types';
 import { getModelGroupAndItem } from '@/functions/getModelGroupAndItem';
+import Link from 'next/link';
 
 export default function SectionGptTokens({modelRef, 
     modelMode, 
@@ -70,6 +71,7 @@ const capitalizeFirstThree = (text: string) => {
         </article>
 
         <div className={styles.btnContainer}>
+          <Link href='/top-up-your-tokens'>
           <button className={styles.btn}>
             <div className={styles.iconWrapper}>
               <Image
@@ -81,6 +83,7 @@ const capitalizeFirstThree = (text: string) => {
             </div>
             <span className={styles.btnSpan1}>Top up tokens</span>
           </button>
+          </Link>
         </div>
       </section>
   )
