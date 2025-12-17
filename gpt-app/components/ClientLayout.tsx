@@ -6,12 +6,13 @@ import Link from "next/link";
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isHomePage = pathname === "/";
+  const isTopUpTokensPage = pathname === "/top-up-your-tokens";
 
   return (
     <>
       <main>{children}</main>
 
-      {!isHomePage && (
+      {!isHomePage && !isTopUpTokensPage && (
         <footer className="text-center text-gray-500 text-sm mt-16 space-y-2 p-6">
           <nav className="flex justify-center gap-6">
             <Link href="/" className="hover:text-gray-700">Home</Link>
