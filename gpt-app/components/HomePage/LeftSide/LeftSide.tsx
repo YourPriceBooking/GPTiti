@@ -18,7 +18,7 @@ export default function LeftSide({onNewChat,
   setSelectedModel,
   selectedModelGroup,
   setSelectedModelGroup,
-}: LeftSideProps) {
+ }: LeftSideProps) {
 
 return (
   <div className={styles.chatsScrollArea}>
@@ -31,7 +31,7 @@ return (
       setSelectedModel={setSelectedModel}
       selectedModelGroup={selectedModelGroup}
       setSelectedModelGroup={setSelectedModelGroup}
-    />
+      />
     <SectionGptChats 
       onNewChat={onNewChat} 
       chatList={chatList} 

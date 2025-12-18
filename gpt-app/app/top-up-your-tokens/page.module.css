@@ -129,12 +129,12 @@
 .plansSpan2 {
     max-width: 134px;
     width: 100%;
-    background:#93c5fd ;
+    background:#2563eb ;
     }
     .plansSpan3 {
     max-width: 108px;
     width: 100%;
-    background: #c4b5fd ;
+    background: #7c3aed ;
     }
 .saveSpan1, .saveSpan2 {
     max-width: 87px;
@@ -212,20 +212,20 @@
         background-color: #1f2937;
         cursor: pointer;
     }
-    .buyButton:focus {
+    .buyButton:active {
         background-color: #0f172a;
 }
 
     .buyButton2, .buyButton3 {
         background: #60a5fa;
         border-radius: 16px; 
-        transition: all 0.3ms ease-in;
+        transition: all 10ms ease-in;
     }
     .buyButton2:hover, .buyButton3:hover {
         background-color:#8fc1ff ;
         cursor: pointer;
     }
-    .buyButton2:focus, .buyButton3:focus {
+    .buyButton2:active, .buyButton3:active {
         background-color: #1e40af;
     }
 
@@ -327,7 +327,8 @@
 }
 .claimButton{
     position: relative;
-    background:  #3b82f6;
+    
+    background-color: #111827;
     border-radius: 16px; 
     max-width: 310px;
     width: 100%; 
@@ -335,13 +336,16 @@
     
     margin-top: 9px;
     margin-bottom: 11px;
-    transition: 0.3ms all ease;
+    transition: 1ms all ease;
+}
+.clicked{
+   background:  #3b82f6; 
 }
 .claimButton:hover{
     background-color:  #60a5fa;
     cursor: pointer;
 }
-.claimButton:focus{
+.claimButton:active{
     background-color: #2563eb;
 }
 
@@ -430,12 +434,6 @@
 .buyButton3{
     max-width: 80vw;
     width: 100%;
-    }
-    .plansSpan2{
-        background: #2563eb;
-    }
-    .plansSpan3{
-        background: #7c3aed;
     }
     .buyButton .buyButtonIcon{
         display: block;

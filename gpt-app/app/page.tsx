@@ -10,6 +10,7 @@ import { useState, useRef, useEffect } from 'react';
 import { ModelType } from '@/types/types';
 
 
+
 export default function Home() {
   const {
     chatList,
@@ -24,6 +25,7 @@ export default function Home() {
     deleteChat,
     renameChat,
   } = useChat();
+  
 
   const { modelMode, setModelMode, modelRef } = useModelMode();
 
@@ -56,7 +58,7 @@ export default function Home() {
           setSelectedModel={setSelectedModel}
           selectedModelGroup={selectedModelGroup}
           setSelectedModelGroup={setSelectedModelGroup}
-        />
+          />
 
         <div className={styles.rightSection}>
           {activeChat && activeChat.messages.length > 0 && (

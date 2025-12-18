@@ -1,8 +1,13 @@
-import React from 'react';
+"use client"
+import  { useState } from 'react';
 import styles from './page.module.css';
 import Image from 'next/image';
+import { useTokensContext } from '@/context/TokensContext';
 
-export default function page() {
+
+export default function TokensPage() {
+    const {balance, countdown, handleClaim} = useTokensContext();
+    const [clicked, setClicked] = useState(false);
   return (
     <div className={styles.container}>
         <header className={styles.topUpHeader}>
@@ -17,7 +22,7 @@ export default function page() {
   <span className={styles.span2}>
     Balance tokens
   </span>
-  <span className={styles.strong}>10,000</span>
+  <span className={styles.strong}>{balance.toLocaleString()}</span>
   </p>
             <Image className={styles.balanceIcon} width={30} height={30} src="/icons/circle-icon2.svg" alt="balance-circle" />
             <Image className={styles.mobileBalanceIcon} width={26} height={26} src="/icons/blue-circle2.svg" alt="balance-circle" />
@@ -86,13 +91,20 @@ export default function page() {
                 
                 <div className={styles.claimTextContainer}>
                 <h5 className={styles.claimTitle}>WEEKLY CLAIM</h5>
-                   <button className={styles.claimButton}>
+                      <button
+                          className={`${styles.claimButton} ${clicked ? styles.clicked : ''}`}
+                          onClick={
+                            () => {
+                                setClicked(true)
+                                handleClaim()}
+                        }
+                      >
                     <div className={styles.buyButtonContent}>
                     <span className={styles.buyButtonSpan}>Claim 10K Tokens</span>
                     <Image className={styles.claimButtonIcon} width={26} height={26} src="/icons/blue-circle.svg" alt="blue-circle"/>
                     </div>
                   </button>
-                <p className={styles.claimParagraph}> Next claim in: 7 days 00:00</p>
+                <p className={styles.claimParagraph}> Next claim in: {countdown}</p>
                 </div>
                 </article>
         </section>
