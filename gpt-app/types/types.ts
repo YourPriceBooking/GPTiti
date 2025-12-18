@@ -61,5 +61,10 @@ export type SectionGptTokensProps = Pick<
   | 'setSelectedModel'
   | 'selectedModelGroup'
   | 'setSelectedModelGroup'
->;
+  >;
 
+export type TokensContextType = {
+  balance: number;
+  countdown: string;
+  handleClaim: () => void;
+};

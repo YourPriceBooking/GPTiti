@@ -5,6 +5,7 @@ import ModalWindow from '../ModalWindow/ModalWindow';
 import { SectionGptTokensProps } from '@/types/types';
 import { getModelGroupAndItem } from '@/functions/getModelGroupAndItem';
 import Link from 'next/link';
+import { useTokensContext } from '@/context/TokensContext';
 
 export default function SectionGptTokens({modelRef, 
     modelMode, 
@@ -12,8 +13,10 @@ export default function SectionGptTokens({modelRef,
     selectedModel, 
     setSelectedModel, 
     selectedModelGroup, 
-    setSelectedModelGroup}: SectionGptTokensProps) {
-     
+    setSelectedModelGroup,
+    }: SectionGptTokensProps) {
+      
+const {balance} = useTokensContext();
 const result = getModelGroupAndItem(selectedModel);
 const capitalizeFirstThree = (text: string) => {
   return text.slice(0, 3).toUpperCase() + text.slice(3);
@@ -65,7 +68,7 @@ const capitalizeFirstThree = (text: string) => {
         <article className={styles.gptBalance}>
           <h2 className={styles.title2}>Balance</h2>
           <div className={styles.balanceContainer}>
-            <span className={styles.gptSpan1}>10 000</span>
+            <span className={styles.gptSpan1}>{balance.toLocaleString()}</span>
             <Image width={24} height={24} src="/icons/badge.svg" alt="badge" />
           </div>
         </article>
