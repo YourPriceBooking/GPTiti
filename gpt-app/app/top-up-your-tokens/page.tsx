@@ -3,6 +3,7 @@ import  { useState } from 'react';
 import styles from './page.module.css';
 import Image from 'next/image';
 import { useTokensContext } from '@/context/TokensContext';
+import Link from 'next/link';
 
 
 export default function TokensPage() {
@@ -11,28 +12,36 @@ export default function TokensPage() {
   return (
     <div className={styles.container}>
         <header className={styles.topUpHeader}>
-            <section>
+            <Link href='/'> 
+         <div className={styles.containerGroupLogos}>
+        <Image className={styles.rabbitLogo} src='/icons/rabbit.svg' alt='logo-rabbit' width={59} height={75}/>
+        <Image className={styles.headerTextLogo} src='/icons/text-logo.svg' alt='text-gptiti-logo' width={125} height={34}/>
+        </div>
+        </Link>  
+        <div className={styles.textInfoContainer}>
         <h1 className={styles.title}>Top up your token balance</h1>
         <h1 className={styles.mobTitle}>Top up tokens</h1>
         <p className={styles.fullparagraph}>No subscriptions. Tokens never expire. Use them anytime.</p>
         <p className={styles.notFullparagraph}>No subscriptions. Tokens never expire</p>
-        </section>
+        </div>
         <button className={styles.balanceButton}>
           <p className={styles.balanceInfo}>
   <span className={styles.span2}>
     Balance tokens
   </span>
-  <span className={styles.strong}>{balance.toLocaleString()}</span>
+  <span className={styles.strong}>{balance.toLocaleString("en-US")}</span>
   </p>
             <Image className={styles.balanceIcon} width={30} height={30} src="/icons/circle-icon2.svg" alt="balance-circle" />
             <Image className={styles.mobileBalanceIcon} width={26} height={26} src="/icons/blue-circle2.svg" alt="balance-circle" />
         </button>
+        
+       
         </header>
         <section className={styles.plansContainer}>
             <article className={styles.plansCard1}>
                 <p className={styles.plansParagraph1}>PACKAGE</p>
                 <h2 className={styles.tokensTitle}>500,000 tokens</h2>
-                <p className={styles.plansParagraph2}>Good for regular chat</p>
+                <p className={styles.plansParagraph2}>good for X–Y messages on GPT-4o-mini</p>
                 <h2 className={styles.priceTitle}>$4</h2>
                 <button className={styles.buyButton}>
                     <div className={styles.buyButtonContent}>
@@ -45,11 +54,11 @@ export default function TokensPage() {
                 <div className={styles.recommendedContainer}>
                  <span className={styles.plansSpan2}>RECOMMENDED</span>
                  </div>
-                 <p className={styles.plansParagraph1}>PACKAGE</p>
+                 <p className={styles.plansRecommendedParagraph}>PACKAGE</p>
                 <h2 className={styles.tokensTitle}>1,000,000 tokens</h2>
-                <p className={styles.plansParagraph2}>Best everyday value</p>
+                <p className={`${styles.plansParagraph2} ${styles.addToPlansParagraph2}`}>Best for daily usage</p>
                 <h2 className={styles.priceTitle}>
-                    <span>$6</span>
+                    <span className={styles.priceTitleSpan}>$6</span>
                     <span className={styles.saveSpan1}>Save 25%</span>
                     </h2>
                 <button className={styles.buyButton2}>
@@ -65,7 +74,7 @@ export default function TokensPage() {
                 </div>
                  <p className={styles.plansParagraph1}>PACKAGE</p>
                 <h2 className={styles.tokensTitle}>3,000,000 tokens</h2>
-                <p className={styles.plansParagraph2}>For power users</p>
+                <p className={styles.plansParagraph2}>best for power users</p>
                 <h2 className={styles.priceTitle}>
                     <span>$12</span>
                     <span className={styles.saveSpan2}>Save 50%</span>
@@ -86,6 +95,14 @@ export default function TokensPage() {
                 <span>Free weekly tokens</span>
                 </p>
             <span className={styles.freeTokensSpan}>Claim 10,000 tokens once per week.</span>
+            <span className={styles.freeTokensSpan2}>Make the most of premium models — on your schedule.</span>
+            <p className={styles.presentParagraph}>
+                <span className={styles.freeTokensSpan3}> NEXT CLAIM IN: 
+                <span className={styles.freeTokensSpan4}>
+                {countdown}
+                </span> 
+                </span>
+                </p>
             </div>
             <article className={styles.weeklyClaim}>
                 
@@ -98,6 +115,7 @@ export default function TokensPage() {
                                 setClicked(true)
                                 handleClaim()}
                         }
+                        disabled = {clicked}
                       >
                     <div className={styles.buyButtonContent}>
                     <span className={styles.buyButtonSpan}>Claim 10K Tokens</span>
@@ -123,6 +141,14 @@ export default function TokensPage() {
                 <span className={styles.adaptiveFooterSpan}>
                     * Different models consume tokens at different rates. 
                     </span>
+                    <nav className={styles.nav}>
+      <Link href="/" className={`${styles.link} ${styles.linkHome}`}>Home</Link>
+  <Link href="/our-mission" className={`${styles.link} ${styles.linkMission}`}>Our Mission</Link>
+    <Link href="/sign-in" className={`${styles.link} ${styles.linkSignIn}`}>Sign in</Link>
+  <Link href="/terms-conditions" className={`${styles.link} ${styles.linkTerms}`}>Terms & Conditions</Link>
+  <Link href="/privacy-policy" className={`${styles.link} ${styles.linkPrivacy}`}>Privacy Policy</Link>
+
+    </nav>
         </footer>
     </div>
   )
