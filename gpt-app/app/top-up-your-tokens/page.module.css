@@ -328,7 +328,8 @@
 .claimButton{
     position: relative;
     
-    background-color: #111827;
+    
+    background:  #3b82f6; 
     border-radius: 16px; 
     max-width: 310px;
     width: 100%; 
@@ -339,7 +340,7 @@
     transition: 1ms all ease;
 }
 .clicked{
-   background:  #3b82f6; 
+   background-color: #111827;
 }
 .claimButton:hover{
     background-color:  #60a5fa;

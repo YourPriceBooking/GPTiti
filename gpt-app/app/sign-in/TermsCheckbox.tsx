@@ -13,7 +13,7 @@ export default function TermsCheckbox({
 }) {
   return (
     <motion.div
-      className="w-full flex items-start gap-2 mt-2 flex-wrap sm:flex-nowrap"
+      className="w-full flex items-start gap-2 mt-2 flex-nowrap sm:flex-nowrap"
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: 0.2 }}
@@ -25,7 +25,6 @@ export default function TermsCheckbox({
         checkedIcon={<CheckCircleIcon sx={{ color: "#00e676" }} />}
         sx={{
           padding: 0,
-          opacity: checked ? 1 : 0.25,
           transition: "opacity 0.3s ease-in-out",
           alignSelf: "flex-start",
         }}
