@@ -19,7 +19,7 @@ export default function SectionGptChats({
   const menuRef = useRef<HTMLDivElement | null>(null);
   const titleRefs = useRef<Record<string, HTMLSpanElement | null>>({});
 
-  // Закриття меню/модалки при кліку поза ними
+ 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
@@ -41,7 +41,7 @@ export default function SectionGptChats({
 
   el.focus();
 
-  // 🧠 курсор в кінець тексту (як у GPT)
+  
   const range = document.createRange();
   const selection = window.getSelection();
 

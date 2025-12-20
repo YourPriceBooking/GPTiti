@@ -6,6 +6,7 @@ import { SectionGptTokensProps } from '@/types/types';
 import { getModelGroupAndItem } from '@/functions/getModelGroupAndItem';
 import Link from 'next/link';
 import { useTokensContext } from '@/context/TokensContext';
+import { TOKENS_SUFFIX } from '@/config/models.config';
 
 export default function SectionGptTokens({modelRef, 
     modelMode, 
@@ -61,7 +62,7 @@ const capitalizeFirstThree = (text: string) => {
           </div>
 
           <p className={styles.paragraph}>
-            approximate asking price 20 tokens*
+            approximate asking price {result?.model.tokens} {TOKENS_SUFFIX}
           </p>
         </article>
 
