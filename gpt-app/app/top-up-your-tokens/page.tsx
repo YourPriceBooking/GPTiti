@@ -15,7 +15,7 @@ export default function TokensPage() {
             <Link href='/'> 
          <div className={styles.containerGroupLogos}>
         <Image className={styles.rabbitLogo} src='/icons/rabbit.svg' alt='logo-rabbit' width={59} height={75}/>
-        <Image className={styles.headerTextLogo} src='/icons/text-logo.svg' alt='text-gptiti-logo' width={125} height={34}/>
+        <Image className={styles.headerTextLogo} src='/icons/text-logo.svg' alt='text-gptiti-logo' width={183} height={49}/>
         </div>
         </Link>  
         <div className={styles.textInfoContainer}>
@@ -56,7 +56,7 @@ export default function TokensPage() {
                  </div>
                  <p className={styles.plansRecommendedParagraph}>PACKAGE</p>
                 <h2 className={styles.tokensTitle}>1,000,000 tokens</h2>
-                <p className={`${styles.plansParagraph2} ${styles.addToPlansParagraph2}`}>Best for daily usage</p>
+                <p className={`${styles.plansParagraph2} ${styles.addToPlansParagraph2}`}>best for daily usage</p>
                 <h2 className={styles.priceTitle}>
                     <span className={styles.priceTitleSpan}>$6</span>
                     <span className={styles.saveSpan1}>Save 25%</span>
@@ -90,10 +90,17 @@ export default function TokensPage() {
         <hr className={styles.horizontalLine}/>
         <section className={styles.freeTokens}>
             <div className={styles.freeTokensInfo}>
+                <div className={styles.groupfreeTokensInfo}>
+                    
             <p className={styles.freeTokensParagraph}>
-                <Image src='/icons/present.svg' alt='present' width={20} height={30}/>
+                <Image src='/icons/present.png' alt='present' width={20} height={30}/>
                 <span>Free weekly tokens</span>
                 </p>
+                
+                <p className={styles.freeTokensReward}>
+                    <span className={styles.freeTokensRewardSpan}>WEEKLY REWARD</span>
+                   </p>
+                   </div>
             <span className={styles.freeTokensSpan}>Claim 10,000 tokens once per week.</span>
             <span className={styles.freeTokensSpan2}>Make the most of premium models — on your schedule.</span>
             <p className={styles.presentParagraph}>
@@ -105,7 +112,6 @@ export default function TokensPage() {
                 </p>
             </div>
             <article className={styles.weeklyClaim}>
-                
                 <div className={styles.claimTextContainer}>
                 <h5 className={styles.claimTitle}>WEEKLY CLAIM</h5>
                       <button
@@ -118,8 +124,17 @@ export default function TokensPage() {
                         disabled = {clicked}
                       >
                     <div className={styles.buyButtonContent}>
-                    <span className={styles.buyButtonSpan}>Claim 10K Tokens</span>
-                    <Image className={styles.claimButtonIcon} width={26} height={26} src="/icons/blue-circle.svg" alt="blue-circle"/>
+                    { clicked ? (
+                        <>
+                         <span className={styles.buyButtonSpan}>Claimed ✓</span>
+                         <Image className={styles.claimButtonIcon} width={26} height={26} src="/icons/white-circle.svg" alt="claimed-tokens"/>
+                        </>
+                    ): (
+                        <>
+                       <span className={styles.buyButtonSpan}>Claim 10K Tokens</span>
+                       <Image className={styles.claimButtonIcon} width={26} height={26} src="/icons/blue-circle.svg" alt="claim-tokens"/>
+                       </>
+                    )}
                     </div>
                   </button>
                 <p className={styles.claimParagraph}> Next claim in: {countdown}</p>
@@ -149,6 +164,8 @@ export default function TokensPage() {
   <Link href="/privacy-policy" className={`${styles.link} ${styles.linkPrivacy}`}>Privacy Policy</Link>
 
     </nav>
+    <span className={styles.gptitiRights}>© {new Date().getFullYear()} Your Price Booking OÜ. All rights reserved. 
+        GPTiti™ is a trademark of Your Price Booking OÜ.</span>
         </footer>
     </div>
   )
