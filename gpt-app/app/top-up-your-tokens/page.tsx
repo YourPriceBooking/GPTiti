@@ -1,6 +1,7 @@
 "use client"
 import  { useState } from 'react';
 import styles from './page.module.css';
+import { motion } from "framer-motion";
 import Image from 'next/image';
 import { useTokensContext } from '@/context/TokensContext';
 import Link from 'next/link';
@@ -10,7 +11,11 @@ export default function TokensPage() {
     const {balance, countdown, handleClaim} = useTokensContext();
     const [clicked, setClicked] = useState(false);
   return (
-    <div className={styles.container}>
+    <motion.div className={styles.container}
+     initial={{ opacity: 0, y: 40 }}         
+  animate={{ opacity: 1, y: 0 }}           
+  exit={{ opacity: 0, y: -20 }}            
+  transition={{ duration: 1.2, ease: "easeInOut" }}>
         <header className={styles.topUpHeader}>
             <Link href='/'> 
          <div className={styles.containerGroupLogos}>
@@ -167,6 +172,6 @@ export default function TokensPage() {
     <span className={styles.gptitiRights}>© {new Date().getFullYear()} Your Price Booking OÜ. All rights reserved. 
         GPTiti™ is a trademark of Your Price Booking OÜ.</span>
         </footer>
-    </div>
+    </motion.div>
   )
 }
