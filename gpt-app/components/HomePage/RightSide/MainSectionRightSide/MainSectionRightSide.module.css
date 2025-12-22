@@ -3,13 +3,13 @@
     border-radius: 17px;
     max-width: 75vw;
     width: 100%;
-    min-height: 692px;
+    min-height: 850px;
     margin-top: 7px;
-    
     }
 .additionalSectionContainer {
     padding-top: 26px;
     padding-left: 40px;
+    padding-bottom: 30px;
     overflow: auto;
     margin: 80px auto;
     background: #e7f0f8;
@@ -110,6 +110,7 @@
 .trySectionParagraphsContainer {
     margin-top: 11px;
     display: flex;
+    flex-wrap: wrap;
     gap: 14px;
 }
 .trySectionParagraph{
