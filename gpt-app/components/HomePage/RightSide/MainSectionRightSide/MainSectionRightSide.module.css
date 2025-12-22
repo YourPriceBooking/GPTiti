@@ -1,0 +1,139 @@
+.mainSectionContainer {
+    background: linear-gradient(180deg, #fff 0%, #fbfdff 100%);
+    border-radius: 17px;
+    max-width: 75vw;
+    width: 100%;
+    min-height: 692px;
+    margin-top: 7px;
+    
+    }
+.additionalSectionContainer {
+    padding-top: 26px;
+    padding-left: 40px;
+    overflow: auto;
+    margin: 80px auto;
+    background: #e7f0f8;
+    border-radius: 26px;
+    max-width: 70vw;
+    width: 100%;
+    min-height: 520px;
+}
+.additionalSectionParagraphContainer{
+    background:  rgba(37, 99, 235, 0.12);
+    max-width: 85px;
+    width: 100%;
+    min-height: 28px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    border-radius: 15px;
+}
+.additionalSectionSpan1 {
+    font-family: var(--font-family);
+    font-style: italic;
+    font-weight: 700;
+    font-size: 12px;
+    color: #fafcff;
+}
+.additionalSectionTitle {
+    font-family: var(--font-family);
+    font-style: italic;
+    font-weight: 700;
+    font-size: 28px;
+    color: #0b1220;
+}
+.additionalSectionSpan2 {
+    font-family: var(--font-family);
+    font-style: italic;
+    font-weight: 700;
+    font-size: 14px;
+    color: #475569;
+}
+.infoContainer {
+    margin-top: 29px;
+    display: flex;
+    /* justify-content: center; */
+    flex-wrap: wrap;
+    gap: 24px;
+}
+.infoContainerCard {
+    display: flex;
+    gap: 16px;
+    padding-top: 16px;
+    padding-left: 16px;
+    max-width: 318px;
+    width: 100%;
+    min-height: 118px;
+    background: linear-gradient(180deg, #fff 0%, #f5f8ff 100%);
+    border-radius: 19px;
+    border: 1px solid #e2e8f0;
+    transition: 0.3ms all ease-in;
+}
+.infoContainerCard:hover {
+    border-color: rgba(59, 130, 246, 0.45);
+    cursor: pointer;
+}
+.infoContainerCard:active {
+    background: linear-gradient(180deg, #f6faff 0%, #eef5ff 100%);
+    border-color: rgba(59, 130, 246, 0.55);
+}
+.CardIconContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 36px;
+    height: 36px;
+    background: rgba(37, 99, 235, 0.1);
+    border: 1px solid rgba(37, 99, 235, 0.3);
+    border-radius: 13px
+}
+
+.CardParapgraph{
+    font-family: var(--font-family);
+    font-style: italic;
+    font-weight: 700;
+    font-size: 14px;
+    color: #0b1220;
+}
+.CardSpan, .trySectionSpan {
+    font-family: var(--font-family);
+    font-style: italic;
+    font-weight: 700;
+    font-size: 12px;
+    color: #64748b;
+}
+.trySectionContainer {
+    margin-top: 18px;
+    /* margin-left: 40px; */
+}
+.trySectionParagraphsContainer {
+    margin-top: 11px;
+    display: flex;
+    gap: 14px;
+}
+.trySectionParagraph{
+    max-width: 210px;
+    width: 100%;
+    min-height: 34px;
+    background:  linear-gradient(180deg, #fff 0%, #f8fafc 100%);
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    padding-left: 14px;
+    padding-top: 10px;
+
+    font-family: var(--font-family);
+    font-style: italic;
+    font-weight: 700;
+    font-size: 12px;
+    color: #0b1220;
+    transition: 0.3ms all ease ;
+}
+.trySectionParagraph:hover {
+    border-color: rgba(59, 130, 246, 0.45);
+    cursor: pointer;
+}
+.trySectionParagraph:active {
+    background:  linear-gradient(180deg, #eff6ff 0%, #e0eeff 100%);
+    border-color: rgba(59, 130, 246, 0.6);
+}

@@ -4,7 +4,7 @@
   height: 100vh;
   max-width: 330px;
   width: 100%;
-  background: var(--foreground);
+  background: linear-gradient(180deg, #0b1220d2 0%, #070b13 100%);
   padding: 38px 3px 20px 24px;
 
  

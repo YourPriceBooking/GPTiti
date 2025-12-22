@@ -72,6 +72,14 @@ export function useChat() {
       )
     );
   }
+  function insertTemplate(template: string) { 
+    if (inputRef.current) 
+      { inputRef.current.value = template; 
+        inputRef.current.style.height = 'auto'; 
+        inputRef.current.style.height = `${inputRef.current.scrollHeight}px`; 
+        setHasInput(true); 
+      } 
+      }
 
   const activeChat = chatList.find(chat => chat.id === activeChatId);
 
@@ -83,6 +91,7 @@ export function useChat() {
     hasInput,
     inputSent,
     inputRef,
+    insertTemplate,
     handleChange,
     handleSendClick,
     handleNewChat,
