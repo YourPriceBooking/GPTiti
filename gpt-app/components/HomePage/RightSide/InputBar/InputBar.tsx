@@ -86,7 +86,7 @@ export default function InputBar({
       `}
     >
       <div className={styles.iconWrapper} tabIndex={0}>
-        <Image width={20} height={20} src="/icons/plus.svg" alt="plus" />
+        <Image width={28} height={28} src="/icons/plus.svg" alt="plus" />
       </div>
 
       <textarea

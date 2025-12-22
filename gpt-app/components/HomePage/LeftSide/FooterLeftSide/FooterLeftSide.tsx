@@ -33,7 +33,8 @@ export default function FooterLeftSide() {
             longer ones cost more.
           </span>
           <p className={styles.footerParagraph}>
-            © 2025 Your Price Booking. All rights reserved.
+            © {new Date().getFullYear()} Your Price Booking OÜ. All rights reserved. 
+            GPTiti™ is a trademark of Your Price Booking OÜ.
           </p>
         </section>
       </footer>

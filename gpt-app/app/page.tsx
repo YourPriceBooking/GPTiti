@@ -8,6 +8,8 @@ import { useChat } from '@/hooks/useChat';
 import { useModelMode } from '@/hooks/useModelMode';
 import { useState, useRef, useEffect } from 'react';
 import { ModelType } from '@/types/types';
+import HeaderRightSide from '@/components/HomePage/RightSide/HeaderRightSide/HeaderRightSide';
+import MainSectionRightSide from '@/components/HomePage/RightSide/MainSectionRightSide/MainSectionRightSide';
 
 
 
@@ -19,6 +21,7 @@ export default function Home() {
     hasInput,
     inputSent,
     inputRef,
+    insertTemplate,
     handleChange,
     handleSendClick,
     handleNewChat,
@@ -61,6 +64,8 @@ export default function Home() {
           />
 
         <div className={styles.rightSection}>
+          <HeaderRightSide chatTitle = {activeChat?.title}/>
+          <MainSectionRightSide insertTemplate={insertTemplate}/>
           {activeChat && activeChat.messages.length > 0 && (
             <MessageList messages={activeChat.messages} />
           )}

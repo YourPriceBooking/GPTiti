@@ -30,9 +30,10 @@
 
 .input::placeholder {
   font-family: var(--font-family);
-  font-weight: 400;
+  font-style: italic;
+  font-weight: 600;
   font-size: 20px;
-  color: #bebebe;
+  color: #94a3b8;
   }
   
 .multiline .input {

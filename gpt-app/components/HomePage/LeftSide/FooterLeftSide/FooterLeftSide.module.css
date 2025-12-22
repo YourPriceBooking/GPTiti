@@ -58,7 +58,7 @@
 
 .footerSpan, .footerParagraph {
     font-family: var(--font-family);
-    color: var(--main-gray2);
+    color:  #82878f;
 }
 
 .footerParagraph{
