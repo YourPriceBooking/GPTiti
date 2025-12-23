@@ -96,7 +96,7 @@
     background: #1b4bb8;
 }
 
-.btn:focus{
+.btn:active{
     cursor: pointer;
     background: #07266b;
 }
