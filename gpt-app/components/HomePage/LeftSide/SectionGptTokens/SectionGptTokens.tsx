@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import styles from './SectionGptTokens.module.css';
 import ModalWindow from '../ModalWindow/ModalWindow';
+import { useEffect } from 'react';
 import { SectionGptTokensProps } from '@/types/types';
 import { getModelGroupAndItem } from '@/functions/getModelGroupAndItem';
 import Link from 'next/link';
@@ -22,6 +23,16 @@ const result = getModelGroupAndItem(selectedModel);
 const capitalizeFirstThree = (text: string) => {
   return text.slice(0, 3).toUpperCase() + text.slice(3);
 };
+
+useEffect(() => 
+  { 
+    if (modelMode === 'click') 
+      { const timeout = setTimeout(
+        () => 
+          { setModelMode('idle'); }, 
+        2000);  
+        return () => clearTimeout(timeout);  } }, 
+        [selectedModel]);
   return (
     <section className={styles.gptTokens}>
         <article className={styles.gptMini}>
