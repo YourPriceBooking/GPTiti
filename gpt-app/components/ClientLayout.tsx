@@ -21,7 +21,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
             <Link href="/privacy-policy" className="hover:text-gray-700">Privacy Policy</Link>
             <Link href="/sign-in" className="hover:text-gray-700">Sign in</Link>
           </nav>
-          <p>© 2025 Your Price Booking. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Your Price Booking. All rights reserved.</p>
         </footer>
       )}
     </>
