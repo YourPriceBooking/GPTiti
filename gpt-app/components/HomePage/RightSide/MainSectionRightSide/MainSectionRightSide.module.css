@@ -8,7 +8,8 @@
     }
 .additionalSectionContainer {
     padding-top: 26px;
-    padding-left: 40px;
+    padding-left: 26px;
+    padding-right: 25px;
     padding-bottom: 30px;
     overflow: auto;
     margin: 80px auto;
@@ -19,7 +20,6 @@
     min-height: 520px;
 }
 .additionalSectionParagraphContainer{
-    position: relative;
     background:  rgba(37, 99, 235, 0.12);
     max-width: 85px;
     width: 100%;
@@ -29,13 +29,13 @@
     align-items: center;
     gap: 8px;
     border-radius: 15px;
-    transition: 0.8s all ease-in-out;
+    transition: 0.5s all ease-in-out;
 }
 .additionalSectionParagraphContainer:hover, .additionalSectionParagraphContainer:active {
     
     max-width: 240px;
     width: 100%;
-    min-height: 44px;
+    max-height: 28px;
     cursor: pointer;
 }
 .additionalSectionParagraphContainer:hover {
@@ -50,15 +50,13 @@
     display: none; 
 }
 .additionalSectionParagraphContainer:hover img { 
-    content: url("/icons/ready-hover.svg"); 
+    content: url("/icons/ready-toggle1.svg"); 
     width: 222px; 
     height: 35px; 
 }
 .additionalSectionParagraphContainer:active img {
-    position: absolute;
-    right: 5px;
-    content: url("/icons/white-circle2.svg");
-    width: 35px;
+    content: url("/icons/ready-toggle2.svg");
+    width: 222px;
     height: 35px;
 }
 
@@ -85,9 +83,8 @@
 }
 .infoContainer {
     margin-top: 29px;
-    display: flex;
-    /* justify-content: center; */
-    flex-wrap: wrap;
+    display: grid; 
+    grid-template-columns: repeat(3, 1fr);
     gap: 24px;
 }
 .infoContainerCard {
