@@ -3,7 +3,7 @@
     border-radius: 17px;
     max-width: 75vw;
     width: 100%;
-    min-height: 691px;
+    min-height: 550px;
     margin-top: 7px;
     }
 .additionalSectionContainer {
@@ -12,7 +12,7 @@
     padding-right: 25px;
     padding-bottom: 30px;
     overflow: auto;
-    margin: 80px auto;
+    margin: 12px auto;
     background: #e7f0f8;
     border-radius: 26px;
     max-width: 70vw;
@@ -167,4 +167,11 @@
 .trySectionParagraph:active {
     background:  linear-gradient(180deg, #eff6ff 0%, #e0eeff 100%);
     border-color: rgba(59, 130, 246, 0.6);
+}
+.hiddenSectionContainer{
+    background: linear-gradient(180deg, #f7faff 0%, #eef5ff 100%);
+    max-width: 71vw;
+    width: 100%;
+    min-height: 520px;
+    margin: 10px auto;
 }

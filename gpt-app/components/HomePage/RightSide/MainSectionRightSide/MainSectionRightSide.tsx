@@ -1,12 +1,14 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styles from './MainSectionRightSide.module.css';
 import Image from 'next/image';
 
 export default function MainSectionRightSide({ insertTemplate }: { insertTemplate: (text: string) => void }) {
+    const [hidden, setHidden] = useState(false);
   return (
     <div className={styles.mainSectionContainer}>
-        <section className={styles.additionalSectionContainer}>
-            <p className={styles.additionalSectionParagraphContainer}>
+        {!hidden ? (<section className={styles.additionalSectionContainer}>
+            <p className={styles.additionalSectionParagraphContainer}
+                onClick={() => setHidden(true)}>
                 <Image src='icons/green-circle.svg' width={12} height={12} alt='ready'/>
                 <span className={styles.additionalSectionSpan1}>Ready</span>
                 </p>
@@ -77,7 +79,12 @@ export default function MainSectionRightSide({ insertTemplate }: { insertTemplat
                 <p className={styles.trySectionParagraph}>Explain this error…</p>
                 </div>
             </section>
-        </section>
+        </section>):(
+                <section className={styles.hiddenSectionContainer}>
+                    <h1>Секція прихована</h1>
+                    </section>
+              
+        )}
     </div>
   )
 }
