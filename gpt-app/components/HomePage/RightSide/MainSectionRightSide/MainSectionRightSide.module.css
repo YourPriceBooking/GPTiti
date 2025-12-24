@@ -169,9 +169,66 @@
     border-color: rgba(59, 130, 246, 0.6);
 }
 .hiddenSectionContainer{
+    position: relative;
     background: linear-gradient(180deg, #f7faff 0%, #eef5ff 100%);
     max-width: 71vw;
     width: 100%;
     min-height: 520px;
     margin: 10px auto;
+    border-radius: 21px;
+}
+.hiddenInfoContainer {
+    padding-top: 16px;
+    padding-left: 27px;
+    display: flex;
+    align-items: center;
+    gap: 50px;
+}
+.InfoContainer {
+    display: flex;
+    gap: 9px;
+}
+.hiddenSpan {
+    font-family: var(--font-family);
+    font-style: italic;
+    font-weight: 700;
+    font-size: 11px;
+    color: #64748b;
+}
+.hiddenCenterSection {
+    
+    margin-top: 112px;
+    margin-left: 106px;
+}
+
+.hiddenCenterTitle {
+    font-family: var(--font-family);
+    font-style: italic;
+    font-weight: 700;
+    font-size: 28px;
+    color: #0b1220;
+}
+.hiddenCenterParagraph{
+    font-family: var(--font-family);
+    font-style: italic;
+    font-weight: 700;
+    font-size: 14px;
+    color: #475569;
+}
+.hiddenCenterSpan1, .hiddenCenterSpan2 {
+    font-family: var(--font-family);
+    font-style: italic;
+    font-weight: 700;
+    font-size: 11px;
+    text-align: center;
+    color: #64748b;
+}
+.hiddenCenterSpan1 {
+    position: absolute;
+     bottom: 160;
+     left: 150;
+}
+.hiddenCenterSpan2 {
+    position: absolute;
+    bottom: 16;
 }
