@@ -34,6 +34,7 @@ export default function Home() {
 
   const [selectedModelGroup, setSelectedModelGroup] = useState<ModelType>('GPT-4o');
   const [selectedModel, setSelectedModel] = useState<string>('gpt-4o-mini');
+  const [focusMode, setFocusMode] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -65,12 +66,12 @@ export default function Home() {
 
         <div className={styles.rightSection}>
           <HeaderRightSide chatTitle = {activeChat?.title}/>
-          <MainSectionRightSide insertTemplate={insertTemplate}/>
+          <MainSectionRightSide insertTemplate={insertTemplate} setFocusMode={setFocusMode}/>
           {activeChat && activeChat.messages.length > 0 && (
             <MessageList messages={activeChat.messages} />
           )}
 
-          <div className={inputSent ? styles.inputBottom : styles.inputWrapper}>
+        <div className={focusMode ? styles.inputCenter : (inputSent ? styles.inputBottom : styles.inputWrapper)}>
             <InputBar
               hasInput={hasInput}
               onChange={handleChange}
@@ -85,7 +86,7 @@ export default function Home() {
                 </span>
               </div>
             )}
-          </div>
+           </div>
           <div ref={messagesEndRef} />
           </div>
         </div>

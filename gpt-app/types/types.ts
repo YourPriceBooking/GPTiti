@@ -68,3 +68,9 @@ export type TokensContextType = {
   countdown: string;
   handleClaim: () => void;
 };
+
+export type MainSectionRightSideProps = 
+{ 
+    insertTemplate: (text: string) => void; 
+    setFocusMode: React.Dispatch<React.SetStateAction<boolean>>; 
+    };

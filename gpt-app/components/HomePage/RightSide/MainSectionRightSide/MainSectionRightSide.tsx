@@ -1,14 +1,20 @@
 import React, { useState } from 'react'
 import styles from './MainSectionRightSide.module.css';
 import Image from 'next/image';
+import { MainSectionRightSideProps } from '@/types/types';
 
-export default function MainSectionRightSide({ insertTemplate }: { insertTemplate: (text: string) => void }) {
+
+
+export default function MainSectionRightSide({ insertTemplate, setFocusMode}:MainSectionRightSideProps) {
     const [hidden, setHidden] = useState(false);
   return (
     <div className={styles.mainSectionContainer}>
         {!hidden ? (<section className={styles.additionalSectionContainer}>
             <p className={styles.additionalSectionParagraphContainer}
-                onClick={() => setHidden(true)}>
+                onClick={() => {setHidden(true);
+                    setFocusMode(true)
+                }
+                    }>
                 <Image src='icons/green-circle.svg' width={12} height={12} alt='ready'/>
                 <span className={styles.additionalSectionSpan1}>Ready</span>
                 </p>
@@ -81,8 +87,20 @@ export default function MainSectionRightSide({ insertTemplate }: { insertTemplat
             </section>
         </section>):(
                 <section className={styles.hiddenSectionContainer}>
-                    <h1>Секція прихована</h1>
-                    </section>
+                    <div className={styles.hiddenInfoContainer}>
+                        <p className={styles.InfoContainer}>
+                        <Image src='/icons/green-circle.svg' width={10} height={10} alt='focus'/>
+                        <span className={styles.hiddenSpan}>Focus mode</span>
+                        </p>
+                        <Image className={styles.hiddenImg} src='icons/focus-toggle.svg' width={56} height={28} alt='focus-toggle'/>
+                    </div>
+                        <section className={styles.hiddenCenterSection}>
+                            <h2 className={styles.hiddenCenterTitle}>Ask anything</h2>
+                            <p className={styles.hiddenCenterParagraph}>Focus mode hides suggestions — just type and go.</p>
+                            <span className={styles.hiddenCenterSpan1}>Tip: press Enter to send • Shift+Enter for a new line</span>
+                            <span className={styles.hiddenCenterSpan2}>AI systems may make mistakes, we recommend verifying important information.</span>
+                           </section>
+                          </section>
               
         )}
     </div>
