@@ -7,10 +7,7 @@
     margin-top: 7px;
     }
 .additionalSectionContainer {
-    padding-top: 26px;
-    padding-left: 26px;
-    padding-right: 25px;
-    padding-bottom: 30px;
+    box-sizing: border-box;
     overflow: auto;
     margin: 12px auto;
     background: #e7f0f8;

@@ -1,32 +1,33 @@
 import styles from './AIResponse.module.css';
+import Image from 'next/image';
 
 export function generateAIResponse(userText: string) {
   return (
         <div className={styles.aiBlock}>
-          <h2 className={styles.aiTitle}>✅ Рекомендовані стилі (під твій інтерфейс)</h2>
+          <h2 className={styles.aiTitle}>
+            <Image src='/icons/rabbit.svg' alt='logo-rabbit' height={41} width={41}/>
+            <p className={styles.aiParagraph}>GPTiti</p>
+            </h2>
   
-          <p className={styles.aiSubtitle}>1. Заголовок блоку</p>
-          <p className={styles.aiText}>
-            (наприклад: “2. Баланс білого простору”) пппппппппппппппппппппппппппппппронононгоононорр
-          </p>
+          
           <ul className={styles.aiList}>
-            <li>Font size: 20–22px</li>
-            <li>Font weight: 600</li>
-            <li>Line height: 130%</li>
-            <li>Letter spacing: 0</li>
-            <li>Color: #1A1A1A</li>
+            <li>
+              <p className={styles.aiListParagraph}>1) Setup (Day 1–2)</p>
+              <span className={styles.aiListSpan}>• Pick 3 default models • pricing tokens • /models endpoint</span>
+            </li>
+            <li>
+              <p className={styles.aiListParagraph}>2) Core chat (Day 3–6)</p>
+              <span className={styles.aiListSpan}>• Threads + history • usage tracking • limits per user • UI polish</span>
+            </li>
+            <li>
+              <p className={styles.aiListParagraph}>3) Payments & top-up (Day 7–10)</p>
+              <span className={styles.aiListSpan}>• Stripe checkout • webhooks → add tokens • receipts • retries</span>
+            </li>
+            <li>
+              <p className={styles.aiListParagraph}>4) Launch (Day 11–14)</p>
+              <span className={styles.aiListSpan}>• QA + monitoring • landing copy • beta users • deploy + backup</span>
+            </li>
           </ul>
-  
-          <p className={styles.aiSubtitle}>2. Підзаголовок / підписи</p>
-          <p className={styles.aiText}>
-            (рядки типу “Зараз воно:”, “Зроби:”) птптьпрьрпьпбььптатрпьрьптиваиапитттттттттттттттттттии
-          </p>
-          <ul className={styles.aiList}>
-            <li>Font size: 16px</li>
-            <li>Font weight: 500</li>
-            <li>Line height: 140%</li>
-            <li>Letter spacing: 0</li>
-          </ul>
-        </div>
+  </div>
       );
 }
