@@ -14,7 +14,7 @@
   display: flex;
   margin-top: 80px;
   margin-bottom: 41px;
-  background: #f4f4f4;
+  background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%);
   border-radius: 22px;
   max-width: 613px;
   width: 100%;
@@ -24,9 +24,9 @@
 .userText {
   padding: 16px 15px 8px 22px;
   font-family: var(--font-family);
-  font-weight: 400;
+  font-style: italic;
+  font-weight: 700;
   font-size: 14px;
-  line-height: 157%;
-  color: #555;
+  color: #fff;
   word-break: break-word;      
 }
