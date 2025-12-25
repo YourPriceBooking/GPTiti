@@ -1,4 +1,5 @@
-import { ReactElement } from "react"
+import { ReactElement } from "react";
+import { ModelProps } from "./shared";
 
 export interface CustomScrollBarProps {
   scrollTargetClass: string; 
@@ -46,22 +47,16 @@ export type LeftSideProps = {
 
   selectedModelGroup: ModelType;
   setSelectedModelGroup: (group: ModelType) => void;
+
+  isModalOpen: boolean; 
+  setIsModalOpen?: React.Dispatch<React.SetStateAction<boolean>>
 };
 
 export type SectionGptChatsProps = Pick<
   LeftSideProps,
   'onNewChat' | 'chatList' | 'setActiveChatId' | 'deleteChat' | 'renameChat'
 >;
-export type SectionGptTokensProps = Pick<
-  LeftSideProps,
-  | 'modelRef'
-  | 'modelMode'
-  | 'setModelMode'
-  | 'selectedModel'
-  | 'setSelectedModel'
-  | 'selectedModelGroup'
-  | 'setSelectedModelGroup'
-  >;
+
 
 export type TokensContextType = {
   balance: number;
@@ -74,3 +69,33 @@ export type MainSectionRightSideProps =
     insertTemplate: (text: string) => void; 
     setFocusMode: React.Dispatch<React.SetStateAction<boolean>>; 
     };
+
+export type ModelModalOverlayProps = { isModalOpen: boolean; 
+  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>; 
+  selectedModel: string; 
+  setSelectedModel: (model: string) => void; 
+  selectedModelGroup: ModelType; 
+  setSelectedModelGroup: (group: ModelType) => void; }; 
+  export type ModelGptitiTitleWithIconProps = { 
+    modelRef: React.RefObject<HTMLDivElement | null>; 
+    selectedModel: string; isModalOpen: boolean; 
+    setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>; }; 
+    export type SectionGptTokensProps = 
+    { selectedModel: string; 
+      modelRef: React.RefObject<HTMLDivElement | null>;
+      modelMode: ModelMode;
+      setModelMode: React.Dispatch<React.SetStateAction<ModelMode>>;
+      selectedModelGroup: ModelType; 
+      setSelectedModel: (model: string) => void; 
+      setSelectedModelGroup: (group: ModelType) => void; 
+      isModalOpen: boolean; 
+      setIsModalOpen?: React.Dispatch<React.SetStateAction<boolean>>; }; 
+      export interface HeaderRightSideProps 
+      { chatTitle: string | null | undefined; 
+        modelRef: React.RefObject<HTMLDivElement | null>; 
+        selectedModel: string; 
+        setSelectedModel: (model: string) => void; 
+        selectedModelGroup: ModelType; 
+        setSelectedModelGroup: (group: ModelType) => void; 
+        isModalOpen: boolean; 
+        setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>; }

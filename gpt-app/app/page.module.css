@@ -15,6 +15,26 @@
   z-index: 998; 
   background: rgba(159, 152, 152, 0.3);
  }
+ .modalWrapper {
+   position: fixed;
+   top: 80px;
+   left: 50%;
+   transform: translateX(-50%);
+   z-index: 9999;
+   width: auto;
+   max-width: 600px;
+   pointer-events: auto;
+   transition: opacity 0.3s ease, transform 0.3s ease;
+ }
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 999;
+  pointer-events: none;
+}
 
 .leftOverlay {
   position: absolute;
@@ -63,7 +83,8 @@
   transform: translate(-50%, -50%); 
   width: 100%; 
   max-width: 816px; 
-  transition: all 0.5s ease; }
+  transition: all 0.5s ease; 
+}
 
 .spanContainer{
   margin-top: 5px;
