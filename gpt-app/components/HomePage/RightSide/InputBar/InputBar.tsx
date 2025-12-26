@@ -6,13 +6,15 @@ export default function InputBar({
   hasInput,
   onChange,
   onSend,
-  inputRef
-}: {
+  inputRef,
+  onHideSection
+ }: {
   hasInput: boolean;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   onSend: (message: string) => void;   
   inputRef: React.RefObject<HTMLTextAreaElement | null>;
-}) {
+  onHideSection: () => void;
+  }) {
   const [isMultiline, setIsMultiline] = useState(false);
   const [shouldScroll, setShouldScroll] = useState(false);
 
@@ -67,7 +69,8 @@ export default function InputBar({
     if (inputRef.current) {
       const message = inputRef.current.value; 
       if (message.trim() !== "") {
-        onSend(message);                      
+        onSend(message);
+        onHideSection(); 
       }
       inputRef.current.value = "";            
       inputRef.current.style.height = "68px"; 

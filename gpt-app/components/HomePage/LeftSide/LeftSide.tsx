@@ -18,6 +18,8 @@ export default function LeftSide({onNewChat,
   setSelectedModel,
   selectedModelGroup,
   setSelectedModelGroup,
+  isModalOpen,
+  setIsModalOpen
  }: LeftSideProps) {
 
 return (
@@ -31,6 +33,8 @@ return (
       setSelectedModel={setSelectedModel}
       selectedModelGroup={selectedModelGroup}
       setSelectedModelGroup={setSelectedModelGroup}
+      isModalOpen={isModalOpen}
+      setIsModalOpen={setIsModalOpen}
       />
     <SectionGptChats 
       onNewChat={onNewChat} 

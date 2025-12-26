@@ -1,105 +1,40 @@
-import React from 'react';
-import Image from 'next/image';
-import styles from './SectionGptTokens.module.css';
-import ModalWindow from '../ModalWindow/ModalWindow';
-import { useEffect } from 'react';
-import { SectionGptTokensProps } from '@/types/types';
-import { getModelGroupAndItem } from '@/functions/getModelGroupAndItem';
-import Link from 'next/link';
-import { useTokensContext } from '@/context/TokensContext';
-import { TOKENS_SUFFIX } from '@/config/models.config';
-
-export default function SectionGptTokens({modelRef, 
-    modelMode, 
-    setModelMode, 
-    selectedModel, 
-    setSelectedModel, 
-    selectedModelGroup, 
-    setSelectedModelGroup,
-    }: SectionGptTokensProps) {
-      
-const {balance} = useTokensContext();
-const result = getModelGroupAndItem(selectedModel);
-const capitalizeFirstThree = (text: string) => {
-  return text.slice(0, 3).toUpperCase() + text.slice(3);
-};
-
-useEffect(() => 
-  { 
-    if (modelMode === 'click') 
-      { const timeout = setTimeout(
-        () => 
-          { setModelMode('idle'); }, 
-        2000);  
-        return () => clearTimeout(timeout);  } }, 
-        [selectedModel]);
-  return (
-    <section className={styles.gptTokens}>
-        <article className={styles.gptMini}>
-          <div
-            ref={modelRef}
-            className={styles.modelHoverWrapper}
-            tabIndex={0}
-            onClick={(e) => {
-              e.stopPropagation();
-              setModelMode(prev => (prev === 'click' ? 'idle' : 'click'));
-            }}
-          >
-            <article className={styles.titleContainer}>
-       <h2 className={styles.title}>
-  {result ? capitalizeFirstThree(result.model.title) : capitalizeFirstThree(selectedModel)}
-</h2>
-              <Image
-                width={11}
-                height={6}
-                src="/icons/chevron-small.svg"
-                alt="chevron-small"
-              />
-            </article>
-            {modelMode === 'click' && (
-              <div
-                className={styles.modalWrapper}
-                onMouseDown={(e) => e.stopPropagation()}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <ModalWindow
-                 selectedModelGroup={selectedModelGroup}
-                 setSelectedModelGroup={setSelectedModelGroup}
-                 selectedModel={selectedModel}
-                 setSelectedModel={setSelectedModel}
-                />
-              </div>
-            )}
-          </div>
-
-          <p className={styles.paragraph}>
-            approximate asking price {result?.model.tokens} {TOKENS_SUFFIX}
-          </p>
-        </article>
-
-        <article className={styles.gptBalance}>
-          <h2 className={styles.title2}>Balance</h2>
-          <div className={styles.balanceContainer}>
-            <span className={styles.gptSpan1}>{balance.toLocaleString()}</span>
-            <Image width={24} height={24} src="/icons/badge.svg" alt="badge" />
-          </div>
-        </article>
-
-        <div className={styles.btnContainer}>
-          <Link href='/top-up-your-tokens'>
-          <button className={styles.btn}>
-            <div className={styles.iconWrapper}>
-              <Image
-                width={33}
-                height={33}
-                src="/icons/circle-icon.svg"
-                alt="circle-icon"
-              />
-            </div>
-            <span className={styles.btnSpan1}>Top up tokens</span>
-          </button>
-          </Link>
-        </div>
-      </section>
-  )
-}
+import React from 'react'; 
+import Image from 'next/image'; 
+import styles from './SectionGptTokens.module.css'; 
+import { SectionGptTokensProps } from '@/types/types'; 
+import { getModelGroupAndItem } from '@/functions/getModelGroupAndItem'; 
+import Link from 'next/link'; 
+import { useTokensContext } from '@/context/TokensContext'; 
+import { TOKENS_SUFFIX } from '@/config/models.config'; 
+import ModelGptitiTitleWithIcon from '@/components/ModelGptitiTitleWithIcon/ModelGptitiTitleWithIcon'; 
+export default function SectionGptTokens({ modelRef, selectedModel, selectedModelGroup, setSelectedModel, setSelectedModelGroup, isModalOpen, setIsModalOpen, }: SectionGptTokensProps) 
+{ const { balance } = useTokensContext(); 
+const result = getModelGroupAndItem(selectedModel); 
+return ( 
+<section className={styles.gptTokens}> 
+  <article className={styles.gptMini}> 
+    <ModelGptitiTitleWithIcon modelRef={modelRef} 
+    selectedModel={selectedModel} isModalOpen={isModalOpen} 
+    setIsModalOpen={setIsModalOpen} /> 
+    <p className={styles.paragraph}> 
+      approximate asking price {result?.model.tokens} {TOKENS_SUFFIX} 
+      </p> 
+      </article> 
+      <article className={styles.gptBalance}> 
+        <h2 className={styles.title2}>Balance</h2> 
+        <div className={styles.balanceContainer}> 
+          <span className={styles.gptSpan1}>{balance.toLocaleString()}</span> 
+          <Image width={24} height={24} src="/icons/badge.svg" alt="badge" /> 
+          </div> 
+          </article> 
+          <div className={styles.btnContainer}> 
+            <Link href="/top-up-your-tokens"> 
+            <button className={styles.btn}> 
+              <div className={styles.iconWrapper}> 
+                <Image width={33} height={33} src="/icons/circle-icon.svg" alt="circle-icon" /> 
+                </div> 
+                <span className={styles.btnSpan1}>Top up tokens</span> 
+                </button> 
+                </Link> 
+                </div> 
+                </section> ); }
