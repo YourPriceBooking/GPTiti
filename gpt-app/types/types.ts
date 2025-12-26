@@ -49,7 +49,7 @@ export type LeftSideProps = {
   setSelectedModelGroup: (group: ModelType) => void;
 
   isModalOpen: boolean; 
-  setIsModalOpen?: React.Dispatch<React.SetStateAction<boolean>>
+  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>
 };
 
 export type SectionGptChatsProps = Pick<
