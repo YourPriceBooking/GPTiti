@@ -24,7 +24,7 @@ export default function Home()
   deleteChat, 
   renameChat, 
 } = useChat(); 
-const { modelRef } = 
+const {  modelMode, setModelMode, modelRef } = 
 useModelMode(); 
 const [selectedModelGroup, setSelectedModelGroup] = useState<ModelType>('GPT-4o'); 
 const [selectedModel, setSelectedModel] = useState<string>('gpt-4o-mini'); 
@@ -47,7 +47,9 @@ setSelectedModelGroup={setSelectedModelGroup} />
   <LeftSide 
   onNewChat={handleNewChat} 
   isModalOpen={isModalOpen} 
-  setIsModalOpen={setIsModalOpen} 
+  setIsModalOpen={setIsModalOpen}
+  modelMode={modelMode} 
+  setModelMode={setModelMode} 
   chatList={chatList} 
   setActiveChatId={setActiveChatId} 
   deleteChat={deleteChat} 
