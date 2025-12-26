@@ -50,6 +50,16 @@
     max-width: 117px;
     width: 100%;
     min-height: 37px;
+    transition: 0.3ms all ease-in-out;
+}
+.quickActionsContainer:hover{
+    border: 1.4px solid #3b82f6;
+    background:  linear-gradient(180deg, #fff 0%, #edf3ff 100%);
+    cursor: pointer;
+}
+.quickActionsContainer:active{
+    border: 1.2px solid rgba(37, 99, 235, 0.55);
+    background: linear-gradient(180deg, #eaf1ff 0%, #dfe9ff 100%);
 }
 .quickActionsSpan{
     font-family: var(--font-family);
