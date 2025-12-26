@@ -86,10 +86,10 @@ export default function MainSectionRightSide(
                 <section className={styles.trySectionContainer}>
                     <span className={styles.trySectionSpan}>Try one of these:</span>
                     <div className={styles.trySectionParagraphsContainer}>
-                        <p className={styles.trySectionParagraph}>Summarize this article…</p>
-                        <p className={styles.trySectionParagraph}>Make this more professional…</p>
-                        <p className={styles.trySectionParagraph}>Create a study plan for…</p>
-                        <p className={styles.trySectionParagraph}>Explain this error…</p>
+                        <p className={styles.trySectionParagraph} onClick = {() => insertTemplate('Summarize this article…') }>Summarize this article…</p>
+                        <p className={styles.trySectionParagraph} onClick = {() => insertTemplate('Make this more professional…') }>Make this more professional…</p>
+                        <p className={styles.trySectionParagraph} onClick = {() => insertTemplate('Create a study plan for…') }>Create a study plan for…</p>
+                        <p className={styles.trySectionParagraph} onClick = {() => insertTemplate('Explain this error…') }>Explain this error…</p>
                     </div>
                 </section>
             </section>) : (
@@ -99,7 +99,15 @@ export default function MainSectionRightSide(
                             <Image src='/icons/green-circle.svg' width={10} height={10} alt='focus' />
                             <span className={styles.hiddenSpan}>Focus mode</span>
                         </p>
-                        <Image className={styles.hiddenImg} src='icons/focus-toggle.svg' width={56} height={28} alt='focus-toggle' />
+                        <Image className={styles.hiddenImg} 
+                        src='icons/focus-toggle.svg' 
+                        width={56} 
+                        height={28} 
+                        alt='focus-toggle'
+                        onClick={() => 
+                        { setHidden(false); 
+                        setFocusMode(false); }} 
+                        style={{ cursor: 'pointer' }} />
                     </div>
                     <section className={styles.hiddenCenterSection}>
                         <h2 className={styles.hiddenCenterTitle}>Ask anything</h2>
