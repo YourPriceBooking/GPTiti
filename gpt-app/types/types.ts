@@ -76,10 +76,12 @@ export type ModelModalOverlayProps = { isModalOpen: boolean;
   setSelectedModel: (model: string) => void; 
   selectedModelGroup: ModelType; 
   setSelectedModelGroup: (group: ModelType) => void; }; 
+  
   export type ModelGptitiTitleWithIconProps = { 
     modelRef: React.RefObject<HTMLDivElement | null>; 
     selectedModel: string; isModalOpen: boolean; 
     setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>; }; 
+    
     export type SectionGptTokensProps = 
     { selectedModel: string; 
       modelRef: React.RefObject<HTMLDivElement | null>;
@@ -90,6 +92,7 @@ export type ModelModalOverlayProps = { isModalOpen: boolean;
       setSelectedModelGroup: (group: ModelType) => void; 
       isModalOpen: boolean; 
       setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>; }; 
+
       export interface HeaderRightSideProps 
       { chatTitle: string | null | undefined; 
         modelRef: React.RefObject<HTMLDivElement | null>; 
