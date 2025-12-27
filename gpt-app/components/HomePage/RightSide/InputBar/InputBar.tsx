@@ -1,79 +1,92 @@
-import Image from 'next/image';
-import styles from './InputBar.module.css';
-import { useState, useEffect } from 'react';
+import Image from "next/image";
+import styles from "./InputBar.module.css";
+import { useState, useEffect, useLayoutEffect } from "react";
 
 export default function InputBar({
   hasInput,
   onChange,
   onSend,
   inputRef,
-  onHideSection
- }: {
+  onHideSection,
+  templateTick,
+}: {
   hasInput: boolean;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-  onSend: (message: string) => void;   
+  onSend: (message: string) => void;
   inputRef: React.RefObject<HTMLTextAreaElement | null>;
   onHideSection: () => void;
-  }) {
+  templateTick: number;
+}) {
   const [isMultiline, setIsMultiline] = useState(false);
   const [shouldScroll, setShouldScroll] = useState(false);
 
-  useEffect(() => {
-    if (inputRef.current) {
-      inputRef.current.style.height = "68px"; 
+  const resizeTextarea = () => {
+    const textarea = inputRef.current;
+    if (!textarea) return;
+
+    const BASE = 68;
+    const MAX = 240;
+
+    const PB_NORMAL = 20;
+    const PB_MULTI = 60;
+
+    textarea.style.overflowY = "hidden";
+    textarea.style.paddingBottom = `${PB_NORMAL}px`;
+    textarea.style.height = `${BASE}px`;
+    textarea.scrollTop = 0;
+
+    if (!textarea.value.trim()) {
+      setIsMultiline(false);
+      setShouldScroll(false);
+      return;
     }
-  }, [inputRef]);
+
+    const overflows = textarea.scrollHeight > textarea.clientHeight;
+
+    if (!overflows) {
+      setIsMultiline(false);
+      setShouldScroll(false);
+      return;
+    }
+
+    textarea.style.paddingBottom = `${PB_MULTI}px`;
+    textarea.style.height = "auto";
+
+    const full = textarea.scrollHeight;
+    const next = Math.min(full + 2, MAX);
+    textarea.style.height = `${next}px`;
+
+    const needScroll = full > MAX;
+    textarea.style.overflowY = needScroll ? "auto" : "hidden";
+    textarea.scrollTop = 0;
+
+    setIsMultiline(true);
+    setShouldScroll(needScroll);
+  };
+
+  useLayoutEffect(() => {
+    resizeTextarea();
+
+    requestAnimationFrame(() => {
+      resizeTextarea();
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [templateTick]);
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-  onChange(e);
-
-  const textarea = inputRef.current;
-  if (!textarea) return;
-
-  const baseHeight = 68;
-  const maxHeight = 240;
-
-  textarea.style.height = `${baseHeight}px`;
-  textarea.style.overflowY = 'hidden';
-
-  
-  const hasWrappedLine = textarea.scrollHeight > textarea.clientHeight;
-
-  if (!textarea.value.trim()) {
-    setIsMultiline(false);
-    setShouldScroll(false);
-    return;
-  }
-
-  if (!hasWrappedLine) {
-    
-    setIsMultiline(false);
-    setShouldScroll(false);
-    return;
-  }
-
-  
-  if (textarea.scrollHeight > maxHeight) {
-    textarea.style.height = `${maxHeight}px`;
-    textarea.style.overflowY = 'auto';
-    setShouldScroll(true);
-  } else {
-    textarea.style.height = `${textarea.scrollHeight}px`;
-    setShouldScroll(false);
-  }
-
-  setIsMultiline(true);
-};
+    onChange(e);
+    resizeTextarea();
+  };
 
   const handleSend = () => {
     if (inputRef.current) {
-      const message = inputRef.current.value; 
+      const message = inputRef.current.value;
       if (message.trim() !== "") {
         onSend(message);
-        onHideSection(); 
+        onHideSection();
       }
-      inputRef.current.value = "";            
-      inputRef.current.style.height = "68px"; 
+      inputRef.current.value = "";
+      inputRef.current.style.height = "68px";
       setIsMultiline(false);
       setShouldScroll(false);
     }
@@ -82,11 +95,10 @@ export default function InputBar({
   return (
     <div
       className={`
-        ${styles.inputContainer} 
-        ${isMultiline ? styles.multiline : ''} 
-        ${isMultiline ? styles.expanded : ''} 
-        ${shouldScroll ? styles.scrollable : ''}
-      `}
+    ${styles.inputContainer} 
+    ${isMultiline ? styles.multiline : ""} 
+    ${shouldScroll ? styles.scrollable : ""}
+  `}
     >
       <div className={styles.iconWrapper} tabIndex={0}>
         <Image width={28} height={28} src="/icons/plus.svg" alt="plus" />
@@ -97,17 +109,22 @@ export default function InputBar({
         className={styles.input}
         placeholder="Ask anything..."
         onChange={handleChange}
-        style={{ height: "68px" }} 
+        rows={1}
       />
 
       <div className={styles.iconWrapper1} tabIndex={0}>
-        <Image width={35} height={35} src="/icons/microphone.svg" alt="microphone" />
+        <Image
+          width={35}
+          height={35}
+          src="/icons/microphone.svg"
+          alt="microphone"
+        />
       </div>
 
       {hasInput ? (
         <div
           className={`${styles.iconWrapper2} ${styles.disabledHover}`}
-          onClick={handleSend}   
+          onClick={handleSend}
         >
           <Image src="/icons/send.svg" width={35} height={35} alt="send" />
         </div>

@@ -1,235 +1,235 @@
 .mainSectionContainer {
-    background: linear-gradient(180deg, #fff 0%, #fbfdff 100%);
-    border-radius: 17px;
-    max-width: 75vw;
-    width: 100%;
-    min-height: 445px;
-    margin-top: 92px;
-    }
+  background: linear-gradient(180deg, #fff 0%, #fbfdff 100%);
+  border-radius: 17px;
+  max-width: 75vw;
+  width: 100%;
+  min-height: 445px;
+  margin-top: 92px;
+}
 .additionalSectionContainer {
-    padding-top: 18px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    box-sizing: border-box;
-    overflow: auto;
-    margin: 29px auto;
-    background: #e7f0f8;
-    border-radius: 26px;
-    max-width: 70vw;
-    width: 100%;
-    min-height: 386px;
+  padding-top: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  overflow: auto;
+  margin: 29px auto;
+  background: #e7f0f8;
+  border-radius: 26px;
+  max-width: 70vw;
+  width: 100%;
+  min-height: 386px;
 }
-.additionalSectionParagraphContainer{
-    background:  rgba(37, 99, 235, 0.12);
-    max-width: 85px;
-    width: 100%;
-    min-height: 28px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-    border-radius: 15px;
-    transition: 0.5s all ease-in-out;
+.additionalSectionParagraphContainer {
+  background: rgba(37, 99, 235, 0.12);
+  max-width: 85px;
+  width: 100%;
+  min-height: 28px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  border-radius: 15px;
+  transition: 0.5s all ease-in-out;
 }
-.additionalSectionParagraphContainer:hover, .additionalSectionParagraphContainer:active {
-    
-    max-width: 240px;
-    width: 100%;
-    max-height: 28px;
-    cursor: pointer;
+.additionalSectionParagraphContainer:hover,
+.additionalSectionParagraphContainer:active {
+  max-width: 240px;
+  width: 100%;
+  max-height: 28px;
+  cursor: pointer;
 }
 .additionalSectionParagraphContainer:hover {
-    background: linear-gradient(180deg, #34d399 0%, #22c55e 100%);
+  background: linear-gradient(180deg, #34d399 0%, #22c55e 100%);
 }
 .additionalSectionParagraphContainer:active {
-    background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%);
+  background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%);
 }
 
-.additionalSectionParagraphContainer:hover .additionalSectionSpan1 
-{ 
-    display: none; 
+.additionalSectionParagraphContainer:hover .additionalSectionSpan1 {
+  display: none;
 }
-.additionalSectionParagraphContainer:hover img { 
-    content: url("/icons/ready-toggle1.svg"); 
-    width: 222px; 
-    height: 35px; 
+.additionalSectionParagraphContainer:hover img {
+  content: url("/icons/ready-toggle1.svg");
+  width: 222px;
+  height: 35px;
 }
 .additionalSectionParagraphContainer:active img {
-    content: url("/icons/ready-toggle2.svg");
-    width: 222px;
-    height: 35px;
+  content: url("/icons/ready-toggle2.svg");
+  width: 222px;
+  height: 35px;
 }
 
 .additionalSectionSpan1 {
-    font-family: var(--font-family);
-    font-style: italic;
-    font-weight: 700;
-    font-size: 12px;
-    color: #fafcff;
+  font-family: var(--font-family);
+  font-style: italic;
+  font-weight: 700;
+  font-size: 12px;
+  color: #fafcff;
 }
 .additionalSectionTitle {
-    font-family: var(--font-family);
-    font-style: italic;
-    font-weight: 700;
-    font-size: 18px;
-    color:#0f172a;
+  font-family: var(--font-family);
+  font-style: italic;
+  font-weight: 700;
+  font-size: 18px;
+  color: #0f172a;
 }
 .additionalSectionSpan2 {
-    font-family: var(--font-family);
-    font-style: italic;
-    font-weight: 700;
-    font-size: 14px;
-    color: #475569;
+  font-family: var(--font-family);
+  font-style: italic;
+  font-weight: 700;
+  font-size: 14px;
+  color: #475569;
 }
 .infoContainer {
-    margin-top: 3px;
-    display: grid; 
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
+  margin-top: 3px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
 }
 .infoContainerCard {
-    display: flex;
-    gap: 16px;
-    padding-top: 16px;
-    padding-left: 16px;
-    max-width: 300px;
-    width: 100%;
-    min-height: 74px;
-    background: linear-gradient(180deg, #fff 0%, #f5f8ff 100%);
-    border-radius: 19px;
-    border: 1px solid #e2e8f0;
-    transition: 0.3ms all ease-in;
+  display: flex;
+  gap: 16px;
+  padding-top: 16px;
+  padding-left: 16px;
+  max-width: 300px;
+  width: 100%;
+  min-height: 74px;
+  background: linear-gradient(180deg, #fff 0%, #f5f8ff 100%);
+  border-radius: 19px;
+  border: 1px solid #e2e8f0;
+  transition: 0.3ms all ease-in;
 }
 .infoContainerCard:hover {
-    border-color: rgba(59, 130, 246, 0.45);
-    cursor: pointer;
+  border-color: rgba(59, 130, 246, 0.45);
+  cursor: pointer;
 }
 .infoContainerCard:active {
-    background: linear-gradient(180deg, #f6faff 0%, #eef5ff 100%);
-    border-color: rgba(59, 130, 246, 0.55);
+  background: linear-gradient(180deg, #f6faff 0%, #eef5ff 100%);
+  border-color: rgba(59, 130, 246, 0.55);
 }
 .CardIconContainer {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 36px;
-    height: 36px;
-    background: rgba(37, 99, 235, 0.1);
-    border: 1px solid rgba(37, 99, 235, 0.3);
-    border-radius: 13px
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 36px;
+  height: 36px;
+  background: rgba(37, 99, 235, 0.1);
+  border: 1px solid rgba(37, 99, 235, 0.3);
+  border-radius: 13px;
 }
 
-.CardParapgraph{
-    font-family: var(--font-family);
-    font-style: italic;
-    font-weight: 700;
-    font-size: 14px;
-    color: #0b1220;
+.CardParapgraph {
+  font-family: var(--font-family);
+  font-style: italic;
+  font-weight: 700;
+  font-size: 14px;
+  color: #0b1220;
 }
-.CardSpan, .trySectionSpan {
-    font-family: var(--font-family);
-    font-style: italic;
-    font-weight: 700;
-    font-size: 12px;
-    color: #64748b;
+.CardSpan,
+.trySectionSpan {
+  font-family: var(--font-family);
+  font-style: italic;
+  font-weight: 700;
+  font-size: 12px;
+  color: #64748b;
 }
 .trySectionContainer {
-    margin-top: 18px;
-    /* margin-left: 40px; */
+  margin-top: 18px;
+  /* margin-left: 40px; */
 }
 .trySectionParagraphsContainer {
-    margin-top: 11px;
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 14px;
+  margin-top: 11px;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 14px;
 }
-.trySectionParagraph{
-    max-width: 210px;
-    width: 100%;
-    min-height: 34px;
-    background:  linear-gradient(180deg, #fff 0%, #f8fafc 100%);
-    border: 1px solid #e2e8f0;
-    border-radius: 18px;
-    padding-left: 14px;
-    padding-top: 10px;
+.trySectionParagraph {
+  max-width: 210px;
+  width: 100%;
+  min-height: 34px;
+  background: linear-gradient(180deg, #fff 0%, #f8fafc 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  padding-left: 14px;
+  padding-top: 10px;
 
-    font-family: var(--font-family);
-    font-style: italic;
-    font-weight: 700;
-    font-size: 12px;
-    color: #0b1220;
-    transition: 0.3ms all ease ;
+  font-family: var(--font-family);
+  font-style: italic;
+  font-weight: 700;
+  font-size: 12px;
+  color: #0b1220;
+  transition: 0.3ms all ease;
 }
 .trySectionParagraph:hover {
-    border-color: rgba(59, 130, 246, 0.45);
-    cursor: pointer;
+  border-color: rgba(59, 130, 246, 0.45);
+  cursor: pointer;
 }
 .trySectionParagraph:active {
-    background:  linear-gradient(180deg, #eff6ff 0%, #e0eeff 100%);
-    border-color: rgba(59, 130, 246, 0.6);
+  background: linear-gradient(180deg, #eff6ff 0%, #e0eeff 100%);
+  border-color: rgba(59, 130, 246, 0.6);
 }
-.hiddenSectionContainer{
-    position: relative;
-    background: linear-gradient(180deg, #f7faff 0%, #eef5ff 100%);
-    max-width: 71vw;
-    width: 100%;
-    min-height: 520px;
-    margin: 10px auto;
-    border-radius: 21px;
+.hiddenSectionContainer {
+  position: relative;
+  background: linear-gradient(180deg, #f7faff 0%, #eef5ff 100%);
+  max-width: 71vw;
+  width: 100%;
+  min-height: 520px;
+  margin: 10px auto;
+  border-radius: 21px;
 }
 .hiddenInfoContainer {
-    padding-top: 16px;
-    padding-left: 27px;
-    display: flex;
-    align-items: center;
-    gap: 50px;
+  padding-top: 16px;
+  padding-left: 27px;
+  display: flex;
+  align-items: center;
+  gap: 50px;
 }
 .InfoContainer {
-    display: flex;
-    gap: 9px;
+  display: flex;
+  gap: 9px;
 }
 .hiddenSpan {
-    font-family: var(--font-family);
-    font-style: italic;
-    font-weight: 700;
-    font-size: 11px;
-    color: #64748b;
+  font-family: var(--font-family);
+  font-style: italic;
+  font-weight: 700;
+  font-size: 11px;
+  color: #64748b;
 }
 .hiddenCenterSection {
-    
-    margin-top: 112px;
-    margin-left: 106px;
+  margin-top: 112px;
+  margin-left: 106px;
 }
 
 .hiddenCenterTitle {
-    font-family: var(--font-family);
-    font-style: italic;
-    font-weight: 700;
-    font-size: 28px;
-    color: #0b1220;
+  font-family: var(--font-family);
+  font-style: italic;
+  font-weight: 700;
+  font-size: 28px;
+  color: #0b1220;
 }
-.hiddenCenterParagraph{
-    font-family: var(--font-family);
-    font-style: italic;
-    font-weight: 700;
-    font-size: 14px;
-    color: #475569;
+.hiddenCenterParagraph {
+  font-family: var(--font-family);
+  font-style: italic;
+  font-weight: 700;
+  font-size: 14px;
+  color: #475569;
 }
-.hiddenCenterSpan1, .hiddenCenterSpan2 {
-    font-family: var(--font-family);
-    font-style: italic;
-    font-weight: 700;
-    font-size: 11px;
-    text-align: center;
-    color: #64748b;
+.hiddenCenterSpan1,
+.hiddenCenterSpan2 {
+  font-family: var(--font-family);
+  font-style: italic;
+  font-weight: 700;
+  font-size: 11px;
+  text-align: center;
+  color: #64748b;
 }
 .hiddenCenterSpan1 {
-    position: absolute;
-     bottom: 160;
-     left: 150;
+  position: absolute;
+  bottom: 160;
+  left: 150;
 }
 .hiddenCenterSpan2 {
-    position: absolute;
-    bottom: 16;
+  position: absolute;
+  bottom: 16;
 }

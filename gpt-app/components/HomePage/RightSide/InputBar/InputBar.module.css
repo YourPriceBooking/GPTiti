@@ -4,7 +4,7 @@
   position: relative;
   max-width: 816px;
   min-width: 380px;
-  min-height: 68px;
+  height: auto;
   width: 100%;
 }
 
@@ -12,19 +12,19 @@
   border: 0.2px solid #3e3d40;
   border-radius: 33px;
   width: 100%;
-  min-height: 68px;
+  height: 68px;
   max-height: 240px;
   padding: 20px 100px 20px 60px;
   box-sizing: border-box;
   box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.25);
   background: var(--main-white);
-  resize: none; 
+  resize: none;
   overflow-y: hidden;
   line-height: 1.4;
   font-size: 18px;
-  }
+}
 
-.input:focus{
+.input:focus {
   outline: none;
 }
 
@@ -34,11 +34,11 @@
   font-weight: 600;
   font-size: 20px;
   color: #94a3b8;
-  }
-  
-.multiline .input {
-  padding-bottom: 50px;
 }
+
+/* .multiline .input {
+  padding-bottom: 50px;
+} */
 .scrollable .input {
   overflow-y: auto;
 }
@@ -58,7 +58,6 @@
   z-index: 1;
 }
 
-
 .multiline .iconWrapper,
 .multiline .iconWrapper1,
 .multiline .iconWrapper2 {
@@ -66,7 +65,6 @@
   bottom: 14px;
   transform: translateY(0);
 }
-
 
 .iconWrapper {
   left: 3%;
@@ -77,7 +75,6 @@
 .iconWrapper2 {
   right: 3%;
 }
-
 
 .iconWrapper::before,
 .iconWrapper1::before,
@@ -101,7 +98,6 @@
 .iconWrapper2:active::before {
   opacity: 1;
 }
-
 
 .iconWrapper::after,
 .iconWrapper1::after,
@@ -139,9 +135,9 @@
   top: 58px;
 }
 
-.expanded .input {
+/* .expanded .input {
   padding: 20px 20px 60px 20px !important;
-}
+} */
 
 .multiline .iconWrapper::after,
 .multiline .iconWrapper1::after,
