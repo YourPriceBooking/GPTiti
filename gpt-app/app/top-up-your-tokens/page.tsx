@@ -48,12 +48,14 @@ export default function TokensPage() {
                 <h2 className={styles.tokensTitle}>500,000 tokens</h2>
                 <p className={styles.plansParagraph2}>good for X–Y messages on GPT-4o-mini</p>
                 <h2 className={styles.priceTitle}>$4</h2>
+                <Link href='/payment-tokens'>
                 <button className={styles.buyButton}>
                     <div className={styles.buyButtonContent}>
                     <span className={styles.buyButtonSpan}>Buy tokens</span>
                     <Image className={styles.buyButtonIcon} width={26} height={26} src="/icons/blue-circle.svg" alt="blue-circle"/>
                     </div>
                 </button>
+                </Link>
             </article>
             <article className={styles.plansCard2}>
                 <div className={styles.recommendedContainer}>
@@ -66,12 +68,14 @@ export default function TokensPage() {
                     <span className={styles.priceTitleSpan}>$6</span>
                     <span className={styles.saveSpan1}>Save 25%</span>
                     </h2>
+                    <Link href='/payment-tokens'>
                 <button className={styles.buyButton2}>
                     <div className={styles.buyButtonContent}>
                     <span className={styles.buyButtonSpan}>Buy tokens</span>
                     <Image className={styles.buyButtonIcon} width={26} height={26} src="/icons/blue-circle.svg" alt="blue-circle"/>
                     </div>
                 </button>
+                </Link>
             </article>
             <article className={styles.plansCard3}>
                 <div className={styles.bestValueContainer}>
@@ -84,12 +88,14 @@ export default function TokensPage() {
                     <span>$12</span>
                     <span className={styles.saveSpan2}>Save 50%</span>
                     </h2>
+                    <Link href='/payment-tokens'>
                 <button className={styles.buyButton3}>
                     <div className={styles.buyButtonContent}>
                     <span className={styles.buyButtonSpan}>Buy tokens</span>
                     <Image className={styles.buyButtonIcon} width={26} height={26} src="/icons/blue-circle.svg" alt="blue-circle"/>
                     </div>
                 </button>
+                </Link>
             </article>
         </section>
         <hr className={styles.horizontalLine}/>
