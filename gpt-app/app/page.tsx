@@ -26,6 +26,7 @@ export default function Home() {
     deleteChat,
     renameChat,
   } = useChat();
+
   const { modelMode, setModelMode, modelRef } = useModelMode();
   const [selectedModelGroup, setSelectedModelGroup] =
     useState<ModelType>("GPT-4o");
