@@ -19,6 +19,21 @@
     width: 100%;
     min-height: 64px;
     }
+    .headerCloseIcon{
+        width: 32px;
+        height: 32px;
+        border-radius: 9px;
+        transition: 0.3ms all ease-in-out;
+    }
+    .headerCloseIcon:hover{
+        background: rgba(255, 255, 255, 0.14);
+        border-color:  rgba(173, 216, 255, 0.42);
+        cursor: pointer;
+    }
+    .headerCloseIcon:active {
+        background: rgba(0, 0, 0, 0.12);
+        border-color: rgba(255, 255, 255, 0.18);
+    }
 .groupHeaderPaymentContent{
     display: flex;
     flex-direction: column;
@@ -35,6 +50,9 @@
     font-style: italic;
     font-weight: 700;
     color: #000;
+}
+.mobileHeaderPaymentSpan2 {
+    display: none;
 }
 .headerPaymentSpan1{
     font-size: 12px;
@@ -72,6 +90,16 @@
     background: rgba(255, 255, 255, 0.14);
     border: 1px solid rgba(255, 255, 255, 0.28);
     border-radius: 13px;
+    transition: 0.3ms all ease;
+}
+.expressInfo:hover{
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(99, 179, 255, 0.55);
+    cursor: pointer; 
+}
+.expressInfo:hover .expressInfoButton{
+    background: linear-gradient(135deg, rgba(99, 179, 255, 0.42) 0%, rgba(45, 123, 255, 0.22) 100%);
+    border-color: rgba(210, 240, 255, 0.3);
 }
 .paymentOptionsLegend, .expressInfoButtonSpan, .expressInfoSpan {
     font-family: var(--font-family);
@@ -96,6 +124,9 @@
 }
 .cardInformationContainer{
     margin-top: 12px;
+    max-width: 340px;
+    width: 100%;
+    margin-right: 12px;
     padding: 16px 15px 35px 15px;
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.1) 100%);
     border: 1px solid rgba(255, 255, 255, 0.3);
@@ -109,49 +140,88 @@
     color: #000;
 }
 
-.cardNumbersParagraph{
-    margin-top: 6px;
-    display: flex;
-    max-width: 308px;
-    width: 100%;
-    min-height: 46px;
-    gap: 58px;
-    padding: 12px 16px 14px 14px;
-    background: rgba(255, 255, 255, 0.16);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 13px;
+
+ .cardNumbersParagraph {
+     margin-top: 6px;
+     display: flex;
+     align-items: center;
+     max-width: 308px;
+     width: 100%;
+     min-height: 46px;
+     gap: 12px;
+     padding: 12px 16px 14px 14px;
+     background: rgba(255, 255, 255, 0.16);
+     border: 1px solid rgba(255, 255, 255, 0.3);
+     border-radius: 13px;
+     }
+
+.cardNumbersParagraph:focus-within { 
+    background: linear-gradient( 180deg, rgba(123, 208, 255, 0.24) 0%, 
+    rgba(45, 123, 255, 0.16) 100% ); 
+    border-color: rgba(99, 179, 255, 0.75);
 }
-.cardNumbersSpan {
-    font-family: var(--font-family);
-    font-weight: 700;
-    font-size: 12px;
-    color: #000;
-}
+    .cardNumbersInput {
+     flex: 1;
+     font-family: var(--font-family);
+     font-weight: 700;
+     font-size: 12px;
+     color: #000;
+     background: transparent;
+     border: none;
+     outline: none;
+     padding: 0;
+     min-width: 0;
+     }
+
+ .cardNumbersInput:focus {
+    color:rgba(255, 255, 255, 0.92);
+    font-weight: 400;
+ }
+
+
+
 .cardInfoContainer {
     margin-top: 10px;
     display: flex;
     gap: 8px;
 }
 
-.cardInfoParagraph {
-    display: flex;
-    align-items: center;
-    background: rgba(255, 255, 255, 0.16);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 13px;
-    max-width: 150px;
-    width: 100%;
-    min-height: 46px;
-}
+.cardInfoParagraph1, .cardInfoParagraph2 {
+     display: flex;
+     align-items: center;
+     max-width: 150px;
+     width: 100%;
+     min-height: 46px;
+     padding: 12px 14px;
+     background: rgba(255, 255, 255, 0.16);
+     border: 1px solid rgba(255, 255, 255, 0.3);
+     border-radius: 13px;
+ }
+ .cardInfoParagraph2:focus-within {
+     background: linear-gradient( 180deg, rgba(123, 208, 255, 0.24) 0%, 
+    rgba(45, 123, 255, 0.16) 100% ); 
+    border-color: rgba(99, 179, 255, 0.75);
+    }
 
-.cardInfoSpan {
-    font-family: var(--font-family);
-    font-weight: 700;
-    font-size: 12px;
-    color: #000;
-    padding-left: 14px;
+ .cardInfoInput1, .cardInfoInput2 {
+     flex: 1;
+     font-family: var(--font-family);
+     font-weight: 700;
+     font-size: 12px;
+     color: #000;
+     background: transparent;
+     border: none;
+     outline: none;
+     padding: 0;
+     min-width: 0;
+ }
+.cardInfoInput2{
+     color:rgba(255, 255, 255, 0.92);
+     font-weight: 400;
 }
-.headerPaymentDivider{
+ 
+
+ .headerPaymentDivider {
     position: absolute;
     right: 50%;
     top: 12%;
@@ -185,6 +255,14 @@
     width: 100%;
     min-height: 54px;
     border-radius: 16px;
+    transition: 0.3ms all ease-out;
+}
+.paymentButton:hover {
+    background: linear-gradient(180deg, #8ed8ff 0%, #3b82f6 100%);
+    cursor: pointer;
+}
+.paymentButton:active{
+    background: rgba(0, 0, 0, 0.1);
 }
 .paymentButtonSpan {
     font-family: var(--font-family);
@@ -351,4 +429,68 @@
         font-weight: 700;
         font-size: 12px;
         color: #000;
+    }
+
+    @media (max-width: 799px) and (min-width: 320px) {
+        .paymentContainer {
+            min-height: 1200px;
+            padding-right: 12px;
+        }
+        .headerPayment{
+            width: 100vw;
+        }
+        .headerPaymentSpan2, .headerPaymentDivider {
+            display: none;
+        }
+       .cardPlanBenefits, .cardPlanSection {
+        position: static;
+       }
+       .cardPlanSection {
+        position: relative;
+        top:0;
+        max-width: 291px;
+        width: 100%;
+        right: 3;
+       }
+       .cardInformationContainer{
+        max-width: 297px;
+        width: 100%;
+        }
+        .cardInfoParagraph1, .cardInfoParagraph2 {
+            max-width: 102px;
+            width: 100%;
+        }
+        .cardInfoContainer{
+            gap: 56px;
+        }
+       .mobileHeaderPaymentSpan2 {
+        display: block;
+        margin-bottom: 16px;
+        margin-left: 28px;
+        font-family: var(--font-family);
+        font-style: italic;
+        font-weight: 700;
+        color: #000;
+        font-size: 11px;
+       }
+       
+       .cardPlanSection {
+        margin-left: 22px;
+        margin-bottom: 6px;
+       }
+       .cardPlanBenefits {
+        margin-left: 22px;
+       }
+       .cardPlanTokensContainer, .cardPlanPriceContainer{
+        display: flex;
+        gap: 24px;
+       }
+       
+       .formPayment{
+        background: transparent;
+        border: none;
+       }
+       .cardPlanSpan{
+        text-align: center;
+        }
     }
