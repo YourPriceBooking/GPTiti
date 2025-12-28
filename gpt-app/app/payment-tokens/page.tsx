@@ -11,7 +11,7 @@ export default function page() {
             <span className={styles.headerPaymentSpan1}>No subscriptions. Tokens never expire.</span>
             </div>
             <span className={styles.headerPaymentSpan2}>ORDER SUMMARY</span>
-            <Image src='icons/close.svg' width={32} height={32} alt='close-icon'/>
+            <Image className={styles.headerCloseIcon} src='icons/close.svg' width={32} height={32} alt='close-icon'/>
            </header>
            <form className={styles.formPayment}>
             <fieldset className={styles.paymentOptions}> 
@@ -27,17 +27,28 @@ export default function page() {
                       <legend className={styles.orText}>or pay with card</legend> 
                       <div className={styles.cardInformationContainer}>
                         <span className={styles.cardInformationSpan}>Card information</span>
-                        <p className={styles.cardNumbersParagraph}>
-                          <span className={styles.cardNumbersSpan}>4242 4242 4242 4242</span>
-                        <Image src='/icons/three-circles.svg' width={86} height={18} alt='card-circles'/>
-                        </p>
+                        <div className={styles.cardNumbersParagraph}> 
+                          <input className={styles.cardNumbersInput} 
+                          placeholder="4242 4242 4242 4242" 
+                          type="text" 
+                          inputMode="numeric" 
+                          maxLength={19}/> 
+                          <Image src="/icons/three-circles.svg" width={86} height={18} alt="card-circles" /> 
+                          </div>
                         <div className={styles.cardInfoContainer}>
-                        <p className={styles.cardInfoParagraph}>
-                          <span className={styles.cardInfoSpan}>12 / 34</span>
-                        </p>
-                         <p className={styles.cardInfoParagraph}>
-                          <span className={styles.cardInfoSpan}>CVC</span>
-                        </p>
+                        <div className={styles.cardInfoParagraph1}>
+                           <input className={styles.cardInfoInput1} 
+                           placeholder="12 / 34" 
+                           type="text" 
+                           inputMode="numeric" 
+                           maxLength={7} /> 
+                           </div> 
+                           <div className={styles.cardInfoParagraph2}> 
+                            <input className={styles.cardInfoInput2} 
+                            placeholder="CVC" 
+                            type="password" 
+                            maxLength={3} /> 
+                            </div>
                         </div>
                         </div>
                     </fieldset>
@@ -58,6 +69,7 @@ export default function page() {
                      <span className={styles.downFormSpan}>By paying you agree to Terms & Conditions  and Privacy Policy• Powered by Stripe</span>
                     </form>
            <div className={styles.headerPaymentDivider}></div>
+           <span className={styles.mobileHeaderPaymentSpan2}>ORDER SUMMARY</span>
            <section className={styles.cardPlanSection}>
             <div className={styles.cardPlanSectionParagraphesContainer}>
             <p className={styles.cardPlanSectionParagraph1}>
