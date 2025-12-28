@@ -1,8 +1,8 @@
-import { ReactElement } from "react";
+import React, { ReactElement } from "react";
 import { ModelProps } from "./shared";
 
 export interface CustomScrollBarProps {
-  scrollTargetClass: string; 
+  scrollTargetClass: string;
 }
 
 export type Message = {
@@ -12,11 +12,11 @@ export type Message = {
 
 export type Chat = {
   id: string;
-  title: string | null;   
+  title: string | null;
   messages: Message[];
 };
 
-export type ModelType = 'GPT-4o' | 'GPT-5.1' | '0-Series';
+export type ModelType = "GPT-4o" | "GPT-5.1" | "0-Series";
 
 export type ModelItem = {
   title: string;
@@ -28,15 +28,15 @@ export type ModelConfig = {
   list: ModelItem[];
 };
 
-export type ModelMode = 'idle' | 'hover' | 'click';
+export type ModelMode = "idle" | "hover" | "click";
 
 export type LeftSideProps = {
   onNewChat: () => void;
   chatList: Chat[];
   setActiveChatId: (id: string) => void;
 
-  deleteChat: (id: string) => void;             
-  renameChat: (id: string, newTitle: string) => void; 
+  deleteChat: (id: string) => void;
+  renameChat: (id: string, newTitle: string) => void;
 
   modelRef: React.RefObject<HTMLDivElement | null>;
   modelMode: ModelMode;
@@ -48,15 +48,14 @@ export type LeftSideProps = {
   selectedModelGroup: ModelType;
   setSelectedModelGroup: (group: ModelType) => void;
 
-  isModalOpen: boolean; 
-  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>
+  isModalOpen: boolean;
+  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export type SectionGptChatsProps = Pick<
   LeftSideProps,
-  'onNewChat' | 'chatList' | 'setActiveChatId' | 'deleteChat' | 'renameChat'
+  "onNewChat" | "chatList" | "setActiveChatId" | "deleteChat" | "renameChat"
 >;
-
 
 export type TokensContextType = {
   balance: number;
@@ -64,41 +63,54 @@ export type TokensContextType = {
   handleClaim: () => void;
 };
 
-export type MainSectionRightSideProps = 
-{ 
-    insertTemplate: (text: string) => void; 
-    setFocusMode: React.Dispatch<React.SetStateAction<boolean>>; 
-    };
+export type MainSectionRightSideProps = {
+  insertTemplate: (text: string) => void;
+  setFocusMode: React.Dispatch<React.SetStateAction<boolean>>;
+  focusMode: boolean;
 
-export type ModelModalOverlayProps = { isModalOpen: boolean; 
-  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>; 
-  selectedModel: string; 
-  setSelectedModel: (model: string) => void; 
-  selectedModelGroup: ModelType; 
-  setSelectedModelGroup: (group: ModelType) => void; }; 
-  
-  export type ModelGptitiTitleWithIconProps = { 
-    modelRef: React.RefObject<HTMLDivElement | null>; 
-    selectedModel: string; isModalOpen: boolean; 
-    setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>; }; 
-    
-    export type SectionGptTokensProps = 
-    { selectedModel: string; 
-      modelRef: React.RefObject<HTMLDivElement | null>;
-      modelMode: ModelMode;
-      setModelMode: React.Dispatch<React.SetStateAction<ModelMode>>;
-      selectedModelGroup: ModelType; 
-      setSelectedModel: (model: string) => void; 
-      setSelectedModelGroup: (group: ModelType) => void; 
-      isModalOpen: boolean; 
-      setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>; }; 
+  hasInput: boolean;
+  onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  onSend: (message: string) => void;
+  inputRef: React.RefObject<HTMLTextAreaElement | null>;
+  onHideSection: () => void;
+  templateTick: number;
+};
 
-      export interface HeaderRightSideProps 
-      { chatTitle: string | null | undefined; 
-        modelRef: React.RefObject<HTMLDivElement | null>; 
-        selectedModel: string; 
-        setSelectedModel: (model: string) => void; 
-        selectedModelGroup: ModelType; 
-        setSelectedModelGroup: (group: ModelType) => void; 
-        isModalOpen: boolean; 
-        setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>; }
+export type ModelModalOverlayProps = {
+  isModalOpen: boolean;
+  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  selectedModel: string;
+  setSelectedModel: (model: string) => void;
+  selectedModelGroup: ModelType;
+  setSelectedModelGroup: (group: ModelType) => void;
+};
+
+export type ModelGptitiTitleWithIconProps = {
+  modelRef: React.RefObject<HTMLDivElement | null>;
+  selectedModel: string;
+  isModalOpen: boolean;
+  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+export type SectionGptTokensProps = {
+  selectedModel: string;
+  modelRef: React.RefObject<HTMLDivElement | null>;
+  modelMode: ModelMode;
+  setModelMode: React.Dispatch<React.SetStateAction<ModelMode>>;
+  selectedModelGroup: ModelType;
+  setSelectedModel: (model: string) => void;
+  setSelectedModelGroup: (group: ModelType) => void;
+  isModalOpen: boolean;
+  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+export interface HeaderRightSideProps {
+  chatTitle: string | null | undefined;
+  modelRef: React.RefObject<HTMLDivElement | null>;
+  selectedModel: string;
+  setSelectedModel: (model: string) => void;
+  selectedModelGroup: ModelType;
+  setSelectedModelGroup: (group: ModelType) => void;
+  isModalOpen: boolean;
+  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
