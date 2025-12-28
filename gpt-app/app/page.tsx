@@ -15,6 +15,7 @@ export default function Home() {
     chatList,
     activeChat,
     setActiveChatId,
+    activeChatId,
     hasInput,
     inputSent,
     inputRef,
@@ -50,6 +51,14 @@ export default function Home() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatList, activeChat]);
+
+  useEffect(() => {
+    const empty = !activeChat || activeChat.messages.length === 0;
+
+    setIsSectionVisible(empty);
+    setFocusMode(false);
+  }, [activeChatId, activeChat?.messages.length]);
+
   return (
     <>
       <ModelModalOverlay
@@ -64,7 +73,7 @@ export default function Home() {
         <LeftSide
           // onNewChat={handleNewChat}
           onNewChat={() => {
-            setNewChatOpened(true);
+            // setIsSectionVisible(true);
             handleNewChat();
           }}
           isModalOpen={isModalOpen}
@@ -95,7 +104,14 @@ export default function Home() {
           <MainSectionRightSide
             insertTemplate={insertTemplate}
             setFocusMode={setFocusMode}
+            focusMode={focusMode}
             isSectionVisible={isSectionVisible}
+            hasInput={hasInput}
+            onChange={handleChange}
+            onSend={handleSendClick}
+            inputRef={inputRef}
+            onHideSection={() => setIsSectionVisible(false)}
+            templateTick={templateTick}
           />
           {activeChat && activeChat.messages.length > 0 && (
             <MessageList messages={activeChat.messages} />
@@ -105,33 +121,37 @@ export default function Home() {
               isExistingChat
                 ? styles.inputBottom
                 : newChatOpened && isNewChat
-                ? styles.inputCenter
+                ? styles.inputBottom
                 : focusMode && inputSent
                 ? styles.inputBottom
                 : focusMode
-                ? styles.inputCenter
+                ? styles.inputBottom
                 : inputSent
                 ? styles.inputBottom
                 : styles.inputWrapper
             }
           >
-            <InputBar
-              hasInput={hasInput}
-              onChange={handleChange}
-              onSend={handleSendClick}
-              inputRef={inputRef}
-              onHideSection={() => setIsSectionVisible(false)}
-              templateTick={templateTick}
-            />
-            {inputSent && (
-              <div className={styles.spanContainer}>
-                <span className={styles.inputSpan}>
-                  {" "}
-                  AI systems may make mistakes, so we recommend verifying
-                  important information.
-                </span>{" "}
+            {!(isSectionVisible && focusMode) && (
+              <div className={styles.inputBottom}>
+                <InputBar
+                  hasInput={hasInput}
+                  onChange={handleChange}
+                  onSend={handleSendClick}
+                  inputRef={inputRef}
+                  onHideSection={() => setIsSectionVisible(false)}
+                  templateTick={templateTick}
+                />
+
+                {inputSent && (
+                  <div className={styles.spanContainer}>
+                    <span className={styles.inputSpan}>
+                      AI systems may make mistakes, so we recommend verifying
+                      important information.
+                    </span>
+                  </div>
+                )}
               </div>
-            )}{" "}
+            )}
           </div>
           <div ref={messagesEndRef} />
         </div>

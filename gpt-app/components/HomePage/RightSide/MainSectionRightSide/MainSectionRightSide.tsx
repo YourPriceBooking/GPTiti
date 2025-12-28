@@ -2,26 +2,34 @@ import React, { useState } from "react";
 import styles from "./MainSectionRightSide.module.css";
 import Image from "next/image";
 import { MainSectionRightSideProps } from "@/types/types";
+import InputBar from "@/components/HomePage/RightSide/InputBar/InputBar";
 
 export default function MainSectionRightSide({
   insertTemplate,
   setFocusMode,
   isSectionVisible,
+  focusMode,
+
+  hasInput,
+  onChange,
+  onSend,
+  inputRef,
+  onHideSection,
+  templateTick,
 }: MainSectionRightSideProps & {
   isSectionVisible: boolean;
+  focusMode: boolean;
 }) {
-  const [hidden, setHidden] = useState(false);
-  if (!isSectionVisible) {
-    return null;
-  }
+  //   const [hidden, setHidden] = useState(false);
+  if (!isSectionVisible) return null;
   return (
     <div className={styles.mainSectionContainer}>
-      {!hidden ? (
+      {!focusMode ? (
         <section className={styles.additionalSectionContainer}>
           <p
             className={styles.additionalSectionParagraphContainer}
             onClick={() => {
-              setHidden(true);
+              //   setHidden(true);
               setFocusMode(true);
             }}
           >
@@ -217,7 +225,7 @@ export default function MainSectionRightSide({
               height={28}
               alt="focus-toggle"
               onClick={() => {
-                setHidden(false);
+                // setHidden(false);
                 setFocusMode(false);
               }}
               style={{ cursor: "pointer" }}
@@ -228,6 +236,16 @@ export default function MainSectionRightSide({
             <p className={styles.hiddenCenterParagraph}>
               Focus mode hides suggestions — just type and go.
             </p>
+            <div className={styles.focusInputWrap}>
+              <InputBar
+                hasInput={hasInput}
+                onChange={onChange}
+                onSend={onSend}
+                inputRef={inputRef}
+                onHideSection={onHideSection}
+                templateTick={templateTick}
+              />
+            </div>
             <span className={styles.hiddenCenterSpan1}>
               Tip: press Enter to send • Shift+Enter for a new line
             </span>

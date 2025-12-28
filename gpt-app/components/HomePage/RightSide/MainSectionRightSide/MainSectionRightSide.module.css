@@ -233,3 +233,15 @@
   position: absolute;
   bottom: 16;
 }
+
+.focusInputWrap {
+  margin-top: 20px;
+  width: 100%;
+  max-width: 816px;
+}
+
+.hiddenCenterSection {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
