@@ -1,6 +1,6 @@
 import Image from "next/image";
 import styles from "./InputBar.module.css";
-import { useState, useEffect, useLayoutEffect } from "react";
+import { useState, useLayoutEffect } from "react";
 
 export default function InputBar({
   hasInput,
@@ -9,6 +9,8 @@ export default function InputBar({
   inputRef,
   onHideSection,
   templateTick,
+  setHasFirstRequest,   
+  hasFirstRequest,
 }: {
   hasInput: boolean;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
@@ -16,6 +18,8 @@ export default function InputBar({
   inputRef: React.RefObject<HTMLTextAreaElement | null>;
   onHideSection: () => void;
   templateTick: number;
+  setHasFirstRequest: React.Dispatch<React.SetStateAction<boolean>>;
+  hasFirstRequest: boolean;
 }) {
   const [isMultiline, setIsMultiline] = useState(false);
   const [shouldScroll, setShouldScroll] = useState(false);
@@ -84,6 +88,7 @@ export default function InputBar({
       if (message.trim() !== "") {
         onSend(message);
         onHideSection();
+        if (!hasFirstRequest) { setHasFirstRequest(true); }
       }
       inputRef.current.value = "";
       inputRef.current.style.height = "68px";

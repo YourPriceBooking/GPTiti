@@ -38,13 +38,15 @@ export default function Home() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const [newChatOpened, setNewChatOpened] = useState(false);
+  const [isOverlayOpen, setIsOverlayOpen] = useState(false);  
+  const [hasFirstRequest, setHasFirstRequest] = useState(false); 
   const isNewChat = !activeChat || activeChat.messages.length === 0;
 
   const isExistingChat = !!activeChat && !newChatOpened;
 
   useEffect(() => {
     if (activeChat && activeChat.messages.length > 0) {
-      setNewChatOpened(false);
+      setTimeout(() => {setNewChatOpened(false)},0);
     }
   }, [activeChat?.messages.length]);
 
@@ -54,10 +56,16 @@ export default function Home() {
 
   useEffect(() => {
     const empty = !activeChat || activeChat.messages.length === 0;
-
-    setIsSectionVisible(empty);
-    setFocusMode(false);
+    setTimeout(() => {setIsSectionVisible(empty);
+    setFocusMode(false);}, 0)
+    
   }, [activeChatId, activeChat?.messages.length]);
+
+const insertTemplateToInput = (template: string) => 
+  { if (inputRef.current) 
+    { inputRef.current.value = template; inputRef.current.focus(); 
+      (
+        { target: inputRef.current, } as unknown as React.ChangeEvent<HTMLTextAreaElement>); } };
 
   return (
     <>
@@ -100,7 +108,30 @@ export default function Home() {
             setSelectedModelGroup={setSelectedModelGroup}
             isModalOpen={isModalOpen}
             setIsModalOpen={setIsModalOpen}
+            hasFirstRequest={hasFirstRequest}
+            onOpenQuickActions={() => { 
+              if (hasFirstRequest) { setIsOverlayOpen(true); } }}
           />
+          {isOverlayOpen && 
+          ( <div className={styles.overlay}> 
+          <div className={styles.overlayContent}> 
+            <MainSectionRightSide insertTemplate={(template) => 
+            { insertTemplateToInput(template); 
+              setIsOverlayOpen(false); 
+              setFocusMode(true); }} 
+              setFocusMode={setFocusMode} 
+              isSectionVisible={isSectionVisible} 
+              focusMode={focusMode} 
+              hasInput={hasInput} 
+               onChange={handleChange} 
+               onSend={handleSendClick} 
+               inputRef={inputRef} 
+               onHideSection={() => setIsSectionVisible(false)} 
+               templateTick={templateTick}
+               setHasFirstRequest={setHasFirstRequest}
+               hasFirstRequest = {hasFirstRequest} /> 
+               </div> 
+               </div> )}
           <MainSectionRightSide
             insertTemplate={insertTemplate}
             setFocusMode={setFocusMode}
@@ -112,6 +143,8 @@ export default function Home() {
             inputRef={inputRef}
             onHideSection={() => setIsSectionVisible(false)}
             templateTick={templateTick}
+            setHasFirstRequest={setHasFirstRequest}
+            hasFirstRequest = {hasFirstRequest}
           />
           {activeChat && activeChat.messages.length > 0 && (
             <MessageList messages={activeChat.messages} />
@@ -136,10 +169,15 @@ export default function Home() {
                 <InputBar
                   hasInput={hasInput}
                   onChange={handleChange}
-                  onSend={handleSendClick}
+                  onSend={() => { handleSendClick(); 
+                    if (!hasFirstRequest) 
+                      { setHasFirstRequest(true);  } 
+                  }}
                   inputRef={inputRef}
                   onHideSection={() => setIsSectionVisible(false)}
                   templateTick={templateTick}
+                  setHasFirstRequest={setHasFirstRequest} 
+                  hasFirstRequest={hasFirstRequest}
                 />
 
                 {inputSent && (

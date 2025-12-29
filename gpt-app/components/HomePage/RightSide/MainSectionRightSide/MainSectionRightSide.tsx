@@ -16,9 +16,13 @@ export default function MainSectionRightSide({
   inputRef,
   onHideSection,
   templateTick,
-}: MainSectionRightSideProps & {
+  setHasFirstRequest,
+  hasFirstRequest
+  }: MainSectionRightSideProps & {
   isSectionVisible: boolean;
   focusMode: boolean;
+  setHasFirstRequest: React.Dispatch<React.SetStateAction<boolean>>;
+  hasFirstRequest: boolean;
 }) {
   //   const [hidden, setHidden] = useState(false);
   if (!isSectionVisible) return null;
@@ -39,8 +43,14 @@ export default function MainSectionRightSide({
               height={12}
               alt="ready"
             />
+            
             <span className={styles.additionalSectionSpan1}>Ready</span>
           </p>
+          <Image
+            src={'/icons/close2.svg'}
+            width={44}
+            height={32}
+            alt='close-icon'/>
           <h1 className={styles.additionalSectionTitle}>
             What do you want to do today?
           </h1>
@@ -244,7 +254,9 @@ export default function MainSectionRightSide({
                 inputRef={inputRef}
                 onHideSection={onHideSection}
                 templateTick={templateTick}
-              />
+                setHasFirstRequest={setHasFirstRequest}
+                hasFirstRequest={hasFirstRequest}
+                />
             </div>
             <span className={styles.hiddenCenterSpan1}>
               Tip: press Enter to send • Shift+Enter for a new line
