@@ -4,27 +4,23 @@ import Image from "next/image";
 import { MainSectionRightSideProps } from "@/types/types";
 import InputBar from "@/components/HomePage/RightSide/InputBar/InputBar";
 
-export default function MainSectionRightSide({
-  insertTemplate,
-  setFocusMode,
-  isSectionVisible,
-  focusMode,
+export default function MainSectionRightSide(props: MainSectionRightSideProps) {
+  const {
+    insertTemplate,
+    setFocusMode,
+    isSectionVisible,
+    focusMode,
+    hasInput,
+    onChange,
+    onSend,
+    inputRef,
+    onHideSection,
+    templateTick,
+    setHasFirstRequest,
+    hasFirstRequest,
+    isOverlay = false,
+  } = props;
 
-  hasInput,
-  onChange,
-  onSend,
-  inputRef,
-  onHideSection,
-  templateTick,
-  setHasFirstRequest,
-  hasFirstRequest,
-}: MainSectionRightSideProps & {
-  isSectionVisible: boolean;
-  focusMode: boolean;
-  setHasFirstRequest: React.Dispatch<React.SetStateAction<boolean>>;
-  hasFirstRequest: boolean;
-}) {
-  //   const [hidden, setHidden] = useState(false);
   if (!isSectionVisible) return null;
   return (
     <div className={styles.mainSectionContainer}>
