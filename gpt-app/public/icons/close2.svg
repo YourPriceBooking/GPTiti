@@ -1,1 +1,12 @@
-<svg width="45" height="33" viewBox="0 0 45 33" fill="none" xmlns="http://www.w3.org/2000/svg"> <!-- Фонова кнопка --> <path d="M32.5 0.5H12.5C5.87258 0.5 0.5 5.87258 0.5 12.5V20.5C0.5 27.1274 5.87258 32.5 12.5 32.5H32.5C39.1274 32.5 44.5 27.1274 44.5 20.5V12.5C44.5 5.87258 39.1274 0.5 32.5 0.5Z" fill="white" stroke="#E2E8F0" /> <!-- Великий хрестик --> <path d="M16.5 10.5L28.5 22.5M28.5 10.5L16.5 22.5" stroke="#0F172A" stroke-width="2.4" stroke-linecap="round" /> <!-- Маленький хрестик по центру --> <g transform="translate(15, 9)"> <svg width="15" height="15" viewBox="0 0 15 15" fill="none"> <path d="M1.2 1.2L13.2 13.2M13.2 1.2L1.2 13.2" stroke="#0F172A" stroke-width="2.4" stroke-linecap="round" /> </svg> </g> </svg>
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 24 24"
+  fill="none"
+>
+  <path
+    d="M6 6L18 18M18 6L6 18"
+    stroke="#0F172A"
+    stroke-width="2"
+    stroke-linecap="round"
+  />
+</svg>
