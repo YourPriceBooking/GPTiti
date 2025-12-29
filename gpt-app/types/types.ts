@@ -68,12 +68,21 @@ export type MainSectionRightSideProps = {
   setFocusMode: React.Dispatch<React.SetStateAction<boolean>>;
   focusMode: boolean;
 
+  isSectionVisible: boolean; // ✅ додали
+
   hasInput: boolean;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-  onSend: (message: string) => void;
+  onSend: () => void; // ✅ було (message: string) — у тебе фактично void
   inputRef: React.RefObject<HTMLTextAreaElement | null>;
   onHideSection: () => void;
   templateTick: number;
+
+  // ✅ додали для логіки quick actions / first request
+  setHasFirstRequest: React.Dispatch<React.SetStateAction<boolean>>;
+  hasFirstRequest: boolean;
+
+  // ✅ додали, щоб TS не сварився
+  isOverlay?: boolean;
 };
 
 export type ModelModalOverlayProps = {
