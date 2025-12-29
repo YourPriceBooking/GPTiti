@@ -2,7 +2,9 @@ import styles from './HeaderRightSide.module.css';
 import Image from 'next/image'; 
 import ModelGptitiTitleWithIcon from '@/components/ModelGptitiTitleWithIcon/ModelGptitiTitleWithIcon'; 
 import { HeaderRightSideProps } from '@/types/types'; 
-export default function HeaderRightSide({ chatTitle, modelRef, selectedModel, setSelectedModel, selectedModelGroup, setSelectedModelGroup, isModalOpen, setIsModalOpen, }: HeaderRightSideProps) 
+export default function HeaderRightSide({ chatTitle, modelRef, selectedModel, setSelectedModel, selectedModelGroup, setSelectedModelGroup, isModalOpen, setIsModalOpen, onOpenQuickActions, hasFirstRequest}: HeaderRightSideProps & {onOpenQuickActions: () => void;
+  hasFirstRequest: boolean;
+}) 
 { return ( 
 <div className={styles.container}> 
   <div className={styles.containerGroupLogos}> 
@@ -24,7 +26,9 @@ export default function HeaderRightSide({ chatTitle, modelRef, selectedModel, se
           </span> 
           </div> 
           </div>
-           <p className={styles.quickActionsContainer}> 
+           <p className={styles.quickActionsContainer}
+           onClick={onOpenQuickActions}
+            style={{ opacity: hasFirstRequest ? 1 : 0.5 }}> 
             <Image src="/icons/quick-actions-icon.svg" width={21} height={21} alt="quick-actions-icon" /> 
             <span className={styles.quickActionsSpan}>Quick actions</span> 
             </p> 
