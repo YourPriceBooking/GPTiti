@@ -123,3 +123,5 @@ export interface HeaderRightSideProps {
   isModalOpen: boolean;
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
+
+export type SecondHeaderRightSideProps = Pick<HeaderRightSideProps, "chatTitle">;
