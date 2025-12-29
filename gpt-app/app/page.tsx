@@ -1,6 +1,5 @@
 "use client";
 import styles from "./page.module.css";
-import Image from "next/image";
 import LeftSide from "@/components/HomePage/LeftSide/LeftSide";
 import MessageList from "@/components/HomePage/RightSide/MessageList/MessageList";
 import InputBar from "@/components/HomePage/RightSide/InputBar/InputBar";
@@ -11,10 +10,6 @@ import { ModelType } from "@/types/types";
 import HeaderRightSide from "@/components/HomePage/RightSide/HeaderRightSide/HeaderRightSide";
 import MainSectionRightSide from "@/components/HomePage/RightSide/MainSectionRightSide/MainSectionRightSide";
 import ModelModalOverlay from "@/components/ModelModalOverlay/ModelModalOverlay";
-
-
-
-import SecondHeaderRightSide from "@/components/HomePage/RightSide/SecondHeaderRightSide.tsx/SecondHeaderRightSide";
 
 export default function Home() {
   const {
@@ -120,18 +115,14 @@ export default function Home() {
             isModalOpen={isModalOpen}
             setIsModalOpen={setIsModalOpen}
             hasFirstRequest={hasFirstRequest}
-
             onOpenQuickActions={() => {
               if (hasFirstRequest) {
                 setIsOverlayOpen(true);
               }
             }}
-
-           
           />
-          <SecondHeaderRightSide chatTitle={activeChat?.title}/>
-        
 
+          {/* Overlay для Quick Actions */}
           {isOverlayOpen && (
             <>
               <div
@@ -148,12 +139,7 @@ export default function Home() {
                     onClick={() => setIsOverlayOpen(false)}
                     aria-label="Close overlay"
                   >
-                    <Image
-                      src={"/icons/close2.svg"}
-                      width={32}
-                      height={32}
-                      alt="close-icon"
-                    />
+                    ✕
                   </button>
                   <MainSectionRightSide
                     insertTemplate={(template) => {
@@ -182,6 +168,7 @@ export default function Home() {
             </>
           )}
 
+          {/* Основний MainSection для нового чату */}
           {!isOverlayOpen && (
             <MainSectionRightSide
               insertTemplate={insertTemplate}
@@ -237,14 +224,12 @@ export default function Home() {
                   hasFirstRequest={hasFirstRequest}
                 />
 
-                {inputSent && (
-                  <div className={styles.spanContainer}>
-                    <span className={styles.inputSpan}>
-                      AI systems may make mistakes, so we recommend verifying
-                      important information.
-                    </span>
-                  </div>
-                )}
+                <div className={styles.spanContainer}>
+                  <span className={styles.inputSpan}>
+                    AI systems may make mistakes, so we recommend verifying
+                    important information.
+                  </span>
+                </div>
               </div>
             )}
           </div>

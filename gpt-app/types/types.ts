@@ -67,21 +67,15 @@ export type MainSectionRightSideProps = {
   insertTemplate: (text: string) => void;
   setFocusMode: React.Dispatch<React.SetStateAction<boolean>>;
   focusMode: boolean;
-
-  isSectionVisible: boolean; // ✅ додали
-
+  isSectionVisible: boolean;
   hasInput: boolean;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-  onSend: () => void; // ✅ було (message: string) — у тебе фактично void
+  onSend: () => void;
   inputRef: React.RefObject<HTMLTextAreaElement | null>;
   onHideSection: () => void;
   templateTick: number;
-
-  // ✅ додали для логіки quick actions / first request
   setHasFirstRequest: React.Dispatch<React.SetStateAction<boolean>>;
   hasFirstRequest: boolean;
-
-  // ✅ додали, щоб TS не сварився
   isOverlay?: boolean;
 };
 
@@ -124,4 +118,7 @@ export interface HeaderRightSideProps {
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export type SecondHeaderRightSideProps = Pick<HeaderRightSideProps, "chatTitle">;
+export type SecondHeaderRightSideProps = Pick<
+  HeaderRightSideProps,
+  "chatTitle"
+>;

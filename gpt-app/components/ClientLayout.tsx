@@ -3,7 +3,11 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 
-export default function ClientLayout({ children }: { children: React.ReactNode }) {
+export default function ClientLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const pathname = usePathname();
   const isHomePage = pathname === "/";
   const isTopUpTokensPage = pathname === "/top-up-your-tokens";
@@ -15,13 +19,26 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       {!isHomePage && !isTopUpTokensPage && (
         <footer className="text-center text-gray-500 text-sm mt-16 space-y-2 p-6">
           <nav className="flex justify-center gap-6">
-            <Link href="/" className="hover:text-gray-700">Home</Link>
-            <Link href="/our-mission" className="hover:text-gray-700">Our Mission</Link>
-            <Link href="/terms-conditions" className="hover:text-gray-700">Terms & Conditions</Link>
-            <Link href="/privacy-policy" className="hover:text-gray-700">Privacy Policy</Link>
-            <Link href="/sign-in" className="hover:text-gray-700">Sign in</Link>
+            <Link href="/" className="hover:text-gray-700">
+              Home
+            </Link>
+            <Link href="/our-mission" className="hover:text-gray-700">
+              Our Mission
+            </Link>
+            <Link href="/terms-conditions" className="hover:text-gray-700">
+              Terms & Conditions
+            </Link>
+            <Link href="/privacy-policy" className="hover:text-gray-700">
+              Privacy Policy
+            </Link>
+            <Link href="/sign-in" className="hover:text-gray-700">
+              Sign in
+            </Link>
           </nav>
-          <p>© {new Date().getFullYear()} Your Price Booking. All rights reserved.</p>
+          <p>
+            © {new Date().getFullYear()} Your Price Booking OÜ. All rights
+            reserved. GPTiti™ is a trademark of Your Price Booking OÜ.
+          </p>
         </footer>
       )}
     </>
