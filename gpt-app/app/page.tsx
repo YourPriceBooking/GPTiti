@@ -12,6 +12,10 @@ import HeaderRightSide from "@/components/HomePage/RightSide/HeaderRightSide/Hea
 import MainSectionRightSide from "@/components/HomePage/RightSide/MainSectionRightSide/MainSectionRightSide";
 import ModelModalOverlay from "@/components/ModelModalOverlay/ModelModalOverlay";
 
+
+
+import SecondHeaderRightSide from "@/components/HomePage/RightSide/SecondHeaderRightSide.tsx/SecondHeaderRightSide";
+
 export default function Home() {
   const {
     chatList,
@@ -116,12 +120,17 @@ export default function Home() {
             isModalOpen={isModalOpen}
             setIsModalOpen={setIsModalOpen}
             hasFirstRequest={hasFirstRequest}
+
             onOpenQuickActions={() => {
               if (hasFirstRequest) {
                 setIsOverlayOpen(true);
               }
             }}
+
+           
           />
+          <SecondHeaderRightSide chatTitle={activeChat?.title}/>
+        
 
           {isOverlayOpen && (
             <>
