@@ -12,6 +12,7 @@ export function useChat() {
   );
   const [hasInput, setHasInput] = useState(false);
   const [inputSent, setInputSent] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [templateTick, setTemplateTick] = useState(0);
@@ -20,14 +21,11 @@ export function useChat() {
     setHasInput(e.target.value.trim().length > 0);
   }
 
-  function handleSendClick() {
+  async function handleSendClick() {
     if (!hasInput || !inputRef.current) return;
 
     const userText = inputRef.current.value.trim();
     if (!userText) return;
-
-    const aiResponse = generateAIResponse(userText);
-    const newMessage = { user: userText, ai: aiResponse };
 
     setChatList((prev) =>
       prev.map((chat) =>
@@ -35,7 +33,7 @@ export function useChat() {
           ? {
               ...chat,
               title: chat.title ?? userText,
-              messages: [...chat.messages, newMessage],
+              messages: [...chat.messages, { user: userText, ai: null }],
             }
           : chat
       )
@@ -43,7 +41,29 @@ export function useChat() {
 
     setInputSent(true);
     setHasInput(false);
+    setIsTyping(true);
     inputRef.current.value = "";
+
+    const delay = Math.random() * 1000 + 1500;
+    await new Promise((resolve) => setTimeout(resolve, delay));
+    const aiResponse = generateAIResponse(userText);
+
+    setChatList((prev) =>
+      prev.map((chat) =>
+        chat.id === activeChatId
+          ? {
+              ...chat,
+              messages: chat.messages.map((msg, idx) =>
+                idx === chat.messages.length - 1
+                  ? { ...msg, ai: aiResponse }
+                  : msg
+              ),
+            }
+          : chat
+      )
+    );
+
+    setIsTyping(false);
   }
 
   function handleNewChat() {
@@ -54,9 +74,11 @@ export function useChat() {
     setActiveChatId(newChatId);
     setHasInput(false);
     setInputSent(false);
+    setIsTyping(false);
 
     if (inputRef.current) inputRef.current.value = "";
   }
+
   function deleteChat(chatId: string) {
     setChatList((prev) => prev.filter((chat) => chat.id !== chatId));
     if (activeChatId === chatId) {
@@ -91,6 +113,7 @@ export function useChat() {
     setActiveChatId,
     hasInput,
     inputSent,
+    isTyping,
     inputRef,
     insertTemplate,
     templateTick,
