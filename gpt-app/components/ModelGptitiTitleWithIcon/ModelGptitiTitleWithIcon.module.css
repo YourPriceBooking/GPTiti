@@ -9,6 +9,9 @@
   z-index: 9999;
   } */
   .titleContainer{
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.08) 100%);
+    max-width: 275px;
+    width: 100%;
     display: flex;
     align-items: end;
     gap: 18px;
@@ -16,8 +19,8 @@
 
 .title {
     font-family: var(--font-family);
-    font-weight: 700;
-    font-size: 24px;
+    font-weight: 400;
+    font-size: 20px;
     color: var(--main-white);
     transition: all 0.5s ease-out;
 }
