@@ -5,9 +5,13 @@
     width: 100%;
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 15px;
-    margin-top: 84px;
+    position: sticky;
+    top: 84px;
     display: flex;
-     gap: 21px; /*coment thia */
+    gap: 21px; /*coment thia */
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04)); 
+    background-color: rgba(0, 0, 0, 0.8); 
+    backdrop-filter: blur(15px);
 }
 .containerChatInfo{
     display: flex;
