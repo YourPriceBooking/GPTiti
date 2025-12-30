@@ -1,32 +1,33 @@
-.messagesContainer {
-  width: 100%;
-  max-width: 816px;
-  margin-bottom: 120px; 
-  flex-shrink: 0; 
-}
-
-.userMessageContainer{
+.messageList {
   display: flex;
-  justify-content: flex-end;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
 }
 
 .userMessage {
   display: flex;
-  margin-top: 80px;
-  margin-bottom: 41px;
-  background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%);
-  border-radius: 22px;
-  max-width: 613px;
+  justify-content: flex-end;
   width: 100%;
-  height: auto;
 }
 
 .userText {
-  padding: 16px 15px 8px 22px;
-  font-family: var(--font-family);
+  background: #3b82f6;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 20px;
+  max-width: 650px;
+  word-wrap: break-word;
+  margin: 0;
   font-style: italic;
-  font-weight: 700;
-  font-size: 14px;
-  color: #fff;
-  word-break: break-word;      
+}
+
+.aiMessage {
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+  max-width: 100%;
 }

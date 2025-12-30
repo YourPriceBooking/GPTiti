@@ -20,6 +20,7 @@ export default function Home() {
     activeChatId,
     hasInput,
     inputSent,
+    isTyping,
     inputRef,
     insertTemplate,
     templateTick,
@@ -67,7 +68,7 @@ export default function Home() {
     }, 0);
   }, [activeChatId, activeChat?.messages.length]);
 
-   const insertTemplateToInput = (template: string) => {
+  const insertTemplateToInput = (template: string) => {
     if (inputRef.current) {
       inputRef.current.value = template;
       inputRef.current.focus();
@@ -75,17 +76,19 @@ export default function Home() {
         target: inputRef.current,
       } as React.ChangeEvent<HTMLTextAreaElement>);
     } else {
-     setPendingTemplate(template);
+      setPendingTemplate(template);
     }
   };
-   useEffect(() => {
+  useEffect(() => {
     if (!isOverlayOpen && pendingTemplate && inputRef.current) {
       inputRef.current.value = pendingTemplate;
       inputRef.current.focus();
       handleChange({
         target: inputRef.current,
       } as React.ChangeEvent<HTMLTextAreaElement>);
-      setTimeout(() => {setPendingTemplate(null);}, 0)
+      setTimeout(() => {
+        setPendingTemplate(null);
+      }, 0);
     }
   }, [isOverlayOpen]);
 
@@ -135,7 +138,7 @@ export default function Home() {
               }
             }}
           />
-          <SecondHeaderRightSide chatTitle={activeChat?.title}/>
+          <SecondHeaderRightSide chatTitle={activeChat?.title} />
           {/* Overlay для Quick Actions */}
           {isOverlayOpen && (
             <>
@@ -148,8 +151,7 @@ export default function Home() {
                   className={styles.overlayContentInner}
                   onClick={(e) => e.stopPropagation()}
                 >
-
-                <MainSectionRightSide
+                  <MainSectionRightSide
                     insertTemplate={(template) => {
                       insertTemplateToInput(template);
                       setIsOverlayOpen(false);
@@ -176,7 +178,6 @@ export default function Home() {
             </>
           )}
 
-          {/* Основний MainSection для нового чату */}
           {!isOverlayOpen && (
             <MainSectionRightSide
               insertTemplate={insertTemplate}
@@ -196,7 +197,7 @@ export default function Home() {
           )}
 
           {activeChat && activeChat.messages.length > 0 && (
-            <MessageList messages={activeChat.messages} />
+            <MessageList messages={activeChat.messages} isTyping={isTyping} />
           )}
 
           <div

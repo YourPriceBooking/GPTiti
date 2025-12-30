@@ -1,20 +1,37 @@
-import { Message } from '@/types/types';
-import styles from './MessageList.module.css';
+import React from "react";
+import styles from "./MessageList.module.css";
+import TypingPlaceholder from "../../TypingPlaceholder/TypingPlaceholder";
 
-export default function MessageList({ messages }: { messages: Message[] }) {
+type Message = {
+  user: string;
+  ai: React.ReactNode | null;
+};
+
+type MessageListProps = {
+  messages: Message[];
+  isTyping?: boolean;
+};
+
+export default function MessageList({
+  messages,
+  isTyping = false,
+}: MessageListProps) {
   return (
-    <div className={styles.messagesContainer}>
-      {messages.map((msg, index) => (
-        <div key={index}>
-          <div className={styles.userMessageContainer}>
-            <div className={styles.userMessage}>
-              <span className={styles.userText}>{msg.user}</span>
+    <div className={styles.messageList}>
+      {messages.map((message, index) => (
+        <React.Fragment key={index}>
+          <div className={styles.userMessage}>
+            <p className={styles.userText}>{message.user}</p>
+          </div>
+
+          {message.ai ? (
+            <div className={styles.aiMessage}>{message.ai}</div>
+          ) : isTyping && index === messages.length - 1 ? (
+            <div className={styles.aiMessage}>
+              <TypingPlaceholder />
             </div>
-          </div>
-          <div className={styles.aiMessageContainer}>
-            <div className={styles.aiMessage}>{msg.ai}</div>
-          </div>
-        </div>
+          ) : null}
+        </React.Fragment>
       ))}
     </div>
   );

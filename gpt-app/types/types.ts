@@ -7,7 +7,7 @@ export interface CustomScrollBarProps {
 
 export type Message = {
   user: string;
-  ai: ReactElement;
+  ai: React.ReactNode | null;
 };
 
 export type Chat = {
