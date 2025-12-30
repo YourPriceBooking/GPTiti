@@ -122,6 +122,7 @@ export default function Home() {
           setSelectedModelGroup={setSelectedModelGroup}
         />
         <div className={styles.rightSection}>
+          
           <HeaderRightSide
             chatTitle={activeChat?.title}
             modelRef={modelRef}
@@ -138,8 +139,13 @@ export default function Home() {
               }
             }}
           />
-          <SecondHeaderRightSide chatTitle={activeChat?.title} />
-          {/* Overlay для Quick Actions */}
+D
+         
+
+          <SecondHeaderRightSide chatTitle={activeChat?.title}/>
+        
+      {/* Overlay для Quick Actions */}
+
           {isOverlayOpen && (
             <>
               <div
