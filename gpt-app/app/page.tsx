@@ -10,6 +10,7 @@ import { ModelType } from "@/types/types";
 import HeaderRightSide from "@/components/HomePage/RightSide/HeaderRightSide/HeaderRightSide";
 import MainSectionRightSide from "@/components/HomePage/RightSide/MainSectionRightSide/MainSectionRightSide";
 import ModelModalOverlay from "@/components/ModelModalOverlay/ModelModalOverlay";
+import SecondHeaderRightSide from "@/components/HomePage/RightSide/SecondHeaderRightSide.tsx/SecondHeaderRightSide";
 
 export default function Home() {
   const {
@@ -41,6 +42,7 @@ export default function Home() {
   const [newChatOpened, setNewChatOpened] = useState(false);
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [hasFirstRequest, setHasFirstRequest] = useState(false);
+  const [pendingTemplate, setPendingTemplate] = useState<string | null>(null);
   const isNewChat = !activeChat || activeChat.messages.length === 0;
 
   const isExistingChat = !!activeChat && !newChatOpened;
@@ -65,15 +67,27 @@ export default function Home() {
     }, 0);
   }, [activeChatId, activeChat?.messages.length]);
 
-  const insertTemplateToInput = (template: string) => {
+   const insertTemplateToInput = (template: string) => {
     if (inputRef.current) {
       inputRef.current.value = template;
       inputRef.current.focus();
       handleChange({
         target: inputRef.current,
-      } as unknown as React.ChangeEvent<HTMLTextAreaElement>);
+      } as React.ChangeEvent<HTMLTextAreaElement>);
+    } else {
+     setPendingTemplate(template);
     }
   };
+   useEffect(() => {
+    if (!isOverlayOpen && pendingTemplate && inputRef.current) {
+      inputRef.current.value = pendingTemplate;
+      inputRef.current.focus();
+      handleChange({
+        target: inputRef.current,
+      } as React.ChangeEvent<HTMLTextAreaElement>);
+      setTimeout(() => {setPendingTemplate(null);}, 0)
+    }
+  }, [isOverlayOpen]);
 
   return (
     <>
@@ -121,7 +135,7 @@ export default function Home() {
               }
             }}
           />
-
+          <SecondHeaderRightSide chatTitle={activeChat?.title}/>
           {/* Overlay для Quick Actions */}
           {isOverlayOpen && (
             <>
@@ -139,7 +153,7 @@ export default function Home() {
                     insertTemplate={(template) => {
                       insertTemplateToInput(template);
                       setIsOverlayOpen(false);
-                      setFocusMode(true);
+                      // setFocusMode(true);
                     }}
                     setFocusMode={setFocusMode}
                     isSectionVisible={true}

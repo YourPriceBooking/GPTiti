@@ -2,6 +2,8 @@ import styles from "./HeaderRightSide.module.css";
 import Image from "next/image";
 import ModelGptitiTitleWithIcon from "@/components/ModelGptitiTitleWithIcon/ModelGptitiTitleWithIcon";
 import { HeaderRightSideProps } from "@/types/types";
+import { TOKENS_SUFFIX } from "@/config/models.config";
+import { getModelGroupAndItem } from "@/functions/getModelGroupAndItem";
 export default function HeaderRightSide({
   chatTitle,
   modelRef,
@@ -19,17 +21,23 @@ export default function HeaderRightSide({
 
 }) 
 
-{ return ( 
+{ const result = getModelGroupAndItem(selectedModel); 
+  return ( 
 <div className={styles.container}> 
   <div className={styles.containerGroupLogos}> 
     <Image className={styles.rabbitLogo} src="/icons/rabbit.svg" alt="logo-rabbit" width={47} height={47} /> 
     <Image className={styles.headerTextLogo} src="/icons/text-logo.svg" alt="text-gptiti-logo" width={92} height={27} /> 
     </div> 
+    <div>
     <ModelGptitiTitleWithIcon 
     modelRef={modelRef} 
     selectedModel={selectedModel} 
     isModalOpen={isModalOpen} 
     setIsModalOpen={setIsModalOpen} /> 
+    <p className={styles.paragraph}> 
+      approximate asking price {result?.model.tokens} {TOKENS_SUFFIX} 
+      </p> 
+      </div>
     <p className={styles.quickActionsContainer}
            onClick={onOpenQuickActions}
             style={{ opacity: hasFirstRequest ? 1 : 0.5 }}> 
