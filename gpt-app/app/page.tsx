@@ -134,14 +134,8 @@ export default function Home() {
                   className={styles.overlayContentInner}
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <button
-                    className={styles.closeButton}
-                    onClick={() => setIsOverlayOpen(false)}
-                    aria-label="Close overlay"
-                  >
-                    ✕
-                  </button>
-                  <MainSectionRightSide
+
+                <MainSectionRightSide
                     insertTemplate={(template) => {
                       insertTemplateToInput(template);
                       setIsOverlayOpen(false);

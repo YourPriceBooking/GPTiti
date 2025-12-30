@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import styles from "./MainSectionRightSide.module.css";
 import Image from "next/image";
 import { MainSectionRightSideProps } from "@/types/types";
 import InputBar from "@/components/HomePage/RightSide/InputBar/InputBar";
+import { button } from "framer-motion/client";
 
 export default function MainSectionRightSide(props: MainSectionRightSideProps) {
   const {
@@ -22,33 +23,48 @@ export default function MainSectionRightSide(props: MainSectionRightSideProps) {
   } = props;
 
   if (!isSectionVisible) return null;
+
   return (
     <div className={styles.mainSectionContainer}>
       {!focusMode ? (
         <section className={styles.additionalSectionContainer}>
-          <p
-            className={styles.additionalSectionParagraphContainer}
-            onClick={() => {
-              //   setHidden(true);
-              setFocusMode(true);
-            }}
-          >
+          {/* 🔽 ЄДИНЕ місце, де додана логіка */}
+          {!isOverlay ? (
+            <p
+              className={styles.additionalSectionParagraphContainer}
+              onClick={() => {
+                setFocusMode(true);
+              }}
+            >
+              <Image
+                src="icons/green-circle.svg"
+                width={12}
+                height={12}
+                alt="ready"
+              />
+              <span className={styles.additionalSectionSpan1}>Ready</span>
+            </p>
+          ) : (
+             <button className={styles.closeButton}>
             <Image
-              src="icons/green-circle.svg"
-              width={12}
-              height={12}
-              alt="ready"
+              src="/icons/close2.svg"
+              width={24}
+              height={24}
+              alt="close"
+              onClick={onHideSection}
+              style={{ cursor: "pointer" }}
             />
-
-            <span className={styles.additionalSectionSpan1}>Ready</span>
-          </p>
+            </button> 
+          )}
 
           <h1 className={styles.additionalSectionTitle}>
             What do you want to do today?
           </h1>
+
           <span className={styles.additionalSectionSpan2}>
             Pick a quick action or type your request below.
           </span>
+
           <section className={styles.infoContainer}>
             <article
               className={styles.infoContainerCard}
@@ -73,6 +89,7 @@ export default function MainSectionRightSide(props: MainSectionRightSideProps) {
                 </span>
               </div>
             </article>
+
             <article
               className={styles.infoContainerCard}
               onClick={() =>
@@ -82,12 +99,7 @@ export default function MainSectionRightSide(props: MainSectionRightSideProps) {
               }
             >
               <div className={styles.CardIconContainer}>
-                <Image
-                  src="icons/write.svg"
-                  width={24}
-                  height={24}
-                  alt="write"
-                />
+                <Image src="icons/write.svg" width={24} height={24} alt="write" />
               </div>
               <div className={styles.CardTextInfoContainer}>
                 <p className={styles.CardParapgraph}>Write / Improve</p>
@@ -96,6 +108,7 @@ export default function MainSectionRightSide(props: MainSectionRightSideProps) {
                 </span>
               </div>
             </article>
+
             <article
               className={styles.infoContainerCard}
               onClick={() =>
@@ -119,6 +132,7 @@ export default function MainSectionRightSide(props: MainSectionRightSideProps) {
                 </span>
               </div>
             </article>
+
             <article
               className={styles.infoContainerCard}
               onClick={() =>
@@ -137,6 +151,7 @@ export default function MainSectionRightSide(props: MainSectionRightSideProps) {
                 </span>
               </div>
             </article>
+
             <article
               className={styles.infoContainerCard}
               onClick={() =>
@@ -160,6 +175,7 @@ export default function MainSectionRightSide(props: MainSectionRightSideProps) {
                 </span>
               </div>
             </article>
+
             <article
               className={styles.infoContainerCard}
               onClick={() => insertTemplate("Give me 15 creative ideas for:")}
@@ -178,6 +194,7 @@ export default function MainSectionRightSide(props: MainSectionRightSideProps) {
               </div>
             </article>
           </section>
+
           <section className={styles.trySectionContainer}>
             <span className={styles.trySectionSpan}>Try one of these:</span>
             <div className={styles.trySectionParagraphsContainer}>
@@ -220,24 +237,24 @@ export default function MainSectionRightSide(props: MainSectionRightSideProps) {
               />
               <span className={styles.hiddenSpan}>Focus mode</span>
             </p>
+
             <Image
               className={styles.hiddenImg}
               src="icons/focus-toggle.svg"
               width={56}
               height={28}
               alt="focus-toggle"
-              onClick={() => {
-                // setHidden(false);
-                setFocusMode(false);
-              }}
+              onClick={() => setFocusMode(false)}
               style={{ cursor: "pointer" }}
             />
           </div>
+
           <section className={styles.hiddenCenterSection}>
             <h2 className={styles.hiddenCenterTitle}>Ask anything</h2>
             <p className={styles.hiddenCenterParagraph}>
               Focus mode hides suggestions — just type and go.
             </p>
+
             <div className={styles.focusInputWrap}>
               <InputBar
                 hasInput={hasInput}
@@ -250,6 +267,7 @@ export default function MainSectionRightSide(props: MainSectionRightSideProps) {
                 hasFirstRequest={hasFirstRequest}
               />
             </div>
+
             <span className={styles.hiddenCenterSpan1}>
               Tip: press Enter to send • Shift+Enter for a new line
             </span>
