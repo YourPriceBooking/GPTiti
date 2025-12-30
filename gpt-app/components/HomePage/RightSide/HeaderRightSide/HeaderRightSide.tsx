@@ -33,7 +33,7 @@ export default function HeaderRightSide({
     <p className={styles.quickActionsContainer}
            onClick={onOpenQuickActions}
             style={{ opacity: hasFirstRequest ? 1 : 0.5 }}> 
-            <Image src="/icons/quick-actions-icon.svg" width={21} height={21} alt="quick-actions-icon" /> 
+            <Image src="/icons/quick-actions.svg" width={21} height={21} alt="quick-actions-icon" /> 
             <span className={styles.quickActionsSpan}>Quick actions</span> 
             </p> 
             </div> ); }
