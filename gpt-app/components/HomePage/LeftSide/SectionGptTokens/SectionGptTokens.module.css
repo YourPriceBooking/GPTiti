@@ -13,12 +13,9 @@
   z-index: 9999;
   }
 
- 
-
-.paragraph {
-    padding-top: 7px;
+ .paragraph {
     font-family: var(--font-family);
-    font-weight: 700;
+    font-weight: 400;
     font-size: 11px;
     color: var(--main-gray2);
 }

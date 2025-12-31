@@ -20,6 +20,6 @@ export default function ModelGptitiTitleWithIcon(
           {result ? capitalizeFirstThree(result.model.title) 
           : capitalizeFirstThree(selectedModel)} 
           </h2> 
-          <Image width={11} height={6} src="/icons/chevron-small.svg" alt="chevron-small" /> 
+          <Image className={styles.chevronIcon} width={11} height={6} src="/icons/chevron-small.svg" alt="chevron-small" /> 
           </article> 
           </div> ); }
