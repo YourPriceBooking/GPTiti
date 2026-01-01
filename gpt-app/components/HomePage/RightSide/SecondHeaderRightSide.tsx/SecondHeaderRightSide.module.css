@@ -6,7 +6,7 @@
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 15px;
     position: sticky;
-    top: 74px;
+    top: 56px;
     display: flex;
     gap: 21px; /*coment thia */
     z-index: 10;
@@ -22,10 +22,21 @@
 
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     transition: 0.5ms all ease-in-out;
-}
+    margin-bottom: 20px;
+    }
 .groupContainerChatInfo:hover{
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.08) 100%);
     cursor: pointer;
+}
+.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.hidden {
+  opacity: 0;
+  transform: translateY(-100%);
+  pointer-events: none;
 }
 .containerChatInfo{
     display: flex;

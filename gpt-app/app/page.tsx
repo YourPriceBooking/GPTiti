@@ -11,6 +11,7 @@ import HeaderRightSide from "@/components/HomePage/RightSide/HeaderRightSide/Hea
 import MainSectionRightSide from "@/components/HomePage/RightSide/MainSectionRightSide/MainSectionRightSide";
 import ModelModalOverlay from "@/components/ModelModalOverlay/ModelModalOverlay";
 import SecondHeaderRightSide from "@/components/HomePage/RightSide/SecondHeaderRightSide.tsx/SecondHeaderRightSide";
+import { useScrollDirection } from "@/hooks/useScrollDirection";
 
 export default function Home() {
   const {
@@ -91,10 +92,12 @@ export default function Home() {
       }, 0);
     }
   }, [isOverlayOpen]);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const { hidden } = useScrollDirection(scrollContainerRef);
 
   return (
     <>
-      <ModelModalOverlay
+     <ModelModalOverlay
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}
         selectedModel={selectedModel}
@@ -122,7 +125,6 @@ export default function Home() {
           setSelectedModelGroup={setSelectedModelGroup}
         />
         <div className={styles.rightSection}>
-          
           <HeaderRightSide
             chatTitle={activeChat?.title}
             modelRef={modelRef}
@@ -139,12 +141,13 @@ export default function Home() {
               }
             }}
           />
-
-         
-
-          <SecondHeaderRightSide chatTitle={activeChat?.title}/>
-        
-      {/* Overlay для Quick Actions */}
+        <div className={styles.scrollableContent}
+          ref={scrollContainerRef}>
+             <SecondHeaderRightSide chatTitle={activeChat?.title}
+          hidden={hidden}/>
+          
+</div>
+        {/* Overlay для Quick Actions */}
 
           {isOverlayOpen && (
             <>
