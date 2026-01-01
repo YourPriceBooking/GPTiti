@@ -11,20 +11,17 @@
     width: 100%;
     min-height: 56px;
     z-index: 10; 
-      background: linear-gradient(180deg, #1A1A1A 0%, #2A2A2A 100%);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.08) 100%);
   
 
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
 
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-     transition: 0.5ms all ease-in-out;
+    
 }
 .container::after { content: ""; position: absolute; bottom: 0; left: 20px; right: 20px; height: 2px; background: linear-gradient( to right, rgba(47, 107, 255, 0) 0%, rgba(47, 107, 255, 0.55) 50%, rgba(47, 107, 255, 0) 100% ); }
-.container:hover {
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.08) 100%);
-    cursor: pointer;
-}
+
 
 .containerGroupLogos{
     margin-left: 49px;
