@@ -143,8 +143,8 @@ export default function Home() {
           />
         <div className={styles.scrollableContent}
           ref={scrollContainerRef}>
-             <SecondHeaderRightSide chatTitle={activeChat?.title}
-          hidden={hidden}/>
+             {/* <SecondHeaderRightSide chatTitle={activeChat?.title}
+          hidden={hidden}/> */}
           
 </div>
         {/* Overlay для Quick Actions */}
