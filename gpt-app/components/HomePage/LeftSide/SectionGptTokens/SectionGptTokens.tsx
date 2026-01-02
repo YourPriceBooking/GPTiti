@@ -12,10 +12,12 @@ export default function SectionGptTokens({ modelRef, selectedModel, selectedMode
 const result = getModelGroupAndItem(selectedModel); 
 return ( 
 <section className={styles.gptTokens}> 
-  <article className={styles.gptMini}> 
+  <article > 
+    <div className={styles.gptMini}>
     <ModelGptitiTitleWithIcon modelRef={modelRef} 
     selectedModel={selectedModel} isModalOpen={isModalOpen} 
-    setIsModalOpen={setIsModalOpen} /> 
+    setIsModalOpen={setIsModalOpen} />
+    </div> 
     <p className={styles.paragraph}> 
       approximate asking price {result?.model.tokens} {TOKENS_SUFFIX} 
       </p> 
