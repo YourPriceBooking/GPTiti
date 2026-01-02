@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { Chat } from "@/types/types";
-import { generateAIResponse } from "@/components/HomePage/RightSide/AIResponse/AIReaponse";
+import { generateAIResponse } from "@/components/HomePage/RightSide/AIResponse/AIResponse";
+
 
 export function useChat() {
   const initialChatId = crypto.randomUUID();
@@ -16,55 +17,62 @@ export function useChat() {
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [templateTick, setTemplateTick] = useState(0);
+  
 
   function handleChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
     setHasInput(e.target.value.trim().length > 0);
   }
 
-  async function handleSendClick() {
-    if (!hasInput || !inputRef.current) return;
+ async function handleSendClick(hasFirstRequest: boolean) {
+  if (!hasInput || !inputRef.current) return;
 
-    const userText = inputRef.current.value.trim();
-    if (!userText) return;
+  const userText = inputRef.current.value.trim();
+  if (!userText) return;
 
-    setChatList((prev) =>
-      prev.map((chat) =>
-        chat.id === activeChatId
-          ? {
-              ...chat,
-              title: chat.title ?? userText,
-              messages: [...chat.messages, { user: userText, ai: null }],
-            }
-          : chat
-      )
-    );
+  // 1. Додаємо повідомлення від користувача
+  setChatList((prev) =>
+    prev.map((chat) =>
+      chat.id === activeChatId
+        ? {
+            ...chat,
+            title: chat.title ?? userText,
+            messages: [...chat.messages, { user: userText, ai: null }],
+          }
+        : chat
+    )
+  );
 
-    setInputSent(true);
-    setHasInput(false);
-    setIsTyping(true);
-    inputRef.current.value = "";
+  setInputSent(true);
+  setHasInput(false);
+  setIsTyping(true);
+  inputRef.current.value = "";
 
-    const delay = Math.random() * 1000 + 1500;
-    await new Promise((resolve) => setTimeout(resolve, delay));
-    const aiResponse = generateAIResponse(userText);
+  // 2. Імітуємо затримку
+  const delay = Math.random() * 1000 + 1500;
+  await new Promise((resolve) => setTimeout(resolve, delay));
 
-    setChatList((prev) =>
-      prev.map((chat) =>
-        chat.id === activeChatId
-          ? {
-              ...chat,
-              messages: chat.messages.map((msg, idx) =>
-                idx === chat.messages.length - 1
-                  ? { ...msg, ai: aiResponse }
-                  : msg
-              ),
-            }
-          : chat
-      )
-    );
+  // 3. Генеруємо відповідь
+  const aiResponse = generateAIResponse(userText, hasFirstRequest);
+  const usedTokens = Math.floor(Math.random() * 100) + 50;
 
-    setIsTyping(false);
-  }
+  // 4. Додаємо окреме повідомлення від AI
+  setChatList((prev) =>
+    prev.map((chat) =>
+      chat.id === activeChatId
+        ? {
+            ...chat,
+            messages: [
+              ...chat.messages,
+              { user: "", ai: aiResponse, tokens: usedTokens },
+            ],
+          }
+        : chat
+    )
+  );
+
+  setIsTyping(false);
+}
+
 
   function handleNewChat() {
     const newChatId = crypto.randomUUID();

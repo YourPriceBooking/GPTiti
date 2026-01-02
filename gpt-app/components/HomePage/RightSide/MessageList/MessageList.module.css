@@ -22,12 +22,32 @@
   max-width: 650px;
   word-wrap: break-word;
   margin: 0;
-  font-style: italic;
-}
+  }
 
 .aiMessage {
   display: flex;
   justify-content: flex-start;
   width: 100%;
   max-width: 100%;
+}
+
+.costInfo{
+ margin-top: 4px;
+ margin-left: 15px;
+ padding-left: 47px;
+ position: absolute;
+ bottom: 155px;
+ background: rgba(37, 99, 235, 0.1);
+ border: 1px solid rgba(37, 99, 235, 0.16);
+ border-radius: 14px;
+ max-width: 182px;
+ width: 100%;
+ min-height: 26px;
+}
+.costSpan {
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 11px;
+  color: #64748b;
+  
 }

@@ -150,3 +150,15 @@
   max-width: 1200px;
 }
 
+.spanContainerFirstRequest {
+  display: flex;
+  flex-direction: column;
+}
+.inputSpan1 {
+  display: flex;
+  margin-left: 50px;
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 13px;
+  color: #94a3b8;
+}

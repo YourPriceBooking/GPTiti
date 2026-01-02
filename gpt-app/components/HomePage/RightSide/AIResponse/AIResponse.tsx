@@ -1,9 +1,9 @@
 import styles from './AIResponse.module.css';
 import Image from 'next/image';
 
-export function generateAIResponse(userText: string) {
+export function generateAIResponse(userText: string, hasFirstRequest:boolean) {
   return (
-        <div className={styles.aiBlock}>
+      <div className={styles.aiBlock}>
           <h2 className={styles.aiTitle}>
             <Image src='/icons/rabbit.svg' alt='logo-rabbit' height={41} width={41}/>
             <p className={styles.aiParagraph}>GPTiti</p>
@@ -29,5 +29,5 @@ export function generateAIResponse(userText: string) {
             </li>
           </ul>
   </div>
-      );
+   );
 }
