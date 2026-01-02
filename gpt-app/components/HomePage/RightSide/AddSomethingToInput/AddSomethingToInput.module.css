@@ -1,0 +1,44 @@
+.addSomethingToInputContainer {
+    max-width: 360px;
+    width: 100%;
+    min-height: 297px;
+    border-radius: 16px;
+    background: linear-gradient(180deg, #0f172a 0%, #020617 100%);
+    padding-left: 20px;
+    padding-top: 10px;
+    } 
+.addSomethingToInput {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.InfoContainer {
+    display: flex;
+    gap: 14px;
+}
+.InfoContainerIcon{
+    max-width: 14;
+    max-height: 14;
+}
+.InfoContainerParagraph {
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: 14px;
+    color: #e5e7eb;
+}
+.InfoContainerSpan {
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: 12px;
+    color: #94a3b8;
+}
+.addSomethingToInputSpanContainer{
+    margin-top: 19px;
+}
+.addSomethingToInputSpan {
+    margin-top: 19px;
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: 11px;
+    color: #64748b;
+    }

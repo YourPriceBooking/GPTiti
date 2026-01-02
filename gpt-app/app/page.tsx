@@ -12,6 +12,7 @@ import MainSectionRightSide from "@/components/HomePage/RightSide/MainSectionRig
 import ModelModalOverlay from "@/components/ModelModalOverlay/ModelModalOverlay";
 import SecondHeaderRightSide from "@/components/HomePage/RightSide/SecondHeaderRightSide.tsx/SecondHeaderRightSide";
 import { useScrollDirection } from "@/hooks/useScrollDirection";
+import AddSomethingToInput from "@/components/HomePage/RightSide/AddSomethingToInput/AddSomethingToInput";
 
 export default function Home() {
   const {
@@ -125,6 +126,7 @@ export default function Home() {
           setSelectedModelGroup={setSelectedModelGroup}
         />
         <div className={styles.rightSection}>
+          
           <HeaderRightSide
             chatTitle={activeChat?.title}
             modelRef={modelRef}
@@ -148,7 +150,7 @@ export default function Home() {
           
 </div>
         {/* Overlay для Quick Actions */}
-
+            {/* <AddSomethingToInput/> */}
           {isOverlayOpen && (
             <>
               <div

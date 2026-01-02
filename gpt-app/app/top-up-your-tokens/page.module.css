@@ -159,8 +159,6 @@
     background: #7c3aed ;
     }
 .saveSpan1, .saveSpan2 {
-    max-width: 87px;
-    width: 100%;
     min-height: 24px;
     background:   #05210f;
     padding: 5px 17px 4px 12px;
@@ -905,3 +903,4 @@
     bottom: 44%
 }
 }
+
