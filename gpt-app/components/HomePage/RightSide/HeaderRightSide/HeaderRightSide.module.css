@@ -83,14 +83,13 @@
     border-radius: 16px;
 }
 .modelGptitiContainer:hover {
-    background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+    background-color:  #1e293b ;
     cursor: pointer;
-    border-color: rgba(59, 130, 246, 0.55);
+    
   }
   .modelGptitiContainer:active {
-    background: linear-gradient(180deg, #0f172a 0%, #020617 100%);
-    border-color: rgba(29, 78, 216, 0.9);
-  }
+    background-color: #0f172a ;
+    }
 .paragraph {
     position: absolute;
     right: 42;

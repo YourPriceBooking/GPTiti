@@ -2,6 +2,17 @@
     flex-shrink: 0;
     padding-left: 28px;
 }
+.gptMini {
+    transition: 0.5ms all ease-out;
+    border-radius: 16px;
+}
+.gptMini:hover{
+    background:  #1e293b ;
+    cursor: pointer;
+}
+.gptMini:active {
+    background: #0f172a ;
+}
 .modelHoverWrapper {
   position: relative;
 }
