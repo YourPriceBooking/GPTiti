@@ -10,9 +10,8 @@ import { ModelType } from "@/types/types";
 import HeaderRightSide from "@/components/HomePage/RightSide/HeaderRightSide/HeaderRightSide";
 import MainSectionRightSide from "@/components/HomePage/RightSide/MainSectionRightSide/MainSectionRightSide";
 import ModelModalOverlay from "@/components/ModelModalOverlay/ModelModalOverlay";
-import SecondHeaderRightSide from "@/components/HomePage/RightSide/SecondHeaderRightSide.tsx/SecondHeaderRightSide";
 import { useScrollDirection } from "@/hooks/useScrollDirection";
-import AddSomethingToInput from "@/components/HomePage/RightSide/AddSomethingToInput/AddSomethingToInput";
+
 
 export default function Home() {
   const {
@@ -174,7 +173,7 @@ export default function Home() {
                     hasInput={hasInput}
                     onChange={handleChange}
                     onSend={() => {
-                      handleSendClick();
+                      handleSendClick(hasFirstRequest);
                       setIsOverlayOpen(false);
                     }}
                     inputRef={inputRef}
@@ -197,7 +196,7 @@ export default function Home() {
               isSectionVisible={isSectionVisible}
               hasInput={hasInput}
               onChange={handleChange}
-              onSend={handleSendClick}
+              onSend={() => handleSendClick(hasFirstRequest)}
               inputRef={inputRef}
               onHideSection={() => setIsSectionVisible(false)}
               templateTick={templateTick}
@@ -208,7 +207,10 @@ export default function Home() {
           )}
 
           {activeChat && activeChat.messages.length > 0 && (
-            <MessageList messages={activeChat.messages} isTyping={isTyping} />
+            <MessageList 
+            messages={activeChat.messages} 
+            isTyping={isTyping}
+            hasFirstRequest={hasFirstRequest} />
           )}
 
           <div
@@ -232,7 +234,7 @@ export default function Home() {
                   hasInput={hasInput}
                   onChange={handleChange}
                   onSend={() => {
-                    handleSendClick();
+                    handleSendClick(hasFirstRequest);
                     if (!hasFirstRequest) {
                       setHasFirstRequest(true);
                     }
@@ -245,10 +247,18 @@ export default function Home() {
                 />
 
                 <div className={styles.spanContainer}>
-                  <span className={styles.inputSpan}>
-                    AI systems may make mistakes, so we recommend verifying
-                    important information.
-                  </span>
+                  {!hasFirstRequest ? 
+                  ( <span className={styles.inputSpan}> 
+                  AI systems may make mistakes, so we recommend verifying important information. 
+                  </span> ) : 
+                  ( <div className={styles.spanContainerFirstRequest}> 
+                  <span className={styles.inputSpan1}> 
+                      ≈ Estimated cost: ~120 tokens
+                      </span> 
+                   <span className={styles.inputSpan}> 
+                  AI systems may make mistakes, so we recommend verifying important information. 
+                  </span> 
+                    </div> )}
                 </div>
               </div>
             )}
@@ -256,6 +266,7 @@ export default function Home() {
           <div ref={messagesEndRef} />
         </div>
       </div>
+      
     </>
   );
 }

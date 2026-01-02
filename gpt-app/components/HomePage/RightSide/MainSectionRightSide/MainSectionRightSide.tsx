@@ -1,4 +1,3 @@
-import React from "react";
 import styles from "./MainSectionRightSide.module.css";
 import Image from "next/image";
 import { MainSectionRightSideProps } from "@/types/types";
@@ -25,7 +24,7 @@ export default function MainSectionRightSide(props: MainSectionRightSideProps) {
   if (!isSectionVisible) return null;
 
   return (
-    <div className={styles.mainSectionContainer}>
+   <div className={`${styles.mainSectionContainer} ${focusMode ? styles.noneContainer : ""}`} >
       {!focusMode ? (
         <section className={styles.additionalSectionContainer}>
           {/* 🔽 ЄДИНЕ місце, де додана логіка */}
@@ -226,57 +225,69 @@ export default function MainSectionRightSide(props: MainSectionRightSideProps) {
           </section>
         </section>
       ) : (
-        <section className={styles.hiddenSectionContainer}>
-          <div className={styles.hiddenInfoContainer}>
-            <p className={styles.InfoContainer}>
-              <Image
-                src="/icons/green-circle.svg"
-                width={10}
-                height={10}
-                alt="focus"
-              />
-              <span className={styles.hiddenSpan}>Focus mode</span>
-            </p>
+        // <section className={styles.hiddenSectionContainer}>
+        //   <div className={styles.hiddenInfoContainer}>
+        //     <p className={styles.InfoContainer}>
+        //       <Image
+        //         src="/icons/green-circle.svg"
+        //         width={10}
+        //         height={10}
+        //         alt="focus"
+        //       />
+        //       <span className={styles.hiddenSpan}>Focus mode</span>
+        //     </p>
 
-            <Image
-              className={styles.hiddenImg}
-              src="icons/focus-toggle.svg"
-              width={56}
-              height={28}
-              alt="focus-toggle"
-              onClick={() => setFocusMode(false)}
-              style={{ cursor: "pointer" }}
-            />
-          </div>
+        //     <Image
+        //       className={styles.hiddenImg}
+        //       src="icons/focus-toggle.svg"
+        //       width={56}
+        //       height={28}
+        //       alt="focus-toggle"
+        //       onClick={() => setFocusMode(false)}
+        //       style={{ cursor: "pointer" }}
+        //     />
+        //   </div>
 
-          <section className={styles.hiddenCenterSection}>
-            <h2 className={styles.hiddenCenterTitle}>Ask anything</h2>
-            <p className={styles.hiddenCenterParagraph}>
-              Focus mode hides suggestions — just type and go.
-            </p>
+        //   <section className={styles.hiddenCenterSection}>
+        //     <h2 className={styles.hiddenCenterTitle}>Ask anything</h2>
+        //     <p className={styles.hiddenCenterParagraph}>
+        //       Focus mode hides suggestions — just type and go.
+        //     </p>
 
-            <div className={styles.focusInputWrap}>
+    
+
+        //     <span className={styles.hiddenCenterSpan1}>
+        //       Tip: press Enter to send • Shift+Enter for a new line
+        //     </span>
+        //     <span className={styles.hiddenCenterSpan2}>
+        //       AI systems may make mistakes, we recommend verifying important
+        //       information.
+        //     </span>
+        //   </section>
+        // </section>
+        <>
+        <div className={styles.noneContainer}>
+            
+        </div>
+          <div className={styles.focusInputWrap}>
               <InputBar
-                hasInput={hasInput}
-                onChange={onChange}
-                onSend={onSend}
-                inputRef={inputRef}
-                onHideSection={onHideSection}
-                templateTick={templateTick}
-                setHasFirstRequest={setHasFirstRequest}
+               hasInput={hasInput}
+                 onChange={onChange}
+                 onSend={onSend}
+                 inputRef={inputRef}
+                 onHideSection={onHideSection}
+                 templateTick={templateTick}
+                 setHasFirstRequest={setHasFirstRequest}
                 hasFirstRequest={hasFirstRequest}
               />
+              <div className={styles.spanContainer}>
+               <span className={styles.inputSpan}>
+                    AI systems may make mistakes, so we recommend verifying
+                    important information.
+                  </span>
+                  </div>
             </div>
-
-            <span className={styles.hiddenCenterSpan1}>
-              Tip: press Enter to send • Shift+Enter for a new line
-            </span>
-            <span className={styles.hiddenCenterSpan2}>
-              AI systems may make mistakes, we recommend verifying important
-              information.
-            </span>
-          </section>
-        </section>
+            </>
       )}
     </div>
   );
