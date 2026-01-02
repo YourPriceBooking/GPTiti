@@ -1,6 +1,7 @@
 import Image from "next/image";
 import styles from "./InputBar.module.css";
-import { useState, useLayoutEffect } from "react";
+import { useState, useLayoutEffect, useEffect, useRef } from "react";
+import AddSomethingToInput from "../AddSomethingToInput/AddSomethingToInput";
 
 export default function InputBar({
   hasInput,
@@ -9,7 +10,7 @@ export default function InputBar({
   inputRef,
   onHideSection,
   templateTick,
-  setHasFirstRequest,   
+  setHasFirstRequest,
   hasFirstRequest,
 }: {
   hasInput: boolean;
@@ -23,6 +24,10 @@ export default function InputBar({
 }) {
   const [isMultiline, setIsMultiline] = useState(false);
   const [shouldScroll, setShouldScroll] = useState(false);
+  const [showAddInput, setShowAddInput] = useState(false);
+
+
+  const modalRef = useRef<HTMLDivElement | null>(null);
 
   const resizeTextarea = () => {
     const textarea = inputRef.current;
@@ -77,6 +82,21 @@ export default function InputBar({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [templateTick]);
 
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
+        setShowAddInput(false);
+      }
+    };
+    if (showAddInput) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showAddInput]);
+
+
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     onChange(e);
     resizeTextarea();
@@ -105,11 +125,22 @@ export default function InputBar({
     ${shouldScroll ? styles.scrollable : ""}
   `}
     >
-      <div className={styles.iconWrapper} tabIndex={0}>
+      <div
+        className={styles.iconWrapper}
+        tabIndex={0}
+        onClick={() => {
+          setShowAddInput((prev) => !prev);
+        }}>
         <Image width={28} height={28} src="/icons/plus.svg" alt="plus" />
       </div>
-
-      <textarea
+      {showAddInput && (
+        <div className={`${styles.modalWrapper} ${showAddInput ? styles.visible : styles.hidden}`}
+          ref={modalRef}
+        >
+          <AddSomethingToInput />
+        </div>
+      )}
+     <textarea
         ref={inputRef}
         className={styles.input}
         placeholder="Ask anything..."

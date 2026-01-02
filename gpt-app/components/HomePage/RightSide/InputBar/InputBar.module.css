@@ -151,3 +151,12 @@
   opacity: 0 !important;
   visibility: hidden !important;
 }
+
+.modalWrapper {
+  max-width: 360px;
+  width: 100%;
+  position: absolute;
+  bottom: 80;
+}
+.modalWrapper.hidden { display: none; } 
+.modalWrapper.visible { display: block; }

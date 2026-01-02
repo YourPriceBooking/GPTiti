@@ -93,6 +93,7 @@
 .paragraph {
     position: absolute;
     right: 42;
+    top: 6.5;
     font-family: var(--font-family);
     font-weight: 200;
     font-size: 11px;
