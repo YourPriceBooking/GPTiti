@@ -11,9 +11,13 @@ import HeaderRightSide from "@/components/HomePage/RightSide/HeaderRightSide/Hea
 import MainSectionRightSide from "@/components/HomePage/RightSide/MainSectionRightSide/MainSectionRightSide";
 import ModelModalOverlay from "@/components/ModelModalOverlay/ModelModalOverlay";
 import { useScrollDirection } from "@/hooks/useScrollDirection";
+import { GoogleLogin } from '@react-oauth/google';
+import { BackendAuthResponse } from "@/types/google.types";
+import { CredentialResponse } from "@react-oauth/google";
 
 
 export default function Home() {
+  
   const {
     chatList,
     activeChat,
@@ -95,6 +99,32 @@ export default function Home() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const { hidden } = useScrollDirection(scrollContainerRef);
 
+  const handleLogin = async (res: CredentialResponse) => {
+  try {
+    if (!res.credential) {
+      console.error("No credential returned");
+      return;
+    }
+
+    const googleToken = res.credential;
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/user`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ googleToken }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Backend error: ${response.status}`);
+    }
+
+    const data: BackendAuthResponse = await response.json();
+    console.log("Backend response:", data);
+  } catch (err) {
+    console.error("Login failed:", err);
+  }
+};
+
+
   return (
     <>
      <ModelModalOverlay
@@ -161,6 +191,7 @@ export default function Home() {
                   className={styles.overlayContentInner}
                   onClick={(e) => e.stopPropagation()}
                 >
+              
                   <MainSectionRightSide
                     insertTemplate={(template) => {
                       insertTemplateToInput(template);
@@ -264,6 +295,9 @@ export default function Home() {
             )}
           </div>
           <div ref={messagesEndRef} />
+              <div style={{ padding: '2rem' }}>
+        <GoogleLogin onSuccess={handleLogin} onError={() => console.log('Login Failed')} />
+      </div>
         </div>
       </div>
       
