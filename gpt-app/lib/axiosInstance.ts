@@ -32,7 +32,7 @@ axiosInstance.interceptors.response.use(
       if (!isRefreshing) {
         isRefreshing = true;
         try {
-          const refreshRes = await axiosInstance.post("/refresh", { refreshToken });
+          const refreshRes = await axiosInstance.post("/users/refresh", { refreshToken });
           const newAccess = refreshRes.data.accessToken as string;
           tokenStorage.setAccess(newAccess);
           // пробуджуємо всі очікувані запити
