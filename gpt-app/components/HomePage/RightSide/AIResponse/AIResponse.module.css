@@ -7,14 +7,14 @@
   border-radius: 20px;
   background: linear-gradient(180deg, #fff 0%, #f7faff 100%);
   border: 1px solid rgba(37, 99, 235, 0.14);
-  margin-bottom: 24px;
+  /* margin-bottom: 24px; */
 }
 
 .aiTitle {
   display: flex;
   align-items: center;
   gap: 5px;
-  }
+}
 
 .aiParagraph {
   font-family: var(--font-family);
