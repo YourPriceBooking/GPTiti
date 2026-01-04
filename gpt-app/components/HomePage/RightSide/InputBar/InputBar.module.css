@@ -158,5 +158,9 @@
   position: absolute;
   bottom: 80;
 }
-.modalWrapper.hidden { display: none; } 
-.modalWrapper.visible { display: block; }
+.modalWrapper.hidden {
+  display: none;
+}
+.modalWrapper.visible {
+  display: block;
+}
