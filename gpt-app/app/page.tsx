@@ -107,10 +107,10 @@ export default function Home() {
     }
 
     const googleToken = res.credential;
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/user`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/users/user`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ googleToken }),
+      body: JSON.stringify({ idToken: googleToken }),
     });
 
     if (!response.ok) {
