@@ -18,33 +18,52 @@ export default function HeaderRightSide({
 }: HeaderRightSideProps & {
   onOpenQuickActions: () => void;
   hasFirstRequest: boolean;
-
-}) 
-
-{ const result = getModelGroupAndItem(selectedModel); 
-  return ( 
-<div className={styles.container}> 
-  <div className={styles.containerGroupLogos}> 
-    <Image className={styles.rabbitLogo} src="/icons/rabbit.svg" alt="logo-rabbit" width={47} height={47} /> 
-    <Image className={styles.headerTextLogo} src="/icons/text-logo.svg" alt="text-gptiti-logo" width={92} height={27} /> 
-    </div> 
-    <div className={styles.modelGptitiWrapper}>
-    <div className={styles.modelGptitiContainer}>
-    <ModelGptitiTitleWithIcon 
-    modelRef={modelRef} 
-    selectedModel={selectedModel} 
-    isModalOpen={isModalOpen} 
-    setIsModalOpen={setIsModalOpen} /> 
-    <p className={styles.paragraph}> 
-    {result?.model.tokens} {TOKENS_SUFFIX} 
-      </p> 
+}) {
+  const result = getModelGroupAndItem(selectedModel);
+  return (
+    <div className={styles.container}>
+      <div className={styles.containerGroupLogos}>
+        <Image
+          className={styles.rabbitLogo}
+          src="/icons/rabbit.svg"
+          alt="logo-rabbit"
+          width={47}
+          height={47}
+        />
+        <Image
+          className={styles.headerTextLogo}
+          src="/icons/text-logo.svg"
+          alt="text-gptiti-logo"
+          width={92}
+          height={27}
+        />
       </div>
+      <div className={styles.modelGptitiWrapper}>
+        <div className={styles.modelGptitiContainer}>
+          <ModelGptitiTitleWithIcon
+            modelRef={modelRef}
+            selectedModel={selectedModel}
+            isModalOpen={isModalOpen}
+            setIsModalOpen={setIsModalOpen}
+          />
+          <p className={styles.paragraph}>
+            {result?.model.tokens} {TOKENS_SUFFIX}
+          </p>
+        </div>
       </div>
-      <p className={styles.quickActionsContainer}
-           onClick={onOpenQuickActions}
-            style={{ opacity: hasFirstRequest ? 1 : 0.5 }}> 
-            <Image src="/icons/quick-actions.svg" width={21} height={21} alt="quick-actions-icon" /> 
-            <span className={styles.quickActionsSpan}>Quick actions</span> 
-            </p> 
-            </div> ); }
-
+      <p
+        className={styles.quickActionsContainer}
+        onClick={onOpenQuickActions}
+        style={{ opacity: hasFirstRequest ? 1 : 0.5 }}
+      >
+        <Image
+          src="/icons/quick-actions.svg"
+          width={21}
+          height={21}
+          alt="quick-actions-icon"
+        />
+        <span className={styles.quickActionsSpan}>Quick actions</span>
+      </p>
+    </div>
+  );
+}

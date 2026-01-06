@@ -11,13 +11,12 @@ import HeaderRightSide from "@/components/HomePage/RightSide/HeaderRightSide/Hea
 import MainSectionRightSide from "@/components/HomePage/RightSide/MainSectionRightSide/MainSectionRightSide";
 import ModelModalOverlay from "@/components/ModelModalOverlay/ModelModalOverlay";
 import { useScrollDirection } from "@/hooks/useScrollDirection";
-import { GoogleLogin } from '@react-oauth/google';
+import { GoogleLogin } from "@react-oauth/google";
 import { BackendAuthResponse } from "@/types/google.types";
 import { CredentialResponse } from "@react-oauth/google";
-
+// import SecondHeaderRightSide from "@/components/HomePage/RightSide/SecondHeaderRightSide.tsx/SecondHeaderRightSide";
 
 export default function Home() {
-  
   const {
     chatList,
     activeChat,
@@ -100,34 +99,36 @@ export default function Home() {
   const { hidden } = useScrollDirection(scrollContainerRef);
 
   const handleLogin = async (res: CredentialResponse) => {
-  try {
-    if (!res.credential) {
-      console.error("No credential returned");
-      return;
+    try {
+      if (!res.credential) {
+        console.error("No credential returned");
+        return;
+      }
+
+      const googleToken = res.credential;
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/users/user`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ idToken: googleToken }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Backend error: ${response.status}`);
+      }
+
+      const data: BackendAuthResponse = await response.json();
+      console.log("Backend response:", data);
+    } catch (err) {
+      console.error("Login failed:", err);
     }
-
-    const googleToken = res.credential;
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/users/user`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ idToken: googleToken }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Backend error: ${response.status}`);
-    }
-
-    const data: BackendAuthResponse = await response.json();
-    console.log("Backend response:", data);
-  } catch (err) {
-    console.error("Login failed:", err);
-  }
-};
-
+  };
 
   return (
     <>
-     <ModelModalOverlay
+      <ModelModalOverlay
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}
         selectedModel={selectedModel}
@@ -155,7 +156,6 @@ export default function Home() {
           setSelectedModelGroup={setSelectedModelGroup}
         />
         <div className={styles.rightSection}>
-          
           <HeaderRightSide
             chatTitle={activeChat?.title}
             modelRef={modelRef}
@@ -172,14 +172,12 @@ export default function Home() {
               }
             }}
           />
-        <div className={styles.scrollableContent}
-          ref={scrollContainerRef}>
-             {/* <SecondHeaderRightSide chatTitle={activeChat?.title}
-          hidden={hidden}/> */}
-          
-</div>
-        {/* Overlay для Quick Actions */}
-            {/* <AddSomethingToInput/> */}
+          <div className={styles.scrollableContent} ref={scrollContainerRef}>
+            {/* <SecondHeaderRightSide
+              chatTitle={activeChat?.title}
+              hidden={hidden}
+            /> */}
+          </div>
           {isOverlayOpen && (
             <>
               <div
@@ -191,7 +189,6 @@ export default function Home() {
                   className={styles.overlayContentInner}
                   onClick={(e) => e.stopPropagation()}
                 >
-              
                   <MainSectionRightSide
                     insertTemplate={(template) => {
                       insertTemplateToInput(template);
@@ -238,10 +235,11 @@ export default function Home() {
           )}
 
           {activeChat && activeChat.messages.length > 0 && (
-            <MessageList 
-            messages={activeChat.messages} 
-            isTyping={isTyping}
-            hasFirstRequest={hasFirstRequest} />
+            <MessageList
+              messages={activeChat.messages}
+              isTyping={isTyping}
+              hasFirstRequest={hasFirstRequest}
+            />
           )}
 
           <div
@@ -278,29 +276,35 @@ export default function Home() {
                 />
 
                 <div className={styles.spanContainer}>
-                  {!hasFirstRequest ? 
-                  ( <span className={styles.inputSpan}> 
-                  AI systems may make mistakes, so we recommend verifying important information. 
-                  </span> ) : 
-                  ( <div className={styles.spanContainerFirstRequest}> 
-                  <span className={styles.inputSpan1}> 
-                      ≈ Estimated cost: ~120 tokens
-                      </span> 
-                   <span className={styles.inputSpan}> 
-                  AI systems may make mistakes, so we recommend verifying important information. 
-                  </span> 
-                    </div> )}
+                  {!hasFirstRequest ? (
+                    <span className={styles.inputSpan}>
+                      AI systems may make mistakes, so we recommend verifying
+                      important information.
+                    </span>
+                  ) : (
+                    <div className={styles.spanContainerFirstRequest}>
+                      <span className={styles.inputSpan1}>
+                        ≈ Estimated cost: ~120 tokens
+                      </span>
+                      <span className={styles.inputSpan}>
+                        AI systems may make mistakes, so we recommend verifying
+                        important information.
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
           </div>
           <div ref={messagesEndRef} />
-              <div style={{ padding: '2rem' }}>
-        <GoogleLogin onSuccess={handleLogin} onError={() => console.log('Login Failed')} />
-      </div>
+          <div style={{ padding: "2rem" }}>
+            <GoogleLogin
+              onSuccess={handleLogin}
+              onError={() => console.log("Login Failed")}
+            />
+          </div>
         </div>
       </div>
-      
     </>
   );
 }
