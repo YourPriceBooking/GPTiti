@@ -1,12 +1,14 @@
-import styles from './LeftSide.module.css';
-import FooterLeftSide from './FooterLeftSide/FooterLeftSide';
-import { LeftSideProps } from '@/types/types';
-import SectionGptUser from './SectionGptUser/SectionGptUser';
-import SectionGptChats from './SectionGptChats/SectionGptChats';
-import SectionGptTokens from './SectionGptTokens/SectionGptTokens';
+import styles from "./LeftSide.module.css";
+import FooterLeftSide from "./FooterLeftSide/FooterLeftSide";
+import { LeftSideProps } from "@/types/types";
+import SectionGptUser from "./SectionGptUser/SectionGptUser";
+import SectionGptChats from "./SectionGptChats/SectionGptChats";
+import SectionGptTokens from "./SectionGptTokens/SectionGptTokens";
+import { useState } from "react";
+import Image from "next/image";
 
-
-export default function LeftSide({onNewChat,
+export default function LeftSide({
+  onNewChat,
   chatList,
   setActiveChatId,
   deleteChat,
@@ -19,33 +21,132 @@ export default function LeftSide({onNewChat,
   selectedModelGroup,
   setSelectedModelGroup,
   isModalOpen,
-  setIsModalOpen
- }: LeftSideProps) {
+  setIsModalOpen,
+}: LeftSideProps) {
+  const [isOpen, setIsOpen] = useState(true);
 
-return (
-  <div className={styles.chatsScrollArea}>
-    <div className={styles.container}>
-    <SectionGptTokens
-      modelRef={modelRef}
-      modelMode={modelMode}
-      setModelMode={setModelMode}
-      selectedModel={selectedModel}
-      setSelectedModel={setSelectedModel}
-      selectedModelGroup={selectedModelGroup}
-      setSelectedModelGroup={setSelectedModelGroup}
-      isModalOpen={isModalOpen}
-      setIsModalOpen={setIsModalOpen}
-      />
-    <SectionGptChats 
-      onNewChat={onNewChat} 
-      chatList={chatList} 
-      setActiveChatId={setActiveChatId}
-      deleteChat={deleteChat}       
-      renameChat={renameChat}
-      />
-    <SectionGptUser/>
-    <FooterLeftSide/>
-</div>
-</div>
+  return (
+    <div
+      className={styles.chatsScrollArea}
+      style={{
+        width: isOpen ? "330px" : "64px",
+        transition: "width 0.3s ease-in-out",
+      }}
+    >
+      <div className={styles.container}>
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className={styles.toggleButton}
+          aria-label={isOpen ? "Hide panel" : "Show panel"}
+        >
+          <svg
+            style={{
+              transform: !isOpen ? "rotate(180deg)" : "rotate(0deg)",
+              transition: "transform 0.3s ease",
+            }}
+            width="12"
+            height="12"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
+        </button>
+        {isOpen ? (
+          <>
+            <SectionGptTokens
+              modelRef={modelRef}
+              modelMode={modelMode}
+              setModelMode={setModelMode}
+              selectedModel={selectedModel}
+              setSelectedModel={setSelectedModel}
+              selectedModelGroup={selectedModelGroup}
+              setSelectedModelGroup={setSelectedModelGroup}
+              isModalOpen={isModalOpen}
+              setIsModalOpen={setIsModalOpen}
+            />
+
+            <SectionGptChats
+              onNewChat={onNewChat}
+              chatList={chatList}
+              setActiveChatId={setActiveChatId}
+              deleteChat={deleteChat}
+              renameChat={renameChat}
+            />
+
+            <SectionGptUser />
+
+            <FooterLeftSide />
+          </>
+        ) : (
+          <div className={styles.collapsedContent}>
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className={styles.iconButton}
+              aria-label="Select a model"
+              title="Select a model"
+            >
+              <svg
+                width="20"
+                height="20"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"
+                />
+              </svg>
+            </button>
+
+            <button
+              onClick={onNewChat}
+              className={styles.iconButton}
+              aria-label="New chat"
+              title="New chat"
+            >
+              <svg
+                width="20"
+                height="20"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+            </button>
+
+            <div className={styles.userIconBottom}>
+              <div
+                className={styles.userIconAvatar}
+                title="henrinkwinta@gmail.com"
+              >
+                <Image
+                  width={20}
+                  height={26}
+                  src="/icons/ghost-user.svg"
+                  alt="user"
+                  className={styles.userAvatarImage}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
