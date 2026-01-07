@@ -25,3 +25,7 @@
     --foreground: #ededed;
   }
 }
+
+body {
+  overflow: hidden;
+}

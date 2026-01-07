@@ -1,4 +1,5 @@
 "use client";
+
 import styles from "./page.module.css";
 import LeftSide from "@/components/HomePage/LeftSide/LeftSide";
 import MessageList from "@/components/HomePage/RightSide/MessageList/MessageList";
@@ -11,10 +12,8 @@ import HeaderRightSide from "@/components/HomePage/RightSide/HeaderRightSide/Hea
 import MainSectionRightSide from "@/components/HomePage/RightSide/MainSectionRightSide/MainSectionRightSide";
 import ModelModalOverlay from "@/components/ModelModalOverlay/ModelModalOverlay";
 import { useScrollDirection } from "@/hooks/useScrollDirection";
-import { GoogleLogin } from "@react-oauth/google";
+import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
 import { BackendAuthResponse } from "@/types/google.types";
-import { CredentialResponse } from "@react-oauth/google";
-// import SecondHeaderRightSide from "@/components/HomePage/RightSide/SecondHeaderRightSide.tsx/SecondHeaderRightSide";
 
 export default function Home() {
   const {
@@ -39,24 +38,26 @@ export default function Home() {
   const [selectedModelGroup, setSelectedModelGroup] =
     useState<ModelType>("GPT-4o");
   const [selectedModel, setSelectedModel] = useState<string>("gpt-4o-mini");
+
   const [focusMode, setFocusMode] = useState(false);
   const [isSectionVisible, setIsSectionVisible] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const { hidden } = useScrollDirection(scrollContainerRef);
 
   const [newChatOpened, setNewChatOpened] = useState(false);
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [hasFirstRequest, setHasFirstRequest] = useState(false);
   const [pendingTemplate, setPendingTemplate] = useState<string | null>(null);
-  const isNewChat = !activeChat || activeChat.messages.length === 0;
 
+  const isNewChat = !activeChat || activeChat.messages.length === 0;
   const isExistingChat = !!activeChat && !newChatOpened;
 
   useEffect(() => {
     if (activeChat && activeChat.messages.length > 0) {
-      setTimeout(() => {
-        setNewChatOpened(false);
-      }, 0);
+      setTimeout(() => setNewChatOpened(false), 0);
     }
   }, [activeChat?.messages.length]);
 
@@ -83,6 +84,7 @@ export default function Home() {
       setPendingTemplate(template);
     }
   };
+
   useEffect(() => {
     if (!isOverlayOpen && pendingTemplate && inputRef.current) {
       inputRef.current.value = pendingTemplate;
@@ -90,13 +92,9 @@ export default function Home() {
       handleChange({
         target: inputRef.current,
       } as React.ChangeEvent<HTMLTextAreaElement>);
-      setTimeout(() => {
-        setPendingTemplate(null);
-      }, 0);
+      setTimeout(() => setPendingTemplate(null), 0);
     }
-  }, [isOverlayOpen]);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const { hidden } = useScrollDirection(scrollContainerRef);
+  }, [isOverlayOpen, pendingTemplate, handleChange, inputRef]);
 
   const handleLogin = async (res: CredentialResponse) => {
     try {
@@ -136,6 +134,7 @@ export default function Home() {
         selectedModelGroup={selectedModelGroup}
         setSelectedModelGroup={setSelectedModelGroup}
       />
+
       <div className={styles.appContainer}>
         <LeftSide
           onNewChat={() => {
@@ -155,6 +154,7 @@ export default function Home() {
           selectedModelGroup={selectedModelGroup}
           setSelectedModelGroup={setSelectedModelGroup}
         />
+
         <div className={styles.rightSection}>
           <HeaderRightSide
             chatTitle={activeChat?.title}
@@ -167,17 +167,40 @@ export default function Home() {
             setIsModalOpen={setIsModalOpen}
             hasFirstRequest={hasFirstRequest}
             onOpenQuickActions={() => {
-              if (hasFirstRequest) {
-                setIsOverlayOpen(true);
-              }
+              if (hasFirstRequest) setIsOverlayOpen(true);
             }}
           />
+
           <div className={styles.scrollableContent} ref={scrollContainerRef}>
-            {/* <SecondHeaderRightSide
-              chatTitle={activeChat?.title}
-              hidden={hidden}
-            /> */}
+            {!isOverlayOpen && (
+              <MainSectionRightSide
+                insertTemplate={insertTemplate}
+                setFocusMode={setFocusMode}
+                focusMode={focusMode}
+                isSectionVisible={isSectionVisible}
+                hasInput={hasInput}
+                onChange={handleChange}
+                onSend={() => handleSendClick(hasFirstRequest)}
+                inputRef={inputRef}
+                onHideSection={() => setIsSectionVisible(false)}
+                templateTick={templateTick}
+                setHasFirstRequest={setHasFirstRequest}
+                hasFirstRequest={hasFirstRequest}
+                isOverlay={false}
+              />
+            )}
+
+            {activeChat && activeChat.messages.length > 0 && (
+              <MessageList
+                messages={activeChat.messages}
+                isTyping={isTyping}
+                hasFirstRequest={hasFirstRequest}
+              />
+            )}
+
+            <div ref={messagesEndRef} />
           </div>
+
           {isOverlayOpen && (
             <>
               <div
@@ -193,7 +216,6 @@ export default function Home() {
                     insertTemplate={(template) => {
                       insertTemplateToInput(template);
                       setIsOverlayOpen(false);
-                      // setFocusMode(true);
                     }}
                     setFocusMode={setFocusMode}
                     isSectionVisible={true}
@@ -216,93 +238,63 @@ export default function Home() {
             </>
           )}
 
-          {!isOverlayOpen && (
-            <MainSectionRightSide
-              insertTemplate={insertTemplate}
-              setFocusMode={setFocusMode}
-              focusMode={focusMode}
-              isSectionVisible={isSectionVisible}
-              hasInput={hasInput}
-              onChange={handleChange}
-              onSend={() => handleSendClick(hasFirstRequest)}
-              inputRef={inputRef}
-              onHideSection={() => setIsSectionVisible(false)}
-              templateTick={templateTick}
-              setHasFirstRequest={setHasFirstRequest}
-              hasFirstRequest={hasFirstRequest}
-              isOverlay={false}
-            />
-          )}
+          <div className={styles.inputDock}>
+            <div
+              className={
+                isExistingChat
+                  ? styles.inputBottom
+                  : newChatOpened && isNewChat
+                  ? styles.inputBottom
+                  : focusMode && inputSent
+                  ? styles.inputBottom
+                  : focusMode
+                  ? styles.inputBottom
+                  : inputSent
+                  ? styles.inputBottom
+                  : styles.inputWrapper
+              }
+            >
+              {!(isSectionVisible && focusMode) && !isOverlayOpen && (
+                <div className={styles.inputBottomInner}>
+                  <InputBar
+                    hasInput={hasInput}
+                    onChange={handleChange}
+                    onSend={() => {
+                      handleSendClick(hasFirstRequest);
+                      if (!hasFirstRequest) setHasFirstRequest(true);
+                    }}
+                    inputRef={inputRef}
+                    onHideSection={() => setIsSectionVisible(false)}
+                    templateTick={templateTick}
+                    setHasFirstRequest={setHasFirstRequest}
+                    hasFirstRequest={hasFirstRequest}
+                  />
 
-          {activeChat && activeChat.messages.length > 0 && (
-            <MessageList
-              messages={activeChat.messages}
-              isTyping={isTyping}
-              hasFirstRequest={hasFirstRequest}
-            />
-          )}
-
-          <div
-            className={
-              isExistingChat
-                ? styles.inputBottom
-                : newChatOpened && isNewChat
-                ? styles.inputBottom
-                : focusMode && inputSent
-                ? styles.inputBottom
-                : focusMode
-                ? styles.inputBottom
-                : inputSent
-                ? styles.inputBottom
-                : styles.inputWrapper
-            }
-          >
-            {!(isSectionVisible && focusMode) && !isOverlayOpen && (
-              <div className={styles.inputBottom}>
-                <InputBar
-                  hasInput={hasInput}
-                  onChange={handleChange}
-                  onSend={() => {
-                    handleSendClick(hasFirstRequest);
-                    if (!hasFirstRequest) {
-                      setHasFirstRequest(true);
-                    }
-                  }}
-                  inputRef={inputRef}
-                  onHideSection={() => setIsSectionVisible(false)}
-                  templateTick={templateTick}
-                  setHasFirstRequest={setHasFirstRequest}
-                  hasFirstRequest={hasFirstRequest}
-                />
-
-                <div className={styles.spanContainer}>
-                  {!hasFirstRequest ? (
-                    <span className={styles.inputSpan}>
-                      AI systems may make mistakes, so we recommend verifying
-                      important information.
-                    </span>
-                  ) : (
-                    <div className={styles.spanContainerFirstRequest}>
-                      <span className={styles.inputSpan1}>
-                        ≈ Estimated cost: ~120 tokens
-                      </span>
+                  <div className={styles.spanContainer}>
+                    {!hasFirstRequest ? (
                       <span className={styles.inputSpan}>
                         AI systems may make mistakes, so we recommend verifying
                         important information.
                       </span>
-                    </div>
-                  )}
+                    ) : (
+                      <div className={styles.spanContainerFirstRequest}>
+                        <span className={styles.inputSpan1}>
+                          ≈ Estimated cost: ~120 tokens
+                        </span>
+                        <span className={styles.inputSpan}>
+                          AI systems may make mistakes, so we recommend
+                          verifying important information.
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
-          <div ref={messagesEndRef} />
-          <div style={{ padding: "2rem" }}>
-            <GoogleLogin
-              onSuccess={handleLogin}
-              onError={() => console.log("Login Failed")}
-            />
-          </div>
+          {/* <div style={{ padding: "2rem" }}>
+            <GoogleLogin onSuccess={handleLogin} onError={() => {}} />
+          </div> */}
         </div>
       </div>
     </>
