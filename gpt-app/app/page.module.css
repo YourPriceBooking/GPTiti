@@ -6,66 +6,32 @@
   overflow: hidden;
 }
 
-.backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 998;
-  background: rgba(159, 152, 152, 0.3);
-}
-.modalWrapper {
-  position: fixed;
-  top: 80px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 9999;
-  width: auto;
-  max-width: 600px;
-  pointer-events: auto;
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-.modalOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 999;
-  pointer-events: none;
-}
-
-.leftOverlay {
-  position: absolute;
-  top: 0px;
-  left: 20px;
-  z-index: 1;
-}
-
-.leftOverlay > * {
-  pointer-events: auto;
-}
-
 .rightSection {
-  background: linear-gradient(180deg, #0b1220 0%, #070b13 100%);
-  overflow-y: auto;
+  background: #0a101c;
   height: 100vh;
   position: relative;
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-bottom: 140px;
+  overflow: hidden;
+
+  --composer-height: 100px;
 }
+
 .scrollableContent {
-  flex: 1;
+  width: 100%;
+  overflow-y: auto;
+  margin-top: 65px;
+  height: calc(100% - 80px - var(--composer-height));
+
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 24px;
-  width: 100%;
-  margin-top: 80px;
+
+  padding-top: 0;
+  flex: none;
 }
 
 .inputWrapper {
@@ -74,27 +40,30 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  max-width: 816px;
-  /* position: absolute;
-  top: 38%;
-  transform: translateY(-38%); */
+  max-width: 900px;
+}
+
+.inputDock {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--composer-height);
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  padding-bottom: 10px;
+  z-index: 20;
 }
 
 .inputBottom {
-  position: fixed;
   width: 100%;
-  max-width: 816px;
-  bottom: 24px;
+  max-width: 900px;
+  padding: 0 20px;
 }
-.inputCenter {
-  margin-top: 50px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+
+.inputBottomInner {
   width: 100%;
-  max-width: 816px;
-  transition: all 0.5s ease;
 }
 
 .spanContainer {
@@ -109,15 +78,20 @@
   color: #fcfdff;
 }
 
-.inputAboveCenter {
-  position: absolute;
-  top: 44%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 100%;
-  max-width: 816px;
-  transition: all 0.5s ease;
+.spanContainerFirstRequest {
+  display: flex;
+  flex-direction: column;
 }
+
+.inputSpan1 {
+  display: flex;
+  margin-left: 50px;
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 13px;
+  color: #94a3b8;
+}
+
 .overlay {
   position: fixed;
   inset: 0;
@@ -149,17 +123,4 @@
   cursor: default;
   width: 100%;
   max-width: 1200px;
-}
-
-.spanContainerFirstRequest {
-  display: flex;
-  flex-direction: column;
-}
-.inputSpan1 {
-  display: flex;
-  margin-left: 50px;
-  font-family: var(--font-family);
-  font-weight: 400;
-  font-size: 13px;
-  color: #94a3b8;
 }
