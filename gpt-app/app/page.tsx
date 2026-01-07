@@ -14,7 +14,7 @@ import ModelModalOverlay from "@/components/ModelModalOverlay/ModelModalOverlay"
 import { useScrollDirection } from "@/hooks/useScrollDirection";
 import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
 import { BackendAuthResponse } from "@/types/google.types";
-
+import { useAuth } from "@/context/AuthContext";  
 export default function Home() {
   const {
     chatList,
@@ -84,7 +84,7 @@ export default function Home() {
       setPendingTemplate(template);
     }
   };
-
+  const { login } = useAuth();
   useEffect(() => {
     if (!isOverlayOpen && pendingTemplate && inputRef.current) {
       inputRef.current.value = pendingTemplate;
@@ -102,23 +102,24 @@ export default function Home() {
         console.error("No credential returned");
         return;
       }
+      const response = await login(res.credential);
+      console.log("Login successful:", response);
+      // const googleToken = res.credential;
+      // const response = await fetch(
+      //   `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/users/user`,
+      //   {
+      //     method: "POST",
+      //     headers: { "Content-Type": "application/json" },
+      //     body: JSON.stringify({ idToken: googleToken, }),
+      //   }
+      // );
+      
+      // if (!response.ok) {
+      //   throw new Error(`Backend error: ${response.status}`);
+      // }
 
-      const googleToken = res.credential;
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/users/user`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ idToken: googleToken }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Backend error: ${response.status}`);
-      }
-
-      const data: BackendAuthResponse = await response.json();
-      console.log("Backend response:", data);
+      // const data: BackendAuthResponse = await response.json();
+      // console.log("Backend response:", data);
     } catch (err) {
       console.error("Login failed:", err);
     }
@@ -292,9 +293,9 @@ export default function Home() {
               )}
             </div>
           </div>
-          {/* <div style={{ padding: "2rem" }}>
+          <div style={{ padding: "2rem", marginTop: "-95px" }}>
             <GoogleLogin onSuccess={handleLogin} onError={() => {}} />
-          </div> */}
+          </div>
         </div>
       </div>
     </>

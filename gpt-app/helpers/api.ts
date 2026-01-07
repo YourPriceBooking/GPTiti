@@ -5,7 +5,7 @@ import { BackendAuthResponse } from "@/types/google.types";
 
 export const api = {
   loginWithGoogle: async (googleToken: string) => {
-    const res = await axiosInstance.post<BackendAuthResponse>("/users/user", { googleToken });
+    const res = await axiosInstance.post<BackendAuthResponse>("/users/user", { idToken: googleToken });
     return res.data;
   },
   refreshAccessToken: async (refreshToken: string) => {
