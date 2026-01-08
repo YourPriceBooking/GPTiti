@@ -4,6 +4,11 @@ import ModelGptitiTitleWithIcon from "@/components/ModelGptitiTitleWithIcon/Mode
 import { HeaderRightSideProps } from "@/types/types";
 import { TOKENS_SUFFIX } from "@/config/models.config";
 import { getModelGroupAndItem } from "@/functions/getModelGroupAndItem";
+import LeftSide from "../../LeftSide/LeftSide";
+import { useModelMode } from "@/hooks/useModelMode";
+import { useChat } from "@/hooks/useChat";
+import { useState } from "react";
+
 export default function HeaderRightSide({
   chatTitle,
   modelRef,
@@ -19,9 +24,50 @@ export default function HeaderRightSide({
   onOpenQuickActions: () => void;
   hasFirstRequest: boolean;
 }) {
+  
   const result = getModelGroupAndItem(selectedModel);
+  const {
+      chatList,
+      setActiveChatId,
+      handleNewChat,
+      deleteChat,
+      renameChat,
+    } = useChat();
+  
+    const { modelMode, setModelMode} = useModelMode();
+    const [isIconClicked, setIsIconClicked] = useState(false)
   return (
     <div className={styles.container}>
+      <Image 
+      className={styles.openModal}
+      src='/icons/open-icon.svg' 
+      width={25} 
+      height={25} 
+      alt="open-modal"
+      onClick= {() => setIsIconClicked(true)}
+      />
+    {isIconClicked && 
+    ( 
+    <div className={styles.modalOverlay} 
+    onClick={() => setIsIconClicked(false)}> 
+    <div className={styles.modalContent} 
+    onClick={(e) => e.stopPropagation()}> 
+    <LeftSide onNewChat={handleNewChat} 
+    isModalOpen={isModalOpen} 
+    setIsModalOpen={setIsModalOpen} 
+    modelMode={modelMode} 
+    setModelMode={setModelMode} 
+    chatList={chatList} 
+    setActiveChatId={setActiveChatId} 
+    deleteChat={deleteChat} 
+    renameChat={renameChat} 
+    modelRef={modelRef} 
+    selectedModel={selectedModel} 
+    setSelectedModel={setSelectedModel} 
+    selectedModelGroup={selectedModelGroup} 
+    setSelectedModelGroup={setSelectedModelGroup} /> 
+    </div> 
+    </div> )}
       <div className={styles.containerGroupLogos}>
         <Image
           className={styles.rabbitLogo}
@@ -61,6 +107,7 @@ export default function HeaderRightSide({
           width={21}
           height={21}
           alt="quick-actions-icon"
+          className={styles.quickActionsIcon}
         />
         <span className={styles.quickActionsSpan}>Quick actions</span>
       </p>

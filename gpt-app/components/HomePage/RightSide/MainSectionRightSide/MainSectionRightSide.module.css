@@ -300,3 +300,27 @@
   margin-top: 5px;
   text-align: center;
 }
+
+@media (max-width: 767px) and (min-width: 320px) {
+  .mainSectionContainer
+  {
+  min-height: 1000px;
+ }
+ .additionalSectionContainer {
+  min-height: 950px;
+ }
+ .infoContainer{
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+ }
+ .trySectionContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+ }
+ .trySectionParagraphsContainer {
+  flex-direction: column;
+  gap: 20px;
+ }
+}
