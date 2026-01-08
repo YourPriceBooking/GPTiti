@@ -136,6 +136,7 @@ export default function Home() {
       />
 
       <div className={styles.appContainer}>
+        <div className = {styles.leftSideContainer}>
         <LeftSide
           onNewChat={() => {
             handleNewChat();
@@ -154,8 +155,9 @@ export default function Home() {
           selectedModelGroup={selectedModelGroup}
           setSelectedModelGroup={setSelectedModelGroup}
         />
-
+        </div>
         <div className={styles.rightSection}>
+          <div className={styles.headerRightSectionContainer}>
           <HeaderRightSide
             chatTitle={activeChat?.title}
             modelRef={modelRef}
@@ -170,6 +172,7 @@ export default function Home() {
               if (hasFirstRequest) setIsOverlayOpen(true);
             }}
           />
+          </div>
 
           <div className={styles.scrollableContent} ref={scrollContainerRef}>
             {!isOverlayOpen && (
