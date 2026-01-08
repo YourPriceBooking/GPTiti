@@ -1,440 +1,447 @@
-.container{
-    background: linear-gradient(180deg, #0b1220 0%, #070b13 100%);
-    height: 100vh;
-    width: 100vw;
-    padding: 0 56px;
-    box-sizing: border-box;
-    overflow: auto;
+.container {
+  background: linear-gradient(180deg, #0b1220 0%, #070b13 100%);
+  height: 100vh;
+  width: 100vw;
+  padding: 0 56px;
+  box-sizing: border-box;
+  overflow: auto;
 }
-.topUpHeader{
-    margin-top: 18px;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.containerGroupLogos{
-    display: flex;
-    transition: transform 0.3s ease;
-}
-.containerGroupLogos:hover{
-     transform: translateY(-5%);
-}
-.containerGroupLogos:active{
-     transform: translateY(0);
-}
-.headerTextLogo{
-    padding: 8px 28px;
+.topUpHeader {
+  margin-top: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.title{
-    font-family: var(--font-family);
-    font-weight: 700;
-    font-size: 34px;
-    color: var(--background);
+.containerGroupLogos {
+  display: flex;
+  transition: transform 0.3s ease;
+}
+.containerGroupLogos:hover {
+  transform: translateY(-5%);
+}
+.containerGroupLogos:active {
+  transform: translateY(0);
+}
+.headerTextLogo {
+  padding: 8px 28px;
+}
+
+.title {
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 34px;
+  color: var(--background);
 }
 .mobTitle {
-    display: none;
+  display: none;
 }
-.mobileBalanceIcon{
-    display: none;
+.mobileBalanceIcon {
+  display: none;
 }
 
-.fullparagraph, .notFullparagraph{
-    font-family: var(--font-family);
-    font-style: italic;
-    font-weight: 700;
-    font-size: 15px;
-    color: #94a3b8;
+.fullparagraph,
+.notFullparagraph {
+  font-family: var(--font-family);
+  font-style: italic;
+  font-weight: 700;
+  font-size: 15px;
+  color: #94a3b8;
 }
-.fullparagraph{
-    display: block;
+.fullparagraph {
+  display: block;
 }
 
 .notFullparagraph {
-    display: none;
+  display: none;
 }
 
-.balanceButton{
-    display: flex;
-    justify-content: space-around;
-    background-color: #0f172a;
-    border-radius: 19px;
-    max-width: 309px;
-    width: 100%;
+.balanceButton {
+  display: flex;
+  justify-content: space-around;
+  background-color: #0f172a;
+  border-radius: 19px;
+  max-width: 309px;
+  width: 100%;
 
-    padding-top: 11px;
-    padding-bottom: 9px;
-   }
-
-   .balanceInfo {
-    display: flex;
-    flex-direction: column;
-   }
-
-.span1, .span2{
-    font-family: var(--font-family);
-    font-weight: 700;
-    font-size: 13px;
+  padding-top: 11px;
+  padding-bottom: 9px;
 }
 
-.span2{
-    color: #94a3b8;
+.balanceInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.span1,
+.span2 {
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.span2 {
+  color: #94a3b8;
 }
 .strong {
-    font-family: var(--font-family);
-    font-weight: 700;
-    font-size: 16px;
-    color: #e5e7eb;
-    margin-right: 50px;
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 16px;
+  color: #e5e7eb;
+  margin-right: 50px;
 }
-.plansContainer{
-    margin-top: 24px;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: flex-end;
+.plansContainer {
+  margin-top: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
 }
-.plansCard1,  .plansCard3 {
-   background: linear-gradient(180deg, #0f172a 0%, #0b1220 100%);
-   padding-left: 22px;
+.plansCard1,
+.plansCard3 {
+  background: linear-gradient(180deg, #0f172a 0%, #0b1220 100%);
+  padding-left: 22px;
 }
 .plansCard2 {
-    padding-left: 22px;
-    background:#172139;
-    border: 1px solid #60A5FA;
+  padding-left: 22px;
+  background: #172139;
+  border: 1px solid #60a5fa;
 }
 
-.plansCard1{
-    display: flex;
-    flex-direction: column;
-    padding-top: 31px;
-    padding-bottom: 14px;
-    
-    max-width: 320px;
-    width: 100%;
-    min-height: 238px;
-    
-    border-radius: 23px;
+.plansCard1 {
+  display: flex;
+  flex-direction: column;
+  padding-top: 31px;
+  padding-bottom: 14px;
+
+  max-width: 320px;
+  width: 100%;
+  min-height: 238px;
+
+  border-radius: 23px;
 }
-.plansCard2{
-     max-width: 345px;
-    width: 100%;
-    min-height: 265px;
-    
-    border-radius: 25px;
-    padding-bottom: 24px;
-    
+.plansCard2 {
+  max-width: 345px;
+  width: 100%;
+  min-height: 265px;
+
+  border-radius: 25px;
+  padding-bottom: 24px;
 }
- .bestValueContainer {
-   margin-top: 18px;
-    }
-    .recommendedContainer{
-        margin-bottom: 28px;
-        margin-top: 25px;
-    }
-    .bestValueContainer{
-        margin-bottom: 27px;
-    }
-.plansSpan2, .plansSpan3 {
-    margin-top: 18px;
-    font-family: var(--font-family);
-    font-weight: 700;
-    font-size: 13px;
-    color: #e0ecff;
-    padding: 5px 14px;
-    min-height: 26px;
-    border-radius: 13px;
+.bestValueContainer {
+  margin-top: 18px;
+}
+.recommendedContainer {
+  margin-bottom: 28px;
+  margin-top: 25px;
+}
+.bestValueContainer {
+  margin-bottom: 27px;
+}
+.plansSpan2,
+.plansSpan3 {
+  margin-top: 18px;
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 13px;
+  color: #e0ecff;
+  padding: 5px 14px;
+  min-height: 26px;
+  border-radius: 13px;
 }
 
 .plansSpan2 {
-    max-width: 134px;
-    width: 100%;
-    background:linear-gradient(135deg, #2563eb 0%, #60a5fa 100%) ;
-    }
-    .plansSpan3 {
-    max-width: 108px;
-    width: 100%;
-    background: #7c3aed ;
-    }
-.saveSpan1, .saveSpan2 {
-    min-height: 24px;
-    background:   #05210f;
-    padding: 5px 17px 4px 12px;
-    border-radius: 13px;
+  max-width: 134px;
+  width: 100%;
+  background: linear-gradient(135deg, #2563eb 0%, #60a5fa 100%);
+}
+.plansSpan3 {
+  max-width: 108px;
+  width: 100%;
+  background: #7c3aed;
+}
+.saveSpan1,
+.saveSpan2 {
+  min-height: 24px;
+  background: #05210f;
+  padding: 5px 17px 4px 12px;
+  border-radius: 13px;
 
-    font-family: var(--font-family);
-    font-style: italic;
-    font-weight: 700;
-    font-size: 12px;
-    color:  #22c55e;
+  font-family: var(--font-family);
+  font-style: italic;
+  font-weight: 700;
+  font-size: 12px;
+  color: #22c55e;
 }
 .saveSpan1 {
-    margin-left: 37px;
-    }
+  margin-left: 37px;
+}
 .saveSpan2 {
-    margin-left: 34px;
-    }
+  margin-left: 34px;
+}
 
 .plansCard3 {
-     max-width: 349px;
-    width: 100%;
-    min-height: 281px;
-    
-    border-radius: 27px;
-    padding-bottom: 10px;
-    margin-right: 24px;
+  max-width: 349px;
+  width: 100%;
+  min-height: 281px;
+
+  border-radius: 27px;
+  padding-bottom: 10px;
+  margin-right: 24px;
 }
 .plansRecommendedParagraph {
-    font-family: var(--font-family);
-    font-style: italic;
-    font-weight: 700;
-    font-size: 11px;
-    color: #94a3b8;
+  font-family: var(--font-family);
+  font-style: italic;
+  font-weight: 700;
+  font-size: 11px;
+  color: #94a3b8;
 }
 
-.plansParagraph1, .plansParagraph2 {
-    font-family: var(--font-family);
-    font-weight: 700;
-    font-size: 13px;
-    color: #a3aab8;
+.plansParagraph1,
+.plansParagraph2 {
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 13px;
+  color: #a3aab8;
 }
-.plansParagraph1{
-   color: #a3aab8;
-   }
+.plansParagraph1 {
+  color: #a3aab8;
+}
 
-.plansParagraph2{
-    color: #d4d7db;
-    font-style: italic;
+.plansParagraph2 {
+  color: #d4d7db;
+  font-style: italic;
 }
-.addToPlansParagraph2{
-    color: #cbd5e1;
+.addToPlansParagraph2 {
+  color: #cbd5e1;
 }
 
 .tokensTitle,
 .priceTitle {
-    font-family: var(--font-family);
-    font-weight: 700;
-    font-size: 22px;
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 22px;
 }
 .tokensTitle {
-    font-style: italic;
-    color: #e5e7eb;
-   }
-.priceTitle {
-    display: flex;
-    align-items: center;
-    color: #fff;
-    margin-top: 19px;
-    margin-bottom: 17px;
+  font-style: italic;
+  color: #e5e7eb;
 }
-.priceTitleSpan{
-    font-weight: 700;
-    font-size: 22px;
+.priceTitle {
+  display: flex;
+  align-items: center;
+  color: #fff;
+  margin-top: 19px;
+  margin-bottom: 17px;
+}
+.priceTitleSpan {
+  font-weight: 700;
+  font-size: 22px;
 }
 .buyButton {
-    position: relative;
-    background: #111827;
-    max-width: 277px;
-    width: 100%;
-    min-height: 47px;
-    border-radius: 17px;
-    transition: all 0.3ms ease-in-out;
-    }
-    .buyButton:hover {
-        background-color: #1f2937;
-        cursor: pointer;
-    }
-    .buyButton:active {
-        background-color: #0f172a;
+  position: relative;
+  background: #111827;
+  max-width: 277px;
+  width: 100%;
+  min-height: 47px;
+  border-radius: 17px;
+  transition: all 0.3ms ease-in-out;
+}
+.buyButton:hover {
+  background-color: #1f2937;
+  cursor: pointer;
+}
+.buyButton:active {
+  background-color: #0f172a;
 }
 
-    .buyButton2, .buyButton3 {
-        background: #60a5fa;
-        border-radius: 16px; 
-        transition: all 10ms ease-in;
-    }
-    .buyButton2:hover, .buyButton3:hover {
-        background-color:#8fc1ff ;
-        cursor: pointer;
-    }
-    .buyButton2:active, .buyButton3:active {
-        background-color: #1e40af;
-    }
+.buyButton2,
+.buyButton3 {
+  background: #60a5fa;
+  border-radius: 16px;
+  transition: all 10ms ease-in;
+}
+.buyButton2:hover,
+.buyButton3:hover {
+  background-color: #8fc1ff;
+  cursor: pointer;
+}
+.buyButton2:active,
+.buyButton3:active {
+  background-color: #1e40af;
+}
 
-    .buyButton2 {
-    position: relative; 
-    max-width: 300px;
-    width: 100%;
-    min-height: 50px;
-    
+.buyButton2 {
+  position: relative;
+  max-width: 300px;
+  width: 100%;
+  min-height: 50px;
 }
 
 .buyButton3 {
-    position: relative;
-    max-width: 304px;
-    width: 100%; 
-    min-height: 52px;
+  position: relative;
+  max-width: 304px;
+  width: 100%;
+  min-height: 52px;
 }
 
 .buyButtonContent {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .buyButtonSpan {
-    font-family: var(--font-family);
-    font-weight: 700;
-    font-size: 14px;
-    color: #fff;
-    text-align: center;
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 14px;
+  color: #fff;
+  text-align: center;
 }
 
 .buyButtonIcon {
-    position: absolute;
-    right: 15px;
+  position: absolute;
+  right: 15px;
 }
-.horizontalLine{
-    margin-top: 34px;
-    border: none;
-    height: 1px;
-    background-color:#1f2937;
+.horizontalLine {
+  margin-top: 34px;
+  border: none;
+  height: 1px;
+  background-color: #1f2937;
 }
 
-.freeTokens{
-    display: flex;
-    position: relative;
-    max-width: 100vw;
-    width: 100%;
-    background:linear-gradient(180deg, #0f172a 0%, #0b1220 100%) ;
-    margin-top: 31px;
-    padding-top: 30px;
-    padding-left: 22px;
-    border-radius: 23px;
-    min-height: 188px;
+.freeTokens {
+  display: flex;
+  position: relative;
+  max-width: 100vw;
+  width: 100%;
+  background: linear-gradient(180deg, #0f172a 0%, #0b1220 100%);
+  margin-top: 31px;
+  padding-top: 30px;
+  padding-left: 22px;
+  border-radius: 23px;
+  min-height: 188px;
 }
-.freeTokensInfo{
-    display: flex;
-    flex-direction: column;
+.freeTokensInfo {
+  display: flex;
+  flex-direction: column;
 }
-.freeTokensParagraph{
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    font-family: var(--font-family);
-    font-weight: 700;
-    font-size: 22px;
-    color: #e5e7eb;
+.freeTokensParagraph {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 22px;
+  color: #e5e7eb;
 }
 .freeTokensReward {
-    max-height: 26px;
-    max-width: 118px;
-    width: 100%;
-    padding-left: 11px;
-    padding-right: 11px;
-    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%) ;
-    max-width: fit-content;
-    border-radius: 26px;
-    }
-.freeTokensRewardSpan{
-    font-family: var(--font-family);
-    font-weight: 700;
-    font-size: 11px;
-    color: #05210f;
-    }
+  max-height: 26px;
+  max-width: 118px;
+  width: 100%;
+  padding-left: 11px;
+  padding-right: 11px;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  max-width: fit-content;
+  border-radius: 26px;
+}
+.freeTokensRewardSpan {
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 11px;
+  color: #05210f;
+}
 .groupfreeTokensInfo {
-    display: flex;
-    align-items: center;
-    gap: 50px;
+  display: flex;
+  align-items: center;
+  gap: 50px;
 }
 
 .freeTokensSpan {
-    font-family: var(--font-family);
-    font-style: italic;
-    font-weight: 700;
-    font-size: 13px;
-    color: #cbd5e1;
+  font-family: var(--font-family);
+  font-style: italic;
+  font-weight: 700;
+  font-size: 13px;
+  color: #cbd5e1;
 }
-.freeTokensSpan2{
-    margin-top: 10px;
-    font-family: var(--font-family);
-    font-style: italic;
-    font-weight: 700;
-    font-size: 12px;
-    color: #cbd5e1;
+.freeTokensSpan2 {
+  margin-top: 10px;
+  font-family: var(--font-family);
+  font-style: italic;
+  font-weight: 700;
+  font-size: 12px;
+  color: #cbd5e1;
 }
 .freeTokensSpan3 {
-    font-family: var(--font-family);
-    font-weight: 700;
-    font-size: 11px;
-    color: #cbd5e1;
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 11px;
+  color: #cbd5e1;
 }
-.freeTokensSpan4{
-    color: #cbd5e1;
-    margin-left: 20px;
+.freeTokensSpan4 {
+  color: #cbd5e1;
+  margin-left: 20px;
 }
-.presentParagraph{
-    padding-left: 12px;
-    padding-bottom: 5px;
-    border-radius: 15px;
-    box-sizing: border-box;
-    background-color: #0b1220;
-    max-width: 213px;
-    width: 100%;
-    margin-top: 20px;
+.presentParagraph {
+  padding-left: 12px;
+  padding-bottom: 5px;
+  border-radius: 15px;
+  box-sizing: border-box;
+  background-color: #0b1220;
+  max-width: 213px;
+  width: 100%;
+  margin-top: 20px;
 }
-.weeklyClaim{
-    background: #0b1220;
-    max-width: 346px;
-    width: 100%;
-    min-height: 128px;
-    border-radius: 19px;
-    padding: 21px 18px 8px 18px;
+.weeklyClaim {
+  background: #0b1220;
+  max-width: 346px;
+  width: 100%;
+  min-height: 128px;
+  border-radius: 19px;
+  padding: 21px 18px 8px 18px;
 
-    position: absolute;
-    right: 22px;
+  position: absolute;
+  right: 22px;
 }
-.weeklyClaimContainer{
-    display: flex;
-    justify-content: center;
+.weeklyClaimContainer {
+  display: flex;
+  justify-content: center;
 }
-.claimTitle, .claimParagraph {
-    font-family: var(--font-family);
-    font-style: italic;
-    font-weight: 700;
+.claimTitle,
+.claimParagraph {
+  font-family: var(--font-family);
+  font-style: italic;
+  font-weight: 700;
 }
-.claimTitle{
-    font-size: 13px;
-    color: #a3aab8;
+.claimTitle {
+  font-size: 13px;
+  color: #a3aab8;
 }
-.claimParagraph{
-    font-size: 11px;
-    color: #a3aab8;
+.claimParagraph {
+  font-size: 11px;
+  color: #a3aab8;
 }
-.claimButton{
-    position: relative;
-    
-    
-    background:  #3b82f6; 
-    border-radius: 16px; 
-    max-width: 310px;
-    width: 100%; 
-    min-height: 50px;
-    
-    margin-top: 9px;
-    margin-bottom: 11px;
-    transition: 1ms all ease;
+.claimButton {
+  position: relative;
+
+  background: #3b82f6;
+  border-radius: 16px;
+  max-width: 310px;
+  width: 100%;
+  min-height: 50px;
+
+  margin-top: 9px;
+  margin-bottom: 11px;
+  transition: 1ms all ease;
 }
-.clicked{
-   background-color: linear-gradient(180deg, #34d399 0%, #16a34a 100%);
+.clicked {
+  background: linear-gradient(180deg, #34d399 0%, #16a34a 100%);
 }
-.claimButton:hover{
-    background-color:  #60a5fa;
-    cursor: pointer;
+.claimButton:hover {
+  background-color: #60a5fa;
+  cursor: pointer;
 }
-.claimButton:active{
-    background-color: #2563eb;
+.claimButton:active {
+  background-color: #2563eb;
 }
 .claimButton:not(:disabled):hover {
   background-color: #60a5fa;
@@ -446,32 +453,33 @@
 }
 
 .claimButton:disabled {
-  background:  linear-gradient(180deg, #34d399 0%, #16a34a 100%); 
-  cursor: not-allowed;      
+  background: linear-gradient(180deg, #34d399 0%, #16a34a 100%);
+  cursor: not-allowed;
 }
 
 .claimButtonIcon {
-    position: absolute;
-    right: 21px;
+  position: absolute;
+  right: 21px;
 }
-.footer{
-    margin-top: 29px;
-    display: flex;
-    flex-direction: column;
-   }
+.footer {
+  margin-top: 29px;
+  display: flex;
+  flex-direction: column;
+}
 
-.footerSpan, .adaptiveFooterSpan {
-    font-family: var(--font-family);
-    font-style: italic;
-    font-weight: 700;
-    font-size: 11px;
-    color: #a3aab8;
+.footerSpan,
+.adaptiveFooterSpan {
+  font-family: var(--font-family);
+  font-style: italic;
+  font-weight: 700;
+  font-size: 11px;
+  color: #a3aab8;
 }
 .footerSpan {
-    display: block;
+  display: block;
 }
 .adaptiveFooterSpan {
-    display: none;
+  display: none;
 }
 .nav {
   margin-top: 29px;
@@ -479,27 +487,27 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  }
+}
 
 .link {
-    font-family: var(--font-family);
-    font-weight: 400;
-    font-size: 12px;
-    color: #a3aab8;
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 12px;
+  color: #a3aab8;
 }
 
 .link:hover {
-    text-decoration: underline;
-    text-decoration-skip-ink: none;
-    color: var(--main-white);
+  text-decoration: underline;
+  text-decoration-skip-ink: none;
+  color: var(--main-white);
 }
 
 .linkMission {
-    margin-left: 57px;
+  margin-left: 57px;
 }
 
 .linkSignIn {
-    margin-left: 62px;
+  margin-left: 62px;
 }
 
 .linkTerms {
@@ -511,219 +519,217 @@
 }
 
 .gptitiRights {
-    font-family: var(--font-family);
-    font-weight: 500;
-    font-size: 11px;
-    color: #a3aab8;
-    text-align: center;
-    margin-bottom: 17px;
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 11px;
+  color: #a3aab8;
+  text-align: center;
+  margin-bottom: 17px;
 }
 @media (max-width: 1024px) and (min-width: 768px) {
-
-    .fullparagraph{
+  .fullparagraph {
     display: none;
-}
-.mobTitle {
+  }
+  .mobTitle {
     display: none;
-}
-.title {
+  }
+  .title {
     font-size: 27px;
-}
-.mobileBalanceIcon{
+  }
+  .mobileBalanceIcon {
     display: none;
-}
-.headerTextLogo{
+  }
+  .headerTextLogo {
     display: none;
-}
-.notFullparagraph {
+  }
+  .notFullparagraph {
     display: block;
-}
-.balanceButton{
+  }
+  .balanceButton {
     max-width: 240px;
     width: 100%;
-}
-.strong {
+  }
+  .strong {
     font-size: 26px;
-}
-.span2{
+  }
+  .span2 {
     margin-right: 30px;
-}
+  }
 
-.tokensTitle,
-.priceTitle {
+  .tokensTitle,
+  .priceTitle {
     font-size: 26px;
-}
-.plansCard1{
+  }
+  .plansCard1 {
     max-height: 230px;
-}
-.plansCard1 .priceTitle{
+  }
+  .plansCard1 .priceTitle {
     margin-top: 0px;
-}
-.plansCard2{
+  }
+  .plansCard2 {
     max-width: 320px;
     width: 100%;
-}
-.plansCard1 {
+  }
+  .plansCard1 {
     position: relative;
-}
-.plansCard1 .plansParagraph2{
+  }
+  .plansCard1 .plansParagraph2 {
     position: absolute;
     bottom: 45%;
     left: 90;
-}
+  }
 
-.plansCard3 {
+  .plansCard3 {
     position: relative;
-}
-.plansCard3 .plansParagraph2{
+  }
+  .plansCard3 .plansParagraph2 {
     position: absolute;
     bottom: 45%;
     left: 271;
-}
-.buyButton2{
+  }
+  .buyButton2 {
     max-width: 276px;
     width: 100%;
-   }
+  }
 
-.plansCard3{
+  .plansCard3 {
     margin-top: 30px;
     max-width: 100vw;
     width: 100%;
     margin-right: 0px;
-}
-.plansCard3 .plansParagraph1 {
+  }
+  .plansCard3 .plansParagraph1 {
     display: none;
-}
-.buyButton3{
+  }
+  .buyButton3 {
     max-width: 80vw;
     width: 100%;
-    }
-    .buyButton .buyButtonIcon{
-        display: block;
-    }
-    
-    .horizontalLine{
-        display: none;
-    }
-    .freeTokens{
-        flex-direction: column;
-         padding-bottom: 21px;
-        }
+  }
+  .buyButton .buyButtonIcon {
+    display: block;
+  }
 
-    .weeklyClaim{
-        position: static;
-        background: transparent;
-        padding: 0px;
-         max-width: 80vw;
-        width: 100%;
-       min-height: 0px;
-    }
-    .claimButton{
-        margin-top: 27px;
-        max-width: 80vw;
-        width: 100%;
-        }
-    .claimTitle {
-        display: none;
-    }
-    .presentParagraph{
-        display: none;
-    }
-    .freeTokensSpan2{
-        display: none;
-    }
-    .groupfreeTokensInfo {
-        gap: 0px;
-        justify-content: space-between;
-    }
-    .freeTokensReward {
-        margin-right: 41px;
-    }
-    .footer{
-        margin-top: 57px;
-    }
-    .adaptiveFooterSpan {
-        display: block;
-    }
-    .footerSpan {
-        display: none;
-    }
-   .nav {
+  .horizontalLine {
+    display: none;
+  }
+  .freeTokens {
+    flex-direction: column;
+    padding-bottom: 21px;
+  }
+
+  .weeklyClaim {
+    position: static;
+    background: transparent;
+    padding: 0px;
+    max-width: 80vw;
+    width: 100%;
+    min-height: 0px;
+  }
+  .claimButton {
+    margin-top: 27px;
+    max-width: 80vw;
+    width: 100%;
+  }
+  .claimTitle {
+    display: none;
+  }
+  .presentParagraph {
+    display: none;
+  }
+  .freeTokensSpan2 {
+    display: none;
+  }
+  .groupfreeTokensInfo {
+    gap: 0px;
+    justify-content: space-between;
+  }
+  .freeTokensReward {
+    margin-right: 41px;
+  }
+  .footer {
+    margin-top: 57px;
+  }
+  .adaptiveFooterSpan {
+    display: block;
+  }
+  .footerSpan {
+    display: none;
+  }
+  .nav {
     gap: 62px;
     margin-top: 58px;
     margin-bottom: 24px;
-   }
-   .linkMission {
+  }
+  .linkMission {
     margin-left: 0;
-}
+  }
 
-.linkSignIn {
+  .linkSignIn {
     margin-left: 0;
-}
+  }
 
-.linkTerms {
-  margin-left: 0;
-}
+  .linkTerms {
+    margin-left: 0;
+  }
 
-.linkPrivacy {
-  margin-left: 0;
-}
-.gptitiRights {
+  .linkPrivacy {
+    margin-left: 0;
+  }
+  .gptitiRights {
     margin-bottom: 27px;
-}
+  }
 }
 
 @media (max-width: 767px) and (min-width: 320px) {
-    .container{
-        padding: 0 22px;
-    }
-    .topUpHeader {
-        display: flex;
-        align-items: start;
-        /* flex-direction: column; */
-    }
-   
-    .container{
-        display: flex;
-        flex-direction: column;
-    }
-    .title{
-        display: none;
-    }
-    .mobTitle {
+  .container {
+    padding: 0 22px;
+  }
+  .topUpHeader {
+    display: flex;
+    align-items: start;
+    /* flex-direction: column; */
+  }
+
+  .container {
+    display: flex;
+    flex-direction: column;
+  }
+  .title {
+    display: none;
+  }
+  .mobTitle {
     display: block;
     font-family: var(--font-family);
     font-weight: 700;
     font-size: 26px;
     color: #fff;
-}
-.mobileBalanceIcon{
+  }
+  .mobileBalanceIcon {
     display: block;
-}
-.headerTextLogo{
+  }
+  .headerTextLogo {
     display: none;
-}
+  }
 
-
-.balanceIcon{
+  .balanceIcon {
     display: none;
-}
-     .fullparagraph{
+  }
+  .fullparagraph {
     display: none;
-}
+  }
 
-.notFullparagraph {
+  .notFullparagraph {
     display: block;
     font-size: 13px;
-}
-.span2{
+  }
+  .span2 {
     font-size: 12px;
     margin-right: 20px;
-}
-.strong {
+  }
+  .strong {
     font-size: 20px;
-}
-.balanceButton{
+  }
+  .balanceButton {
     margin-top: 13px;
     max-width: 100vw;
     width: 100%;
@@ -732,157 +738,156 @@
     padding-bottom: 8px;
     padding-left: 16px;
     padding-right: 13px;
-}
-.plansContainer{
-   flex-wrap: nowrap;
-   flex-direction: column;
-   gap: 20px;
-   align-items: flex-start;
-}
-.plansCard1, .plansCard2, .plansCard3 {
+  }
+  .plansContainer {
+    flex-wrap: nowrap;
+    flex-direction: column;
+    gap: 20px;
+    align-items: flex-start;
+  }
+  .plansCard1,
+  .plansCard2,
+  .plansCard3 {
     max-width: 100vw;
     width: 100%;
     padding-left: 18px;
     padding-right: 18px;
-}
-.plansCard1 {
+  }
+  .plansCard1 {
     position: relative;
-}
-.plansCard1 .plansParagraph2{
+  }
+  .plansCard1 .plansParagraph2 {
     position: absolute;
     bottom: 54%;
     left: 90;
-}
-.plansCard2 {
+  }
+  .plansCard2 {
     position: relative;
-}
-.plansCard2 .plansParagraph2{
+  }
+  .plansCard2 .plansParagraph2 {
     position: absolute;
     bottom: 42%;
     left: 195;
-}
+  }
 
-.plansCard3 {
+  .plansCard3 {
     position: relative;
-}
-.plansCard3 .plansParagraph2{
+  }
+  .plansCard3 .plansParagraph2 {
     position: absolute;
     bottom: 48%;
     left: 195;
-}
+  }
 
-.priceTitle {
+  .priceTitle {
     margin-top: 0px;
-}
-.buyButton, .buyButton2, .buyButton3 {
+  }
+  .buyButton,
+  .buyButton2,
+  .buyButton3 {
     max-width: 100vw;
     width: 100%;
-    
-}
-    .plansSpan2{
-        background: #2563eb;
-    }
-    .plansSpan3{
-        background: #7c3aed;
-    }
-    .freeTokens {
-        display: block;
-        padding-left: 18px;
-        margin-top: 0px;
-        padding-top: 14px;
-        }
-    .weeklyClaim{
-        position: static;
-        background: transparent;
-        padding: 0px;
-         max-width: 80vw;
-        width: 100%;
-       min-height: 0px;
-    }
-    .claimButton{
-        margin-top: 27px;
-        max-width: 80vw;
-        width: 100%;
-       
-    }
-    .claimTitle {
-        display: none;
-    }
-    .presentParagraph{
-        display: none;
-    }
-    
-    .freeTokensSpan2{
-        display: none;
-    }
-  
-    .freeTokensParagraph {
-        font-size: 20px;
-        
-    }
-    .freeTokensReward {
-        margin-right: 8px;
-        }
+  }
+  .plansSpan2 {
+    background: #2563eb;
+  }
+  .plansSpan3 {
+    background: #7c3aed;
+  }
+  .freeTokens {
+    display: block;
+    padding-left: 18px;
+    margin-top: 0px;
+    padding-top: 14px;
+  }
+  .weeklyClaim {
+    position: static;
+    background: transparent;
+    padding: 0px;
+    max-width: 80vw;
+    width: 100%;
+    min-height: 0px;
+  }
+  .claimButton {
+    margin-top: 27px;
+    max-width: 80vw;
+    width: 100%;
+  }
+  .claimTitle {
+    display: none;
+  }
+  .presentParagraph {
+    display: none;
+  }
 
-     .groupfreeTokensInfo {
-        gap: 16px;
-        }
+  .freeTokensSpan2 {
+    display: none;
+  }
 
-     .adaptiveFooterSpan {
-        display: none;
-    }
-    .footerSpan {
-        display: none;
-    }
-    .nav {
-        gap: 15px;
-    }
-    .linkMission {
+  .freeTokensParagraph {
+    font-size: 20px;
+  }
+  .freeTokensReward {
+    margin-right: 8px;
+  }
+
+  .groupfreeTokensInfo {
+    gap: 16px;
+  }
+
+  .adaptiveFooterSpan {
+    display: none;
+  }
+  .footerSpan {
+    display: none;
+  }
+  .nav {
+    gap: 15px;
+  }
+  .linkMission {
     margin-left: 57px;
-}
+  }
 
-.linkSignIn {
+  .linkSignIn {
     margin-left: 62px;
-}
+  }
 
-.linkTerms {
-  margin-left: 13px;
-  
-}
+  .linkTerms {
+    margin-left: 13px;
+  }
 
-.linkPrivacy {
-  margin-left: 76px;
-  
-}
-.nav {
+  .linkPrivacy {
+    margin-left: 76px;
+  }
+  .nav {
     margin-bottom: 23px;
-}
-.gptitiRights {
+  }
+  .gptitiRights {
     margin-bottom: 27px;
-}
+  }
 }
 
 @media (max-width: 440px) {
-     .freeTokens{
-        min-height: 230px;
-    }
+  .freeTokens {
+    min-height: 230px;
+  }
   .groupfreeTokensInfo {
     display: flex;
-    flex-wrap: wrap; 
+    flex-wrap: wrap;
     align-items: center;
     gap: 12px;
   }
 
   .freeTokensParagraph {
-    flex: 1 1 auto; 
-    min-width: 0;   
+    flex: 1 1 auto;
+    min-width: 0;
   }
 
   .freeTokensReward {
     display: flex;
     justify-content: center;
     padding: 7px 0px;
-    flex-shrink: 0; 
+    flex-shrink: 0;
     max-width: 150px;
     width: 100%;
   }
@@ -893,14 +898,13 @@
 }
 
 @media (max-width: 380px) {
-.plansCard1 .plansParagraph2{
-   bottom: 48%;
+  .plansCard1 .plansParagraph2 {
+    bottom: 48%;
+  }
+  .plansCard2 .plansParagraph2 {
+    bottom: 38%;
+  }
+  .plansCard3 .plansParagraph2 {
+    bottom: 44%;
+  }
 }
-.plansCard2 .plansParagraph2 {
-    bottom: 38%
-}
-.plansCard3 .plansParagraph2 {
-    bottom: 44%
-}
-}
-
