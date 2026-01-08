@@ -1,11 +1,13 @@
 .container {
-  position: fixed;
+  position: sticky;
   top: 9px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-
-  max-width: 1000px;
+  /* left: 0; 
+  right: 0; */
+  max-width: 70vw;
+  
   width: 100%;
   min-height: 56px;
 
