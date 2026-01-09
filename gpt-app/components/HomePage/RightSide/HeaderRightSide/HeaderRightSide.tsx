@@ -6,8 +6,8 @@ import { TOKENS_SUFFIX } from "@/config/models.config";
 import { getModelGroupAndItem } from "@/functions/getModelGroupAndItem";
 import LeftSide from "../../LeftSide/LeftSide";
 import { useModelMode } from "@/hooks/useModelMode";
-import { useChat } from "@/hooks/useChat";
-import { useState } from "react";
+import { useChatContext } from "@/context/ChatContext";
+import { useEffect, useState } from "react";
 
 export default function HeaderRightSide({
   chatTitle,
@@ -32,10 +32,19 @@ export default function HeaderRightSide({
       handleNewChat,
       deleteChat,
       renameChat,
-    } = useChat();
+      activeChatId
+    } = useChatContext();
   
     const { modelMode, setModelMode} = useModelMode();
-    const [isIconClicked, setIsIconClicked] = useState(false)
+    const [isIconClicked, setIsIconClicked] = useState(false);
+    useEffect(() => 
+      { 
+        if (isIconClicked) 
+          { const timer = setTimeout(()=> {setIsIconClicked(false)},
+        0);
+      return () => clearTimeout(timer); } 
+      }, 
+        [activeChatId]);
   return (
     <div className={styles.container}>
       <Image 
@@ -52,6 +61,11 @@ export default function HeaderRightSide({
     onClick={() => setIsIconClicked(false)}> 
     <div className={styles.modalContent} 
     onClick={(e) => e.stopPropagation()}> 
+    <button className={styles.closeButton} onClick={() => setIsIconClicked(false)}
+        aria-label="Close modal"
+      >
+        <Image src='/icons/close.svg' width={20} height={20} alt="close-modal" />
+      </button>
     <LeftSide onNewChat={handleNewChat} 
     isModalOpen={isModalOpen} 
     setIsModalOpen={setIsModalOpen} 
@@ -68,6 +82,7 @@ export default function HeaderRightSide({
     setSelectedModelGroup={setSelectedModelGroup} /> 
     </div> 
     </div> )}
+    
       <div className={styles.containerGroupLogos}>
         <Image
           className={styles.rabbitLogo}

@@ -170,3 +170,10 @@
     flex-wrap: wrap;
     margin: 21px 22px;
 }
+
+@media (max-width: 575px) and (min-width: 320px) {
+ .modalContainer {
+    min-width: 284px;
+    width: 100%;
+ }
+}
