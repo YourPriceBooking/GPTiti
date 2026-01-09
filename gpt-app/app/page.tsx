@@ -4,7 +4,7 @@ import styles from "./page.module.css";
 import LeftSide from "@/components/HomePage/LeftSide/LeftSide";
 import MessageList from "@/components/HomePage/RightSide/MessageList/MessageList";
 import InputBar from "@/components/HomePage/RightSide/InputBar/InputBar";
-import { useChat } from "@/hooks/useChat";
+import { useChatContext } from "@/context/ChatContext";
 import { useModelMode } from "@/hooks/useModelMode";
 import { useState, useRef, useEffect } from "react";
 import { ModelType } from "@/types/types";
@@ -32,7 +32,7 @@ export default function Home() {
     handleNewChat,
     deleteChat,
     renameChat,
-  } = useChat();
+  } = useChatContext();
 
   const { modelMode, setModelMode, modelRef } = useModelMode();
   const [selectedModelGroup, setSelectedModelGroup] =
