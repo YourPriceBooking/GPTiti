@@ -122,3 +122,12 @@ export type SecondHeaderRightSideProps = Pick<
   HeaderRightSideProps,
   "chatTitle"
 >;
+
+export type Plan = {
+  id: string;
+  tokens: number;
+  price: number;
+  subtitle: string;
+  badge?: string | null;
+  saveText?: string | null;
+};
