@@ -8,6 +8,7 @@ import LeftSide from "../../LeftSide/LeftSide";
 import { useModelMode } from "@/hooks/useModelMode";
 import { useChatContext } from "@/context/ChatContext";
 import { useEffect, useState } from "react";
+import {createPortal} from 'react-dom';
 
 export default function HeaderRightSide({
   chatTitle,
@@ -56,7 +57,7 @@ export default function HeaderRightSide({
       onClick= {() => setIsIconClicked(true)}
       />
     {isIconClicked && 
-    ( 
+    createPortal ( 
     <div className={styles.modalOverlay} 
     onClick={() => setIsIconClicked(false)}> 
     <div className={styles.modalContent} 
@@ -81,7 +82,8 @@ export default function HeaderRightSide({
     selectedModelGroup={selectedModelGroup} 
     setSelectedModelGroup={setSelectedModelGroup} /> 
     </div> 
-    </div> )}
+    </div> ,
+    document.body)}
     
       <div className={styles.containerGroupLogos}>
         <Image
