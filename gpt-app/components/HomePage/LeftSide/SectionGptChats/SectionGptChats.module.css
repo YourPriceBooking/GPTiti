@@ -119,3 +119,12 @@
   padding: 2px 4px;
   cursor: text;
 }
+
+@media (max-width:767px) and (min-width:320px) {
+ 
+.menuContainer{
+  
+  
+}
+
+}

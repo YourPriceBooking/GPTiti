@@ -251,10 +251,8 @@
 
 .closeButton {
   position: absolute;
-  top: 130px;
-  right: 40px;
-  width: 32px;
-  height: 32px;
+  right: 20px;
+  top: 30px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.9);
   border: none;
@@ -323,4 +321,13 @@
   flex-direction: column;
   gap: 20px;
  }
+}
+@media (max-width: 766px) and (min-width: 320px) {
+  .closeButton {
+  top: 25px;
+  right: 10px;
+  }
+  .mainSectionContainer{
+    position: relative;
+  }
 }

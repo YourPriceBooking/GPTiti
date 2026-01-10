@@ -139,9 +139,17 @@
   width: 100%;
   max-width: 1200px;
 }
-@media (max-width: 1024px) and (min-width: 768px) {
+@media (max-width: 1024px) {
+.overlayContent {
+   
+    overflow-y: auto;
+  }
 
+  .overlayContentInner {
+    max-width: 100%; 
+  }
 }
+
 @media (max-width: 767px) and (min-width: 320px) {
  
 .leftSideContainer {
@@ -155,4 +163,19 @@
 
   width: 100%;
 }
+.overlayContent {
+    left: 0;
+   
+  }
+ .overlayContentInner {
+    min-width: 400px; 
+    
+  }
+}
+
+@media (max-width: 500px){
+  .overlayContentInner {
+    min-width: 300px; 
+    
+  }
 }
