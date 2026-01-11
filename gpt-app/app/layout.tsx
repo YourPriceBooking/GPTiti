@@ -5,6 +5,7 @@ import ClientLayout from "@/components/ClientLayout";
 import { TokensProvider } from "@/context/TokensContext";
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { ChatProvider } from "@/context/ChatContext";
+import { AuthProvider } from "@/context/AuthContext";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -19,11 +20,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
          <GoogleOAuthProvider clientId="208320907418-1nlduimdeu6d0cbvausroj0hqhit91gh.apps.googleusercontent.com">
-        <TokensProvider>
-          <ChatProvider>
-        <ClientLayout>{children}</ClientLayout>
-        </ChatProvider>
-        </TokensProvider>
+           <AuthProvider>
+            <TokensProvider>
+              <ChatProvider>
+                <ClientLayout>{children}</ClientLayout>
+              </ChatProvider>
+          </TokensProvider>
+        </AuthProvider>
         </GoogleOAuthProvider>
       </body>
     </html>

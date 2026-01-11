@@ -34,3 +34,19 @@ To learn more about Next.js, take a look at the following resources:
     The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
    Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+
+## reusing and redact routes to backend
+
+  усі роути написані в helpers/api.ts
+  типи що використовуються в types/api.types.ts
+
+  приклад використання:
+
+  import { api } from "@/helpers/api";
+  ......
+  const summary = await api.getUsageSummary();
+  const data = await api.loginWithGoogle(googleToken);
+  const history = await api.getUsageHistory(7);
+
+  далі-обробляти дані так, як зі звичайними данними, що прийшли з того чи іншого роуту бек енду

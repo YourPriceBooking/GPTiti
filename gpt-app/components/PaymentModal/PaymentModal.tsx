@@ -6,6 +6,7 @@ import { IMaskInput } from "react-imask";
 import Image from "next/image";
 import styles from "./PaymentModal.module.css";
 import type { Plan } from "@/types/types";
+import { api } from "@/helpers/api";
 
 type Props = {
   isOpen: boolean;
@@ -42,10 +43,16 @@ export default function PaymentModal({ isOpen, onClose, plan }: Props) {
   const handleBackdropMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) onClose();
   };
-
+  // const handlePay = async () => { ... }  // payment logic here
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Pay for plan:", plan, "cardNumber:", cardNumber);
+    // try {
+    //   const { checkoutUrl } = await api.createCheckout(plan.id);
+    //   window.location.href = checkoutUrl;
+    // } catch (err) {
+    //   console.error("Payment failed:", err);
+    // }
   };
 
   return (

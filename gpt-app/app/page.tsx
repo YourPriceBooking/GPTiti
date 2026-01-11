@@ -14,6 +14,7 @@ import ModelModalOverlay from "@/components/ModelModalOverlay/ModelModalOverlay"
 import { useScrollDirection } from "@/hooks/useScrollDirection";
 import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
 import { BackendAuthResponse } from "@/types/google.types";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Home() {
   const {
@@ -95,6 +96,7 @@ export default function Home() {
       setTimeout(() => setPendingTemplate(null), 0);
     }
   }, [isOverlayOpen, pendingTemplate, handleChange, inputRef]);
+  const { login } = useAuth();
 
   const handleLogin = async (res: CredentialResponse) => {
     try {
@@ -103,22 +105,7 @@ export default function Home() {
         return;
       }
 
-      const googleToken = res.credential;
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/users/user`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ idToken: googleToken }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Backend error: ${response.status}`);
-      }
-
-      const data: BackendAuthResponse = await response.json();
-      console.log("Backend response:", data);
+      await login(res.credential);
     } catch (err) {
       console.error("Login failed:", err);
     }
@@ -295,9 +282,9 @@ export default function Home() {
               )}
             </div>
           </div>
-          {/* <div style={{ padding: "2rem" }}>
+          <div style={{ padding: "2rem", marginTop: "40px" }}>
             <GoogleLogin onSuccess={handleLogin} onError={() => {}} />
-          </div> */}
+          </div>
         </div>
       </div>
     </>

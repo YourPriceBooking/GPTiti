@@ -1,8 +1,15 @@
 import React from 'react';
 import styles from './SectionGptUser.module.css';
 import Image from 'next/image';
+import { useAuth } from '@/context/AuthContext';
 
 export default function SectionGptUser() {
+  const { user, logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+  };
+
   return (
    <section className={styles.gptUser}>
         <article className={styles.userInfo}>
@@ -12,11 +19,11 @@ export default function SectionGptUser() {
             src="/icons/ghost-user.svg"
             alt="ghost-user"
           />
-          <span className={styles.gptUserEmail}>henrinkwinta@gmail.com</span>
+          <span className={styles.gptUserEmail}>{user?.email || "Guest"}</span>
         </article>
 
         <div className={styles.logoutBtnContainer}>
-          <button className={styles.logoutBtn}>
+          <button className={styles.logoutBtn} onClick={handleLogout}>
             <span className={styles.logoutBtnSpan}>Log out</span>
           </button>
         </div>

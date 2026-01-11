@@ -3,7 +3,7 @@ import axios from "axios";
 import { tokenStorage } from "@/utils/tokenStorage";
 
 export const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_BACKEND_API_URL,
+  baseURL: "https://ypbooking.chost.com.ua/gpt-titi/api",
   headers: { "Content-Type": "application/json" },
 });
 
