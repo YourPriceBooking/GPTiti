@@ -192,11 +192,25 @@
   height: auto;
   
 }
-.iconWrapper{
-  left:15px;
+.input::placeholder{
+  position: relative;
+  top: 5;
+  font-size: 16px;
 }
-.iconWrapper1 {
-  right: 10%;
+.iconWrapper,
+.iconWrapper1,
+.iconWrapper2 {
+  width: 30;
+  height: 30;
 }
 
+.iconWrapper{
+  left:20;
+}
+.iconWrapper1 {
+  right: 25%;
+}
+.iconWrapper2 {
+  right: 10%;
+}
 }
