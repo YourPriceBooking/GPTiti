@@ -1,10 +1,13 @@
 import React from 'react';
 import styles from './SectionGptUser.module.css';
 import Image from 'next/image';
+import Link from "next/link";
 import { useAuth } from '@/context/AuthContext';
 
 export default function SectionGptUser() {
-  const { user, logout } = useAuth();
+  const { user, accessToken, logout } = useAuth();
+
+  const isLoggedIn = Boolean(accessToken || user);
 
   const handleLogout = async () => {
     await logout();
@@ -23,9 +26,15 @@ export default function SectionGptUser() {
         </article>
 
         <div className={styles.logoutBtnContainer}>
-          <button className={styles.logoutBtn} onClick={handleLogout}>
-            <span className={styles.logoutBtnSpan}>Log out</span>
-          </button>
+          {isLoggedIn ? (
+            <button className={styles.logoutBtn} onClick={handleLogout}>
+              <span className={styles.logoutBtnSpan}>Log out</span>
+            </button>
+          ) : (
+            <Link className={styles.logoutBtn} href="/sign-in">
+              <span className={styles.logoutBtnSpan}>Log in with Google</span>
+            </Link>
+          )}
         </div>
       </section>
   )
