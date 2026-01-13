@@ -31,7 +31,25 @@
     min-height: 46px;
     background: rgba(255, 255, 255, 0.08);
 }
+.loginBtn {
+    margin-top: 20px;
+    border: 1px solid rgba(96, 165, 250, 0.35);
+    border-radius: 11px;
+    min-width: 263px;
+    width: 100%;
+    min-height: 46px;
+    background: #1F6FFF;
+}
 
+.loginBtnSpan {
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: 16px;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 .logoutBtnSpan {
     font-family: var(--font-family);
     font-weight: 500;
@@ -48,5 +66,16 @@
 .logoutBtn:active{
     cursor: pointer;
     background: rgba(99, 98, 102, 0.44);
+    border-color: #60a5fa;
+}
+.loginBtn:hover {
+    cursor: pointer;
+    background: #4C8DFF;
+    border-color: rgba(96, 165, 250, 0.7);
+}
+
+.loginBtn:active{
+    cursor: pointer;
+    background: #1B56CC;
     border-color: #60a5fa;
 }

@@ -29,6 +29,10 @@ export const api = {
       throw new Error(error.response?.data?.message || "Login failed");
     }
   },
+  loginWithGoogleCode: async (code: string) => {
+    const res = await axiosInstance.post("/users/google/code", { code });
+    return res.data;
+  },
   getUsageSummary: async () => {
     const res = await axiosInstance.get<UsageSummaryResponse>("/users/usage/summary");
     return res.data;

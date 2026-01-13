@@ -3,10 +3,11 @@ import styles from './SectionGptUser.module.css';
 import Image from 'next/image';
 import Link from "next/link";
 import { useAuth } from '@/context/AuthContext';
+import LoginModal from "@/components/HomePage/common/LoginModal/LoginModal";
 
 export default function SectionGptUser() {
   const { user, accessToken, logout } = useAuth();
-
+  const [isLoginOpen, setIsLoginOpen] = React.useState(false);
   const isLoggedIn = Boolean(accessToken || user);
 
   const handleLogout = async () => {
@@ -31,11 +32,12 @@ export default function SectionGptUser() {
               <span className={styles.logoutBtnSpan}>Log out</span>
             </button>
           ) : (
-            <Link className={styles.logoutBtn} href="/sign-in">
-              <span className={styles.logoutBtnSpan}>Log in with Google</span>
-            </Link>
+            <button className={styles.loginBtn} onClick={() => setIsLoginOpen(true)}>
+              <span className={styles.loginBtnSpan}><span style={{fontSize: '28px', fontWeight: '700', marginRight: '8px',lineHeight: '28px'}}>G</span>Continue in with Google</span>
+            </button>
           )}
         </div>
+        <LoginModal open={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
       </section>
   )
 }
