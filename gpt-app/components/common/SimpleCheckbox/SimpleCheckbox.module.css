@@ -1,0 +1,26 @@
+.root {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.button {
+  appearance: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  line-height: 0;
+  cursor: pointer;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  display: block;
+}

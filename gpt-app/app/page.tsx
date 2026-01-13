@@ -104,7 +104,7 @@ export default function Home() {
         console.error("No credential returned");
         return;
       }
-
+      console.log("Got credential?", Boolean(res.credential));
       await login(res.credential);
     } catch (err) {
       console.error("Login failed:", err);
@@ -282,9 +282,9 @@ export default function Home() {
               )}
             </div>
           </div>
-          <div style={{ padding: "2rem", marginTop: "40px" }}>
+          {/* <div style={{ padding: "2rem", marginTop: "40px" }}>
             <GoogleLogin onSuccess={handleLogin} onError={() => {}} />
-          </div>
+          </div> */}
         </div>
       </div>
     </>

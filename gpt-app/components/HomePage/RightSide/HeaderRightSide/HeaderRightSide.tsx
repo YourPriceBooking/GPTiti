@@ -9,6 +9,9 @@ import { useModelMode } from "@/hooks/useModelMode";
 import { useChatContext } from "@/context/ChatContext";
 import { useEffect, useState } from "react";
 import {createPortal} from 'react-dom';
+import { useAuth } from "@/context/AuthContext";
+import LoginModal from "@/components/HomePage/common/LoginModal/LoginModal";
+import userStyles from "@/components/HomePage/LeftSide/SectionGptUser/SectionGptUser.module.css";
 
 export default function HeaderRightSide({
   chatTitle,
@@ -25,7 +28,8 @@ export default function HeaderRightSide({
   onOpenQuickActions: () => void;
   hasFirstRequest: boolean;
 }) {
-  
+  const { accessToken } = useAuth();
+  const isAuthed = Boolean(accessToken);
   const result = getModelGroupAndItem(selectedModel);
   const {
       chatList,
@@ -38,6 +42,7 @@ export default function HeaderRightSide({
   
     const { modelMode, setModelMode} = useModelMode();
     const [isIconClicked, setIsIconClicked] = useState(false);
+    const [isLoginOpen, setIsLoginOpen] = useState(false);
     useEffect(() => 
       { 
         if (isIconClicked) 
@@ -114,20 +119,35 @@ export default function HeaderRightSide({
           </p>
         </div>
       </div>
-      <p
-        className={styles.quickActionsContainer}
-        onClick={onOpenQuickActions}
-        style={{ opacity: hasFirstRequest ? 1 : 0.5 }}
-      >
-        <Image
-          src="/icons/quick-actions.svg"
-          width={21}
-          height={21}
-          alt="quick-actions-icon"
-          className={styles.quickActionsIcon}
-        />
-        <span className={styles.quickActionsSpan}>Quick actions</span>
-      </p>
+      {!isAuthed ? (
+        <>
+          <button className={userStyles.loginBtnHeader} onClick={() => setIsLoginOpen(true)}>
+            <span className={userStyles.loginBtnSpan}>
+              <span style={{ fontSize: "28px", fontWeight: "700", marginRight: "8px", lineHeight: "28px" }}>
+                G
+              </span>
+              Continue in with Google
+            </span>
+          </button>
+
+          <LoginModal open={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
+        </>
+      ) : (
+        <p
+          className={styles.quickActionsContainer}
+          onClick={onOpenQuickActions}
+          style={{ opacity: hasFirstRequest ? 1 : 0.5 }}
+        >
+          <Image
+            src="/icons/quick-actions.svg"
+            width={21}
+            height={21}
+            alt="quick-actions-icon"
+            className={styles.quickActionsIcon}
+          />
+          <span className={styles.quickActionsSpan}>Quick actions</span>
+        </p>
+      )}
     </div>
   );
 }
