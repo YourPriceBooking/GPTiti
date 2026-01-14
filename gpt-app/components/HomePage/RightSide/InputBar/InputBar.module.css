@@ -36,9 +36,6 @@
   color: #94a3b8;
 }
 
-/* .multiline .input {
-  padding-bottom: 50px;
-} */
 .scrollable .input {
   overflow-y: auto;
 }
@@ -135,10 +132,6 @@
   top: 58px;
 }
 
-/* .expanded .input {
-  padding: 20px 20px 60px 20px !important;
-} */
-
 .multiline .iconWrapper::after,
 .multiline .iconWrapper1::after,
 .multiline .iconWrapper2::after {
@@ -165,52 +158,45 @@
   display: block;
 }
 @media (max-width: 767px) and (min-width: 320px) {
-.inputContainer{
-  width: 100%;  
-  min-width: auto; 
-  max-width: 100%; 
-  padding: 0 12px;  
-  box-sizing: border-box;
-}
-/* .input {
-  font-size: 16px;
-  padding: 16px 60px 16px 40px;
-  height: auto;
-} */
+  .inputContainer {
+    width: 100%;
+    min-width: auto;
+    max-width: 100%;
+    padding: 0 12px;
+    box-sizing: border-box;
+  }
 
-.iconWrapper,
-.iconWrapper1,
-.iconWrapper2 {
-  transform: translateY(-50%);
-  
-}
+  .iconWrapper,
+  .iconWrapper1,
+  .iconWrapper2 {
+    transform: translateY(-50%);
+  }
 }
 @media (max-width: 767px) and (min-width: 320px) {
   .input {
-  font-size: 16px;
-  padding: 16px 60px 16px 40px;
-  height: auto;
-  
-}
-.input::placeholder{
-  position: relative;
-  top: 5;
-  font-size: 16px;
-}
-.iconWrapper,
-.iconWrapper1,
-.iconWrapper2 {
-  width: 30;
-  height: 30;
-}
+    font-size: 16px;
+    padding: 16px 88px 16px 40px;
+    height: auto;
+  }
+  .input::placeholder {
+    position: relative;
+    top: 5;
+    font-size: 16px;
+  }
+  .iconWrapper,
+  .iconWrapper1,
+  .iconWrapper2 {
+    width: 30;
+    height: 30;
+  }
 
-.iconWrapper{
-  left:20;
-}
-.iconWrapper1 {
-  right: 25%;
-}
-.iconWrapper2 {
-  right: 10%;
-}
+  .iconWrapper {
+    left: 20;
+  }
+  .iconWrapper1 {
+    right: 25%;
+  }
+  .iconWrapper2 {
+    right: 10%;
+  }
 }

@@ -111,6 +111,10 @@ export default function Home() {
     }
   };
 
+  function setIsIconClicked(arg0: boolean): void {
+    throw new Error("Function not implemented.");
+  }
+
   return (
     <>
       <ModelModalOverlay
@@ -123,42 +127,42 @@ export default function Home() {
       />
 
       <div className={styles.appContainer}>
-        <div className = {styles.leftSideContainer}>
-        <LeftSide
-          onNewChat={() => {
-            handleNewChat();
-          }}
-          isModalOpen={isModalOpen}
-          setIsModalOpen={setIsModalOpen}
-          modelMode={modelMode}
-          setModelMode={setModelMode}
-          chatList={chatList}
-          setActiveChatId={setActiveChatId}
-          deleteChat={deleteChat}
-          renameChat={renameChat}
-          modelRef={modelRef}
-          selectedModel={selectedModel}
-          setSelectedModel={setSelectedModel}
-          selectedModelGroup={selectedModelGroup}
-          setSelectedModelGroup={setSelectedModelGroup}
-        />
-        </div>
-        <div className={styles.rightSection}>
-          <div className={styles.headerRightSectionContainer}>
-          <HeaderRightSide
-            chatTitle={activeChat?.title}
+        <div className={styles.leftSideContainer}>
+          <LeftSide
+            onNewChat={() => {
+              handleNewChat();
+            }}
+            isModalOpen={isModalOpen}
+            setIsModalOpen={setIsModalOpen}
+            modelMode={modelMode}
+            setModelMode={setModelMode}
+            chatList={chatList}
+            setActiveChatId={setActiveChatId}
+            deleteChat={deleteChat}
+            renameChat={renameChat}
             modelRef={modelRef}
             selectedModel={selectedModel}
             setSelectedModel={setSelectedModel}
             selectedModelGroup={selectedModelGroup}
             setSelectedModelGroup={setSelectedModelGroup}
-            isModalOpen={isModalOpen}
-            setIsModalOpen={setIsModalOpen}
-            hasFirstRequest={hasFirstRequest}
-            onOpenQuickActions={() => {
-              if (hasFirstRequest) setIsOverlayOpen(true);
-            }}
           />
+        </div>
+        <div className={styles.rightSection}>
+          <div className={styles.headerRightSectionContainer}>
+            <HeaderRightSide
+              chatTitle={activeChat?.title}
+              modelRef={modelRef}
+              selectedModel={selectedModel}
+              setSelectedModel={setSelectedModel}
+              selectedModelGroup={selectedModelGroup}
+              setSelectedModelGroup={setSelectedModelGroup}
+              isModalOpen={isModalOpen}
+              setIsModalOpen={setIsModalOpen}
+              hasFirstRequest={hasFirstRequest}
+              onOpenQuickActions={() => {
+                if (hasFirstRequest) setIsOverlayOpen(true);
+              }}
+            />
           </div>
 
           <div className={styles.scrollableContent} ref={scrollContainerRef}>
@@ -282,9 +286,6 @@ export default function Home() {
               )}
             </div>
           </div>
-          {/* <div style={{ padding: "2rem", marginTop: "40px" }}>
-            <GoogleLogin onSuccess={handleLogin} onError={() => {}} />
-          </div> */}
         </div>
       </div>
     </>

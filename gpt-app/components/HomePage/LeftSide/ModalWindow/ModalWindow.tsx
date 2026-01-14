@@ -1,15 +1,16 @@
-
-import styles from './ModalWindow.module.css';
-import Image from 'next/image';
-import { ModelType } from '@/types/types';
-import { modelConfig, TOKENS_SUFFIX } from '@/config/models.config';
+"use client";
+import styles from "./ModalWindow.module.css";
+import Image from "next/image";
+import { ModelType } from "@/types/types";
+import { modelConfig, TOKENS_SUFFIX } from "@/config/models.config";
+import { getModelGroupAndItem } from "@/functions/getModelGroupAndItem";
 
 type Props = {
-  selectedModelGroup: ModelType;
+  selectedModelGroup: ModelType; // вкладка, яку зараз переглядають
   setSelectedModelGroup: (group: ModelType) => void;
-  selectedModel: string;
+  selectedModel: string; // реально вибрана модель
   setSelectedModel: (model: string) => void;
- setIsModalOpen: (open: boolean) => void;
+  setIsModalOpen: (open: boolean) => void;
 };
 
 export default function ModalWindow({
@@ -17,17 +18,25 @@ export default function ModalWindow({
   setSelectedModelGroup,
   selectedModel,
   setSelectedModel,
-  setIsModalOpen
+  setIsModalOpen,
 }: Props) {
+  const appliedGroup =
+    (getModelGroupAndItem(selectedModel)?.group as ModelType | undefined) ??
+    selectedModelGroup;
+
   return (
     <div className={styles.modalContainer}>
       <header className={styles.header}>
         <h2 className={styles.title}>Chat</h2>
+
         <div className={styles.btnsContainer}>
           {Object.keys(modelConfig).map((group) => (
             <button
               key={group}
-              className={`${styles.btn} ${selectedModelGroup === group ? styles.active : ''}`}
+              type="button"
+              className={`${styles.btn} ${
+                appliedGroup === group ? styles.groupActive : ""
+              }`}
               onClick={() => setSelectedModelGroup(group as ModelType)}
             >
               {group}
@@ -38,15 +47,19 @@ export default function ModalWindow({
 
       <section className={styles.mainSection}>
         <h5 className={styles.title2}>Choose a model</h5>
+
         <div className={styles.btnsContainer2}>
           {modelConfig[selectedModelGroup].list.map((item) => (
             <button
               key={item.title}
-              className={`${styles.btn2} ${selectedModel === item.title ? styles.active : ''}`}
-             onClick={() => { setSelectedModel(item.title); 
-              
-               }
-            }
+              type="button"
+              className={`${styles.btn2} ${
+                selectedModel === item.title ? styles.modelActive : ""
+              }`}
+              onClick={() => {
+                setSelectedModel(item.title);
+                setIsModalOpen(false);
+              }}
             >
               <div className={styles.mainContainerbtn2}>
                 <p className={styles.btn2Paragraph}>{item.title}</p>
@@ -65,13 +78,14 @@ export default function ModalWindow({
           <h2 className={styles.title3}>Balance</h2>
           <div className={styles.balanceContainer}>
             <span className={styles.gptSpan1}>10 000</span>
-            <Image width={24} height={24} src='/icons/badge.svg' alt='badge' />
+            <Image width={24} height={24} src="/icons/badge.svg" alt="badge" />
           </div>
         </article>
+
         <span className={styles.footerSpan}>
           * We show an approximate price based on a typical 30-word message.
-          Real token usage depends on how much you write — shorter prompts cost less,
-          longer ones cost more.
+          Real token usage depends on how much you write — shorter prompts cost
+          less, longer ones cost more.
         </span>
       </footer>
     </div>

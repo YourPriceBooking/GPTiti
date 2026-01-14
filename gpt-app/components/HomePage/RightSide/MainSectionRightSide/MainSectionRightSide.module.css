@@ -4,9 +4,8 @@
   max-width: 75vw;
   width: 100%;
   min-height: 445px;
-  /* margin-top: 92px; */
-
   overflow: hidden;
+  margin-top: 65px;
 }
 .additionalSectionContainer {
   padding-top: 18px;
@@ -138,7 +137,6 @@
 }
 .trySectionContainer {
   margin-top: 18px;
-  /* margin-left: 40px; */
 }
 .trySectionParagraphsContainer {
   margin-top: 11px;
@@ -251,7 +249,7 @@
 
 .closeButton {
   position: absolute;
-  right: 20px;
+  left: 20px;
   top: 30px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.9);
@@ -284,8 +282,8 @@
   display: block;
 }
 
-.noneContainer{
- background: transparent;
+.noneContainer {
+  background: transparent;
 }
 .inputSpan {
   font-family: var(--font-family);
@@ -300,34 +298,36 @@
 }
 
 @media (max-width: 1024px) and (min-width: 320px) {
-  .mainSectionContainer
-  {
-  min-height: 1000px;
- }
- .additionalSectionContainer {
-  min-height: 950px;
- }
- .infoContainer{
-  margin-top: 20px;
-  display: flex;
-  flex-direction: column;
- }
- .trySectionContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
- }
- .trySectionParagraphsContainer {
-  flex-direction: column;
-  gap: 20px;
- }
+  .mainSectionContainer {
+    min-height: 900px;
+    padding: 0 20px 0 20px;
+    margin-top: 10px;
+  }
+  .additionalSectionContainer {
+    min-height: 850px;
+  }
+  .infoContainer {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .trySectionContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .trySectionParagraphsContainer {
+    flex-direction: column;
+  }
+}
+@media (min-width: 768px) {
+  .closeButton {
+    display: none;
+  }
 }
 @media (max-width: 766px) and (min-width: 320px) {
-  .closeButton {
-  top: 25px;
-  right: 10px;
-  }
-  .mainSectionContainer{
+  .mainSectionContainer {
     position: relative;
   }
 }

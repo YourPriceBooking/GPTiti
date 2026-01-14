@@ -1,5 +1,5 @@
 import React, { ReactElement } from "react";
-import { ModelProps } from "./shared";
+// import { ModelProps } from "./shared";
 
 export interface CustomScrollBarProps {
   scrollTargetClass: string;
@@ -49,7 +49,7 @@ export type LeftSideProps = {
   setSelectedModelGroup: (group: ModelType) => void;
 
   isModalOpen: boolean;
-  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsModalOpen: (open: boolean) => void;
 };
 
 export type SectionGptChatsProps = Pick<
@@ -81,7 +81,7 @@ export type MainSectionRightSideProps = {
 
 export type ModelModalOverlayProps = {
   isModalOpen: boolean;
-  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsModalOpen: (open: boolean) => void;
   selectedModel: string;
   setSelectedModel: (model: string) => void;
   selectedModelGroup: ModelType;
@@ -92,7 +92,7 @@ export type ModelGptitiTitleWithIconProps = {
   modelRef: React.RefObject<HTMLDivElement | null>;
   selectedModel: string;
   isModalOpen: boolean;
-  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsModalOpen: (open: boolean) => void;
 };
 
 export type SectionGptTokensProps = {
@@ -104,7 +104,7 @@ export type SectionGptTokensProps = {
   setSelectedModel: (model: string) => void;
   setSelectedModelGroup: (group: ModelType) => void;
   isModalOpen: boolean;
-  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsModalOpen: (open: boolean) => void;
 };
 
 export interface HeaderRightSideProps {
@@ -115,7 +115,7 @@ export interface HeaderRightSideProps {
   selectedModelGroup: ModelType;
   setSelectedModelGroup: (group: ModelType) => void;
   isModalOpen: boolean;
-  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsModalOpen: (open: boolean) => void;
 }
 
 export type SecondHeaderRightSideProps = Pick<

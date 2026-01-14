@@ -1,3 +1,4 @@
+"use client";
 import styles from "./HeaderRightSide.module.css";
 import Image from "next/image";
 import ModelGptitiTitleWithIcon from "@/components/ModelGptitiTitleWithIcon/ModelGptitiTitleWithIcon";
@@ -8,7 +9,7 @@ import LeftSide from "../../LeftSide/LeftSide";
 import { useModelMode } from "@/hooks/useModelMode";
 import { useChatContext } from "@/context/ChatContext";
 import { useEffect, useState } from "react";
-import {createPortal} from 'react-dom';
+import { createPortal } from "react-dom";
 import { useAuth } from "@/context/AuthContext";
 import LoginModal from "@/components/HomePage/common/LoginModal/LoginModal";
 import userStyles from "@/components/HomePage/LeftSide/SectionGptUser/SectionGptUser.module.css";
@@ -32,64 +33,115 @@ export default function HeaderRightSide({
   const isAuthed = Boolean(accessToken);
   const result = getModelGroupAndItem(selectedModel);
   const {
-      chatList,
-      setActiveChatId,
-      handleNewChat,
-      deleteChat,
-      renameChat,
-      activeChatId
-    } = useChatContext();
-  
-    const { modelMode, setModelMode} = useModelMode();
-    const [isIconClicked, setIsIconClicked] = useState(false);
-    const [isLoginOpen, setIsLoginOpen] = useState(false);
-    useEffect(() => 
-      { 
-        if (isIconClicked) 
-          { const timer = setTimeout(()=> {setIsIconClicked(false)},
-        0);
-      return () => clearTimeout(timer); } 
-      }, 
-        [activeChatId]);
+    chatList,
+    setActiveChatId,
+    handleNewChat,
+    deleteChat,
+    renameChat,
+    activeChatId,
+  } = useChatContext();
+
+  const { modelMode, setModelMode } = useModelMode();
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isModalMounted, setIsModalMounted] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+
+  const ANIM_MS = 220;
+
+  const openLeftPanel = () => {
+    setIsClosing(false);
+    setIsModalMounted(true);
+    requestAnimationFrame(() => setIsModalVisible(true));
+  };
+
+  const closeLeftPanel = () => {
+    setIsClosing(true);
+    setIsModalVisible(false);
+
+    window.setTimeout(() => {
+      setIsModalMounted(false);
+      setIsClosing(false);
+    }, ANIM_MS);
+  };
+
+  const setModelModalOpenSafe = (open: boolean) => {
+    if (!open) {
+      setIsModalOpen(false);
+      return;
+    }
+
+    if (isModalMounted) {
+      closeLeftPanel();
+      window.setTimeout(() => {
+        setIsModalOpen(true);
+      }, ANIM_MS);
+      return;
+    }
+
+    setIsModalOpen(true);
+  };
+
+  useEffect(() => {
+    if (isModalMounted) closeLeftPanel();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeChatId]);
+
   return (
     <div className={styles.container}>
-      <Image 
-      className={styles.openModal}
-      src='/icons/open-icon.svg' 
-      width={25} 
-      height={25} 
-      alt="open-modal"
-      onClick= {() => setIsIconClicked(true)}
+      <Image
+        className={styles.openModal}
+        src="/icons/open-icon.svg"
+        width={25}
+        height={25}
+        alt="open-modal"
+        onClick={openLeftPanel}
       />
-    {isIconClicked && 
-    createPortal ( 
-    <div className={styles.modalOverlay} 
-    onClick={() => setIsIconClicked(false)}> 
-    <div className={styles.modalContent} 
-    onClick={(e) => e.stopPropagation()}> 
-    <button className={styles.closeButton} onClick={() => setIsIconClicked(false)}
-        aria-label="Close modal"
-      >
-        <Image src='/icons/close.svg' width={20} height={20} alt="close-modal" />
-      </button>
-    <LeftSide onNewChat={handleNewChat} 
-    isModalOpen={isModalOpen} 
-    setIsModalOpen={setIsModalOpen} 
-    modelMode={modelMode} 
-    setModelMode={setModelMode} 
-    chatList={chatList} 
-    setActiveChatId={setActiveChatId} 
-    deleteChat={deleteChat} 
-    renameChat={renameChat} 
-    modelRef={modelRef} 
-    selectedModel={selectedModel} 
-    setSelectedModel={setSelectedModel} 
-    selectedModelGroup={selectedModelGroup} 
-    setSelectedModelGroup={setSelectedModelGroup} /> 
-    </div> 
-    </div> ,
-    document.body)}
-    
+
+      {isModalMounted &&
+        createPortal(
+          <div
+            className={`${styles.modalOverlay} ${
+              isModalVisible ? styles.modalOverlayOpen : ""
+            } ${isClosing ? styles.modalOverlayClosing : ""}`}
+            onClick={closeLeftPanel}
+          >
+            <div
+              className={`${styles.modalContent} ${
+                isModalVisible ? styles.modalContentOpen : ""
+              } ${isClosing ? styles.modalContentClosing : ""}`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                className={styles.closeButton}
+                onClick={closeLeftPanel}
+                aria-label="Close modal"
+                type="button"
+              >
+                <Image src="/icons/close.svg" width={20} height={20} alt="" />
+              </button>
+
+              <LeftSide
+                onNewChat={handleNewChat}
+                isModalOpen={isModalOpen}
+                setIsModalOpen={setModelModalOpenSafe}
+                modelMode={modelMode}
+                setModelMode={setModelMode}
+                chatList={chatList}
+                setActiveChatId={setActiveChatId}
+                deleteChat={deleteChat}
+                renameChat={renameChat}
+                modelRef={modelRef}
+                selectedModel={selectedModel}
+                setSelectedModel={setSelectedModel}
+                selectedModelGroup={selectedModelGroup}
+                setSelectedModelGroup={setSelectedModelGroup}
+              />
+            </div>
+          </div>,
+          document.body
+        )}
+
       <div className={styles.containerGroupLogos}>
         <Image
           className={styles.rabbitLogo}
@@ -106,31 +158,47 @@ export default function HeaderRightSide({
           height={27}
         />
       </div>
+
       <div className={styles.modelGptitiWrapper}>
         <div className={styles.modelGptitiContainer}>
           <ModelGptitiTitleWithIcon
             modelRef={modelRef}
             selectedModel={selectedModel}
             isModalOpen={isModalOpen}
-            setIsModalOpen={setIsModalOpen}
+            setIsModalOpen={setModelModalOpenSafe}
           />
           <p className={styles.paragraph}>
             {result?.model.tokens} {TOKENS_SUFFIX}
           </p>
         </div>
       </div>
+
       {!isAuthed ? (
         <>
-          <button className={userStyles.loginBtnHeader} onClick={() => setIsLoginOpen(true)}>
+          <button
+            className={userStyles.loginBtnHeader}
+            onClick={() => setIsLoginOpen(true)}
+            type="button"
+          >
             <span className={userStyles.loginBtnSpan}>
-              <span style={{ fontSize: "28px", fontWeight: "700", marginRight: "8px", lineHeight: "28px" }}>
+              <span
+                style={{
+                  fontSize: "28px",
+                  fontWeight: "700",
+                  marginRight: "8px",
+                  lineHeight: "28px",
+                }}
+              >
                 G
               </span>
               Continue in with Google
             </span>
           </button>
 
-          <LoginModal open={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
+          <LoginModal
+            open={isLoginOpen}
+            onClose={() => setIsLoginOpen(false)}
+          />
         </>
       ) : (
         <p

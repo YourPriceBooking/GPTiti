@@ -35,31 +35,29 @@ export default function LeftSide({
     >
       <div className={styles.container}>
         <button
+          type="button"
           onClick={() => setIsOpen(!isOpen)}
           className={styles.toggleButton}
           aria-label={isOpen ? "Hide panel" : "Show panel"}
         >
-          <svg
+          <Image
+            src="/chevron-left.svg"
+            alt=""
+            width={24}
+            height={24}
+            className={styles.chevron}
             style={{
               transform: !isOpen ? "rotate(180deg)" : "rotate(0deg)",
               transition: "transform 0.3s ease",
             }}
-            width="12"
-            height="12"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
+          />
         </button>
         {isOpen ? (
-          <>
+          <div
+            className={`${styles.panelContent} ${
+              isOpen ? styles.panelContentShow : styles.panelContentHide
+            }`}
+          >
             <SectionGptTokens
               modelRef={modelRef}
               modelMode={modelMode}
@@ -83,9 +81,13 @@ export default function LeftSide({
             <SectionGptUser />
 
             <FooterLeftSide />
-          </>
+          </div>
         ) : (
-          <div className={styles.collapsedContent}>
+          <div
+            className={`${styles.collapsedContent} ${
+              isOpen ? styles.collapsedHide : styles.collapsedShow
+            }`}
+          >
             <button
               onClick={() => setIsModalOpen(true)}
               className={styles.iconButton}
