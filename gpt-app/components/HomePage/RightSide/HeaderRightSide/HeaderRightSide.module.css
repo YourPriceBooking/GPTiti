@@ -4,10 +4,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  /* left: 0; 
-  right: 0; */
   max-width: 70vw;
-  
+
   width: 100%;
   min-height: 56px;
 
@@ -125,39 +123,45 @@
   font-size: 11px;
   color: var(--main-gray2);
 }
-.closeButton{
-  position: absolute; 
-  top: 8px; 
-  left: 12px;
-  z-index: 1001; 
-  background: transparent; 
+.closeButton {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1001;
+  background: transparent;
   border: none;
   transition: 0.5ms all ease-in-out;
-  padding: 0; 
+  padding: 0;
   cursor: pointer;
 }
-.closeButton:hover { background: rgba(255, 255, 255, 0.2); }
-@media (min-width:768px) {
-  .openModal {
-    display: none;
-    }
+.closeButton:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
-@media(max-width: 1024px) and (min-width: 768px) {
-  .container {
-   justify-content: flex-start;
-  }
-
-   .headerTextLogo {
+@media (min-width: 768px) {
+  .modalOverlay {
     display: none;
   }
-  .containerGroupLogos{
+  .openModal {
+    display: none;
+  }
+}
+
+@media (max-width: 1024px) and (min-width: 768px) {
+  .container {
+    justify-content: flex-start;
+  }
+
+  .headerTextLogo {
+    display: none;
+  }
+  .containerGroupLogos {
     margin-left: 0;
   }
   .quickActionsContainer {
     margin-right: 0;
   }
-  .modelGptitiContainer{
+  .modelGptitiContainer {
     max-width: 200px;
     width: 100%;
   }
@@ -171,7 +175,7 @@
   .headerTextLogo {
     display: none;
   }
-  .containerGroupLogos{
+  .containerGroupLogos {
     margin-left: 20px;
   }
   .quickActionsSpan {
@@ -190,40 +194,60 @@
     margin-left: 15px;
   }
 
- .modalOverlay {
-   position: fixed;
-   inset: 0;
-   
-   background: rgba(0, 0, 0, 0.44);
-   backdrop-filter: blur(6px);
-   z-index: 999;
-  
-   display: flex;
-   justify-content: flex-start;
-   
- }
+  .modalOverlay {
+    position: fixed;
+    inset: 0;
 
- .modalContent {
-   width: 330px;
-   height: 100vh;
-   background: #0a101c;
-   box-shadow: 2px 0 12px rgba(0, 0, 0, 0.5);
-   position: relative;
- }
- }
- @media(max-width: 528px) {
-   .modelGptitiContainer {
-  max-width: 250px;
-  width: 100%;
- }
- }
+    background: rgba(0, 0, 0, 0.44);
+    z-index: 999;
 
- @media (max-width: 409px) {
+    display: flex;
+    justify-content: flex-start;
+    opacity: 0;
+    transition: opacity 220ms ease;
+  }
+
+  .modalOverlayOpen {
+    opacity: 1;
+  }
+
+  .modalOverlayClosing {
+    opacity: 0;
+  }
+  .modalContent {
+    width: 330px;
+    height: 100vh;
+    background: #0a101c;
+    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.5);
+    position: relative;
+    transform: translateX(-100%);
+    opacity: 0;
+    transition: transform 220ms ease, opacity 220ms ease;
+    will-change: transform, opacity;
+  }
+
+  .modalContentOpen {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  .modalContentClosing {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+@media (max-width: 528px) {
+  .modelGptitiContainer {
+    max-width: 250px;
+    width: 100%;
+  }
+}
+
+@media (max-width: 409px) {
   .paragraph {
     display: none;
   }
   .modelGptitiContainer {
-  min-width: 120px;
-  
- }
- }
+    min-width: 120px;
+  }
+}

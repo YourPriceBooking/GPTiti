@@ -24,10 +24,13 @@ export default function MainSectionRightSide(props: MainSectionRightSideProps) {
   if (!isSectionVisible) return null;
 
   return (
-   <div className={`${styles.mainSectionContainer} ${focusMode ? styles.noneContainer : ""}`} >
+    <div
+      className={`${styles.mainSectionContainer} ${
+        focusMode ? styles.noneContainer : ""
+      }`}
+    >
       {!focusMode ? (
         <section className={styles.additionalSectionContainer}>
-          {/* 🔽 ЄДИНЕ місце, де додана логіка */}
           {!isOverlay ? (
             <p
               className={styles.additionalSectionParagraphContainer}
@@ -44,16 +47,16 @@ export default function MainSectionRightSide(props: MainSectionRightSideProps) {
               <span className={styles.additionalSectionSpan1}>Ready</span>
             </p>
           ) : (
-             <button className={styles.closeButton}>
-            <Image
-              src="/icons/close2.svg"
-              width={24}
-              height={24}
-              alt="close"
-              onClick={onHideSection}
-              style={{ cursor: "pointer" }}
-            />
-            </button> 
+            <button className={styles.closeButton}>
+              <Image
+                src="/icons/close2.svg"
+                width={24}
+                height={24}
+                alt="close"
+                onClick={onHideSection}
+                style={{ cursor: "pointer" }}
+              />
+            </button>
           )}
 
           <h1 className={styles.additionalSectionTitle}>
@@ -98,7 +101,12 @@ export default function MainSectionRightSide(props: MainSectionRightSideProps) {
               }
             >
               <div className={styles.CardIconContainer}>
-                <Image src="icons/write.svg" width={24} height={24} alt="write" />
+                <Image
+                  src="icons/write.svg"
+                  width={24}
+                  height={24}
+                  alt="write"
+                />
               </div>
               <div className={styles.CardTextInfoContainer}>
                 <p className={styles.CardParapgraph}>Write / Improve</p>
@@ -254,8 +262,6 @@ export default function MainSectionRightSide(props: MainSectionRightSideProps) {
         //       Focus mode hides suggestions — just type and go.
         //     </p>
 
-    
-
         //     <span className={styles.hiddenCenterSpan1}>
         //       Tip: press Enter to send • Shift+Enter for a new line
         //     </span>
@@ -266,28 +272,26 @@ export default function MainSectionRightSide(props: MainSectionRightSideProps) {
         //   </section>
         // </section>
         <>
-        <div className={styles.noneContainer}>
-            
-        </div>
+          <div className={styles.noneContainer}></div>
           <div className={styles.focusInputWrap}>
-              <InputBar
-               hasInput={hasInput}
-                 onChange={onChange}
-                 onSend={onSend}
-                 inputRef={inputRef}
-                 onHideSection={onHideSection}
-                 templateTick={templateTick}
-                 setHasFirstRequest={setHasFirstRequest}
-                hasFirstRequest={hasFirstRequest}
-              />
-              <div className={styles.spanContainer}>
-               <span className={styles.inputSpan}>
-                    AI systems may make mistakes, so we recommend verifying
-                    important information.
-                  </span>
-                  </div>
+            <InputBar
+              hasInput={hasInput}
+              onChange={onChange}
+              onSend={onSend}
+              inputRef={inputRef}
+              onHideSection={onHideSection}
+              templateTick={templateTick}
+              setHasFirstRequest={setHasFirstRequest}
+              hasFirstRequest={hasFirstRequest}
+            />
+            <div className={styles.spanContainer}>
+              <span className={styles.inputSpan}>
+                AI systems may make mistakes, so we recommend verifying
+                important information.
+              </span>
             </div>
-            </>
+          </div>
+        </>
       )}
     </div>
   );
