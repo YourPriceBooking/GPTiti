@@ -2,14 +2,14 @@
 
 import { useState } from "react";
 import styles from "./page.module.css";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { useTokensContext } from "@/context/TokensContext";
 import Link from "next/link";
 import PaymentModal from "@/components/PaymentModal/PaymentModal";
 import type { Plan } from "@/types/types";
 
-const PLANS = [
+const PLANS: Plan[] = [
   {
     id: "p500",
     tokens: 500000,
@@ -42,6 +42,7 @@ export default function TokensPage() {
 
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
+
   const openPayment = (plan: Plan) => {
     setSelectedPlan(plan);
     setIsPaymentOpen(true);
@@ -354,12 +355,17 @@ export default function TokensPage() {
         </span>
       </footer>
 
-      {/* MODAL */}
-      <PaymentModal
-        isOpen={isPaymentOpen}
-        onClose={closePayment}
-        plan={selectedPlan}
-      />
+      {/* ✅ MODAL WITH OPEN/CLOSE ANIMATION */}
+      <AnimatePresence mode="wait">
+        {isPaymentOpen && (
+          <PaymentModal
+            key="payment-modal"
+            isOpen={isPaymentOpen}
+            onClose={closePayment}
+            plan={selectedPlan}
+          />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

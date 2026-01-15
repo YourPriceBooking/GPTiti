@@ -6,12 +6,24 @@ import { IMaskInput } from "react-imask";
 import Image from "next/image";
 import styles from "./PaymentModal.module.css";
 import type { Plan } from "@/types/types";
-import { api } from "@/helpers/api";
+import { motion } from "framer-motion";
 
 type Props = {
   isOpen: boolean;
   onClose: () => void;
   plan: Plan | null;
+};
+
+const backdrop = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1 },
+  exit: { opacity: 0 },
+};
+
+const modal = {
+  hidden: { opacity: 0, y: 24, scale: 0.985 },
+  visible: { opacity: 1, y: 0, scale: 1 },
+  exit: { opacity: 0, y: 18, scale: 0.985 },
 };
 
 export default function PaymentModal({ isOpen, onClose, plan }: Props) {
@@ -25,6 +37,7 @@ export default function PaymentModal({ isOpen, onClose, plan }: Props) {
     };
 
     window.addEventListener("keydown", onKeyDown);
+
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
@@ -34,8 +47,6 @@ export default function PaymentModal({ isOpen, onClose, plan }: Props) {
     };
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
-
   const tokensText = plan?.tokens ? plan.tokens.toLocaleString("en-US") : "";
   const priceText = plan?.price ?? "";
   const subtitle = plan?.subtitle ?? "";
@@ -43,21 +54,33 @@ export default function PaymentModal({ isOpen, onClose, plan }: Props) {
   const handleBackdropMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) onClose();
   };
-  // const handlePay = async () => { ... }  // payment logic here
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Pay for plan:", plan, "cardNumber:", cardNumber);
-    // try {
-    //   const { checkoutUrl } = await api.createCheckout(plan.id);
-    //   window.location.href = checkoutUrl;
-    // } catch (err) {
-    //   console.error("Payment failed:", err);
-    // }
   };
 
   return (
-    <div className={styles.backdrop} onMouseDown={handleBackdropMouseDown}>
-      <div className={styles.modal} role="dialog" aria-modal="true">
+    <motion.div
+      className={styles.backdrop}
+      onMouseDown={handleBackdropMouseDown}
+      variants={backdrop}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+      transition={{ duration: 0.2, ease: "easeOut" }}
+    >
+      <motion.div
+        className={styles.modal}
+        role="dialog"
+        aria-modal="true"
+        variants={modal}
+        initial="hidden"
+        animate="visible"
+        exit="exit"
+        transition={{ duration: 0.25, ease: "easeOut" }}
+        onMouseDown={(e) => e.stopPropagation()}
+      >
         <div className={styles.paymentContainer}>
           <header className={styles.headerPayment}>
             <div className={styles.groupHeaderPaymentContent}>
@@ -292,7 +315,7 @@ export default function PaymentModal({ isOpen, onClose, plan }: Props) {
             </ul>
           </section>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
