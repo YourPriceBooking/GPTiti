@@ -6,9 +6,9 @@ import { modelConfig, TOKENS_SUFFIX } from "@/config/models.config";
 import { getModelGroupAndItem } from "@/functions/getModelGroupAndItem";
 
 type Props = {
-  selectedModelGroup: ModelType; // вкладка, яку зараз переглядають
+  selectedModelGroup: ModelType;
   setSelectedModelGroup: (group: ModelType) => void;
-  selectedModel: string; // реально вибрана модель
+  selectedModel: string;
   setSelectedModel: (model: string) => void;
   setIsModalOpen: (open: boolean) => void;
 };
