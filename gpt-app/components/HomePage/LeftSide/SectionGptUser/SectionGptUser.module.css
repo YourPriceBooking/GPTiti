@@ -101,3 +101,21 @@
     background: #1B56CC;
     border-color: #60a5fa;
 }
+
+@media (max-width: 950px) {
+    .loginBtnText {
+        display: none;
+    }
+    .loginBtnHeader .loginBtnSpan{
+        display: flex;
+        justify-content: center;
+    }
+    .loginBtnHeader {
+        max-width: max-content;
+        width: max-content;
+        min-width: max-content;
+        padding-left: 20px;
+        padding-right: 20px;
+        margin-left: 20px;
+    }
+}
