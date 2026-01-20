@@ -63,8 +63,9 @@ export default function Home() {
   }, [activeChat?.messages.length]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [chatList, activeChat]);
+  if (!activeChat || activeChat.messages.length === 0) return;
+  messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+}, [activeChat?.id, activeChat?.messages.length]);
 
   useEffect(() => {
     const empty = !activeChat || activeChat.messages.length === 0;

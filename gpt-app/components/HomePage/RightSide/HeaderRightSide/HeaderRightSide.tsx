@@ -191,7 +191,7 @@ export default function HeaderRightSide({
               >
                 G
               </span>
-              Continue in with Google
+              <span className={userStyles.loginBtnText}>Continue in with Google</span>
             </span>
           </button>
 
