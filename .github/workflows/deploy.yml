@@ -1,4 +1,4 @@
-name: Deploy GPTiti
+name: Deploy GPTiti Production
 
 on:
     push:
@@ -14,41 +14,64 @@ env:
     PORT: 3030
 
 jobs:
-    notify_start:
+    deploy:
         runs-on: ubuntu-latest
+
         steps:
-            - uses: appleboy/telegram-action@master
+            ################################################
+            # TELEGRAM START
+            ################################################
+
+            - name: 🚀 Telegram START
+              uses: appleboy/telegram-action@master
               with:
-                  token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
                   to: ${{ secrets.TELEGRAM_CHAT_ID }}
+                  token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
                   message: |
                       🚀 DEPLOY STARTED
 
                       Project: ${{ env.PROJECT_NAME }}
+                      Repo: ${{ github.repository }}
                       Branch: ${{ github.ref_name }}
                       Commit: ${{ github.sha }}
+                      Actor: ${{ github.actor }}
 
-    deploy:
-        runs-on: ubuntu-latest
-        needs: notify_start
+            ################################################
+            # DEPLOY
+            ################################################
 
-        steps:
-            - uses: appleboy/ssh-action@v1.0.3
+            - name: 🚀 Deploy via SSH
+              uses: appleboy/ssh-action@v1.0.3
+              env:
+                  PROJECT_NAME: ${{ env.PROJECT_NAME }}
+                  APP_DIR: ${{ env.APP_DIR }}
+                  RELEASES_DIR: ${{ env.RELEASES_DIR }}
+                  CURRENT_LINK: ${{ env.CURRENT_LINK }}
+                  ECOSYSTEM: ${{ env.ECOSYSTEM }}
+                  PORT: ${{ env.PORT }}
               with:
                   host: ${{ secrets.SERVER_HOST }}
                   username: root
                   key: ${{ secrets.SERVER_SSH_KEY }}
                   script_stop: true
-
+                  envs: PROJECT_NAME,APP_DIR,RELEASES_DIR,CURRENT_LINK,ECOSYSTEM,PORT
                   script: |
 
                       set -e
+
+                      echo "Deploying $PROJECT_NAME"
 
                       mkdir -p $RELEASES_DIR
 
                       PREVIOUS_RELEASE=$(readlink -f $CURRENT_LINK || echo "")
 
                       NEW_RELEASE="$RELEASES_DIR/$(date +%Y%m%d_%H%M%S)"
+
+                      echo "New release: $NEW_RELEASE"
+
+                      ################################################
+                      # CLONE
+                      ################################################
 
                       git clone \
                         --depth 1 \
@@ -58,21 +81,53 @@ jobs:
 
                       cd $NEW_RELEASE
 
+                      ################################################
+                      # INSTALL
+                      ################################################
+
+                      echo "Installing dependencies"
                       npm ci
 
+                      ################################################
+                      # BUILD
+                      ################################################
+
+                      echo "Building project"
                       npm run build
 
+                      ################################################
+                      # SWITCH RELEASE
+                      ################################################
+
+                      echo "Switch current → $NEW_RELEASE"
                       ln -sfn $NEW_RELEASE $CURRENT_LINK
 
-                      pm2 reload $ECOSYSTEM --update-env
+                      ################################################
+                      # PM2 RELOAD
+                      ################################################
 
+                      echo "Reload PM2"
+
+                      pm2 reload $ECOSYSTEM --update-env || pm2 start $ECOSYSTEM
+
+                      ################################################
+                      # WAIT STARTUP
+                      ################################################
+
+                      echo "Wait startup"
                       sleep 10
+
+                      ################################################
+                      # HEALTHCHECK
+                      ################################################
 
                       HEALTH_OK=0
 
                       for i in {1..20}; do
 
                         STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:$PORT || true)
+
+                        echo "Healthcheck attempt $i → $STATUS"
 
                         if [ "$STATUS" = "200" ]; then
 
@@ -85,7 +140,13 @@ jobs:
 
                       done
 
+                      ################################################
+                      # ROLLBACK IF FAILED
+                      ################################################
+
                       if [ $HEALTH_OK -eq 0 ]; then
+
+                        echo "Healthcheck failed → rollback"
 
                         if [ ! -z "$PREVIOUS_RELEASE" ]; then
 
@@ -101,38 +162,52 @@ jobs:
 
                       fi
 
+                      ################################################
+                      # CLEAN OLD RELEASES (KEEP LAST 5)
+                      ################################################
+
                       cd $RELEASES_DIR
 
                       ls -dt */ | tail -n +6 | xargs rm -rf || true
 
-    notify_success:
-        runs-on: ubuntu-latest
-        needs: deploy
-        if: success()
+                      echo "Deploy success"
 
-        steps:
-            - uses: appleboy/telegram-action@master
+            ################################################
+            # TELEGRAM SUCCESS
+            ################################################
+
+            - name: ✅ Telegram SUCCESS
+              if: success()
+              uses: appleboy/telegram-action@master
               with:
-                  token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
                   to: ${{ secrets.TELEGRAM_CHAT_ID }}
+                  token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
                   message: |
                       ✅ DEPLOY SUCCESS
 
-                      Project: GPTiti
+                      Project: ${{ env.PROJECT_NAME }}
+                      Repo: ${{ github.repository }}
                       Commit: ${{ github.sha }}
 
-    notify_failure:
-        runs-on: ubuntu-latest
-        needs: deploy
-        if: failure()
+                      Server: OK
+                      Port: ${{ env.PORT }}
 
-        steps:
-            - uses: appleboy/telegram-action@master
+            ################################################
+            # TELEGRAM FAILURE
+            ################################################
+
+            - name: ❌ Telegram FAILURE
+              if: failure()
+              uses: appleboy/telegram-action@master
               with:
-                  token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
                   to: ${{ secrets.TELEGRAM_CHAT_ID }}
+                  token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
                   message: |
                       ❌ DEPLOY FAILED
 
-                      Project: GPTiti
+                      Project: ${{ env.PROJECT_NAME }}
+                      Repo: ${{ github.repository }}
                       Commit: ${{ github.sha }}
+
+                      Check logs:
+                      https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
