@@ -12,6 +12,7 @@ env:
     CURRENT_LINK: /var/www/GPTiti/current
     ECOSYSTEM: /var/www/GPTiti/ecosystem.config.js
     PORT: 3030
+    PROJECT_SUBDIR: gpt-app
 
 jobs:
     deploy:
@@ -30,11 +31,9 @@ jobs:
                   message: |
                       🚀 DEPLOY STARTED
 
-                      Project: ${{ env.PROJECT_NAME }}
+                      Project: GPTiti
                       Repo: ${{ github.repository }}
-                      Branch: ${{ github.ref_name }}
                       Commit: ${{ github.sha }}
-                      Actor: ${{ github.actor }}
 
             ################################################
             # DEPLOY
@@ -43,23 +42,21 @@ jobs:
             - name: 🚀 Deploy via SSH
               uses: appleboy/ssh-action@v1.0.3
               env:
-                  PROJECT_NAME: ${{ env.PROJECT_NAME }}
                   APP_DIR: ${{ env.APP_DIR }}
                   RELEASES_DIR: ${{ env.RELEASES_DIR }}
                   CURRENT_LINK: ${{ env.CURRENT_LINK }}
                   ECOSYSTEM: ${{ env.ECOSYSTEM }}
                   PORT: ${{ env.PORT }}
+                  PROJECT_SUBDIR: ${{ env.PROJECT_SUBDIR }}
               with:
                   host: ${{ secrets.SERVER_HOST }}
                   username: root
                   key: ${{ secrets.SERVER_SSH_KEY }}
                   script_stop: true
-                  envs: PROJECT_NAME,APP_DIR,RELEASES_DIR,CURRENT_LINK,ECOSYSTEM,PORT
+                  envs: APP_DIR,RELEASES_DIR,CURRENT_LINK,ECOSYSTEM,PORT,PROJECT_SUBDIR
                   script: |
 
                       set -e
-
-                      echo "Deploying $PROJECT_NAME"
 
                       mkdir -p $RELEASES_DIR
 
@@ -67,11 +64,7 @@ jobs:
 
                       NEW_RELEASE="$RELEASES_DIR/$(date +%Y%m%d_%H%M%S)"
 
-                      echo "New release: $NEW_RELEASE"
-
-                      ################################################
-                      # CLONE
-                      ################################################
+                      echo "Cloning repo → $NEW_RELEASE"
 
                       git clone \
                         --depth 1 \
@@ -79,47 +72,29 @@ jobs:
                         git@github.com:${{ github.repository }}.git \
                         $NEW_RELEASE
 
-                      cd $NEW_RELEASE
+                      echo "Entering project directory"
 
-                      ################################################
-                      # INSTALL
-                      ################################################
+                      cd $NEW_RELEASE/$PROJECT_SUBDIR
 
-                      echo "Installing dependencies"
-                      npm ci
+                      echo "Install dependencies"
 
-                      ################################################
-                      # BUILD
-                      ################################################
+                      npm install
 
-                      echo "Building project"
+                      echo "Build project"
+
                       npm run build
 
-                      ################################################
-                      # SWITCH RELEASE
-                      ################################################
+                      echo "Switch release"
 
-                      echo "Switch current → $NEW_RELEASE"
-                      ln -sfn $NEW_RELEASE $CURRENT_LINK
-
-                      ################################################
-                      # PM2 RELOAD
-                      ################################################
+                      ln -sfn $NEW_RELEASE/$PROJECT_SUBDIR $CURRENT_LINK
 
                       echo "Reload PM2"
 
                       pm2 reload $ECOSYSTEM --update-env || pm2 start $ECOSYSTEM
 
-                      ################################################
-                      # WAIT STARTUP
-                      ################################################
-
                       echo "Wait startup"
-                      sleep 10
 
-                      ################################################
-                      # HEALTHCHECK
-                      ################################################
+                      sleep 10
 
                       HEALTH_OK=0
 
@@ -127,7 +102,7 @@ jobs:
 
                         STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:$PORT || true)
 
-                        echo "Healthcheck attempt $i → $STATUS"
+                        echo "Healthcheck $i → $STATUS"
 
                         if [ "$STATUS" = "200" ]; then
 
@@ -140,13 +115,9 @@ jobs:
 
                       done
 
-                      ################################################
-                      # ROLLBACK IF FAILED
-                      ################################################
-
                       if [ $HEALTH_OK -eq 0 ]; then
 
-                        echo "Healthcheck failed → rollback"
+                        echo "Rollback"
 
                         if [ ! -z "$PREVIOUS_RELEASE" ]; then
 
@@ -162,9 +133,7 @@ jobs:
 
                       fi
 
-                      ################################################
-                      # CLEAN OLD RELEASES (KEEP LAST 5)
-                      ################################################
+                      echo "Clean old releases"
 
                       cd $RELEASES_DIR
 
@@ -185,12 +154,8 @@ jobs:
                   message: |
                       ✅ DEPLOY SUCCESS
 
-                      Project: ${{ env.PROJECT_NAME }}
-                      Repo: ${{ github.repository }}
+                      Project: GPTiti
                       Commit: ${{ github.sha }}
-
-                      Server: OK
-                      Port: ${{ env.PORT }}
 
             ################################################
             # TELEGRAM FAILURE
@@ -205,9 +170,5 @@ jobs:
                   message: |
                       ❌ DEPLOY FAILED
 
-                      Project: ${{ env.PROJECT_NAME }}
-                      Repo: ${{ github.repository }}
+                      Project: GPTiti
                       Commit: ${{ github.sha }}
-
-                      Check logs:
-                      https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
