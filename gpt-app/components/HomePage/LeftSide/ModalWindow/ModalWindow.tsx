@@ -58,7 +58,7 @@ export default function ModalWindow({
               }`}
               onClick={() => {
                 setSelectedModel(item.title);
-                setIsModalOpen(false);
+                // setIsModalOpen(false);
               }}
             >
               <div className={styles.mainContainerbtn2}>
