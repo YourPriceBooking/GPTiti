@@ -1,0 +1,59 @@
+.tooltipContainer {
+    background-color: #000;
+    stroke-width: 1px;
+    stroke: rgba(255, 255, 255, 0.05);
+    max-width: 284px;
+    width: 100%;
+    min-height: 168px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 14px;
+    padding-left: 15px;
+}
+.tooltipTitle{
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: 16px;
+    color: #fff;
+    margin-top: 14px;
+}
+.tooltipSection{
+    margin-top: 9px;
+    width: 100%;
+}
+.tooltipList{
+    display: inline-block;
+    max-width: 197px;
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+.tooltipParagraph, .tooltipListItem1, .tooltipListItem2 {
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.92);   
+}
+.tooltipParagraph{
+    display: inline-block;
+    max-width: 197px;
+}
+.tooltipListItem2 {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.closeBtn {
+  display: none; /* приховано за замовчуванням */
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+/* показуємо тільки на планшетах і телефонах */
+@media (max-width: 767px) {
+  .closeBtn {
+    display: inline-block;
+  }
+}
