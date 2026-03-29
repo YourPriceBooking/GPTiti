@@ -81,11 +81,11 @@ export default function LeftSide({
 
             <SectionGptUser />
 
-            {process.env.NODE_ENV !== "production" && (
+            {/* {process.env.NODE_ENV !== "production" && (
               <div style={{ marginTop: 12 }}>
                 <WsDebugPanel />
               </div>
-            )}
+            )} */}
 
             <FooterLeftSide />
           </div>
