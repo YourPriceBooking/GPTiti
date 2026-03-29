@@ -6,6 +6,7 @@ import SectionGptChats from "./SectionGptChats/SectionGptChats";
 import SectionGptTokens from "./SectionGptTokens/SectionGptTokens";
 import { useState } from "react";
 import Image from "next/image";
+import WsDebugPanel from "@/components/common/WsDebugPanel/WsDebugPanel";
 
 export default function LeftSide({
   onNewChat,
@@ -79,6 +80,12 @@ export default function LeftSide({
             />
 
             <SectionGptUser />
+
+            {process.env.NODE_ENV !== "production" && (
+              <div style={{ marginTop: 12 }}>
+                <WsDebugPanel />
+              </div>
+            )}
 
             <FooterLeftSide />
           </div>
