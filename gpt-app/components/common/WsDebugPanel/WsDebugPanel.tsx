@@ -4,20 +4,39 @@ import React from "react";
 import { createRequestId } from "@/lib/wsProtocol";
 import { useWs } from "@/context/WsContext";
 import { useWsChatActions } from "@/hooks/useWsChatActions";
+import { useEffect } from "react";
+import  { WsEvent } from "@/types/ws.types";
 
 export default function WsDebugPanel() {
-  const { onMessage } = useWs();
+  const { onMessage, emit } = useWs();
   const { status, lastError, sendMessage } = useWsChatActions();
   const [log, setLog] = React.useState<string[]>([]);
 
-  React.useEffect(() => {
-    return onMessage((msg) => {
-      setLog((prev) => {
-        const line = `${new Date().toISOString()} <= ${msg.event}:${msg.type} ${msg.requestId ?? ""}`;
-        return [line, ...prev].slice(0, 50);
-      });
-    });
+  useEffect(() => {
+    const unsub = onMessage((msg) => {
+    if (msg.event === WsEvent.TESTBACK) {
+      setLog((prev) => [
+        `${new Date().toISOString()} <= test-ws-back: ${JSON.stringify(msg)}`,
+        ...prev,
+      ]);
+    }
+  });
+  return unsub;
   }, [onMessage]);
+
+  const sendFrontTest = () => {
+    const requestId = createRequestId("front-test");
+    emit({
+      event: WsEvent.TESTFRONT,
+      type: "front-test",
+      payload: { hello: "from frontend" },
+      requestId,
+    });
+    setLog((prev) => [
+      `${new Date().toISOString()} => emit test-ws:front-test ${requestId}`,
+      ...prev,
+    ]);
+  };
 
   const sendPingLike = async () => {
     const requestId = createRequestId("dbg");
@@ -69,6 +88,14 @@ export default function WsDebugPanel() {
           style={{ padding: "10px 12px", borderRadius: 10, border: "1px solid #243052" }}
         >
           Send test
+        </button>
+        <button
+          type="button"
+          onClick={sendFrontTest}
+          style={{ padding: "10px 12px", borderRadius: 10, border: "1px solid #243052" }}
+          disabled={status !== "connected"}
+        >
+          Emit front-test
         </button>
       </div>
 

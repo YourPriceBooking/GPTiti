@@ -1,5 +1,7 @@
 export enum WsEvent {
   CHAT = "chat",
+  TESTFRONT= 'test-ws-front',
+  TESTBACK= 'test-ws-back',
   AI = "ai",
   SYSTEM = "system",
   AUTH = "auth",
