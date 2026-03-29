@@ -50,3 +50,19 @@ const data = await api.loginWithGoogle(googleToken);
 const history = await api.getUsageHistory(7);
 
 далі-обробляти дані так, як зі звичайними данними, що прийшли з того чи іншого роуту бек енду
+  далі-обробляти дані так, як зі звичайними данними, що прийшли з того чи іншого роуту бек енду
+
+## Socket.IO (frontend)
+
+Frontend uses `socket.io-client` (pinned) and is wired via `SocketProvider`.
+
+To enable the connection set these env vars (at build time):
+
+- `NEXT_PUBLIC_SOCKET_URL` (example: `http://localhost:4000` or `https://your-domain.com`)
+- `NEXT_PUBLIC_SOCKET_PATH` (optional, example: `/gpt-titi/socket.io`; default is Socket.IO standard `/socket.io` when omitted)
+
+Optional for local testing without auth:
+
+- `NEXT_PUBLIC_SOCKET_ALLOW_GUEST=true`
+
+Auth token is sent as: `socket.handshake.auth.token`.
