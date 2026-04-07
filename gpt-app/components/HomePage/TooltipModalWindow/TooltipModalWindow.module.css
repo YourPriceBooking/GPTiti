@@ -1,44 +1,69 @@
 .tooltipContainer {
-    background-color: #000;
-    stroke-width: 1px;
-    stroke: rgba(255, 255, 255, 0.05);
-    max-width: 284px;
-    width: 100%;
-    min-height: 168px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 14px;
-    padding-left: 15px;
+  background-color: #000;
+  stroke-width: 1px;
+  stroke: rgba(255, 255, 255, 0.05);
+  max-width: 284px;
+  width: 100%;
+  min-height: 168px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 14px;
+  padding-left: 15px;
 }
-.tooltipTitle{
-    font-family: var(--font-family);
-    font-weight: 400;
-    font-size: 16px;
-    color: #fff;
-    margin-top: 14px;
+.tooltipTitle {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 16px;
+  color: #fff;
+  margin-top: 14px;
 }
-.tooltipSection{
-    margin-top: 9px;
-    width: 100%;
+.tooltipSection {
+  margin-top: 9px;
+  width: 220px;
+  padding: 15px;
 }
-.tooltipList{
-    display: inline-block;
-    max-width: 197px;
-    margin-top: 8px;
-    margin-bottom: 8px;
+.tooltipList {
+  display: inline-block;
+  max-width: 197px;
+  margin-top: 8px;
+  margin-bottom: 8px;
 }
 
-.tooltipParagraph, .tooltipListItem1, .tooltipListItem2 {
-    font-family: var(--font-family);
-    font-weight: 400;
-    font-size: 13px;
-    color: rgba(255, 255, 255, 0.92);   
+.tooltipParagraph,
+.tooltipListItem1,
+.tooltipListItem2 {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.92);
 }
-.tooltipParagraph{
-    display: inline-block;
-    max-width: 197px;
+.tooltipParagraph {
+  max-width: 197px;
 }
 .tooltipListItem2 {
-    color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.typingText {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.92);
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+
+.cursor {
+  display: inline-block;
+  width: 6px;
+  height: 13px;
+  background: white;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
 }
 
 .closeBtn {

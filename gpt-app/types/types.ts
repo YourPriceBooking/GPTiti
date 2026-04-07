@@ -18,10 +18,18 @@ export type Chat = {
 
 export type ModelType = "GPT-4o" | "GPT-5.1" | "0-Series";
 
+export type ModelTooltip = {
+  title: string;
+  intro: string;
+  pros: string[];
+  cons: string[];
+};
+
 export type ModelItem = {
   title: string;
   tokens: number;
   desc: string;
+  tooltip: ModelTooltip;
 };
 
 export type ModelConfig = {

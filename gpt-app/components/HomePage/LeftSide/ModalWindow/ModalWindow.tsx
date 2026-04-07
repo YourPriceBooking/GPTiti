@@ -32,14 +32,14 @@ export default function ModalWindow({
   const [visibleModel, setVisibleModel] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
 
-   useEffect(() => {
+  useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth <= 767);
     checkMobile();
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-    useEffect(() => {
+  useEffect(() => {
     if (isMobile) return;
     let showTimer: NodeJS.Timeout;
     let hideTimer: NodeJS.Timeout;
@@ -61,20 +61,20 @@ export default function ModalWindow({
       clearTimeout(hideTimer);
     };
   }, [hoveredModel, isMobile]);
-  
-// Функція для мобільного кліку
+
+  // Функція для мобільного кліку
   const toggleTooltip = (model: string) => {
-   if (visibleModel === model) {
+    if (visibleModel === model) {
       setTimeout(() => setVisibleModel(null), 1000);
     } else {
-      setTimeout(() => setVisibleModel(model), 2000); 
+      setTimeout(() => setVisibleModel(model), 2000);
     }
   };
 
   return (
     <div className={styles.modalContainer}>
       <header className={styles.header}>
-        <h2 className={styles.title}>Chat</h2>
+        <h2 className={styles.title}>Choose a model GPT Chat</h2>
 
         <div className={styles.btnsContainer}>
           {Object.keys(modelConfig).map((group) => (
@@ -93,15 +93,13 @@ export default function ModalWindow({
       </header>
 
       <section className={styles.mainSection}>
-        <h5 className={styles.title2}>Choose a model</h5>
-
         <div className={styles.btnsContainer2}>
           {modelConfig[selectedModelGroup].list.map((item) => (
             <div
               key={item.title}
               className={styles.modelWrapper}
-              onMouseEnter={() => setHoveredModel(item.title)}   // desktop
-              onMouseLeave={() => setHoveredModel(null)}         // desktop
+              onMouseEnter={() => setHoveredModel(item.title)} // desktop
+              onMouseLeave={() => setHoveredModel(null)} // desktop
             >
               <button
                 type="button"
@@ -121,22 +119,29 @@ export default function ModalWindow({
                 </div>
                 <span className={styles.btn2Span2}>{item.desc}</span>
 
-              
                 <span
                   className={styles.eyeIcon}
                   onClick={(e) => {
-                    e.stopPropagation(); 
+                    e.stopPropagation();
                     toggleTooltip(item.title);
                   }}
                 >
-                  <Image width={25} height={15} src="/icons/eye.svg" alt="eye" />
+                  <Image
+                    width={25}
+                    height={15}
+                    src="/icons/eye.svg"
+                    alt="eye"
+                  />
                 </span>
               </button>
 
               {/* Tooltip */}
               {visibleModel === item.title && (
                 <div className={styles.tooltipWrapper}>
-                  <TooltipModalWindow onClose={() => setVisibleModel(null)} />
+                  <TooltipModalWindow
+                    onClose={() => setVisibleModel(null)}
+                    tooltip={item.tooltip}
+                  />
                 </div>
               )}
             </div>
