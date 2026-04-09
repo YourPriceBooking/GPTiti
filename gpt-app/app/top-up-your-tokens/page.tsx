@@ -320,32 +320,36 @@ export default function TokensPage() {
         </span>
 
         <nav className={styles.nav}>
-          <Link href="/" className={`${styles.link} ${styles.linkHome}`}>
+          <Link href="/" className={styles.link}>
             Home
           </Link>
           <Link
             href="/our-mission"
-            className={`${styles.link} ${styles.linkMission}`}
+            className={styles.link}
           >
             Our Mission
           </Link>
           <Link
             href="/sign-in"
-            className={`${styles.link} ${styles.linkSignIn}`}
+            className={styles.link}
           >
             Sign in
           </Link>
           <Link
             href="/terms-conditions"
-            className={`${styles.link} ${styles.linkTerms}`}
+            className={styles.link}
           >
             Terms & Conditions
           </Link>
           <Link
             href="/privacy-policy"
-            className={`${styles.link} ${styles.linkPrivacy}`}
+            className={styles.link} 
           >
             Privacy Policy
+          </Link>
+
+          <Link href="/trust" className={styles.link}>
+            Trust & Safety
           </Link>
         </nav>
 

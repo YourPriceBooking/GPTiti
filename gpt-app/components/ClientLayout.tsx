@@ -18,7 +18,7 @@ export default function ClientLayout({
 
       {!isHomePage && !isTopUpTokensPage && (
         <footer className="text-center text-gray-500 text-sm mt-16 space-y-2 p-6">
-          <nav className="flex justify-center gap-6">
+          <nav className="flex flex-wrap justify-center gap-x-6 gap-y-3">
             <Link href="/" className="hover:text-gray-700">
               Home
             </Link>
@@ -33,6 +33,9 @@ export default function ClientLayout({
             </Link>
             <Link href="/sign-in" className="hover:text-gray-700">
               Sign in
+            </Link>
+            <Link href="/trust" className="hover:text-gray-700">
+              Trust & Safety
             </Link>
           </nav>
           <p>

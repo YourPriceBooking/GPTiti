@@ -486,6 +486,8 @@
   margin-bottom: 17px;
   display: flex;
   flex-wrap: wrap;
+  row-gap: 10px;
+  column-gap: 5px;
   justify-content: center;
 }
 
