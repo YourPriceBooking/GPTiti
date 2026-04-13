@@ -14,7 +14,9 @@ export default function ClientLayout({
 
   return (
     <>
-      <main>{children}</main>
+      <main className={isHomePage ? "h-screen overflow-hidden" : ""}>
+        {children}
+      </main>
 
       {!isHomePage && !isTopUpTokensPage && (
         <footer className="text-center text-gray-500 text-sm mt-16 space-y-2 p-6">
