@@ -1,20 +1,20 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function PrivacyPage() {
   return (
     <div className="min-h-screen h-full bg-white text-slate-900 font-sans overflow-y-auto">
       <nav className="sticky top-0 z-50 w-full bg-white border-b border-slate-100 p-4">
         <div className="max-w-4xl mx-auto flex justify-between items-center">
-          {/* Исправленная кнопка Back на главную */}
+          {}
           <Link href="/" className="text-blue-600 font-medium hover:underline">← Back</Link>
           <div className="flex items-center gap-2">
-            <img src="/icons/rabbit.svg" alt="logo" className="w-8 h-8" />
+            <Image src="/icons/rabbit.svg" alt="logo" width={32} height={32} />
             <span className="font-bold text-xl tracking-tighter">GPT<span className="text-blue-600">iti</span></span>
           </div>
         </div>
       </nav>
-
       <main className="max-w-4xl mx-auto px-6 py-12 mb-20">
         <h1 className="text-4xl font-extrabold mb-4">Privacy Policy</h1>
         <p className="text-slate-500 mb-8">Last updated: April 7, 2026</p>
