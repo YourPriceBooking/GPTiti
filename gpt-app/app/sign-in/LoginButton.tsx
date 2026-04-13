@@ -3,8 +3,8 @@ import { motion } from "framer-motion";
 export default function LoginButton({ checked }: { checked: boolean }) {
   return (
     <motion.button
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
       transition={{ duration: 0.6, delay: 0.15 }}
       className={`w-full py-3 rounded-xl text-white font-semibold text-lg transition-all focus:ring-4 ${
         checked

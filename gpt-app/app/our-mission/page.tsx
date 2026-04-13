@@ -1,9 +1,6 @@
-
-
 import React from "react";
 import Head from "next/head";
 import OurMission from "./OurMission";
-
 
 export default function OurMissionPage() {
   return (
@@ -40,7 +37,7 @@ export default function OurMissionPage() {
           }}
         />
       </Head>
-    <OurMission />
-</>
+      <OurMission />
+    </>
   );
 }
