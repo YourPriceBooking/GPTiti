@@ -1,4 +1,5 @@
-"use client";
+import { buildMetadata } from "@/lib/metadata";
+import LoginPage from "./LoginPage";
 
 import { useState } from "react";
 import Head from "next/head";
