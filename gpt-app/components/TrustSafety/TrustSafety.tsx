@@ -1,37 +1,28 @@
 "use client";
 
-import React from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import Link from "next/link";
+import PageNav from "../common/PageNav";
 
 const TrustSafety = () => {
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center py-16 px-6 md:px-12 lg:px-24">
+    <div className="min-h-screen bg-white flex flex-col items-center justify-center">
+      <PageNav />
       <motion.section
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.1 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="w-full max-w-3xl space-y-10"
+        className="w-full max-w-3xl space-y-10 p-6"
       >
-        <div className="flex items-center mb-2">
-          <Link href="/">
-            <Image
-              src="/icons/rabbit.svg"
-              alt="logo-rabbit"
-              width={47}
-              height={47}
-            />
-          </Link>
-          <h1 className="flex-1 text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 text-center mr-10">
+        <div>
+          <h1 className="flex-1 text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 text-center">
             Trust & Safety
           </h1>
+          <p className="text-gray-500 text-sm text-center mt-3">
+            Last updated: April 7, 2026
+          </p>
         </div>
-
-        <p className="text-gray-500 text-sm text-center">
-          Last updated: April 7, 2026
-        </p>
 
         <motion.p
           initial={{ opacity: 0, y: 20 }}
