@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from "react";
 import styles from "./TooltipModalWindow.module.css";
 import Image from "next/image";
 import { ModelTooltip } from "@/types/types";
@@ -10,21 +10,21 @@ type Props = {
 };
 
 function buildFullText(tooltip: ModelTooltip): string {
-  const pros = tooltip.pros.map((p) => `✓ ${p}`).join('\n');
-  const cons = tooltip.cons.map((c) => `— ${c}`).join('\n');
+  const pros = tooltip.pros.map((p) => `✓ ${p}`).join("\n");
+  const cons = tooltip.cons.map((c) => `— ${c}`).join("\n");
   return `${tooltip.intro}\n\n${pros}\n\n${cons}`;
 }
 
 export default function TooltipModalWindow({ onClose, tooltip }: Props) {
   const fullText = buildFullText(tooltip);
-  const [displayed, setDisplayed] = useState('');
+  const [displayed, setDisplayed] = useState("");
   const [done, setDone] = useState(false);
   const indexRef = useRef(0);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     indexRef.current = 0;
-    setDisplayed('');
+    setDisplayed("");
     setDone(false);
 
     const type = () => {
@@ -34,9 +34,10 @@ export default function TooltipModalWindow({ onClose, tooltip }: Props) {
         indexRef.current = i + 1;
 
         const ch = fullText[i];
-        const speed = ch === '.' || ch === '\n'
-          ? 80 + Math.random() * 40
-          : 10 + Math.random() * 25;
+        const speed =
+          ch === "." || ch === "\n"
+            ? 80 + Math.random() * 40
+            : 10 + Math.random() * 25;
 
         timerRef.current = setTimeout(type, speed);
       } else {
@@ -54,7 +55,7 @@ export default function TooltipModalWindow({ onClose, tooltip }: Props) {
   return (
     <div className={styles.tooltipContainer}>
       <button className={styles.closeBtn} onClick={onClose}>
-        <Image width={14} height={14} src="/icons/close.svg" alt="close" />
+        <Image width={30} height={30} src="/icons/close.svg" alt="close" />
       </button>
 
       <h5 className={styles.tooltipTitle}>{tooltip.title}</h5>

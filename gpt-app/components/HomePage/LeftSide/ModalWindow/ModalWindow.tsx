@@ -108,7 +108,6 @@ export default function ModalWindow({
                 }`}
                 onClick={() => {
                   setSelectedModel(item.title);
-                  toggleTooltip(item.title); // мобільний клік
                 }}
               >
                 <div className={styles.mainContainerbtn2}>
@@ -127,8 +126,8 @@ export default function ModalWindow({
                   }}
                 >
                   <Image
-                    width={25}
-                    height={15}
+                    width={30}
+                    height={20}
                     src="/icons/eye.svg"
                     alt="eye"
                   />
