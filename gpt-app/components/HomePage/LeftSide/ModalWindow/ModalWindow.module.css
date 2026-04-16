@@ -1,6 +1,5 @@
 .modalContainer {
-  max-width: 284px;
-  width: 100%;
+  width: 385px;
   padding: 16px;
   min-height: 494px;
   border-radius: 22px;
@@ -26,6 +25,7 @@
 .btnsContainer {
   display: flex;
   align-items: center;
+  width: 100%;
   gap: 8px;
 }
 
@@ -197,6 +197,7 @@
 .eyeIcon {
   display: none; /* приховано на десктопі */
   position: absolute;
+  height: 30px;
   bottom: 6px;
   right: 6px;
   font-size: 18px;
@@ -206,13 +207,13 @@
 /* показуємо тільки на планшетах і телефонах */
 @media (max-width: 767px) {
   .eyeIcon {
-    display: inline-block;
+    display: flex;
+    align-items: end;
   }
 }
 
 @media (max-width: 575px) and (min-width: 320px) {
   .modalContainer {
-    min-width: 284px;
-    width: 100%;
+    width: 320px;
   }
 }
