@@ -1,121 +1,120 @@
-.gptUser{
+.gptUser {
   flex-shrink: 0;
   margin-top: 24px;
   padding-left: 28px;
 }
 
 .userInfo {
-    margin-right: 39px;
-    display: flex;
-    gap: 12px;
-    align-items: center;
+  margin-right: 39px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
 }
 
 .gptUserEmail {
-    font-family: var(--font-family);
-    font-weight: 500;
-    font-size: 16px;
-    color: var(--main-white);
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  color: var(--main-white);
 }
 
-.logoutBtnContainer{
-    padding-right: 40px;
+.logoutBtnContainer {
+  padding-right: 40px;
 }
 
 .logoutBtn {
-    margin-top: 20px;
-    border: 1px solid rgba(96, 165, 250, 0.35);
-    border-radius: 11px;
-    min-width: 263px;
-    width: 100%;
-    min-height: 46px;
-    background: rgba(255, 255, 255, 0.08);
+  margin-top: 20px;
+  border: 1px solid rgba(96, 165, 250, 0.35);
+  border-radius: 11px;
+  min-width: 263px;
+  width: 100%;
+  min-height: 46px;
+  background: rgba(255, 255, 255, 0.08);
 }
 .loginBtn {
-    margin-top: 20px;
-    border: 1px solid rgba(96, 165, 250, 0.35);
-    border-radius: 11px;
-    min-width: 263px;
-    width: 100%;
-    min-height: 46px;
-    background: #1F6FFF;
+  margin-top: 20px;
+  border: 1px solid rgba(96, 165, 250, 0.35);
+  border-radius: 11px;
+  min-width: 263px;
+  width: 100%;
+  min-height: 46px;
+  background: #1f6fff;
 }
 .loginBtnHeader {
-    border: 1px solid rgba(96, 165, 250, 0.35);
-    border-radius: 11px;
-    min-width: 263px;
-    width: 100%;
-    max-width: 285px;
-    height: 45px;
-    margin-right: 28px;
-    background: #1F6FFF;
+  border: 1px solid rgba(96, 165, 250, 0.35);
+  border-radius: 11px;
+  min-width: 263px;
+  width: 100%;
+  max-width: 285px;
+  height: 45px;
+  margin-right: 28px;
+  background: #1f6fff;
 }
 .loginBtnBlack {
-    border:none;
-    border-radius: 11px;
-    min-width: 263px;
-    width: 100%;
-    max-width: 285px;
-    height: 45px;
-    margin-left: -10px;
-    margin-top: 15px;
-    background: transparent;
+  border: none;
+  border-radius: 11px;
+  min-width: 263px;
+  width: 100%;
+  max-width: 285px;
+  height: 45px;
+  margin-left: -10px;
+  margin-top: 15px;
+  background: transparent;
 }
 
 .loginBtnSpan {
-    font-family: var(--font-family);
-    font-weight: 500;
-    font-size: 16px;
-    color: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .logoutBtnSpan {
-    font-family: var(--font-family);
-    font-weight: 500;
-    font-size: 14px;
-    color: #265ed9;
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 14px;
+  color: #265ed9;
 }
 
 .logoutBtn:hover {
-    cursor: pointer;
-    background: rgba(183, 180, 196, 0.25);
-    border-color: rgba(96, 165, 250, 0.7);
+  cursor: pointer;
+  background: rgba(183, 180, 196, 0.25);
+  border-color: rgba(96, 165, 250, 0.7);
 }
 
-.logoutBtn:active{
-    cursor: pointer;
-    background: rgba(99, 98, 102, 0.44);
-    border-color: #60a5fa;
+.logoutBtn:active {
+  cursor: pointer;
+  background: rgba(99, 98, 102, 0.44);
+  border-color: #60a5fa;
 }
 .loginBtnHeader:hover,
 .loginBtn:hover {
-    cursor: pointer;
-    background: #4C8DFF;
-    border-color: rgba(96, 165, 250, 0.7);
+  cursor: pointer;
+  background: #4c8dff;
+  border-color: rgba(96, 165, 250, 0.7);
 }
 .loginBtnHeader:active,
-.loginBtn:active{
-    cursor: pointer;
-    background: #1B56CC;
-    border-color: #60a5fa;
+.loginBtn:active {
+  cursor: pointer;
+  background: #1b56cc;
+  border-color: #60a5fa;
 }
 
 @media (max-width: 950px) {
-    .loginBtnText {
-        display: none;
-    }
-    .loginBtnHeader .loginBtnSpan{
-        display: flex;
-        justify-content: center;
-    }
-    .loginBtnHeader {
-        max-width: max-content;
-        width: max-content;
-        min-width: max-content;
-        padding-left: 20px;
-        padding-right: 20px;
-        margin-left: 20px;
-    }
+  .loginBtnText {
+    display: none;
+  }
+  .loginBtnHeader .loginBtnSpan {
+    display: flex;
+    justify-content: center;
+  }
+  .loginBtnHeader {
+    max-width: max-content;
+    width: max-content;
+    min-width: max-content;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
 }

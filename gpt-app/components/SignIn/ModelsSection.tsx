@@ -17,7 +17,7 @@ export default function ModelsSection() {
         Available Models
       </motion.h2>
 
-      <Category title="🔵 Category 1 — GPT-5.1 (Premium)" color="text-blue-600" models={["gpt-5.1","gpt-5.1-mini","gpt-5.1-realtime"]} />
+      <Category title="🔵 GPT-5 Series — Most powerful AI models" color="text-blue-600" models={["gpt-5.4 (New)","gpt-5.4-mini (New)","gpt-5.1","gpt-5.1-mini","gpt-5.1-realtime"]} />
       <Category title="🟣 Category 2 — GPT-4o (Balanced)" color="text-purple-600" models={["gpt-4o","gpt-4o-mini","gpt-4o-realtime"]} />
       <Category title="🔴 Category 3 — O-Series (Reasoning)" color="text-red-600" models={["o1","o1-mini","o3-mini"]} />
     </motion.div>

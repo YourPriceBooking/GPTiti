@@ -2,6 +2,7 @@
   position: sticky;
   top: 9px;
   display: flex;
+  gap: 5px;
   align-items: center;
   justify-content: space-between;
   max-width: 70vw;
@@ -14,7 +15,8 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
 
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06),
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
     0 8px 24px rgba(0, 0, 0, 0.45);
 
   z-index: 10;
@@ -116,12 +118,13 @@
 }
 .paragraph {
   position: absolute;
-  right: 42;
-  top: 6.5;
+  right: 27px;
+  top: 8.5px;
   font-family: var(--font-family);
   font-weight: 200;
-  font-size: 11px;
+  font-size: 10px;
   color: var(--main-gray2);
+  white-space: nowrap;
 }
 .closeButton {
   position: absolute;
@@ -162,7 +165,7 @@
     margin-right: 0;
   }
   .modelGptitiContainer {
-    max-width: 200px;
+    max-width: 250px;
     width: 100%;
   }
 }
@@ -222,7 +225,9 @@
     position: relative;
     transform: translateX(-100%);
     opacity: 0;
-    transition: transform 220ms ease, opacity 220ms ease;
+    transition:
+      transform 220ms ease,
+      opacity 220ms ease;
     will-change: transform, opacity;
   }
 
@@ -240,6 +245,12 @@
   .modelGptitiContainer {
     max-width: 250px;
     width: 100%;
+  }
+}
+
+@media (max-width: 425px) {
+  .paragraphRealtime {
+    display: none;
   }
 }
 

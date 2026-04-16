@@ -1,7 +1,6 @@
 .modalContainer {
   width: 385px;
   padding: 16px;
-  min-height: 494px;
   border-radius: 22px;
   background: var(--foreground);
   display: flex;
@@ -65,6 +64,7 @@
 }
 
 .mainSection {
+  flex: 1;
   margin-top: 16px;
 }
 

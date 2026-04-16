@@ -124,9 +124,9 @@ export const modelConfig: Record<ModelType, ModelConfig> = {
         desc: "Most. Powerful.",
         tooltip: {
           title: "GPT-5.4",
-          intro: "Most powerful model yet.",
-          pros: ["Top-tier reasoning", "Best quality output"],
-          cons: ["Slower", "Higher cost"],
+          intro: "Next-level intelligence.",
+          pros: ["Most powerful", "Best reasoning"],
+          cons: ["Expensive usage"],
         },
       },
       {
@@ -135,9 +135,9 @@ export const modelConfig: Record<ModelType, ModelConfig> = {
         desc: "Best. Balance.",
         tooltip: {
           title: "GPT-5.4 mini",
-          intro: "Balanced speed and power.",
-          pros: ["Fast", "Balanced cost"],
-          cons: ["Less depth than full 5.4"],
+          intro: "Best balance of power.",
+          pros: ["Fast", "Cost-efficient"],
+          cons: ["Slightly less powerful than full model"],
         },
       },
     ],

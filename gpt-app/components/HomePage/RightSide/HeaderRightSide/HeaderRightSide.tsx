@@ -167,7 +167,11 @@ export default function HeaderRightSide({
             isModalOpen={isModalOpen}
             setIsModalOpen={setModelModalOpenSafe}
           />
-          <p className={styles.paragraph}>
+          <p
+            className={`${styles.paragraph} ${
+              selectedModel === "gpt-4o-realtime" ? styles.paragraphRealtime : ""
+            }`}
+          >
             {result?.model.tokens} {TOKENS_SUFFIX}
           </p>
         </div>
