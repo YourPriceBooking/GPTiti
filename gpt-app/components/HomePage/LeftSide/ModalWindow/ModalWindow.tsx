@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import styles from "./ModalWindow.module.css";
 import Image from "next/image";
+import Link from "next/link";
 import { ModelType } from "@/types/types";
 import { modelConfig, TOKENS_SUFFIX } from "@/config/models.config";
 import { getModelGroupAndItem } from "@/functions/getModelGroupAndItem";
@@ -153,9 +154,21 @@ export default function ModalWindow({
           <h2 className={styles.title3}>Balance</h2>
           <div className={styles.balanceContainer}>
             <span className={styles.gptSpan1}>10 000</span>
-            <Image width={24} height={24} src="/icons/badge.svg" alt="badge" />
+            <Link href="/top-up-your-tokens" className={styles.badgeLink}>
+              <Image
+                width={24}
+                height={24}
+                src="/icons/badge.svg"
+                alt="badge"
+              />
+              <span className={styles.badgeText}>Top up tokens</span>
+            </Link>
           </div>
         </article>
+
+        <p className={styles.subscriptionsNote}>
+          No subscriptions • Tokens never expire •
+        </p>
 
         <span className={styles.footerSpan}>
           * We show an approximate price based on a typical 30-word message.
