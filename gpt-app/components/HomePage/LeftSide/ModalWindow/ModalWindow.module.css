@@ -156,14 +156,13 @@
 }
 
 .balanceContainer {
-  padding: 0 4px;
+  padding: 0 0 0 4px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   border: 0.2px solid var(--background);
   border-radius: 7px;
   width: 100%;
-  max-width: 158px;
   min-height: 25px;
 }
 
@@ -172,6 +171,40 @@
   font-weight: 700;
   font-size: 16px;
   color: var(--main-gray2);
+}
+
+.badgeLink {
+  display: flex;
+  align-items: center;
+  padding: 0px 5px;
+  background-color: var(--button-background);
+  gap: 6px;
+  cursor: pointer;
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+  border-top-right-radius: 7px;
+  border-bottom-right-radius: 7px;
+  transition: opacity 0.2s ease;
+}
+
+.badgeLink:hover {
+  opacity: 0.8;
+}
+
+.badgeText {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 13px;
+  color: var(--main-gray2);
+}
+
+.subscriptionsNote {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--main-gray2);
+  text-align: center;
+  margin-top: 10px;
 }
 
 .footerSpan {
