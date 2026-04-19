@@ -60,10 +60,10 @@ jobs:
               exit 1
             fi
 
-            echo "🔗 Linking ENV..."
-            ln -sfn "$SHARED_DIR/.env.production" .env.production
-
             cd "$NEW_RELEASE/$PROJECT_SUBDIR"
+
+            echo "Linking env..."
+            ln -sfn /var/www/GPTiti/shared/.env.production .env.production
 
             echo "Installing dependencies..."
             npm ci
