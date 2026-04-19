@@ -18,11 +18,13 @@ export default function SectionGptUser() {
     <section className={styles.gptUser}>
       <article className={styles.userInfo}>
         <Image
+          className={styles.userAvatar}
           width={27.11}
           height={35.65}
-          src='/icons/ghost-user.svg'
+          src={user?.avatar || '/icons/ghost-user.svg'}
           alt='ghost-user'
         />
+
         <span className={styles.gptUserEmail}>{user?.email || 'Guest'}</span>
       </article>
 

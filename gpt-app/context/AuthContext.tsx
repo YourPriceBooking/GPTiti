@@ -7,6 +7,7 @@ export interface User {
   id: number
   email: string
   name: string
+  avatar?: string
 }
 interface AuthContextType {
   user: User | null
@@ -49,7 +50,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setAccessToken(data.accessToken)
     setRefreshToken(data.refreshToken)
     setUser(data.user)
-    tokenStorage.set(data.accessToken, data.refreshToken)
+    tokenStorage.set(data.accessToken, data.refreshToken, data.user)
   }
 
   const logout = async () => {
