@@ -1,105 +1,108 @@
 name: Deploy GPTiti Frontend
 
 on:
-    push:
-        branches:
-            - main
+  push:
+    branches:
+      - main
 
 env:
-    PROJECT_SUBDIR: gpt-app
-    APP_DIR: /var/www/GPTiti
-    RELEASES_DIR: /var/www/GPTiti/releases
-    CURRENT_LINK: /var/www/GPTiti/current
-    ECOSYSTEM: /var/www/GPTiti/ecosystem.config.js
+  PROJECT_SUBDIR: gpt-app
+  APP_DIR: /var/www/GPTiti
+  RELEASES_DIR: /var/www/GPTiti/releases
+  CURRENT_LINK: /var/www/GPTiti/current
+  ECOSYSTEM: /var/www/GPTiti/ecosystem.config.js
 
 jobs:
-    deploy:
-        runs-on: ubuntu-latest
+  deploy:
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: 🚀 Telegram START
-              run: |
-                  curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
-                  -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
-                  -d text="🚀 GPTiti deploy STARTED"
+    steps:
+      - name: 🚀 Telegram START
+        run: |
+          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
+          -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+          -d text="🚀 GPTiti deploy STARTED"
 
-            - name: 🚀 Deploy via SSH
-              uses: appleboy/ssh-action@v1.0.3
-              env:
-                  PROJECT_SUBDIR: ${{ env.PROJECT_SUBDIR }}
-                  RELEASES_DIR: ${{ env.RELEASES_DIR }}
-                  CURRENT_LINK: ${{ env.CURRENT_LINK }}
-                  ECOSYSTEM: ${{ env.ECOSYSTEM }}
-              with:
-                  host: ${{ secrets.SERVER_HOST }}
-                  username: root
-                  key: ${{ secrets.SERVER_SSH_KEY }}
-                  script_stop: true
-                  envs: PROJECT_SUBDIR,RELEASES_DIR,CURRENT_LINK,ECOSYSTEM
-                  script: |
+      - name: 🚀 Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          PROJECT_SUBDIR: ${{ env.PROJECT_SUBDIR }}
+          RELEASES_DIR: ${{ env.RELEASES_DIR }}
+          CURRENT_LINK: ${{ env.CURRENT_LINK }}
+          ECOSYSTEM: ${{ env.ECOSYSTEM }}
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: root
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script_stop: true
+          envs: PROJECT_SUBDIR,RELEASES_DIR,CURRENT_LINK,ECOSYSTEM
+          script: |
 
-                      set -e
+            set -e
 
-                      echo "Starting deploy..."
+            echo "Starting deploy..."
 
-                      TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
-                      NEW_RELEASE="$RELEASES_DIR/$TIMESTAMP"
+            TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
+            NEW_RELEASE="$RELEASES_DIR/$TIMESTAMP"
 
-                      echo "Creating release folder: $NEW_RELEASE"
-                      mkdir -p "$NEW_RELEASE"
+            echo "Creating release folder: $NEW_RELEASE"
+            mkdir -p "$NEW_RELEASE"
 
-                      echo "Cloning repo via SSH..."
-                      git clone \
-                        --depth 1 \
-                        --branch main \
-                        git@github.com:${{ github.repository }}.git \
-                        "$NEW_RELEASE"
+            echo "Cloning repo via SSH..."
+            git clone \
+              --depth 1 \
+              --branch main \
+              git@github.com:${{ github.repository }}.git \
+              "$NEW_RELEASE"
 
-                      if [ ! -f "$NEW_RELEASE/$PROJECT_SUBDIR/package.json" ]; then
-                        echo "ERROR: package.json not found"
-                        exit 1
-                      fi
+            if [ ! -f "$NEW_RELEASE/$PROJECT_SUBDIR/package.json" ]; then
+              echo "ERROR: package.json not found"
+              exit 1
+            fi
 
-                      cd "$NEW_RELEASE/$PROJECT_SUBDIR"
+            echo "🔗 Linking ENV..."
+            ln -sfn "$SHARED_DIR/.env.production" .env.production
 
-                      echo "Installing dependencies..."
-                      npm ci
+            cd "$NEW_RELEASE/$PROJECT_SUBDIR"
 
-                      echo "Building project..."
-                      npm run build
+            echo "Installing dependencies..."
+            npm ci
 
-                      echo "Switching current symlink..."
+            echo "Building project..."
+            npm run build
 
-                      PREVIOUS_RELEASE=$(readlink -f "$CURRENT_LINK" || echo "")
+            echo "Switching current symlink..."
 
-                      rm -rf "$CURRENT_LINK"
-                      ln -sfn "$NEW_RELEASE/$PROJECT_SUBDIR" "$CURRENT_LINK"
+            PREVIOUS_RELEASE=$(readlink -f "$CURRENT_LINK" || echo "")
 
-                      if [ ! -f "$CURRENT_LINK/package.json" ]; then
-                        echo "ERROR: verification failed"
-                        exit 1
-                      fi
+            rm -rf "$CURRENT_LINK"
+            ln -sfn "$NEW_RELEASE/$PROJECT_SUBDIR" "$CURRENT_LINK"
 
-                      echo "Restarting PM2..."
-                      pm2 startOrRestart "$ECOSYSTEM"
-                      pm2 save
+            if [ ! -f "$CURRENT_LINK/package.json" ]; then
+              echo "ERROR: verification failed"
+              exit 1
+            fi
 
-                      echo "Cleaning old releases..."
-                      cd "$RELEASES_DIR"
-                      ls -dt */ | tail -n +6 | xargs -r rm -rf
+            echo "Restarting PM2..."
+            pm2 startOrRestart "$ECOSYSTEM"
+            pm2 save
 
-                      echo "Deploy successful"
+            echo "Cleaning old releases..."
+            cd "$RELEASES_DIR"
+            ls -dt */ | tail -n +6 | xargs -r rm -rf
 
-            - name: ✅ Telegram SUCCESS
-              if: success()
-              run: |
-                  curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
-                  -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
-                  -d text="✅ GPTiti deploy SUCCESS"
+            echo "Deploy successful"
 
-            - name: ❌ Telegram FAIL
-              if: failure()
-              run: |
-                  curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
-                  -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
-                  -d text="❌ GPTiti deploy FAILED"
+      - name: ✅ Telegram SUCCESS
+        if: success()
+        run: |
+          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
+          -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+          -d text="✅ GPTiti deploy SUCCESS"
+
+      - name: ❌ Telegram FAIL
+        if: failure()
+        run: |
+          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
+          -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+          -d text="❌ GPTiti deploy FAILED"
