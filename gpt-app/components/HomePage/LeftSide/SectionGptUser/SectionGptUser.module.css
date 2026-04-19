@@ -3,6 +3,9 @@
   margin-top: 24px;
   padding-left: 28px;
 }
+.userAvatar {
+  border-radius: 50%;
+}
 
 .userInfo {
   margin-right: 39px;

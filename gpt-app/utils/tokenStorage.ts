@@ -17,9 +17,10 @@ export const tokenStorage = {
     localStorage.setItem("user", JSON.stringify(user));
   }
   ,
-  set(accessToken: string, refreshToken: string) {
+  set(accessToken: string, refreshToken: string, user: User) {
     localStorage.setItem("accessToken", accessToken);
     localStorage.setItem("refreshToken", refreshToken);
+    localStorage.setItem("user", JSON.stringify(user));
   },
   setAccess(accessToken: string) {
     localStorage.setItem("accessToken", accessToken);
@@ -27,5 +28,6 @@ export const tokenStorage = {
   clear() {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
+    localStorage.removeItem("user");
   },
 };
