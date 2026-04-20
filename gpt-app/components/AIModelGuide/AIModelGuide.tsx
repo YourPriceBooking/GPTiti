@@ -66,7 +66,7 @@ const AIModelGuide = () => {
               <br />
               <span className="text-sm pl-4">
                 <Link
-                  href="/compare-gpt-5-4-vs-o1"
+                  href="/ai-models-guide/compare-gpt-5-4-vs-o1"
                   className="text-gray-500 hover:underline"
                 >
                   Compare with O1
@@ -89,7 +89,7 @@ const AIModelGuide = () => {
               <br />
               <span className="text-sm pl-4">
                 <Link
-                  href="/compare-gpt-5-4-mini-vs-gpt-4o-mini"
+                  href="/ai-models-guide/compare-gpt-5-4-mini-vs-gpt-4o-mini"
                   className="text-gray-500 hover:underline"
                 >
                   Compare with GPT-4o-mini
@@ -106,7 +106,7 @@ const AIModelGuide = () => {
               <br />
               <span className="text-sm pl-4">
                 <Link
-                  href="/compare-gpt-4o-vs-gpt-5-1"
+                  href="/ai-models-guide/compare-gpt-4o-vs-gpt-5-1"
                   className="text-gray-500 hover:underline"
                 >
                   Compare with GPT-4o
@@ -153,7 +153,7 @@ const AIModelGuide = () => {
               <br />
               <span className="text-sm pl-4">
                 <Link
-                  href="/compare-gpt-4o-vs-gpt-5-1"
+                  href="/ai-models-guide/compare-gpt-4o-vs-gpt-5-1"
                   className="text-gray-500 hover:underline"
                 >
                   Compare with GPT-5.1
@@ -170,7 +170,7 @@ const AIModelGuide = () => {
               <br />
               <span className="text-sm pl-4">
                 <Link
-                  href="/compare-gpt-5-4-mini-vs-gpt-4o-mini"
+                  href="/ai-models-guide/compare-gpt-5-4-mini-vs-gpt-4o-mini"
                   className="text-gray-500 hover:underline"
                 >
                   Compare with GPT-5.4-mini
@@ -209,7 +209,7 @@ const AIModelGuide = () => {
               <br />
               <span className="text-sm pl-4">
                 <Link
-                  href="/compare-o1-vs-o3-mini"
+                  href="/ai-models-guide/compare-o1-vs-o3-mini"
                   className="text-gray-500 hover:underline"
                 >
                   Compare with O3-mini
@@ -234,7 +234,7 @@ const AIModelGuide = () => {
               <br />
               <span className="text-sm pl-4">
                 <Link
-                  href="/compare-o1-vs-o3-mini"
+                  href="/ai-models-guide/compare-o1-vs-o3-mini"
                   className="text-gray-500 hover:underline"
                 >
                   Compare with O1
