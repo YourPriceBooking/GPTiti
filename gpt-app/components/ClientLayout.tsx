@@ -39,6 +39,9 @@ export default function ClientLayout({
             <Link href="/trust" className="hover:text-gray-700">
               Trust & Safety
             </Link>
+            <Link href="/ai-models-guide" className="hover:text-gray-700">
+              AI Models Guide
+            </Link>
           </nav>
           <p>
             © {new Date().getFullYear()} Your Price Booking OÜ. All rights

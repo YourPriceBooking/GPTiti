@@ -323,33 +323,23 @@ export default function TokensPage() {
           <Link href="/" className={styles.link}>
             Home
           </Link>
-          <Link
-            href="/our-mission"
-            className={styles.link}
-          >
+          <Link href="/our-mission" className={styles.link}>
             Our Mission
           </Link>
-          <Link
-            href="/sign-in"
-            className={styles.link}
-          >
-            Sign in
-          </Link>
-          <Link
-            href="/terms-conditions"
-            className={styles.link}
-          >
+          <Link href="/terms-conditions" className={styles.link}>
             Terms & Conditions
           </Link>
-          <Link
-            href="/privacy-policy"
-            className={styles.link} 
-          >
+          <Link href="/privacy-policy" className={styles.link}>
             Privacy Policy
           </Link>
-
+          <Link href="/sign-in" className={styles.link}>
+            Sign in
+          </Link>
           <Link href="/trust" className={styles.link}>
             Trust & Safety
+          </Link>
+          <Link href="/ai-models-guide" className={styles.link}>
+            AI Models Guide
           </Link>
         </nav>
 
