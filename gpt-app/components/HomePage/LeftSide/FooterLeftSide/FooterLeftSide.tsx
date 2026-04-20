@@ -7,37 +7,25 @@ export default function FooterLeftSide() {
     <footer className={styles.footer}>
       <ul className={styles.footerList}>
         <li className={styles.footerItem}>
-          <Link href="/" className={styles.footerLink}>
-            Home
-          </Link>
+          <Link href="/" className={styles.footerLink}>Home</Link>
         </li>
         <li className={styles.footerItem}>
-          <Link href="/our-mission" className={styles.footerLink}>
-            Our Mission
-          </Link>
+          <Link href="/our-mission" className={styles.footerLink}>Our Mission</Link>
         </li>
         <li className={styles.footerItem}>
-          <Link href="/sign-in" className={styles.footerLink}>
-            Sign in
-          </Link>
-        </li>
-      </ul>
-
-      <ul className={styles.footerList1}>
-        <li className={styles.footerItem}>
-          <Link href="/terms-conditions" className={styles.footerLink}>
-            Terms & Conditions
-          </Link>
+          <Link href="/sign-in" className={styles.footerLink}>Sign in</Link>
         </li>
         <li className={styles.footerItem}>
-          <Link href="/privacy-policy" className={styles.footerLink}>
-            Privacy Policy
-          </Link>
+          <Link href="/terms-conditions" className={styles.footerLink}>Terms & Conditions</Link>
         </li>
         <li className={styles.footerItem}>
-          <Link href="/trust" className={styles.footerLink}>
-            Trust & Safety
-          </Link>
+          <Link href="/privacy-policy" className={styles.footerLink}>Privacy Policy</Link>
+        </li>
+        <li className={styles.footerItem}>
+          <Link href="/trust" className={styles.footerLink}>Trust & Safety</Link>
+        </li>
+        <li className={styles.footerItem}>
+          <Link href="/ai-models-guide" className={styles.footerLink}>AI Models Guide</Link>
         </li>
       </ul>
 

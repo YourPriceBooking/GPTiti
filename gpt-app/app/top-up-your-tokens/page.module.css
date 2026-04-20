@@ -465,6 +465,8 @@
   margin-top: 29px;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 .footerSpan,
@@ -486,15 +488,15 @@
   margin-bottom: 17px;
   display: flex;
   flex-wrap: wrap;
-  row-gap: 10px;
-  column-gap: 5px;
+  row-gap: 12px;
+  column-gap: 24px;
   justify-content: center;
 }
 
 .link {
   font-family: var(--font-family);
   font-weight: 400;
-  font-size: 12px;
+  font-size: 14px;
   color: #a3aab8;
 }
 
@@ -523,7 +525,7 @@
 .gptitiRights {
   font-family: var(--font-family);
   font-weight: 500;
-  font-size: 11px;
+  font-size: 13px;
   color: #a3aab8;
   text-align: center;
   margin-bottom: 17px;
@@ -862,7 +864,7 @@
     margin-left: 76px;
   }
   .nav {
-    margin-bottom: 23px;
+    margin-bottom: 15px;
   }
   .gptitiRights {
     margin-bottom: 27px;
