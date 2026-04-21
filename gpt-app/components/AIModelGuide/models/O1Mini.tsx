@@ -183,7 +183,7 @@ const O1Mini = () => (
       <ul className="list-disc list-inside text-lg leading-relaxed space-y-1 pl-5">
         <li>
           <Link
-            href="/ai-models-guide/o1-vs-o3-mini"
+            href="/ai-models-guide/compare-o1-vs-o3-mini"
             className="text-blue-600 hover:underline"
           >
             O1 vs O3-mini
@@ -191,7 +191,7 @@ const O1Mini = () => (
         </li>
         <li>
           <Link
-            href="/ai-models-guide/gpt-5-4-vs-o1"
+            href="/ai-models-guide/compare-gpt-5-4-vs-o1"
             className="text-blue-600 hover:underline"
           >
             GPT-5.4 vs O1

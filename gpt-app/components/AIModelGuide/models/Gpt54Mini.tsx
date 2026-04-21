@@ -165,7 +165,7 @@ const Gpt54Mini = () => (
       <ul className="list-disc list-inside text-lg leading-relaxed space-y-1 pl-5">
         <li>
           <Link
-            href="/ai-models-guide/gpt-5-4-mini-vs-gpt-4o-mini"
+            href="/ai-models-guide/compare-gpt-5-4-mini-vs-gpt-4o-mini"
             className="text-blue-600 hover:underline"
           >
             GPT-5.4-mini vs GPT-4o-mini
@@ -173,7 +173,7 @@ const Gpt54Mini = () => (
         </li>
         <li>
           <Link
-            href="/ai-models-guide/gpt-5-4-vs-o1"
+            href="/ai-models-guide/compare-gpt-5-4-vs-o1"
             className="text-blue-600 hover:underline"
           >
             GPT-5.4 vs O1

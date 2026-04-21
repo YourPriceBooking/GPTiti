@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import PageNav from "../common/PageNav";
+import ModelCompareTable from "../common/ModelCompareTable/ModelCompareTable";
 
 const AIModelGuide = () => {
   return (
@@ -41,6 +42,14 @@ const AIModelGuide = () => {
           Whether you need fast chat, advanced reasoning, or high-quality
           content generation, this guide helps you choose the right AI model.
         </motion.p>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
+          className="space-y-4"
+        >
+          <ModelCompareTable />
+        </motion.div>
 
         {/* GPT-5 Series */}
         <motion.div
@@ -238,6 +247,89 @@ const AIModelGuide = () => {
                   className="text-gray-500 hover:underline"
                 >
                   Compare with O1
+                </Link>
+              </span>
+            </li>
+          </ul>
+          <Link
+            href="/ai-models-guide/best-ai-model-for-chat"
+            className="text-sm font-bold text-[#2F6BFF] px-2.5 py-1.5 rounded-lg bg-[#F2F6FF] inline-block"
+          >
+            🔥 Compare best AI models for chat →
+          </Link>
+        </motion.div>
+
+        {/* AI Tools */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
+          className="space-y-4"
+        >
+          <h2 className="text-xl md:text-2xl font-bold text-yellow-500">
+            🟡 AI Tools — Smart Features
+          </h2>
+          <ul className="list-disc list-inside text-gray-700 text-lg leading-relaxed space-y-3 pl-5">
+            <li>
+              <Link
+                href="#"
+                className="text-blue-600 hover:underline font-medium"
+              >
+                Smart Search
+              </Link>
+              <br />
+              <span className="text-sm pl-4 text-gray-500">
+                Search your data with AI
+              </span>
+              <br />
+              <span className="text-sm pl-4">
+                <Link
+                  href="/compare-smart-search-vs-chat"
+                  className="text-gray-500 hover:underline"
+                >
+                  Compare with Chat AI
+                </Link>
+              </span>
+            </li>
+            <li>
+              <Link
+                href="#"
+                className="text-blue-600 hover:underline font-medium"
+              >
+                Voice → Text
+              </Link>
+              <br />
+              <span className="text-sm pl-4 text-gray-500">
+                Convert speech to text instantly
+              </span>
+              <br />
+              <span className="text-sm pl-4">
+                <Link
+                  href="/compare-voice-vs-text-input"
+                  className="text-gray-500 hover:underline"
+                >
+                  Compare with Text input
+                </Link>
+              </span>
+            </li>
+            <li>
+              <Link
+                href="#"
+                className="text-blue-600 hover:underline font-medium"
+              >
+                Text → Voice
+              </Link>
+              <br />
+              <span className="text-sm pl-4 text-gray-500">
+                Generate AI voice responses
+              </span>
+              <br />
+              <span className="text-sm pl-4">
+                <Link
+                  href="/compare-voice-vs-text-output"
+                  className="text-gray-500 hover:underline"
+                >
+                  Compare with Text output
                 </Link>
               </span>
             </li>
