@@ -17,6 +17,7 @@ import CompareGpt54MiniVsGpt4oMini from "@/components/AIModelGuide/models/Compar
 import CompareGpt4oVsGpt51 from "@/components/AIModelGuide/models/CompareGpt4oVsGpt51";
 import CompareO1VsO3Mini from "@/components/AIModelGuide/models/CompareO1VsO3Mini";
 import type { ReactNode } from "react";
+import BestAiModelForChat from "@/components/AIModelGuide/models/BestAiModelForChat";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -51,14 +52,15 @@ const modelData: Record<string, ModelEntry> = {
       desc: "GPT-5.1 is a powerful AI model for writing, coding, and business tasks. Better performance than mid-tier models with balanced cost and quality.",
     },
   },
-  // "gpt-5-1-mini": {
-  //   title: "GPT-5.1-mini",
-  //   // content: <Gpt51Mini />,
-  //   meta: {
-  //     title: "GPT-5.4 — Most Powerful AI Model for Complex Tasks | GPTiti",
-  //     desc: "GPT-5.4 is the most powerful AI model for coding, content, and complex tasks. Perfect for professionals who need top-level performance and accuracy.",
-  //   },
-  // },
+  "gpt-5-1-mini": {
+    title: "GPT-5.1-mini AI Model — Smart & Affordable Performance",
+    content: <Gpt51Mini />,
+    meta: {
+      title:
+        "GPT-5.1-mini — Affordable AI Model with Strong Performance | GPTiti",
+      desc: "GPT-5.1-mini is a balanced AI model with strong performance, better reasoning than basic models, and lower cost than GPT-5.1. Ideal for writing, coding, and daily work.",
+    },
+  },
   "gpt-5-1-realtime": {
     title: "GPT-5.1 Realtime — Live AI Interaction",
     content: <Gpt51Realtime />,
@@ -93,14 +95,15 @@ const modelData: Record<string, ModelEntry> = {
       desc: "GPT-4o-realtime is a fast and affordable AI model for voice chat and real-time interaction. Ideal for live assistants and interactive apps.",
     },
   },
-  // o1: {
-  //   title: "O1",
-  //   // content: <O1 />,
-  //   meta: {
-  //     title: "O1 — Advanced Reasoning AI Model | GPTiti",
-  //     desc: "O1 on GPTiti — advanced reasoning model ideal for math, science, coding, and complex problem solving.",
-  //   },
-  // },
+  o1: {
+    title: "O1 AI Model — Maximum Reasoning Power",
+    content: <O1 />,
+    meta: {
+      title:
+        "O1 — Most Powerful AI Model for Reasoning & Complex Problems | GPTiti",
+      desc: "O1 is the most powerful reasoning AI model. Best for complex problems, advanced coding, and deep analysis. Use O1 when other models are not enough.",
+    },
+  },
   "o1-mini": {
     title: "O1-mini AI Model — Efficient Reasoning",
     content: <O1Mini />,
@@ -109,22 +112,24 @@ const modelData: Record<string, ModelEntry> = {
       desc: "O1-mini is a powerful AI model for reasoning, coding, and problem solving. Get strong logic and structured answers at a lower cost than O1.",
     },
   },
-  // "o3-mini": {
-  //   title: "O3-mini",
-  // content: <O3Mini />,
-  //   meta: {
-  //     title: "O1-mini — Affordable AI Model for Reasoning & Coding | GPTiti",
-  //     desc: "O1-mini is a powerful AI model for reasoning, coding, and problem solving. Get strong logic and structured answers at a lower cost than O1.",
-  //   },
-  // },
-  // "compare-gpt-5-4-vs-o1": {
-  //   title: "GPT-5.4 vs O1",
-  //   // content: <CompareGpt54VsO1 />,
-  //   meta: {
-  //     title: "GPT-5.4 vs O1 — Model Comparison | GPTiti",
-  //     desc: "Compare GPT-5.4 and O1 on GPTiti. See which model is better for your use case — content generation vs advanced reasoning.",
-  //   },
-  // },
+  "o3-mini": {
+    title: "O3-mini AI Model — Affordable Reasoning Power",
+    content: <O3Mini />,
+    meta: {
+      title:
+        "O3-mini — Affordable AI Model for Reasoning & Structured Tasks | GPTiti",
+      desc: "O3-mini is a cost-efficient AI model for reasoning, logic, and structured thinking. Best alternative to O1 for budget-friendly problem solving.",
+    },
+  },
+  "compare-gpt-5-4-vs-o1": {
+    title: "GPT-5.4 vs O1 — Which AI Model Should You Choose?",
+    content: <CompareGpt54VsO1 />,
+    meta: {
+      title:
+        "GPT-5.4 vs O1 — Which AI Model is Better for Your Tasks? | GPTiti",
+      desc: "Compare GPT-5.4 vs O1. Learn which AI model is better for coding, reasoning, and complex tasks. Choose the right model based on cost, speed, and performance.",
+    },
+  },
   "compare-gpt-5-4-mini-vs-gpt-4o-mini": {
     title: "GPT-5.4-mini vs GPT-4o-mini — Which AI Model Should You Choose?",
     content: <CompareGpt54MiniVsGpt4oMini />,
@@ -133,20 +138,28 @@ const modelData: Record<string, ModelEntry> = {
       desc: "Compare GPT-5.4-mini vs GPT-4o-mini. Learn the difference in cost, quality, and performance to choose the best AI model for your needs.",
     },
   },
-  // "compare-gpt-4o-vs-gpt-5-1": {
-  //   title: "GPT-4o vs GPT-5.1",
-  //   // content: <CompareGpt4oVsGpt51 />,
-  //   meta: {
-  //     title: "GPT-5.4-mini vs GPT-4o-mini — Which AI Model is Better? | GPTiti",
-  //     desc: "Compare GPT-4o and GPT-5.1 on GPTiti. Understand the upgrade from GPT-4o to the GPT-5 generation.",
-  //   },
-  // },
+  "compare-gpt-4o-vs-gpt-5-1": {
+    title: "GPT-4o vs GPT-5.1 — Which AI Model Should You Choose?",
+    content: <CompareGpt4oVsGpt51 />,
+    meta: {
+      title: "GPT-4o vs GPT-5.1 — Which AI Model Should You Choose? | GPTiti",
+      desc: "Compare GPT-4o vs GPT-5.1. Learn which AI model is better for chat, coding, and content based on performance, cost, and quality.",
+    },
+  },
   "compare-o1-vs-o3-mini": {
     title: "O1 vs O3-mini — Which AI Reasoning Model Should You Choose?",
     content: <CompareO1VsO3Mini />,
     meta: {
       title: "O1 vs O3-mini — Best AI Model for Reasoning? | GPTiti",
       desc: "Compare O1 vs O3-mini AI models. Learn which is better for reasoning, logic, and problem solving based on cost and performance.",
+    },
+  },
+  "best-ai-model-for-chat": {
+    title: "Best AI Model for Chat — Which One Should You Use?",
+    content: <BestAiModelForChat />,
+    meta: {
+      title: "Best AI Model for Chat — Compare GPT Models | GPTiti",
+      desc: "Find the best AI model for chat. Compare GPT-5.4, GPT-5.4-mini, GPT-4o-mini, and O1 based on cost, speed, and quality.",
     },
   },
 };

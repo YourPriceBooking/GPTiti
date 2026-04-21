@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import PageNav from "../common/PageNav";
 import type { ReactNode } from "react";
+import ModelCompareTable from "../common/ModelCompareTable/ModelCompareTable";
 
 type Props = {
   title: string;
@@ -28,6 +29,15 @@ const AIModelSlugPage = ({ title, content }: Props) => {
         {content}
 
         <hr className="border-gray-200" />
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
+          className="space-y-4"
+        >
+          <ModelCompareTable />
+        </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}

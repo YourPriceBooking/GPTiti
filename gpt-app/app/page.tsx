@@ -40,6 +40,17 @@ export default function Home() {
     useState<ModelType>("GPT-4o");
   const [selectedModel, setSelectedModel] = useState<string>("gpt-4o-mini");
 
+  useEffect(() => {
+    const savedModel = localStorage.getItem("selectedModel");
+    const savedGroup = localStorage.getItem("selectedModelGroup");
+    if (savedModel) {
+      setSelectedModel(savedModel);
+    }
+    if (savedGroup) {
+      setSelectedModelGroup(savedGroup as ModelType);
+    }
+  }, []);
+
   const [focusMode, setFocusMode] = useState(false);
   const [isSectionVisible, setIsSectionVisible] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -63,9 +74,9 @@ export default function Home() {
   }, [activeChat?.messages.length]);
 
   useEffect(() => {
-  if (!activeChat || activeChat.messages.length === 0) return;
-  messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-}, [activeChat?.id, activeChat?.messages.length]);
+    if (!activeChat || activeChat.messages.length === 0) return;
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [activeChat?.id, activeChat?.messages.length]);
 
   useEffect(() => {
     const empty = !activeChat || activeChat.messages.length === 0;
@@ -239,14 +250,14 @@ export default function Home() {
                 isExistingChat
                   ? styles.inputBottom
                   : newChatOpened && isNewChat
-                  ? styles.inputBottom
-                  : focusMode && inputSent
-                  ? styles.inputBottom
-                  : focusMode
-                  ? styles.inputBottom
-                  : inputSent
-                  ? styles.inputBottom
-                  : styles.inputWrapper
+                    ? styles.inputBottom
+                    : focusMode && inputSent
+                      ? styles.inputBottom
+                      : focusMode
+                        ? styles.inputBottom
+                        : inputSent
+                          ? styles.inputBottom
+                          : styles.inputWrapper
               }
             >
               {!(isSectionVisible && focusMode) && !isOverlayOpen && (
