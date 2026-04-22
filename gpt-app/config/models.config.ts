@@ -1,45 +1,34 @@
 import { ModelType, ModelConfig } from "@/types/types";
 export const TOKENS_SUFFIX = "tokens*";
 export const modelConfig: Record<ModelType, ModelConfig> = {
-  "GPT-4o": {
+  "gpt-5.4": {
     list: [
       {
-        title: "gpt-4o",
-        tokens: 500,
-        desc: "Fast. Affordable. Powerful.",
+        title: "gpt-5.4",
+        tokens: 1000,
+        desc: "Most. Powerful.",
         tooltip: {
-          title: "GPT-4o",
-          intro: "Power meets speed.",
-          pros: ["Fast", "Versatile"],
-          cons: ["Less deep reasoning"],
+          title: "GPT-5.4",
+          intro: "Next-level intelligence.",
+          pros: ["Most powerful", "Best reasoning"],
+          cons: ["Expensive usage"],
         },
       },
       {
-        title: "gpt-4o-mini",
-        tokens: 38,
-        desc: "Smart. Efficient. Budget-friendly.",
+        title: "gpt-5.4-mini",
+        tokens: 200,
+        desc: "Best. Balance.",
         tooltip: {
-          title: "GPT-4o mini",
-          intro: "Small. Capable. Ready.",
-          pros: ["Extremely fast", "Low cost"],
-          cons: ["Limited reasoning"],
-        },
-      },
-      {
-        title: "gpt-4o-realtime",
-        tokens: 1250,
-        desc: "Stream chat. Interactive.",
-        tooltip: {
-          title: "GPT-4o realtime",
-          intro: "Live. Reactive. Instant.",
-          pros: ["Real-time interaction"],
-          cons: ["Less detailed"],
+          title: "GPT-5.4 mini",
+          intro: "Best balance of power.",
+          pros: ["Fast", "Cost-efficient"],
+          cons: ["Slightly less powerful than full model"],
         },
       },
     ],
   },
 
-  "GPT-5.1": {
+  "gpt-5.1": {
     list: [
       {
         title: "gpt-5.1",
@@ -73,6 +62,75 @@ export const modelConfig: Record<ModelType, ModelConfig> = {
           intro: "Talk. Think. Respond instantly.",
           pros: ["Real-time responses", "Voice ready"],
           cons: ["Less depth"],
+        },
+      },
+    ],
+  },
+
+  "AI tools": {
+    list: [
+      {
+        title: "Smart Search",
+        tokens: 200,
+        desc: "Smart Search [AI]",
+        subDesc: "Search your data instantly",
+        tooltip: {
+          title: "Smart Search",
+          intro: "Find answers instantly. Search your data with AI context.",
+          pros: ["Fast and relevant results", "Works with your data"],
+          cons: ["Depends on data quality", "Limited without context"],
+        },
+      },
+      {
+        title: "Image → Create HD",
+        tokens: 12000,
+        amount: "1 image",
+        desc: "Best quality images",
+        subDesc: "(gpt-image-1)",
+        tooltip: {
+          title: "Image → Create HD",
+          intro: "High-definition image generation.",
+          pros: ["Best visual quality", "Detailed output"],
+          cons: ["Higher cost", "Slower"],
+        },
+      },
+      {
+        title: "Image → Create Fast",
+        tokens: 4000,
+        amount: "1 image",
+        desc: "Fast & Cheap",
+        subDesc: "(gpt-image-1-mini)",
+        tooltip: {
+          title: "Image → Create Fast",
+          intro: "Quick, affordable image generation.",
+          pros: ["Fast", "Cost-efficient"],
+          cons: ["Lower detail"],
+        },
+      },
+      {
+        title: "Voice → Text",
+        tokens: 1800,
+        amount: "1 min",
+        desc: "Speak. Get text instantly.",
+        tooltip: {
+          title: "Voice → Text",
+          intro:
+            "Speak naturally. Get text instantly. Turn voice into accurate text.",
+          pros: ["Fast and hands-free", "High accuracy"],
+          cons: ["Affected by noise", "Needs clear speech"],
+        },
+      },
+      {
+        title: "Text → Voice",
+        tokens: 6000,
+        amount: "1 min",
+        desc: "Turn text into natural voice",
+        tooltip: {
+          title: "Text → Speech",
+          intro:
+            "Listen instead of reading. Turn text into natural AI voice.",
+          pros: ["Hands-free experience", "Instant audio output"],
+          cons: ["Less emotional than human", "Higher cost"],
         },
       },
     ],
@@ -116,28 +174,39 @@ export const modelConfig: Record<ModelType, ModelConfig> = {
     ],
   },
 
-  "GPT-5.4": {
+  "gpt-4o": {
     list: [
       {
-        title: "gpt-5.4",
-        tokens: 1000,
-        desc: "Most. Powerful.",
+        title: "gpt-4o",
+        tokens: 500,
+        desc: "Fast. Affordable. Powerful.",
         tooltip: {
-          title: "GPT-5.4",
-          intro: "Next-level intelligence.",
-          pros: ["Most powerful", "Best reasoning"],
-          cons: ["Expensive usage"],
+          title: "GPT-4o",
+          intro: "Power meets speed.",
+          pros: ["Fast", "Versatile"],
+          cons: ["Less deep reasoning"],
         },
       },
       {
-        title: "gpt-5.4-mini",
-        tokens: 200,
-        desc: "Best. Balance.",
+        title: "gpt-4o-mini",
+        tokens: 38,
+        desc: "Smart. Efficient. Budget-friendly.",
         tooltip: {
-          title: "GPT-5.4 mini",
-          intro: "Best balance of power.",
-          pros: ["Fast", "Cost-efficient"],
-          cons: ["Slightly less powerful than full model"],
+          title: "GPT-4o mini",
+          intro: "Small. Capable. Ready.",
+          pros: ["Extremely fast", "Low cost"],
+          cons: ["Limited reasoning"],
+        },
+      },
+      {
+        title: "gpt-4o-realtime",
+        tokens: 1250,
+        desc: "Stream chat. Interactive.",
+        tooltip: {
+          title: "GPT-4o realtime",
+          intro: "Live. Reactive. Instant.",
+          pros: ["Real-time interaction"],
+          cons: ["Less detailed"],
         },
       },
     ],

@@ -16,7 +16,12 @@ export type Chat = {
   messages: Message[];
 };
 
-export type ModelType = "GPT-4o" | "GPT-5.1" | "GPT-5.4" | "0-Series";
+export type ModelType =
+  | "gpt-4o"
+  | "gpt-5.1"
+  | "gpt-5.4"
+  | "0-Series"
+  | "AI tools";
 
 export type ModelTooltip = {
   title: string;
@@ -29,7 +34,10 @@ export type ModelItem = {
   title: string;
   tokens: number;
   desc: string;
+  subDesc?: string;
   tooltip: ModelTooltip;
+  unit?: string;
+  amount?: string;
 };
 
 export type ModelConfig = {

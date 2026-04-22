@@ -9,8 +9,6 @@ export default function ModelGptitiTitleWithIcon({
   setIsModalOpen,
 }: ModelGptitiTitleWithIconProps) {
   const result = getModelGroupAndItem(selectedModel);
-  const capitalizeFirstThree = (text: string) =>
-    text.slice(0, 3).toUpperCase() + text.slice(3);
   return (
     <div
       ref={modelRef}
@@ -23,9 +21,7 @@ export default function ModelGptitiTitleWithIcon({
     >
       <article className={styles.titleContainer}>
         <h2 className={styles.title}>
-          {result
-            ? capitalizeFirstThree(result.model.title)
-            : capitalizeFirstThree(selectedModel)}
+          {result ? result.model.title : selectedModel}
         </h2>
         <Image
           className={styles.chevronIcon}

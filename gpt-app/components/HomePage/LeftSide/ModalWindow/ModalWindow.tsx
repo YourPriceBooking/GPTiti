@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import clsx from "clsx";
 import styles from "./ModalWindow.module.css";
 import Image from "next/image";
 import Link from "next/link";
@@ -32,6 +33,15 @@ export default function ModalWindow({
   // Стан для видимості тултіпа
   const [visibleModel, setVisibleModel] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
+  // Остання натиснута кнопка групи — тримає hover-ефект до перемикання
+  const [clickedGroup, setClickedGroup] = useState<string | null>(null);
+
+  const getGroupBtnClass = (group: string) =>
+    clsx(
+      styles.btn,
+      appliedGroup === group && styles.groupActive,
+      clickedGroup === group && styles.groupClicked,
+    );
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth <= 767);
@@ -75,17 +85,18 @@ export default function ModalWindow({
   return (
     <div className={styles.modalContainer}>
       <header className={styles.header}>
-        <h2 className={styles.title}>Choose a model GPT Chat</h2>
+        <h2 className={styles.title}>Choose a AI tools or model GPT Chat</h2>
 
         <div className={styles.btnsContainer}>
           {Object.keys(modelConfig).map((group) => (
             <button
               key={group}
               type="button"
-              className={`${styles.btn} ${
-                appliedGroup === group ? styles.groupActive : ""
-              }`}
-              onClick={() => setSelectedModelGroup(group as ModelType)}
+              className={getGroupBtnClass(group)}
+              onClick={() => {
+                setSelectedModelGroup(group as ModelType);
+                setClickedGroup(group);
+              }}
             >
               {group}
             </button>
@@ -114,10 +125,14 @@ export default function ModalWindow({
                 <div className={styles.mainContainerbtn2}>
                   <p className={styles.btn2Paragraph}>{item.title}</p>
                   <span className={styles.btn2Span1}>
+                    {item.amount ? `${item.amount} ≈ ` : ""}
                     {item.tokens} {TOKENS_SUFFIX}
                   </span>
                 </div>
                 <span className={styles.btn2Span2}>{item.desc}</span>
+                {item.subDesc && (
+                  <span className={styles.btn2Span2}>{item.subDesc}</span>
+                )}
 
                 <span
                   className={styles.eyeIcon}

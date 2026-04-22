@@ -272,7 +272,7 @@ const AIModelGuide = () => {
           <ul className="list-disc list-inside text-gray-700 text-lg leading-relaxed space-y-3 pl-5">
             <li>
               <Link
-                href="#"
+                href="/ai-models-guide/smart-search"
                 className="text-blue-600 hover:underline font-medium"
               >
                 Smart Search
@@ -284,7 +284,7 @@ const AIModelGuide = () => {
               <br />
               <span className="text-sm pl-4">
                 <Link
-                  href="/compare-smart-search-vs-chat"
+                  href="/ai-models-guide/compare-smart-search-vs-chat"
                   className="text-gray-500 hover:underline"
                 >
                   Compare with Chat AI
@@ -293,7 +293,7 @@ const AIModelGuide = () => {
             </li>
             <li>
               <Link
-                href="#"
+                href="/ai-models-guide/voice-to-text"
                 className="text-blue-600 hover:underline font-medium"
               >
                 Voice → Text
@@ -305,7 +305,7 @@ const AIModelGuide = () => {
               <br />
               <span className="text-sm pl-4">
                 <Link
-                  href="/compare-voice-vs-text-input"
+                  href="/ai-models-guide/compare-voice-vs-text-input"
                   className="text-gray-500 hover:underline"
                 >
                   Compare with Text input
@@ -314,7 +314,7 @@ const AIModelGuide = () => {
             </li>
             <li>
               <Link
-                href="#"
+                href="/ai-models-guide/text-to-speech"
                 className="text-blue-600 hover:underline font-medium"
               >
                 Text → Voice
@@ -326,7 +326,7 @@ const AIModelGuide = () => {
               <br />
               <span className="text-sm pl-4">
                 <Link
-                  href="/compare-voice-vs-text-output"
+                  href="/ai-models-guide/compare-voice-vs-text-output"
                   className="text-gray-500 hover:underline"
                 >
                   Compare with Text output

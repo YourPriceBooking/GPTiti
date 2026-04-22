@@ -18,6 +18,12 @@ import CompareGpt4oVsGpt51 from "@/components/AIModelGuide/models/CompareGpt4oVs
 import CompareO1VsO3Mini from "@/components/AIModelGuide/models/CompareO1VsO3Mini";
 import type { ReactNode } from "react";
 import BestAiModelForChat from "@/components/AIModelGuide/models/BestAiModelForChat";
+import SmartSearch from "@/components/AIModelGuide/models/SmartSearch";
+import CompareSmartSearchVsChat from "@/components/AIModelGuide/models/CompareSmartSearchVsChat";
+import VoiceToText from "@/components/AIModelGuide/models/VoiceToText";
+import CompareVoiceVsTextInput from "@/components/AIModelGuide/models/CompareVoiceVsTextInput";
+import TextToSpeech from "@/components/AIModelGuide/models/TextToSpeech";
+import CompareVoiceVsTextOutput from "@/components/AIModelGuide/models/CompareVoiceVsTextOutput";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -160,6 +166,55 @@ const modelData: Record<string, ModelEntry> = {
     meta: {
       title: "Best AI Model for Chat — Compare GPT Models | GPTiti",
       desc: "Find the best AI model for chat. Compare GPT-5.4, GPT-5.4-mini, GPT-4o-mini, and O1 based on cost, speed, and quality.",
+    },
+  },
+  "smart-search": {
+    title: "Smart Search AI — Search Your Data with AI",
+    content: <SmartSearch />,
+    meta: {
+      title: "Smart Search AI — Search Your Data with AI | GPTiti",
+      desc: "Smart Search AI lets you search documents, chats, and data using natural language. Powered by embeddings and GPT models for accurate results.",
+    },
+  },
+  "compare-smart-search-vs-chat": {
+    title: "Smart Search vs Chat AI — What’s the Difference?",
+    content: <CompareSmartSearchVsChat />,
+    meta: {
+      title: "Smart Search vs Chat AI — What’s the Difference? | GPTiti",
+      desc: "Compare Smart Search vs Chat AI. Learn how AI search works with embeddings vs GPT chat models and which is better for your use case.",
+    },
+  },
+  "voice-to-text": {
+    title: "Voice to Text AI — Convert Speech to Text Instantly",
+    content: <VoiceToText />,
+    meta: {
+      title: "Voice to Text AI — Convert Speech to Text Instantly | GPTiti",
+      desc: "Voice to Text AI converts speech into text instantly using advanced speech recognition models. Fast, accurate, and easy to use.",
+    },
+  },
+  "compare-voice-vs-text-input": {
+    title: "Voice vs Text Input — Which Is Better for AI?",
+    content: <CompareVoiceVsTextInput />,
+    meta: {
+      title: "Voice vs Text Input — Which Is Better for AI? | GPTiti",
+      desc: "Compare voice vs text input for AI. Learn which is faster, more accurate, and better for chat, productivity, and real-world use.",
+    },
+  },
+  "text-to-speech": {
+    title: "Text to Speech AI — Generate Realistic Voice from Text",
+    content: <TextToSpeech />,
+    meta: {
+      title: "Text to Speech AI — Generate Realistic AI Voice | GPTiti",
+      desc: "Text to Speech AI converts text into realistic voice. Learn how AI voice works, its advantages, and how it compares to human speech.",
+    },
+  },
+  "compare-voice-vs-text-output": {
+    title: "Voice vs Text Output — Listening vs Reading",
+    content: <CompareVoiceVsTextOutput />,
+    meta: {
+      title:
+        "Voice vs Text Output — Which Is Better for Learning & AI? | GPTiti",
+      desc: "Compare voice vs text output. Is listening faster than reading? Learn which is better for productivity, learning, and AI interaction.",
     },
   },
 };
