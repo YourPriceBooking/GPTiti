@@ -34,21 +34,123 @@ const TAG_COLORS: Record<Tag["color"], string> = {
 };
 
 const rows: Row[] = [
-  { type: "model", model: "gpt-4o-mini",      bestFor: "Cheap chat",         speed: "⚡️⚡️⚡️⚡️⚡️", reasoning: "⭐️",          cost: "💲" },
-  { type: "model", model: "gpt-4o",            bestFor: "General tasks",      speed: "⚡️⚡️⚡️⚡️",    reasoning: "⭐️⭐️",        cost: "💲💲" },
-  { type: "model", model: "gpt-4o-realtime",   bestFor: "Live chat / voice",  speed: "⚡️⚡️⚡️⚡️⚡️", reasoning: "⭐️",          cost: "💲💲💲" },
-  { type: "model", model: "gpt-5.4-mini",      bestFor: "Best balance",       speed: "⚡️⚡️⚡️⚡️",    reasoning: "⭐️⭐️⭐️⭐️",    cost: "💲💲💲",  highlight: true, tag: { label: "Best value", color: "orange" } },
-  { type: "model", model: "gpt-5.1-mini",      bestFor: "Balanced usage",     speed: "⚡️⚡️⚡️⚡️",    reasoning: "⭐️⭐️⭐️",      cost: "💲💲" },
-  { type: "model", model: "gpt-5.1",           bestFor: "Work & content",     speed: "⚡️⚡️⚡️",       reasoning: "⭐️⭐️⭐️⭐️",    cost: "💲💲💲" },
-  { type: "model", model: "gpt-5.1-realtime",  bestFor: "Premium live AI",    speed: "⚡️⚡️⚡️⚡️⚡️", reasoning: "⭐️⭐️",        cost: "💲💲💲💲" },
-  { type: "model", model: "gpt-5.4",           bestFor: "Top performance",    speed: "⚡️⚡️⚡️",       reasoning: "⭐️⭐️⭐️⭐️⭐️",  cost: "💲💲💲💲", tag: { label: "Top", color: "red" } },
-  { type: "model", model: "o3-mini",           bestFor: "Budget reasoning",   speed: "⚡️⚡️⚡️⚡️",    reasoning: "⭐️⭐️⭐️",      cost: "💲💲" },
-  { type: "model", model: "o1-mini",           bestFor: "Affordable reasoning",speed: "⚡️⚡️⚡️",      reasoning: "⭐️⭐️⭐️⭐️",    cost: "💲💲💲" },
-  { type: "model", model: "o1",                bestFor: "Deep reasoning",     speed: "⚡️⚡️",          reasoning: "⭐️⭐️⭐️⭐️⭐️",  cost: "💲💲💲💲💲", tag: { label: "Reasoning", color: "orange" } },
+  {
+    type: "model",
+    model: "gpt-4o-mini",
+    bestFor: "Cheap chat",
+    speed: "⚡️⚡️⚡️⚡️⚡️",
+    reasoning: "⭐️",
+    cost: "💲",
+  },
+  {
+    type: "model",
+    model: "gpt-4o",
+    bestFor: "General tasks",
+    speed: "⚡️⚡️⚡️⚡️",
+    reasoning: "⭐️⭐️",
+    cost: "💲💲",
+  },
+  {
+    type: "model",
+    model: "gpt-4o-realtime",
+    bestFor: "Live chat / voice",
+    speed: "⚡️⚡️⚡️⚡️⚡️",
+    reasoning: "⭐️",
+    cost: "💲💲💲",
+  },
+  {
+    type: "model",
+    model: "gpt-5.4-mini",
+    bestFor: "Best balance",
+    speed: "⚡️⚡️⚡️⚡️",
+    reasoning: "⭐️⭐️⭐️⭐️",
+    cost: "💲💲💲",
+    highlight: true,
+    tag: { label: "Best value", color: "orange" },
+  },
+  {
+    type: "model",
+    model: "gpt-5.1-mini",
+    bestFor: "Balanced usage",
+    speed: "⚡️⚡️⚡️⚡️",
+    reasoning: "⭐️⭐️⭐️",
+    cost: "💲💲",
+  },
+  {
+    type: "model",
+    model: "gpt-5.1",
+    bestFor: "Work & content",
+    speed: "⚡️⚡️⚡️",
+    reasoning: "⭐️⭐️⭐️⭐️",
+    cost: "💲💲💲",
+  },
+  {
+    type: "model",
+    model: "gpt-5.1-realtime",
+    bestFor: "Premium live AI",
+    speed: "⚡️⚡️⚡️⚡️⚡️",
+    reasoning: "⭐️⭐️",
+    cost: "💲💲💲💲",
+  },
+  {
+    type: "model",
+    model: "gpt-5.4",
+    bestFor: "Top performance",
+    speed: "⚡️⚡️⚡️",
+    reasoning: "⭐️⭐️⭐️⭐️⭐️",
+    cost: "💲💲💲💲",
+    tag: { label: "Top", color: "red" },
+  },
+  {
+    type: "model",
+    model: "o3-mini",
+    bestFor: "Budget reasoning",
+    speed: "⚡️⚡️⚡️⚡️",
+    reasoning: "⭐️⭐️⭐️",
+    cost: "💲💲",
+  },
+  {
+    type: "model",
+    model: "o1-mini",
+    bestFor: "Affordable reasoning",
+    speed: "⚡️⚡️⚡️",
+    reasoning: "⭐️⭐️⭐️⭐️",
+    cost: "💲💲💲",
+  },
+  {
+    type: "model",
+    model: "o1",
+    bestFor: "Deep reasoning",
+    speed: "⚡️⚡️",
+    reasoning: "⭐️⭐️⭐️⭐️⭐️",
+    cost: "💲💲💲💲💲",
+    tag: { label: "Reasoning", color: "orange" },
+  },
   { type: "divider", label: "AI Tools" },
-  { type: "tool", name: "Smart Search",  bestFor: "Search your data with AI", speed: "⚡️⚡️⚡️⚡️",    reasoning: "⭐️⭐️⭐️", cost: "💲",    tag: { label: "Soon", color: "orange" } },
-  { type: "tool", name: "Voice to Text", bestFor: "Convert speech to text",   speed: "⚡️⚡️⚡️⚡️⚡️", reasoning: "⭐️",        cost: "💲💲",  tag: { label: "Soon", color: "orange" } },
-  { type: "tool", name: "Text to Speech",bestFor: "Generate AI voice",        speed: "⚡️⚡️⚡️⚡️",    reasoning: "⭐️",        cost: "💲💲",  tag: { label: "Soon", color: "orange" } },
+  {
+    type: "tool",
+    name: "Smart Search",
+    bestFor: "Search your data with AI",
+    speed: "⚡️⚡️⚡️⚡️",
+    reasoning: "⭐️⭐️⭐️",
+    cost: "💲",
+  },
+  {
+    type: "tool",
+    name: "Voice → Text",
+    bestFor: "Convert speech to text",
+    speed: "⚡️⚡️⚡️⚡️⚡️",
+    reasoning: "⭐️",
+    cost: "💲💲",
+  },
+  {
+    type: "tool",
+    name: "Text → Voice",
+    bestFor: "Generate AI voice",
+    speed: "⚡️⚡️⚡️⚡️",
+    reasoning: "⭐️",
+    cost: "💲💲",
+  },
 ];
 
 export default function ModelCompareTable() {
@@ -79,7 +181,10 @@ export default function ModelCompareTable() {
             if (row.type === "divider") {
               return (
                 <tr key={i} className="bg-gray-50">
-                  <td colSpan={5} className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wide">
+                  <td
+                    colSpan={5}
+                    className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wide"
+                  >
                     {row.label}
                   </td>
                 </tr>
@@ -88,11 +193,17 @@ export default function ModelCompareTable() {
 
             if (row.type === "tool") {
               return (
-                <tr key={i} className="cursor-pointer transition-colors hover:bg-blue-50">
+                <tr
+                  key={i}
+                  onClick={() => handleModelClick(row.name)}
+                  className="cursor-pointer transition-colors hover:bg-blue-50"
+                >
                   <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap">
                     {row.name}
                     {row.tag && (
-                      <span className={`ml-2 inline-block text-xs font-semibold px-1.5 py-0.5 rounded ${TAG_COLORS[row.tag.color]}`}>
+                      <span
+                        className={`ml-2 inline-block text-xs font-semibold px-1.5 py-0.5 rounded ${TAG_COLORS[row.tag.color]}`}
+                      >
                         {row.tag.label}
                       </span>
                     )}
@@ -114,7 +225,9 @@ export default function ModelCompareTable() {
                 <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap">
                   {row.model}
                   {row.tag && (
-                    <span className={`ml-2 inline-block text-xs font-semibold px-1.5 py-0.5 rounded ${TAG_COLORS[row.tag.color]}`}>
+                    <span
+                      className={`ml-2 inline-block text-xs font-semibold px-1.5 py-0.5 rounded ${TAG_COLORS[row.tag.color]}`}
+                    >
                       {row.tag.label}
                     </span>
                   )}

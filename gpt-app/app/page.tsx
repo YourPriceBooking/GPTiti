@@ -37,7 +37,7 @@ export default function Home() {
 
   const { modelMode, setModelMode, modelRef } = useModelMode();
   const [selectedModelGroup, setSelectedModelGroup] =
-    useState<ModelType>("GPT-4o");
+    useState<ModelType>("gpt-4o");
   const [selectedModel, setSelectedModel] = useState<string>("gpt-4o-mini");
 
   useEffect(() => {
