@@ -37,8 +37,8 @@ export default function Home() {
 
   const { modelMode, setModelMode, modelRef } = useModelMode();
   const [selectedModelGroup, setSelectedModelGroup] =
-    useState<ModelType>("gpt-4o");
-  const [selectedModel, setSelectedModel] = useState<string>("gpt-4o-mini");
+    useState<ModelType>("gpt-5.4");
+  const [selectedModel, setSelectedModel] = useState<string>("gpt-5.4-mini");
 
   useEffect(() => {
     const savedModel = localStorage.getItem("selectedModel");

@@ -151,6 +151,22 @@ const rows: Row[] = [
     reasoning: "⭐️",
     cost: "💲💲",
   },
+  {
+    type: "tool",
+    name: "Image → Create HD",
+    bestFor: "High-quality image generation",
+    speed: "⚡️⚡️⚡️",
+    reasoning: "⭐️⭐️⭐️⭐️",
+    cost: "💲💲💲💲",
+  },
+  {
+    type: "tool",
+    name: "Image → Create Fast",
+    bestFor: "Fast & cheap image generation",
+    speed: "⚡️⚡️⚡️⚡️⚡️",
+    reasoning: "⭐️⭐️",
+    cost: "💲💲",
+  },
 ];
 
 export default function ModelCompareTable() {
