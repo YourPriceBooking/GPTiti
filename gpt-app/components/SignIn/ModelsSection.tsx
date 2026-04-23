@@ -14,20 +14,60 @@ export default function ModelsSection() {
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        Available Models
+        Available Models and Tools
       </motion.h2>
 
-      <Category title="🔵 GPT-5 Series — Most powerful AI models" color="text-blue-600" models={["gpt-5.4 (New)","gpt-5.4-mini (New)","gpt-5.1","gpt-5.1-mini","gpt-5.1-realtime"]} />
-      <Category title="🟣 Category 2 — GPT-4o (Balanced)" color="text-purple-600" models={["gpt-4o","gpt-4o-mini","gpt-4o-realtime"]} />
-      <Category title="🔴 Category 3 — O-Series (Reasoning)" color="text-red-600" models={["o1","o1-mini","o3-mini"]} />
-      <Category title="🟡 AI Tools — Smart Features" color="text-yellow-500" models={["Smart Search — search your data with AI","Voice → Text — convert speech to text instantly","Text → Voice — generate AI voice responses"]} />
+      <Category
+        title="🟡 AI Tools — Smart Features"
+        color="text-yellow-500"
+        models={[
+          "Smart Search — search your data with AI",
+          "Voice → Text — convert speech to text instantly",
+          "Text → Voice — generate AI voice responses",
+          "Image → Create HD — create high-quality, detailed images with maximum accuracy",
+          "Image → Create Fast — create images faster with lower cost for everyday use",
+        ]}
+      />
+      <Category
+        title="🔵 GPT-5 Series — Most powerful AI models"
+        color="text-blue-600"
+        models={[
+          "gpt-5.4 (New)",
+          "gpt-5.4-mini (New)",
+          "gpt-5.1",
+          "gpt-5.1-mini",
+          "gpt-5.1-realtime",
+        ]}
+      />
+      <Category
+        title="🟣 Category 2 — GPT-4o (Balanced)"
+        color="text-purple-600"
+        models={["gpt-4o", "gpt-4o-mini", "gpt-4o-realtime"]}
+      />
+      <Category
+        title="🔴 Category 3 — O-Series (Reasoning)"
+        color="text-red-600"
+        models={["o1", "o1-mini", "o3-mini"]}
+      />
     </motion.div>
   );
 }
 
-function Category({ title, color, models }: { title: string; color: string; models: string[] }) {
+function Category({
+  title,
+  color,
+  models,
+}: {
+  title: string;
+  color: string;
+  models: string[];
+}) {
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+    >
       <h3 className={`${color} font-semibold text-lg`}>{title}</h3>
       <ul className="text-gray-700 ml-4 list-disc">
         {models.map((m) => (

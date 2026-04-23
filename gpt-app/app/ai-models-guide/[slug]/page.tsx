@@ -24,6 +24,8 @@ import VoiceToText from "@/components/AIModelGuide/models/VoiceToText";
 import CompareVoiceVsTextInput from "@/components/AIModelGuide/models/CompareVoiceVsTextInput";
 import TextToSpeech from "@/components/AIModelGuide/models/TextToSpeech";
 import CompareVoiceVsTextOutput from "@/components/AIModelGuide/models/CompareVoiceVsTextOutput";
+import ImageCreateFast from "@/components/AIModelGuide/models/ImageCreateFast";
+import ImageCreateHD from "@/components/AIModelGuide/models/ImageCreateHD";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -215,6 +217,23 @@ const modelData: Record<string, ModelEntry> = {
       title:
         "Voice vs Text Output — Which Is Better for Learning & AI? | GPTiti",
       desc: "Compare voice vs text output. Is listening faster than reading? Learn which is better for productivity, learning, and AI interaction.",
+    },
+  },
+  "image-create-hd": {
+    title: "AI Image Generator (HD) — High Quality Text to Image AI",
+    content: <ImageCreateHD />,
+    meta: {
+      title: "AI Image Generator HD — High Quality Text to Image AI | GPTiti",
+      desc: "Create high-quality AI images with GPTiti. Generate detailed visuals, realistic scenes, and images with text using advanced AI image generation.",
+    },
+  },
+  "image-create-fast": {
+    title: "Fast AI Image Generator — Quick and Affordable Image Creation",
+    content: <ImageCreateFast />,
+    meta: {
+      title:
+        "Fast AI Image Generator — Cheap and быстрый Text to Image AI | GPTiti",
+      desc: "Generate AI images fast and cheap with GPTiti. Create visuals instantly for drafts, ideas, and content using fast AI image generation.",
     },
   },
 };
