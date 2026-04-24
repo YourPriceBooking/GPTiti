@@ -62,6 +62,26 @@
   animation: blink 1s infinite;
 }
 
+.tooltipImages {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.tooltipImage {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  object-fit: cover;
+  animation: fadeInImg 400ms ease-out both;
+}
+
+@keyframes fadeInImg {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 @keyframes blink {
   50% { opacity: 0; }
 }
