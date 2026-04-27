@@ -2,6 +2,8 @@ import Image from "next/image";
 import styles from "./InputBar.module.css";
 import { useState, useLayoutEffect, useEffect, useRef } from "react";
 import AddSomethingToInput from "../AddSomethingToInput/AddSomethingToInput";
+import { useAuth } from "@/context/AuthContext";
+import LoginModal from "@/components/HomePage/common/LoginModal/LoginModal";
 
 export default function InputBar({
   hasInput,
@@ -25,7 +27,10 @@ export default function InputBar({
   const [isMultiline, setIsMultiline] = useState(false);
   const [shouldScroll, setShouldScroll] = useState(false);
   const [showAddInput, setShowAddInput] = useState(false);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
 
+  const { user, accessToken } = useAuth();
+  const isLoggedIn = Boolean(accessToken || user);
 
   const modalRef = useRef<HTMLDivElement | null>(null);
 
@@ -106,6 +111,10 @@ export default function InputBar({
     if (inputRef.current) {
       const message = inputRef.current.value;
       if (message.trim() !== "") {
+        if (!isLoggedIn) {
+          setIsLoginOpen(true);
+          return;
+        }
         onSend(message);
         onHideSection();
         if (!hasFirstRequest) { setHasFirstRequest(true); }
@@ -169,6 +178,8 @@ export default function InputBar({
           <Image src="/icons/voice.svg" width={35} height={35} alt="voice" />
         </div>
       )}
+
+      <LoginModal open={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
     </div>
   );
 }

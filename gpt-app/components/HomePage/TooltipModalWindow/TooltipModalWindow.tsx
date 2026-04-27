@@ -22,7 +22,7 @@ const MODEL_IMAGES: Record<string, string[]> = {
   ],
 };
 
-const READ_DELAY_MS = 2500;
+const READ_DELAY_MS = 1000;
 const IMAGE_INTERVAL_MS = 2000;
 
 function buildFullText(tooltip: ModelTooltip): string {
@@ -37,6 +37,7 @@ export default function TooltipModalWindow({ onClose, tooltip }: Props) {
   const [done, setDone] = useState(false);
   const [showImagesPhase, setShowImagesPhase] = useState(false);
   const [imageIndex, setImageIndex] = useState(0);
+  const [prevImageIndex, setPrevImageIndex] = useState<number | null>(null);
   const indexRef = useRef(0);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -48,6 +49,7 @@ export default function TooltipModalWindow({ onClose, tooltip }: Props) {
     setDone(false);
     setShowImagesPhase(false);
     setImageIndex(0);
+    setPrevImageIndex(null);
 
     const type = () => {
       const i = indexRef.current;
@@ -83,13 +85,17 @@ export default function TooltipModalWindow({ onClose, tooltip }: Props) {
   useEffect(() => {
     if (!showImagesPhase || images.length <= 1) return;
     const id = setInterval(() => {
-      setImageIndex((i) => (i + 1) % images.length);
+      setImageIndex((i) => {
+        setPrevImageIndex(i);
+        return (i + 1) % images.length;
+      });
     }, IMAGE_INTERVAL_MS);
     return () => clearInterval(id);
   }, [showImagesPhase, images.length]);
 
   const showImages = showImagesPhase && images.length > 0;
   const currentSrc = images[imageIndex];
+  const prevSrc = prevImageIndex !== null ? images[prevImageIndex] : null;
 
   return (
     <div className={styles.tooltipContainer}>
@@ -108,9 +114,20 @@ export default function TooltipModalWindow({ onClose, tooltip }: Props) {
 
         {showImages && (
           <div className={styles.tooltipImages}>
+            {prevSrc && (
+              <Image
+                key={`prev-${prevSrc}`}
+                className={`${styles.tooltipImage} ${styles.slideOut}`}
+                src={prevSrc}
+                alt={tooltip.title}
+                width={220}
+                height={220}
+                onAnimationEnd={() => setPrevImageIndex(null)}
+              />
+            )}
             <Image
-              key={currentSrc}
-              className={styles.tooltipImage}
+              key={`curr-${currentSrc}`}
+              className={`${styles.tooltipImage} ${prevSrc ? styles.slideIn : ""}`}
               src={currentSrc}
               alt={tooltip.title}
               width={220}

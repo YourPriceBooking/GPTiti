@@ -284,6 +284,7 @@
 
 .noneContainer {
   background: transparent;
+  max-width: none;
 }
 .inputSpan {
   font-family: var(--font-family);
