@@ -63,27 +63,53 @@
 }
 
 .tooltipImages {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
   margin-top: 10px;
+  overflow: hidden;
+  border-radius: 8px;
 }
 
 .tooltipImage {
-  width: 100%;
-  height: auto;
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
   border-radius: 8px;
   object-fit: cover;
-  animation: fadeInImg 400ms ease-out both;
 }
 
-@keyframes fadeInImg {
-  from { opacity: 0; transform: translateY(4px); }
-  to   { opacity: 1; transform: translateY(0); }
+.slideIn {
+  animation: slideInLeft 500ms ease-out both;
+}
+
+.slideOut {
+  animation: slideOutRight 500ms ease-in both;
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
 }
 
 @keyframes blink {
-  50% { opacity: 0; }
+  50% {
+    opacity: 0;
+  }
 }
 
 .closeBtn {

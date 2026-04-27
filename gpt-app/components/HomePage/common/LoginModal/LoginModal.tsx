@@ -1,11 +1,10 @@
 "use client";
 
-import React from "react";
-import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
+import { GoogleLogin } from "@react-oauth/google";
 
 import AppModal from "@/components/HomePage/common/AppModal/AppModal";
-import { useAuth } from "@/context/AuthContext";
 import SimpleCheckbox from "@/components/common/SimpleCheckbox/SimpleCheckbox";
+import { useGoogleLogin } from "@/hooks/useGoogleLogin";
 import styles from "./LoginModal.module.css";
 
 type LoginModalProps = {
@@ -14,28 +13,7 @@ type LoginModalProps = {
 };
 
 export default function LoginModal({ open, onClose }: LoginModalProps) {
-  const [, setLoading] = React.useState(false);
-  const [errorText, setErrorText] = React.useState<string | null>(null);
-  const { login } = useAuth();
-
-  const handleLogin = async (res: CredentialResponse) => {
-    try {
-      setLoading(true);
-      setErrorText(null);
-      if (!res.credential) {
-        setErrorText("No credential returned from Google");
-        return;
-      }
-      await login(res.credential);
-      onClose();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) {
-      console.error("Login failed:", err);
-      setErrorText(err?.message || "Login failed. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { handleCredential, handleError, errorText } = useGoogleLogin(onClose);
   return (
     <AppModal open={open} onClose={onClose} title="Welcome to GPTiti ">
       <div style={{ display: "flex", flexDirection: "column" }}>
@@ -65,8 +43,8 @@ export default function LoginModal({ open, onClose }: LoginModalProps) {
         <div className={styles.actionsRow}>
           <div className={styles.googleWrap}>
           <GoogleLogin
-            onSuccess={handleLogin}
-            onError={() => setErrorText("Google login failed")}
+            onSuccess={handleCredential}
+            onError={handleError}
             theme="filled_black" 
             size="large"
             shape="pill"

@@ -1,8 +1,11 @@
+"use client";
+
 import Checkbox from "@mui/material/Checkbox";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useAuth } from "@/context/AuthContext";
 
 export default function TermsCheckbox({
   checked,
@@ -11,6 +14,34 @@ export default function TermsCheckbox({
   checked: boolean;
   setChecked: (val: boolean) => void;
 }) {
+  const { user, accessToken } = useAuth();
+  const isLoggedIn = Boolean(accessToken || user);
+
+  if (isLoggedIn) {
+    return (
+      <motion.div
+        className="w-full flex items-center justify-center gap-2 mt-2 text-sm"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+      >
+        <Link
+          href="/terms-conditions"
+          className="text-blue-600 hover:underline hover:text-blue-800"
+        >
+          Terms & Conditions
+        </Link>
+        <span className="text-gray-500">·</span>
+        <Link
+          href="/privacy-policy"
+          className="text-blue-600 hover:underline hover:text-blue-800"
+        >
+          Privacy Policy
+        </Link>
+      </motion.div>
+    );
+  }
+
   return (
     <motion.div
       className="w-full flex items-start gap-2 mt-2 flex-nowrap sm:flex-nowrap"

@@ -5,8 +5,10 @@ import styles from "./page.module.css";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { useTokensContext } from "@/context/TokensContext";
+import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
 import PaymentModal from "@/components/PaymentModal/PaymentModal";
+import LoginModal from "@/components/HomePage/common/LoginModal/LoginModal";
 import type { Plan } from "@/types/types";
 
 const PLANS: Plan[] = [
@@ -38,12 +40,19 @@ const PLANS: Plan[] = [
 
 export default function TokensPage() {
   const { balance, countdown, handleClaim } = useTokensContext();
+  const { user, accessToken } = useAuth();
+  const isLoggedIn = Boolean(accessToken || user);
   const [clicked, setClicked] = useState(false);
 
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
 
   const openPayment = (plan: Plan) => {
+    if (!isLoggedIn) {
+      setIsLoginOpen(true);
+      return;
+    }
     setSelectedPlan(plan);
     setIsPaymentOpen(true);
   };
@@ -360,6 +369,8 @@ export default function TokensPage() {
           />
         )}
       </AnimatePresence>
+
+      <LoginModal open={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
     </motion.div>
   );
 }

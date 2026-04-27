@@ -51,7 +51,10 @@
   justify-content: center;
   outline: none;
   cursor: pointer;
-  transition: top 0.2s ease, bottom 0.2s ease, transform 0.2s ease;
+  transition:
+    top 0.2s ease,
+    bottom 0.2s ease,
+    transform 0.2s ease;
   z-index: 1;
 }
 
@@ -110,7 +113,9 @@
   white-space: nowrap;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 1s ease, visibility 1s ease;
+  transition:
+    opacity 1s ease,
+    visibility 1s ease;
 }
 
 .iconWrapper:hover::after,
