@@ -6,6 +6,7 @@ type Message = {
   user: string;
   ai: React.ReactNode | null;
   tokens?: number;
+  images?: string[];
 };
 
 type MessageListProps = {
@@ -23,11 +24,27 @@ export default function MessageList({
     <div className={styles.messageList}>
       {messages.map((message, index) => (
         <React.Fragment key={index}>
-          {message.user && (
-  <div className={styles.userMessage}>
-    <p className={styles.userText}>{message.user}</p>
-  </div>
-)}
+          {(message.user || (message.images && message.images.length > 0)) && (
+            <div className={styles.userMessage}>
+              <div className={styles.userBubble}>
+                {message.images && message.images.length > 0 && (
+                  <div className={styles.userImages}>
+                    {message.images.map((src, i) => (
+                      <img
+                        key={i}
+                        src={src}
+                        alt="user attachment"
+                        className={styles.userImage}
+                      />
+                    ))}
+                  </div>
+                )}
+                {message.user && (
+                  <p className={styles.userText}>{message.user}</p>
+                )}
+              </div>
+            </div>
+          )}
 
 {message.ai ? (
             <div className={styles.aiMessage}> 

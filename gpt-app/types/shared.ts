@@ -27,6 +27,6 @@ export type ModelProps = {
         templateTick: number; 
 
         handleChange: (e: React.ChangeEvent<HTMLTextAreaElement | null>) => void; 
-        handleSendClick: (hasFirstRequest: boolean) => Promise<void>; 
+        handleSendClick: (hasFirstRequest: boolean, imageUrls?: string[]) => Promise<void>;
         insertTemplate: (template: string) => void; 
     };

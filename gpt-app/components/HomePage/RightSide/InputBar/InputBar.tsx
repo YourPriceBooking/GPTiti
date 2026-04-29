@@ -19,7 +19,7 @@ export default function InputBar({
 }: {
   hasInput: boolean;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-  onSend: (message: string) => void;
+  onSend: (message: string, imageUrls?: string[]) => void;
   inputRef: React.RefObject<HTMLTextAreaElement | null>;
   onHideSection: () => void;
   templateTick: number;
@@ -63,6 +63,7 @@ export default function InputBar({
     textarea.style.overflowY = "hidden";
     textarea.style.paddingBottom = `${PB_NORMAL}px`;
     textarea.style.height = `${BASE}px`;
+    textarea.style.minHeight = "";
     textarea.scrollTop = 0;
 
     if (!textarea.value.trim()) {
@@ -125,7 +126,7 @@ export default function InputBar({
   const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
     const items = Array.from(e.clipboardData.items);
     const hasImage = items.some(
-      (item) => item.kind === "file" && item.type.startsWith("image/")
+      (item) => item.kind === "file" && item.type.startsWith("image/"),
     );
 
     if (hasImage && aviableModelImgPaste.includes(selectedModel)) {
@@ -155,15 +156,30 @@ export default function InputBar({
     setImages((prev) => prev.filter((img) => img.id !== id));
   };
 
+  const handleImageSelect = (files: File[]) => {
+    const newImages = files.map((file) => ({
+      id: crypto.randomUUID(),
+      url: URL.createObjectURL(file),
+      file,
+    }));
+    setImages((prev) => [...prev, ...newImages]);
+    setShowAddInput(false);
+  };
+
   const handleSend = () => {
     if (inputRef.current) {
       const message = inputRef.current.value;
-      if (message.trim() !== "") {
+      const hasContent = message.trim() !== "" || images.length > 0;
+      if (hasContent) {
         if (!isLoggedIn) {
           setIsLoginOpen(true);
           return;
         }
-        onSend(message);
+        onSend(
+          message,
+          images.map((img) => img.url)
+        );
+        setImages([]);
         onHideSection();
         if (!hasFirstRequest) {
           setHasFirstRequest(true);
@@ -199,7 +215,14 @@ export default function InputBar({
           className={`${styles.modalWrapper} ${showAddInput ? styles.visible : styles.hidden}`}
           ref={modalRef}
         >
-          <AddSomethingToInput />
+          <AddSomethingToInput
+            onImageSelect={handleImageSelect}
+            isImageBlocked={aviableModelImgPaste.includes(selectedModel)}
+            onImageBlocked={() => {
+              setShowAddInput(false);
+              setIsImgErrorOpen(true);
+            }}
+          />
         </div>
       )}
 
@@ -238,7 +261,7 @@ export default function InputBar({
         />
       </div>
 
-      {hasInput ? (
+      {hasInput || images.length > 0 ? (
         <div
           className={`${styles.iconWrapper2} ${styles.disabledHover}`}
           onClick={handleSend}

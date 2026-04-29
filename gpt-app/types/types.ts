@@ -8,6 +8,7 @@ export interface CustomScrollBarProps {
 export type Message = {
   user: string;
   ai: React.ReactNode | null;
+  images?: string[];
 };
 
 export type Chat = {
@@ -86,7 +87,7 @@ export type MainSectionRightSideProps = {
   isSectionVisible: boolean;
   hasInput: boolean;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-  onSend: () => void;
+  onSend: (message: string, imageUrls?: string[]) => void;
   inputRef: React.RefObject<HTMLTextAreaElement | null>;
   onHideSection: () => void;
   templateTick: number;
