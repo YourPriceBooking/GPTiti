@@ -186,7 +186,9 @@ export default function Home() {
                 isSectionVisible={isSectionVisible}
                 hasInput={hasInput}
                 onChange={handleChange}
-                onSend={() => handleSendClick(hasFirstRequest)}
+                onSend={(_message, imageUrls) => {
+                  handleSendClick(hasFirstRequest, imageUrls);
+                }}
                 inputRef={inputRef}
                 onHideSection={() => setIsSectionVisible(false)}
                 templateTick={templateTick}
@@ -229,8 +231,8 @@ export default function Home() {
                     focusMode={false}
                     hasInput={hasInput}
                     onChange={handleChange}
-                    onSend={() => {
-                      handleSendClick(hasFirstRequest);
+                    onSend={(_message, imageUrls) => {
+                      handleSendClick(hasFirstRequest, imageUrls);
                       setIsOverlayOpen(false);
                     }}
                     inputRef={inputRef}
@@ -267,8 +269,8 @@ export default function Home() {
                   <InputBar
                     hasInput={hasInput}
                     onChange={handleChange}
-                    onSend={() => {
-                      handleSendClick(hasFirstRequest);
+                    onSend={(_message, imageUrls) => {
+                      handleSendClick(hasFirstRequest, imageUrls);
                       if (!hasFirstRequest) setHasFirstRequest(true);
                     }}
                     inputRef={inputRef}

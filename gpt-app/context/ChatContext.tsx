@@ -23,18 +23,24 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     setHasInput(e.target.value.trim().length > 0);
   }
 
-  async function handleSendClick(hasFirstRequest: boolean) {
-    if (!hasInput || !inputRef.current) return;
+  async function handleSendClick(
+    hasFirstRequest: boolean,
+    imageUrls: string[] = []
+  ) {
+    if (!inputRef.current) return;
     const userText = inputRef.current.value.trim();
-    if (!userText) return;
+    if (!userText && imageUrls.length === 0) return;
 
     setChatList((prev) =>
       prev.map((chat) =>
         chat.id === activeChatId
           ? {
               ...chat,
-              title: chat.title ?? userText,
-              messages: [...chat.messages, { user: userText, ai: null }],
+              title: chat.title ?? (userText || "Image"),
+              messages: [
+                ...chat.messages,
+                { user: userText, ai: null, images: imageUrls },
+              ],
             }
           : chat
       )

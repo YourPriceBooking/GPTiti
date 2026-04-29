@@ -211,6 +211,7 @@
   height: 140px;
   padding-top: 80px;
   padding-bottom: 24px;
+  align-content: flex-start;
 }
 
 .hasImages.multiline .input {
@@ -223,6 +224,7 @@
   width: 100%;
   position: absolute;
   bottom: 80;
+  z-index: 10;
 }
 .modalWrapper.hidden {
   display: none;
