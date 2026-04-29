@@ -55,7 +55,11 @@ export default function SectionGptUser() {
           </button>
         )}
       </div>
-      <LoginModal open={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
+      {/* <LoginModal open={isLoginOpen} onClose={() => setIsLoginOpen(false)} /> */}
+      <ErrorPatchImgModal
+        open={isLoginOpen}
+        onClose={() => setIsLoginOpen(false)}
+      />
     </section>
   );
 }
