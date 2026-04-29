@@ -1,18 +1,19 @@
-import React from 'react'
-import styles from './SectionGptUser.module.css'
-import Image from 'next/image'
-import Link from 'next/link'
-import { useAuth } from '@/context/AuthContext'
-import LoginModal from '@/components/HomePage/common/LoginModal/LoginModal'
+import React from "react";
+import styles from "./SectionGptUser.module.css";
+import Image from "next/image";
+import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
+import LoginModal from "@/components/HomePage/common/LoginModal/LoginModal";
+import ErrorPatchImgModal from "../../common/ErrorPatchImgModal/ErrorPatchImgModal";
 
 export default function SectionGptUser() {
-  const { user, accessToken, logout } = useAuth()
-  const [isLoginOpen, setIsLoginOpen] = React.useState(false)
-  const isLoggedIn = Boolean(accessToken || user)
+  const { user, accessToken, logout } = useAuth();
+  const [isLoginOpen, setIsLoginOpen] = React.useState(false);
+  const isLoggedIn = Boolean(accessToken || user);
 
   const handleLogout = async () => {
-    await logout()
-  }
+    await logout();
+  };
 
   return (
     <section className={styles.gptUser}>
@@ -21,11 +22,11 @@ export default function SectionGptUser() {
           className={styles.userAvatar}
           width={27.11}
           height={35.65}
-          src={user?.avatar || '/icons/ghost-user.svg'}
-          alt='ghost-user'
+          src={user?.avatar || "/icons/ghost-user.svg"}
+          alt="ghost-user"
         />
 
-        <span className={styles.gptUserEmail}>{user?.email || 'Guest'}</span>
+        <span className={styles.gptUserEmail}>{user?.email || "Guest"}</span>
       </article>
 
       <div className={styles.logoutBtnContainer}>
@@ -41,10 +42,10 @@ export default function SectionGptUser() {
             <span className={styles.loginBtnSpan}>
               <span
                 style={{
-                  fontSize: '28px',
-                  fontWeight: '700',
-                  marginRight: '8px',
-                  lineHeight: '28px',
+                  fontSize: "28px",
+                  fontWeight: "700",
+                  marginRight: "8px",
+                  lineHeight: "28px",
                 }}
               >
                 G
@@ -54,7 +55,11 @@ export default function SectionGptUser() {
           </button>
         )}
       </div>
-      <LoginModal open={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
+      {/* <LoginModal open={isLoginOpen} onClose={() => setIsLoginOpen(false)} /> */}
+      <ErrorPatchImgModal
+        open={isLoginOpen}
+        onClose={() => setIsLoginOpen(false)}
+      />
     </section>
-  )
+  );
 }

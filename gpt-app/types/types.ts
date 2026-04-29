@@ -93,6 +93,7 @@ export type MainSectionRightSideProps = {
   setHasFirstRequest: React.Dispatch<React.SetStateAction<boolean>>;
   hasFirstRequest: boolean;
   isOverlay?: boolean;
+  selectedModel: string;
 };
 
 export type ModelModalOverlayProps = {

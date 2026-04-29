@@ -4,6 +4,7 @@ import { useState, useLayoutEffect, useEffect, useRef } from "react";
 import AddSomethingToInput from "../AddSomethingToInput/AddSomethingToInput";
 import { useAuth } from "@/context/AuthContext";
 import LoginModal from "@/components/HomePage/common/LoginModal/LoginModal";
+import ErrorPatchImgModal from "@/components/HomePage/common/ErrorPatchImgModal/ErrorPatchImgModal";
 
 export default function InputBar({
   hasInput,
@@ -14,6 +15,7 @@ export default function InputBar({
   templateTick,
   setHasFirstRequest,
   hasFirstRequest,
+  selectedModel,
 }: {
   hasInput: boolean;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
@@ -23,11 +25,24 @@ export default function InputBar({
   templateTick: number;
   setHasFirstRequest: React.Dispatch<React.SetStateAction<boolean>>;
   hasFirstRequest: boolean;
+  selectedModel: string;
 }) {
   const [isMultiline, setIsMultiline] = useState(false);
   const [shouldScroll, setShouldScroll] = useState(false);
   const [showAddInput, setShowAddInput] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isImgErrorOpen, setIsImgErrorOpen] = useState(false);
+  const [images, setImages] = useState<
+    { id: string; url: string; file: File }[]
+  >([]);
+
+  const aviableModelImgPaste = [
+    "o1",
+    "o1-mini",
+    "o3-mini",
+    "gpt-5.1-realtime",
+    "gpt-4o-realtime",
+  ];
 
   const { user, accessToken } = useAuth();
   const isLoggedIn = Boolean(accessToken || user);
@@ -38,10 +53,11 @@ export default function InputBar({
     const textarea = inputRef.current;
     if (!textarea) return;
 
-    const BASE = 68;
-    const MAX = 240;
+    const hasImages = images.length > 0;
+    const BASE = hasImages ? 140 : 68;
+    const MAX = hasImages ? 320 : 240;
 
-    const PB_NORMAL = 20;
+    const PB_NORMAL = hasImages ? 24 : 20;
     const PB_MULTI = 60;
 
     textarea.style.overflowY = "hidden";
@@ -85,7 +101,7 @@ export default function InputBar({
       resizeTextarea();
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [templateTick]);
+  }, [templateTick, images.length]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -101,10 +117,42 @@ export default function InputBar({
     };
   }, [showAddInput]);
 
-
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     onChange(e);
     resizeTextarea();
+  };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    const items = Array.from(e.clipboardData.items);
+    const hasImage = items.some(
+      (item) => item.kind === "file" && item.type.startsWith("image/")
+    );
+
+    if (hasImage && aviableModelImgPaste.includes(selectedModel)) {
+      e.preventDefault();
+      setIsImgErrorOpen(true);
+      return;
+    }
+
+    items.forEach((item) => {
+      if (item.kind === "file" && item.type.startsWith("image/")) {
+        const file = item.getAsFile();
+
+        const url = URL.createObjectURL(file as any);
+
+        setImages((prevs): any => [
+          ...prevs,
+          { id: crypto.randomUUID(), url, file },
+        ]);
+      }
+    });
+  };
+
+  const removeImage = (id: string) => {
+    const image = images.find((img) => img.id === id);
+    if (image) URL.revokeObjectURL(image.url);
+
+    setImages((prev) => prev.filter((img) => img.id !== id));
   };
 
   const handleSend = () => {
@@ -117,7 +165,9 @@ export default function InputBar({
         }
         onSend(message);
         onHideSection();
-        if (!hasFirstRequest) { setHasFirstRequest(true); }
+        if (!hasFirstRequest) {
+          setHasFirstRequest(true);
+        }
       }
       inputRef.current.value = "";
       inputRef.current.style.height = "68px";
@@ -129,9 +179,10 @@ export default function InputBar({
   return (
     <div
       className={`
-    ${styles.inputContainer} 
-    ${isMultiline ? styles.multiline : ""} 
+    ${styles.inputContainer}
+    ${isMultiline ? styles.multiline : ""}
     ${shouldScroll ? styles.scrollable : ""}
+    ${images.length > 0 ? styles.hasImages : ""}
   `}
     >
       <div
@@ -139,21 +190,42 @@ export default function InputBar({
         tabIndex={0}
         onClick={() => {
           setShowAddInput((prev) => !prev);
-        }}>
+        }}
+      >
         <Image width={28} height={28} src="/icons/plus.svg" alt="plus" />
       </div>
       {showAddInput && (
-        <div className={`${styles.modalWrapper} ${showAddInput ? styles.visible : styles.hidden}`}
+        <div
+          className={`${styles.modalWrapper} ${showAddInput ? styles.visible : styles.hidden}`}
           ref={modalRef}
         >
           <AddSomethingToInput />
         </div>
       )}
-     <textarea
+
+      {images.length > 0 && (
+        <div className={styles.imagePreviewRow}>
+          {images.map((img) => (
+            <div key={img.id} className={styles.imageChip}>
+              <img src={img.url} alt="pasted preview" />
+              <button
+                type="button"
+                aria-label="Remove image"
+                onClick={() => removeImage(img.id)}
+              >
+                ×
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <textarea
         ref={inputRef}
         className={styles.input}
         placeholder="Ask anything..."
         onChange={handleChange}
+        onPaste={handlePaste}
         rows={1}
       />
 
@@ -180,6 +252,10 @@ export default function InputBar({
       )}
 
       <LoginModal open={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
+      <ErrorPatchImgModal
+        open={isImgErrorOpen}
+        onClose={() => setIsImgErrorOpen(false)}
+      />
     </div>
   );
 }
