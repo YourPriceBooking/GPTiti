@@ -16,6 +16,11 @@ type AppModalProps = {
   maxWidth?: "xs" | "sm" | "md" | "lg" | "xl";
   fullWidth?: boolean;
   showCloseButton?: boolean;
+  dividers?: boolean;
+  paperClassName?: string;
+  titleClassName?: string;
+  contentClassName?: string;
+  closeBtnClassName?: string;
 };
 
 export default function AppModal({
@@ -24,6 +29,11 @@ export default function AppModal({
   title,
   children,
   showCloseButton = true,
+  dividers = true,
+  paperClassName,
+  titleClassName,
+  contentClassName,
+  closeBtnClassName,
 }: AppModalProps) {
   return (
     <Dialog open={open}
@@ -31,22 +41,33 @@ export default function AppModal({
         maxWidth={false}
         fullWidth={false}
         slotProps={{
-            paper: { className: styles.paper },
+            paper: { className: `${styles.paper} ${paperClassName ?? ""}` },
         }}
     >
-      {title != null && (
-        <DialogTitle className={styles.title}>
+      {title != null ? (
+        <DialogTitle className={`${styles.title} ${titleClassName ?? ""}`}>
           <span className={styles.titleText}>{title}</span>
 
           {showCloseButton && (
-             <IconButton className={styles.closeBtn} aria-label="Close modal" onClick={onClose} size="small">
+             <IconButton className={`${styles.closeBtn} ${closeBtnClassName ?? ""}`} aria-label="Close modal" onClick={onClose} size="small">
                 <CloseIcon className={styles.closeIcon} fontSize="small" />
             </IconButton>
           )}
         </DialogTitle>
+      ) : (
+        showCloseButton && (
+          <IconButton
+            className={`${styles.closeBtn} ${styles.closeBtnFloating} ${closeBtnClassName ?? ""}`}
+            aria-label="Close modal"
+            onClick={onClose}
+            size="small"
+          >
+            <CloseIcon className={styles.closeIcon} fontSize="small" />
+          </IconButton>
+        )
       )}
 
-      <DialogContent className={styles.content} dividers>
+      <DialogContent className={`${styles.content} ${contentClassName ?? ""}`} dividers={dividers}>
         {children}</DialogContent>
       </Dialog>
   );

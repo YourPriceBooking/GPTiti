@@ -19,6 +19,7 @@ export default function MainSectionRightSide(props: MainSectionRightSideProps) {
     setHasFirstRequest,
     hasFirstRequest,
     isOverlay = false,
+    selectedModel,
   } = props;
 
   if (!isSectionVisible) return null;
@@ -283,6 +284,7 @@ export default function MainSectionRightSide(props: MainSectionRightSideProps) {
               templateTick={templateTick}
               setHasFirstRequest={setHasFirstRequest}
               hasFirstRequest={hasFirstRequest}
+              selectedModel={selectedModel}
             />
             <div className={styles.spanContainer}>
               <span className={styles.inputSpan}>

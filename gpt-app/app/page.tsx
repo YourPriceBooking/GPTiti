@@ -193,6 +193,7 @@ export default function Home() {
                 setHasFirstRequest={setHasFirstRequest}
                 hasFirstRequest={hasFirstRequest}
                 isOverlay={false}
+                selectedModel={selectedModel}
               />
             )}
 
@@ -238,6 +239,7 @@ export default function Home() {
                     setHasFirstRequest={setHasFirstRequest}
                     hasFirstRequest={hasFirstRequest}
                     isOverlay={true}
+                    selectedModel={selectedModel}
                   />
                 </div>
               </div>
@@ -274,6 +276,7 @@ export default function Home() {
                     templateTick={templateTick}
                     setHasFirstRequest={setHasFirstRequest}
                     hasFirstRequest={hasFirstRequest}
+                    selectedModel={selectedModel}
                   />
 
                   <div className={styles.spanContainer}>
