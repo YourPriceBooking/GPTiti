@@ -1,17 +1,32 @@
 "use client";
-import styles from "./HeaderRightSide.module.css";
-import Image from "next/image";
-import ModelGptitiTitleWithIcon from "@/components/ModelGptitiTitleWithIcon/ModelGptitiTitleWithIcon";
-import { HeaderRightSideProps } from "@/types/types";
-import { TOKENS_SUFFIX } from "@/config/models.config";
-import { getModelGroupAndItem } from "@/functions/getModelGroupAndItem";
-import LeftSide from "../../LeftSide/LeftSide";
-import { useModelMode } from "@/hooks/useModelMode";
-import { useChatContext } from "@/context/ChatContext";
+
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { useAuth } from "@/context/AuthContext";
+
+import Image from "next/image";
+import ModelGptitiTitleWithIcon from "@/components/ModelGptitiTitleWithIcon/ModelGptitiTitleWithIcon";
 import LoginModal from "@/components/HomePage/common/LoginModal/LoginModal";
+import LeftSide from "../../LeftSide/LeftSide";
+
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { selectIsLoggedIn } from "@/redux/auth/selectors";
+import { selectActiveChatId, selectChatList } from "@/redux/chat/selectors";
+import {
+  deleteChat,
+  handleNewChat,
+  renameChat,
+  setActiveChatId,
+} from "@/redux/chat/slice";
+
+import { useModelMode } from "@/hooks/useModelMode";
+
+import { TOKENS_SUFFIX } from "@/config/models.config";
+
+import { getModelGroupAndItem } from "@/functions/getModelGroupAndItem";
+
+import { HeaderRightSideProps } from "@/types/types";
+
+import styles from "./HeaderRightSide.module.css";
 import userStyles from "@/components/HomePage/LeftSide/SectionGptUser/SectionGptUser.module.css";
 
 export default function HeaderRightSide({
@@ -29,23 +44,19 @@ export default function HeaderRightSide({
   onOpenQuickActions: () => void;
   hasFirstRequest: boolean;
 }) {
-  const { accessToken } = useAuth();
-  const isAuthed = Boolean(accessToken);
-  const result = getModelGroupAndItem(selectedModel);
-  const {
-    chatList,
-    setActiveChatId,
-    handleNewChat,
-    deleteChat,
-    renameChat,
-    activeChatId,
-  } = useChatContext();
+  const dispatch = useAppDispatch();
 
-  const { modelMode, setModelMode } = useModelMode();
+  const isAuthed = useAppSelector(selectIsLoggedIn);
+  const activeChatId = useAppSelector(selectActiveChatId);
+  const chatList = useAppSelector(selectChatList);
+
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isModalMounted, setIsModalMounted] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
+
+  const result = getModelGroupAndItem(selectedModel);
+  const { modelMode, setModelMode } = useModelMode();
 
   const ANIM_MS = 220;
 
@@ -122,15 +133,17 @@ export default function HeaderRightSide({
               </button>
 
               <LeftSide
-                onNewChat={handleNewChat}
+                onNewChat={() => dispatch(handleNewChat())}
                 isModalOpen={isModalOpen}
                 setIsModalOpen={setModelModalOpenSafe}
                 modelMode={modelMode}
                 setModelMode={setModelMode}
                 chatList={chatList}
-                setActiveChatId={setActiveChatId}
-                deleteChat={deleteChat}
-                renameChat={renameChat}
+                setActiveChatId={(id) => dispatch(setActiveChatId(id))}
+                deleteChat={(id) => dispatch(deleteChat(id))}
+                renameChat={(chatId, newTitle) =>
+                  dispatch(renameChat({ chatId, newTitle }))
+                }
                 modelRef={modelRef}
                 selectedModel={selectedModel}
                 setSelectedModel={setSelectedModel}
@@ -139,7 +152,7 @@ export default function HeaderRightSide({
               />
             </div>
           </div>,
-          document.body
+          document.body,
         )}
 
       <div className={styles.containerGroupLogos}>
@@ -169,7 +182,9 @@ export default function HeaderRightSide({
           />
           <p
             className={`${styles.paragraph} ${
-              selectedModel === "gpt-4o-realtime" ? styles.paragraphRealtime : ""
+              selectedModel === "gpt-4o-realtime"
+                ? styles.paragraphRealtime
+                : ""
             }`}
           >
             {result?.model.tokens} {TOKENS_SUFFIX}
@@ -195,7 +210,9 @@ export default function HeaderRightSide({
               >
                 G
               </span>
-              <span className={userStyles.loginBtnText}>Continue in with Google</span>
+              <span className={userStyles.loginBtnText}>
+                Continue in with Google
+              </span>
             </span>
           </button>
 

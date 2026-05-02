@@ -2,7 +2,6 @@ import styles from "./MainSectionRightSide.module.css";
 import Image from "next/image";
 import { MainSectionRightSideProps } from "@/types/types";
 import InputBar from "@/components/HomePage/RightSide/InputBar/InputBar";
-import { button } from "framer-motion/client";
 
 export default function MainSectionRightSide(props: MainSectionRightSideProps) {
   const {

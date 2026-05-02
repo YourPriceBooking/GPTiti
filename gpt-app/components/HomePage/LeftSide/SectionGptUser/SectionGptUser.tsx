@@ -1,18 +1,25 @@
 import React from "react";
-import styles from "./SectionGptUser.module.css";
+
 import Image from "next/image";
-import Link from "next/link";
-import { useAuth } from "@/context/AuthContext";
+
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { selectIsLoggedIn, selectUser } from "@/redux/auth/selectors";
+import { logoutUser } from "@/redux/auth/operations";
+
 import LoginModal from "@/components/HomePage/common/LoginModal/LoginModal";
-import ErrorPatchImgModal from "../../common/ErrorPatchImgModal/ErrorPatchImgModal";
+
+import styles from "./SectionGptUser.module.css";
 
 export default function SectionGptUser() {
-  const { user, accessToken, logout } = useAuth();
+  const dispatch = useAppDispatch();
+
+  const user = useAppSelector(selectUser);
+  const isLoggedIn = useAppSelector(selectIsLoggedIn);
+
   const [isLoginOpen, setIsLoginOpen] = React.useState(false);
-  const isLoggedIn = Boolean(accessToken || user);
 
   const handleLogout = async () => {
-    await logout();
+    await dispatch(logoutUser());
   };
 
   return (

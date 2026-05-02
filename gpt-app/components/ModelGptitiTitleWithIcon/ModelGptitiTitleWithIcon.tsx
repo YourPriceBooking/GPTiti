@@ -5,7 +5,6 @@ import { getModelGroupAndItem } from "@/functions/getModelGroupAndItem";
 export default function ModelGptitiTitleWithIcon({
   modelRef,
   selectedModel,
-  isModalOpen,
   setIsModalOpen,
 }: ModelGptitiTitleWithIconProps) {
   const result = getModelGroupAndItem(selectedModel);

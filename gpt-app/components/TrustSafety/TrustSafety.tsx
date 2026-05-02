@@ -2,18 +2,15 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
-import PageNav from "../common/PageNav";
 
 const TrustSafety = () => {
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center">
-      <PageNav />
-      <motion.section
+    <motion.section
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.1 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="w-full max-w-3xl space-y-10 p-6"
+        className="w-full max-w-3xl mx-auto space-y-10 p-6"
       >
         <div>
           <h1 className="flex-1 text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 text-center">
@@ -405,8 +402,7 @@ const TrustSafety = () => {
             Trust is a core part of that mission.
           </p>
         </motion.div>
-      </motion.section>
-    </div>
+    </motion.section>
   );
 };
 

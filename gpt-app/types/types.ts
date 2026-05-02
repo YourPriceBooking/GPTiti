@@ -1,13 +1,16 @@
-import React, { ReactElement } from "react";
-// import { ModelProps } from "./shared";
+import React from "react";
 
 export interface CustomScrollBarProps {
   scrollTargetClass: string;
 }
 
+export type AiKind = "default";
+
 export type Message = {
   user: string;
-  ai: React.ReactNode | null;
+  /** Kind of AI reply to render (string, serialisable). null = no AI reply yet. */
+  ai: AiKind | null;
+  tokens?: number;
   images?: string[];
 };
 
@@ -74,12 +77,6 @@ export type SectionGptChatsProps = Pick<
   "onNewChat" | "chatList" | "setActiveChatId" | "deleteChat" | "renameChat"
 >;
 
-export type TokensContextType = {
-  balance: number;
-  countdown: string;
-  handleClaim: () => void;
-};
-
 export type MainSectionRightSideProps = {
   insertTemplate: (text: string) => void;
   setFocusMode: React.Dispatch<React.SetStateAction<boolean>>;
@@ -109,7 +106,6 @@ export type ModelModalOverlayProps = {
 export type ModelGptitiTitleWithIconProps = {
   modelRef: React.RefObject<HTMLDivElement | null>;
   selectedModel: string;
-  isModalOpen: boolean;
   setIsModalOpen: (open: boolean) => void;
 };
 

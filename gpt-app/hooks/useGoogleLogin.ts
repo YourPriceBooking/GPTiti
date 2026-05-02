@@ -2,10 +2,13 @@
 
 import { useState } from "react";
 import { CredentialResponse } from "@react-oauth/google";
-import { useAuth } from "@/context/AuthContext";
+
+import { useAppDispatch } from "@/redux/hooks";
+import { loginUser } from "@/redux/auth/operations";
 
 export function useGoogleLogin(onSuccess?: () => void) {
-  const { login } = useAuth();
+  const dispatch = useAppDispatch();
+
   const [loading, setLoading] = useState(false);
   const [errorText, setErrorText] = useState<string | null>(null);
 
@@ -17,12 +20,13 @@ export function useGoogleLogin(onSuccess?: () => void) {
         setErrorText("No credential returned from Google");
         return;
       }
-      await login(res.credential);
+      await dispatch(loginUser(res.credential)).unwrap();
       onSuccess?.();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) {
+    } catch (err) {
+      const message =
+        typeof err === "string" ? err : "Login failed. Please try again.";
       console.error("Login failed:", err);
-      setErrorText(err?.message || "Login failed. Please try again.");
+      setErrorText(message);
     } finally {
       setLoading(false);
     }

@@ -1,10 +1,15 @@
-import Image from "next/image";
-import styles from "./InputBar.module.css";
 import { useState, useLayoutEffect, useEffect, useRef } from "react";
+
+import Image from "next/image";
+
 import AddSomethingToInput from "../AddSomethingToInput/AddSomethingToInput";
-import { useAuth } from "@/context/AuthContext";
 import LoginModal from "@/components/HomePage/common/LoginModal/LoginModal";
 import ErrorPatchImgModal from "@/components/HomePage/common/ErrorPatchImgModal/ErrorPatchImgModal";
+
+import { useAppSelector } from "@/redux/hooks";
+import { selectIsLoggedIn } from "@/redux/auth/selectors";
+
+import styles from "./InputBar.module.css";
 
 export default function InputBar({
   hasInput,
@@ -27,6 +32,10 @@ export default function InputBar({
   hasFirstRequest: boolean;
   selectedModel: string;
 }) {
+  const isLoggedIn = useAppSelector(selectIsLoggedIn);
+
+  const modalRef = useRef<HTMLDivElement | null>(null);
+
   const [isMultiline, setIsMultiline] = useState(false);
   const [shouldScroll, setShouldScroll] = useState(false);
   const [showAddInput, setShowAddInput] = useState(false);
@@ -43,11 +52,6 @@ export default function InputBar({
     "gpt-5.1-realtime",
     "gpt-4o-realtime",
   ];
-
-  const { user, accessToken } = useAuth();
-  const isLoggedIn = Boolean(accessToken || user);
-
-  const modalRef = useRef<HTMLDivElement | null>(null);
 
   const resizeTextarea = () => {
     const textarea = inputRef.current;
@@ -175,9 +179,16 @@ export default function InputBar({
           setIsLoginOpen(true);
           return;
         }
+        if (
+          images.length > 0 &&
+          aviableModelImgPaste.includes(selectedModel)
+        ) {
+          setIsImgErrorOpen(true);
+          return;
+        }
         onSend(
           message,
-          images.map((img) => img.url)
+          images.map((img) => img.url),
         );
         setImages([]);
         onHideSection();

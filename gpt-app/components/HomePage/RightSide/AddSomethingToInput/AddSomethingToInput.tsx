@@ -70,36 +70,6 @@ export default function AddSomethingToInput({
             </span>
           </div>
         </div>
-        <div className={styles.InfoContainer}>
-          <Image
-            className={styles.InfoContainerIcon}
-            width={14}
-            height={14}
-            src="/icons/paste.png"
-            alt="paste"
-          />
-          <div>
-            <p className={styles.InfoContainerParagraph}>Paste text</p>
-            <span className={styles.InfoContainerSpan}>
-              Large texts or articles
-            </span>
-          </div>
-        </div>
-        <div className={styles.InfoContainer}>
-          <Image
-            className={styles.InfoContainerIcon}
-            width={14}
-            height={14}
-            src="/icons/link.png"
-            alt="add link"
-          />
-          <div>
-            <p className={styles.InfoContainerParagraph}>Add link</p>
-            <span className={styles.InfoContainerSpan}>
-              Analyze a web page{" "}
-            </span>
-          </div>
-        </div>
       </div>
       <div className={styles.addSomethingToInputSpanContainer}>
         <span className={styles.addSomethingToInputSpan}>
