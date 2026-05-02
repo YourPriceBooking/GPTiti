@@ -76,8 +76,18 @@ const chatSlice = createSlice({
     },
     deleteChat(state, { payload }: PayloadAction<string>) {
       state.chatList = state.chatList.filter((c) => c.id !== payload);
+
       if (state.activeChatId === payload) {
-        state.activeChatId = null;
+        if (state.chatList.length > 0) {
+          state.activeChatId = state.chatList[state.chatList.length - 1].id;
+        } else {
+          const newChatId = crypto.randomUUID?.() ?? `chat-${Date.now()}`;
+          state.chatList.push({ id: newChatId, title: null, messages: [] });
+          state.activeChatId = newChatId;
+        }
+        state.hasInput = false;
+        state.inputSent = false;
+        state.isTyping = false;
       }
     },
     renameChat(
