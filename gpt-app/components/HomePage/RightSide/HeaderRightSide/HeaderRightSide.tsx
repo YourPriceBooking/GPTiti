@@ -177,7 +177,6 @@ export default function HeaderRightSide({
           <ModelGptitiTitleWithIcon
             modelRef={modelRef}
             selectedModel={selectedModel}
-            isModalOpen={isModalOpen}
             setIsModalOpen={setModelModalOpenSafe}
           />
           <p
