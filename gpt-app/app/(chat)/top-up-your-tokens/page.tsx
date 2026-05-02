@@ -1,15 +1,27 @@
 "use client";
 
-import { useState } from "react";
-import styles from "./page.module.css";
-import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useState } from "react";
+
 import Image from "next/image";
-import { useTokensContext } from "@/context/TokensContext";
-import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
-import PaymentModal from "@/components/PaymentModal/PaymentModal";
+
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import {
+  selectBalance,
+  selectCountdown,
+  selectNextClaimTime,
+} from "@/redux/tokens/selectors";
+import { claim, setCountdown } from "@/redux/tokens/slice";
+import { selectIsLoggedIn } from "@/redux/auth/selectors";
+
 import LoginModal from "@/components/HomePage/common/LoginModal/LoginModal";
+import PaymentModal from "@/components/PaymentModal/PaymentModal";
+
+import { motion, AnimatePresence } from "framer-motion";
+
 import type { Plan } from "@/types/types";
+
+import styles from "./page.module.css";
 
 const PLANS: Plan[] = [
   {
@@ -39,10 +51,42 @@ const PLANS: Plan[] = [
 ];
 
 export default function TokensPage() {
-  const { balance, countdown, handleClaim } = useTokensContext();
-  const { user, accessToken } = useAuth();
-  const isLoggedIn = Boolean(accessToken || user);
+  const dispatch = useAppDispatch();
+  const balance = useAppSelector(selectBalance);
+  const countdown = useAppSelector(selectCountdown);
+  const nextClaimTime = useAppSelector(selectNextClaimTime);
+  const isLoggedIn = useAppSelector(selectIsLoggedIn);
   const [clicked, setClicked] = useState(false);
+
+  const handleClaim = () => dispatch(claim());
+
+  useEffect(() => {
+    if (!nextClaimTime) return;
+    const target = new Date(nextClaimTime).getTime();
+
+    const tick = () => {
+      const diff = target - Date.now();
+      if (diff <= 0) {
+        dispatch(setCountdown("Available now"));
+        return true;
+      }
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+      dispatch(
+        setCountdown(
+          `${days} days ${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`,
+        ),
+      );
+      return false;
+    };
+
+    if (tick()) return;
+    const interval = setInterval(() => {
+      if (tick()) clearInterval(interval);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [nextClaimTime, dispatch]);
 
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);

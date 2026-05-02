@@ -1,11 +1,15 @@
 "use client";
 
+import Link from "next/link";
+
 import Checkbox from "@mui/material/Checkbox";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import Link from "next/link";
+
+import { useAppSelector } from "@/redux/hooks";
+import { selectIsLoggedIn } from "@/redux/auth/selectors";
+
 import { motion } from "framer-motion";
-import { useAuth } from "@/context/AuthContext";
 
 export default function TermsCheckbox({
   checked,
@@ -14,8 +18,7 @@ export default function TermsCheckbox({
   checked: boolean;
   setChecked: (val: boolean) => void;
 }) {
-  const { user, accessToken } = useAuth();
-  const isLoggedIn = Boolean(accessToken || user);
+  const isLoggedIn = useAppSelector(selectIsLoggedIn);
 
   if (isLoggedIn) {
     return (
@@ -62,11 +65,17 @@ export default function TermsCheckbox({
       />
       <span className="text-gray-500 hover:text-gray-700 text-sm leading-snug">
         I have read and agree to the{" "}
-        <Link href="/terms-conditions" className="text-blue-600 hover:underline hover:text-blue-800">
+        <Link
+          href="/terms-conditions"
+          className="text-blue-600 hover:underline hover:text-blue-800"
+        >
           Terms & Conditions
         </Link>{" "}
         and{" "}
-        <Link href="/privacy-policy" className="text-blue-600 hover:underline hover:text-blue-800">
+        <Link
+          href="/privacy-policy"
+          className="text-blue-600 hover:underline hover:text-blue-800"
+        >
           Privacy Policy
         </Link>
       </span>

@@ -21,6 +21,8 @@ export function getOrCreateSocket({ url, path }: SocketClientOptions): Socket {
       path,
       autoConnect: false,
       transports: ["websocket", "polling"],
+      reconnectionAttempts: 3,
+      reconnectionDelay: 2000,
     });
     socketKey = key;
   }

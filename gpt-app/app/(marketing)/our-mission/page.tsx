@@ -1,6 +1,5 @@
-import React from "react";
 import { buildMetadata } from "@/lib/metadata";
-import OurMission from "../../components/OurMission/OurMission";
+import OurMission from "@/components/OurMission/OurMission";
 
 export const metadata = buildMetadata(
   "Our Mission | GPtiti — Free Access to Advanced AI Models",

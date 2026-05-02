@@ -1,13 +1,8 @@
 import React from "react";
 import styles from "./MessageList.module.css";
 import TypingPlaceholder from "../../TypingPlaceholder/TypingPlaceholder";
-
-type Message = {
-  user: string;
-  ai: React.ReactNode | null;
-  tokens?: number;
-  images?: string[];
-};
+import AIResponse from "../AIResponse/AIResponse";
+import type { Message } from "@/types/types";
 
 type MessageListProps = {
   messages: Message[];
@@ -15,10 +10,19 @@ type MessageListProps = {
   hasFirstRequest: boolean;
 };
 
+function renderAi(kind: Message["ai"]) {
+  switch (kind) {
+    case "default":
+      return <AIResponse />;
+    default:
+      return null;
+  }
+}
+
 export default function MessageList({
   messages,
   isTyping = false,
-  hasFirstRequest
+  hasFirstRequest,
 }: MessageListProps) {
   return (
     <div className={styles.messageList}>
@@ -46,16 +50,17 @@ export default function MessageList({
             </div>
           )}
 
-{message.ai ? (
-            <div className={styles.aiMessage}> 
-            {message.ai} 
-            {hasFirstRequest && message.tokens !== undefined 
-            && ( <div className={styles.costInfo}> 
-            <span className={styles.costSpan}>
-              Used: {message.tokens} tokens
-              </span> 
-              </div> )} 
-              </div>
+          {message.ai ? (
+            <div className={styles.aiMessage}>
+              {renderAi(message.ai)}
+              {hasFirstRequest && message.tokens !== undefined && (
+                <div className={styles.costInfo}>
+                  <span className={styles.costSpan}>
+                    Used: {message.tokens} tokens
+                  </span>
+                </div>
+              )}
+            </div>
           ) : isTyping && index === messages.length - 1 ? (
             <div className={styles.aiMessage}>
               <TypingPlaceholder />

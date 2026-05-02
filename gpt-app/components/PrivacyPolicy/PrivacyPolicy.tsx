@@ -1,14 +1,8 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
-import PageNav from "../common/PageNav";
-
 const PrivacyPolicy = () => {
   return (
-    <div className="min-h-screen h-full relative bg-white text-slate-900 font-sans">
-      <PageNav />
-      <main className="max-w-4xl mx-auto p-6 mb-20">
+    <div className="max-w-4xl mx-auto p-6 mb-20 text-slate-900 font-sans">
         <h1 className="text-4xl font-extrabold mb-4">Privacy Policy</h1>
         <p className="text-slate-500 mb-8">Last updated: April 7, 2026</p>
 
@@ -225,7 +219,6 @@ const PrivacyPolicy = () => {
             </p>
           </section>
         </div>
-      </main>
     </div>
   );
 };

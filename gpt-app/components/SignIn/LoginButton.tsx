@@ -1,14 +1,21 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { GoogleLogin } from "@react-oauth/google";
+
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { selectIsLoggedIn } from "@/redux/auth/selectors";
+import { logoutUser } from "@/redux/auth/operations";
+
 import { useGoogleLogin } from "@/hooks/useGoogleLogin";
-import { useAuth } from "@/context/AuthContext";
+
+import { motion } from "framer-motion";
 
 export default function LoginButton({ checked }: { checked: boolean }) {
+  const dispatch = useAppDispatch();
+
+  const isLoggedIn = useAppSelector(selectIsLoggedIn);
+
   const { handleCredential, handleError, errorText } = useGoogleLogin();
-  const { user, accessToken, logout } = useAuth();
-  const isLoggedIn = Boolean(accessToken || user);
 
   if (isLoggedIn) {
     return (
@@ -17,7 +24,7 @@ export default function LoginButton({ checked }: { checked: boolean }) {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.15 }}
-          onClick={() => logout()}
+          onClick={() => dispatch(logoutUser())}
           type="button"
           className="w-full py-3 rounded-xl text-white font-semibold text-lg transition-all focus:ring-4 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 focus:ring-blue-300"
         >
@@ -55,7 +62,7 @@ export default function LoginButton({ checked }: { checked: boolean }) {
               shape="pill"
               text="continue_with"
               logo_alignment="left"
-              width="100%"
+              width={400}
             />
           </div>
         )}

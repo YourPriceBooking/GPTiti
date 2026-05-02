@@ -4,7 +4,8 @@ import React, { createContext, useContext, useEffect, useMemo, useState } from "
 import type { Socket } from "socket.io-client";
 
 import { getOrCreateSocket } from "@/lib/socketClient";
-import { useAuth } from "@/context/AuthContext";
+import { useAppSelector } from "@/redux/hooks";
+import { selectAccessToken } from "@/redux/auth/selectors";
 
 type SocketStatus = "disabled" | "disconnected" | "connecting" | "connected" | "error";
 
@@ -26,7 +27,7 @@ function resolveSocketConfig() {
 }
 
 export function SocketProvider({ children }: { children: React.ReactNode }) {
-  const { accessToken } = useAuth();
+  const accessToken = useAppSelector(selectAccessToken);
   const socketConfig = useMemo(() => resolveSocketConfig(), []);
   const allowGuest = process.env.NEXT_PUBLIC_SOCKET_ALLOW_GUEST === "true";
 

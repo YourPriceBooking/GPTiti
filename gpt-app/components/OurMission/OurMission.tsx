@@ -1,19 +1,16 @@
 "use client";
 
 import { motion } from "framer-motion";
-import PageNav from "../common/PageNav";
 
 export default function OurMission() {
   return (
-    <div className="min-h-screen bg-white relative">
-      <PageNav />
-      <section className="min-h-screen bg-white flex flex-col items-center justify-center p-6">
-        <motion.section
+    <section className="flex flex-col items-center justify-center">
+      <motion.section
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="w-full max-w-3xl space-y-10"
+          className="w-full max-w-3xl mx-auto space-y-10"
         >
           <h1 className="flex-1 text-4xl font-bold text-gray-900 text-center">
             Our Mission
@@ -85,7 +82,6 @@ export default function OurMission() {
             humanity.
           </motion.p>
         </motion.section>
-      </section>
-    </div>
+    </section>
   );
 }

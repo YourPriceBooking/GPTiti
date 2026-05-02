@@ -1,5 +1,7 @@
+import type { ReactNode } from "react";
+
 import { notFound } from "next/navigation";
-import { buildMetadata } from "@/lib/metadata";
+
 import AIModelSlugPage from "@/components/AIModelGuide/AIModelSlugPage";
 import Gpt54 from "@/components/AIModelGuide/models/Gpt54";
 import Gpt54Mini from "@/components/AIModelGuide/models/Gpt54Mini";
@@ -16,7 +18,6 @@ import CompareGpt54VsO1 from "@/components/AIModelGuide/models/CompareGpt54VsO1"
 import CompareGpt54MiniVsGpt4oMini from "@/components/AIModelGuide/models/CompareGpt54MiniVsGpt4oMini";
 import CompareGpt4oVsGpt51 from "@/components/AIModelGuide/models/CompareGpt4oVsGpt51";
 import CompareO1VsO3Mini from "@/components/AIModelGuide/models/CompareO1VsO3Mini";
-import type { ReactNode } from "react";
 import BestAiModelForChat from "@/components/AIModelGuide/models/BestAiModelForChat";
 import SmartSearch from "@/components/AIModelGuide/models/SmartSearch";
 import CompareSmartSearchVsChat from "@/components/AIModelGuide/models/CompareSmartSearchVsChat";
@@ -26,6 +27,8 @@ import TextToSpeech from "@/components/AIModelGuide/models/TextToSpeech";
 import CompareVoiceVsTextOutput from "@/components/AIModelGuide/models/CompareVoiceVsTextOutput";
 import ImageCreateFast from "@/components/AIModelGuide/models/ImageCreateFast";
 import ImageCreateHD from "@/components/AIModelGuide/models/ImageCreateHD";
+
+import { buildMetadata } from "@/lib/metadata";
 
 type Props = { params: Promise<{ slug: string }> };
 
