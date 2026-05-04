@@ -1,9 +1,13 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
+import Image from "next/image";
+import Link from "next/link";
+
 import { GoogleLogin } from "@react-oauth/google";
 
 import AppModal from "@/components/HomePage/common/AppModal/AppModal";
-import SimpleCheckbox from "@/components/common/SimpleCheckbox/SimpleCheckbox";
 import { useGoogleLogin } from "@/hooks/useGoogleLogin";
 import styles from "./LoginModal.module.css";
 
@@ -14,83 +18,71 @@ type LoginModalProps = {
 
 export default function LoginModal({ open, onClose }: LoginModalProps) {
   const { handleCredential, handleError, errorText } = useGoogleLogin(onClose);
+  const [agreed, setAgreed] = useState(false);
+
+  useEffect(() => {
+    if (!open) setAgreed(false);
+  }, [open]);
+
   return (
     <AppModal open={open} onClose={onClose} title="Welcome to GPTiti ">
-      <div style={{ display: "flex", flexDirection: "column" }}>
-        <div
-          style={{
-            color: "#A9BEDC",
-            fontSize: 14,
-            lineHeight: 1.4,
-            marginBottom: "32px",
-          }}
-        >
+      <div className={styles.root}>
+        <p className={styles.lead}>
           Premium AI models. No subscriptions. Just access.
-        </div>
-        <div
-          style={{
-            color: "#ffffff",
-            fontSize: 14,
-            lineHeight: 1.4,
-            marginBottom: "9px",
-          }}
-        >
-          🎁 10,000 free tokens for your first sign-in
-        </div>
-        <div
-          style={{
-            color: "#ffffff",
-            fontSize: 14,
-            lineHeight: 1.4,
-            marginBottom: "9px",
-          }}
-        >
-          ⚡ Access to premium GPT models
-        </div>
-        <div
-          style={{
-            color: "#ffffff",
-            fontSize: 14,
-            lineHeight: 1.4,
-            marginBottom: "9px",
-          }}
-        >
-          🎁 Weekly token gifts — automatically unlocked
-        </div>
-        <div
-          style={{
-            color: "#ffffff",
-            fontSize: 14,
-            lineHeight: 1.4,
-            marginBottom: "9px",
-          }}
-        >
-          ⏳ Tokens never expire — use them anytime
-        </div>
+        </p>
 
-        <div
-          style={{
-            height: 1,
-            width: "100%",
-            background: "#243052",
-            margin: "16px 0",
-          }}
-        />
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            marginBottom: 16,
-          }}
-        >
-          <SimpleCheckbox ariaLabel="Accept terms" />
-          <div style={{ fontSize: 14, color: "#A9BEDC" }}>
-            I agree to the Terms Conditions and Privacy Policy
-          </div>
-        </div>
+        <ul className={styles.benefits}>
+          <li className={styles.benefit}>
+            🎁 10,000 free tokens for your first sign-in
+          </li>
+          <li className={styles.benefit}>⚡ Access to premium GPT models</li>
+          <li className={styles.benefit}>
+            🎁 Weekly token gifts — automatically unlocked
+          </li>
+          <li className={styles.benefit}>
+            ⏳ Tokens never expire — use them anytime
+          </li>
+        </ul>
+
+        <div className={styles.divider} />
+
+        <label className={styles.checkboxRow}>
+          <input
+            type="checkbox"
+            className={styles.checkboxInput}
+            checked={agreed}
+            onChange={(e) => setAgreed(e.target.checked)}
+          />
+          <span className={styles.checkboxBox}>
+            {agreed && (
+              <Image
+                src="/checkbox_hecked.svg"
+                alt=""
+                width={20}
+                height={20}
+                unoptimized
+              />
+            )}
+          </span>
+          <span className={styles.checkboxLabel}>
+            I agree to the{" "}
+            <Link href="/terms-conditions" className={styles.link}>
+              Terms Conditions
+            </Link>{" "}
+            and{" "}
+            <Link href="/privacy-policy" className={styles.link}>
+              Privacy Policy
+            </Link>
+          </span>
+        </label>
+
         <div className={styles.actionsRow}>
-          <div className={styles.googleWrap}>
+          <div
+            className={`${styles.googleWrap} ${
+              !agreed ? styles.googleWrapDisabled : ""
+            }`}
+            aria-disabled={!agreed}
+          >
             <GoogleLogin
               onSuccess={handleCredential}
               onError={handleError}
@@ -99,13 +91,10 @@ export default function LoginModal({ open, onClose }: LoginModalProps) {
               shape="pill"
               text="continue_with"
               logo_alignment="left"
-              width={300}
             />
           </div>
 
-          {errorText && (
-            <div style={{ color: "#ffb4b4", fontSize: 13 }}>{errorText}</div>
-          )}
+          {errorText && <div className={styles.error}>{errorText}</div>}
 
           <button
             type="button"

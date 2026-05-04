@@ -2,18 +2,32 @@
 
 import type { ReactNode } from "react";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import ModelCompareTable from "../common/ModelCompareTable/ModelCompareTable";
+
+import { useSelectModel } from "@/hooks/useSelectModel";
 
 import { motion } from "framer-motion";
 
 type Props = {
   title: string;
   content: ReactNode;
+  model?: string;
 };
 
-const AIModelSlugPage = ({ title, content }: Props) => {
+const AIModelSlugPage = ({ title, content, model }: Props) => {
+  const router = useRouter();
+  const selectModel = useSelectModel();
+
+  const handleTryClick = () => {
+    if (model) {
+      selectModel(model);
+    } else {
+      router.push("/");
+    }
+  };
+
   return (
     <motion.section
       initial={{ opacity: 0, y: 30 }}
@@ -54,12 +68,13 @@ const AIModelSlugPage = ({ title, content }: Props) => {
           <br />
           No subscriptions • Tokens never expire.
         </p>
-        <Link
-          href="/sign-in"
+        <button
+          type="button"
+          onClick={handleTryClick}
           className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold text-lg px-6 py-3 rounded-xl transition-colors"
         >
           Try GPTiti now
-        </Link>
+        </button>
       </motion.div>
     </motion.section>
   );

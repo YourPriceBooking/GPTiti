@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import styles from "./TooltipModalWindow.module.css";
 import Image from "next/image";
+import Link from "next/link";
 import { ModelTooltip } from "@/types/types";
 
 type Props = {
@@ -20,6 +21,25 @@ const MODEL_IMAGES: Record<string, string[]> = {
     "/img/ImageCreateFast/img-2.webp",
     "/img/ImageCreateFast/img-3.webp",
   ],
+};
+
+const MODEL_GUIDE_SLUG: Record<string, string> = {
+  "GPT-5.4": "gpt-5-4",
+  "GPT-5.4 mini": "gpt-5-4-mini",
+  "GPT-5.1": "gpt-5-1",
+  "GPT-5.1 mini": "gpt-5-1-mini",
+  "GPT-5.1 realtime": "gpt-5-1-realtime",
+  "GPT-4o": "gpt-4o",
+  "GPT-4o mini": "gpt-4o-mini",
+  "GPT-4o realtime": "gpt-4o-realtime",
+  o1: "o1",
+  "o1 mini": "o1-mini",
+  "o3 mini": "o3-mini",
+  "Smart Search": "smart-search",
+  "Voice → Text": "voice-to-text",
+  "Text → Speech": "text-to-speech",
+  "Image → Create HD": "image-create-hd",
+  "Image → Create Fast": "image-create-fast",
 };
 
 const READ_DELAY_MS = 1000;
@@ -96,6 +116,7 @@ export default function TooltipModalWindow({ onClose, tooltip }: Props) {
   const showImages = showImagesPhase && images.length > 0;
   const currentSrc = images[imageIndex];
   const prevSrc = prevImageIndex !== null ? images[prevImageIndex] : null;
+  const guideSlug = MODEL_GUIDE_SLUG[tooltip.title];
 
   return (
     <div className={styles.tooltipContainer}>
@@ -134,6 +155,15 @@ export default function TooltipModalWindow({ onClose, tooltip }: Props) {
               height={220}
             />
           </div>
+        )}
+
+        {done && guideSlug && (
+          <Link
+            href={`/ai-models-guide/${guideSlug}`}
+            className={styles.readMore}
+          >
+            Read more
+          </Link>
         )}
       </section>
     </div>

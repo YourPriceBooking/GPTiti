@@ -36,12 +36,14 @@ type ModelEntry = {
   title: string;
   content: ReactNode;
   meta: { title: string; desc: string };
+  model?: string;
 };
 
 const modelData: Record<string, ModelEntry> = {
   "gpt-5-4": {
     title: "GPT-5.4 AI Model — Maximum Performance",
     content: <Gpt54 />,
+    model: "gpt-5.4",
     meta: {
       title: "GPT-5.4 — Most Powerful AI Model for Complex Tasks | GPTiti",
       desc: "GPT-5.4 is the most powerful AI model for coding, content, and complex tasks. Perfect for professionals who need top-level performance and accuracy.",
@@ -50,6 +52,7 @@ const modelData: Record<string, ModelEntry> = {
   "gpt-5-4-mini": {
     title: "GPT-5.4-mini AI Model — Best Balance",
     content: <Gpt54Mini />,
+    model: "gpt-5.4-mini",
     meta: {
       title: "GPT-5.4-mini — Best AI Model for Chat, Writing & Coding | GPTiti",
       desc: "GPT-5.4-mini is the best AI model for chat, writing, and coding. It offers the perfect balance of cost and quality. Get ~75 messages with 10,000 tokens.",
@@ -58,6 +61,7 @@ const modelData: Record<string, ModelEntry> = {
   "gpt-5-1": {
     title: "GPT-5.1 AI Model — Advanced Performance",
     content: <Gpt51 />,
+    model: "gpt-5.1",
     meta: {
       title: "GPT-5.1 — Advanced AI Model for Work, Coding & Content | GPTiti",
       desc: "GPT-5.1 is a powerful AI model for writing, coding, and business tasks. Better performance than mid-tier models with balanced cost and quality.",
@@ -66,6 +70,7 @@ const modelData: Record<string, ModelEntry> = {
   "gpt-5-1-mini": {
     title: "GPT-5.1-mini AI Model — Smart & Affordable Performance",
     content: <Gpt51Mini />,
+    model: "gpt-5.1-mini",
     meta: {
       title:
         "GPT-5.1-mini — Affordable AI Model with Strong Performance | GPTiti",
@@ -75,6 +80,7 @@ const modelData: Record<string, ModelEntry> = {
   "gpt-5-1-realtime": {
     title: "GPT-5.1 Realtime — Live AI Interaction",
     content: <Gpt51Realtime />,
+    model: "gpt-5.1-realtime",
     meta: {
       title:
         "GPT-5.1 Realtime — Live AI Model for Voice & Instant Chat | GPTiti",
@@ -84,6 +90,7 @@ const modelData: Record<string, ModelEntry> = {
   "gpt-4o": {
     title: "GPT-4o AI Model",
     content: <Gpt4o />,
+    model: "gpt-4o",
     meta: {
       title: "GPT-4o — Fast & Powerful AI Model for Chat & Writing | GPTiti",
       desc: "GPT-4o is a fast and powerful AI model for chat, writing, and everyday tasks. Better quality than basic models with balanced cost and performance.",
@@ -92,6 +99,7 @@ const modelData: Record<string, ModelEntry> = {
   "gpt-4o-mini": {
     title: "GPT-4o-mini AI Model — Fast & Affordable",
     content: <Gpt4oMini />,
+    model: "gpt-4o-mini",
     meta: {
       title: "GPT-4o-mini — Fast & Cheap AI Model for Chat | GPTiti",
       desc: "GPT-4o-mini is a fast and affordable AI model for everyday chat, writing, and simple tasks. Get up to 260 messages with 10,000 tokens.",
@@ -100,6 +108,7 @@ const modelData: Record<string, ModelEntry> = {
   "gpt-4o-realtime": {
     title: "GPT-4o Realtime — Fast Live AI",
     content: <Gpt4oRealtime />,
+    model: "gpt-4o-realtime",
     meta: {
       title:
         "GPT-4o Realtime — Fast & Affordable AI for Voice & Live Chat | GPTiti",
@@ -109,6 +118,7 @@ const modelData: Record<string, ModelEntry> = {
   o1: {
     title: "O1 AI Model — Maximum Reasoning Power",
     content: <O1 />,
+    model: "o1",
     meta: {
       title:
         "O1 — Most Powerful AI Model for Reasoning & Complex Problems | GPTiti",
@@ -118,6 +128,7 @@ const modelData: Record<string, ModelEntry> = {
   "o1-mini": {
     title: "O1-mini AI Model — Efficient Reasoning",
     content: <O1Mini />,
+    model: "o1-mini",
     meta: {
       title: "O1-mini — Affordable AI Model for Reasoning & Coding | GPTiti",
       desc: "O1-mini is a powerful AI model for reasoning, coding, and problem solving. Get strong logic and structured answers at a lower cost than O1.",
@@ -126,6 +137,7 @@ const modelData: Record<string, ModelEntry> = {
   "o3-mini": {
     title: "O3-mini AI Model — Affordable Reasoning Power",
     content: <O3Mini />,
+    model: "o3-mini",
     meta: {
       title:
         "O3-mini — Affordable AI Model for Reasoning & Structured Tasks | GPTiti",
@@ -176,6 +188,7 @@ const modelData: Record<string, ModelEntry> = {
   "smart-search": {
     title: "Smart Search AI — Search Your Data with AI",
     content: <SmartSearch />,
+    model: "Smart Search",
     meta: {
       title: "Smart Search AI — Search Your Data with AI | GPTiti",
       desc: "Smart Search AI lets you search documents, chats, and data using natural language. Powered by embeddings and GPT models for accurate results.",
@@ -192,6 +205,7 @@ const modelData: Record<string, ModelEntry> = {
   "voice-to-text": {
     title: "Voice to Text AI — Convert Speech to Text Instantly",
     content: <VoiceToText />,
+    model: "Voice → Text",
     meta: {
       title: "Voice to Text AI — Convert Speech to Text Instantly | GPTiti",
       desc: "Voice to Text AI converts speech into text instantly using advanced speech recognition models. Fast, accurate, and easy to use.",
@@ -208,6 +222,7 @@ const modelData: Record<string, ModelEntry> = {
   "text-to-speech": {
     title: "Text to Speech AI — Generate Realistic Voice from Text",
     content: <TextToSpeech />,
+    model: "Text → Voice",
     meta: {
       title: "Text to Speech AI — Generate Realistic AI Voice | GPTiti",
       desc: "Text to Speech AI converts text into realistic voice. Learn how AI voice works, its advantages, and how it compares to human speech.",
@@ -225,6 +240,7 @@ const modelData: Record<string, ModelEntry> = {
   "image-create-hd": {
     title: "AI Image Generator (HD) — High Quality Text to Image AI",
     content: <ImageCreateHD />,
+    model: "Image → Create HD",
     meta: {
       title: "AI Image Generator HD — High Quality Text to Image AI | GPTiti",
       desc: "Create high-quality AI images with GPTiti. Generate detailed visuals, realistic scenes, and images with text using advanced AI image generation.",
@@ -233,6 +249,7 @@ const modelData: Record<string, ModelEntry> = {
   "image-create-fast": {
     title: "Fast AI Image Generator — Quick and Affordable Image Creation",
     content: <ImageCreateFast />,
+    model: "Image → Create Fast",
     meta: {
       title:
         "Fast AI Image Generator — Cheap and быстрый Text to Image AI | GPTiti",
@@ -253,5 +270,11 @@ export default async function SlugPage({ params }: Props) {
   const data = modelData[slug];
   if (!data) notFound();
 
-  return <AIModelSlugPage title={data.title} content={data.content} />;
+  return (
+    <AIModelSlugPage
+      title={data.title}
+      content={data.content}
+      model={data.model}
+    />
+  );
 }
