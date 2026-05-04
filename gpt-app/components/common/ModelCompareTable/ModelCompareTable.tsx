@@ -1,11 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-
-import { useAppDispatch } from "@/redux/hooks";
-import { setSelectedModel, setSelectedModelGroup } from "@/redux/model/slice";
-
-import { getModelGroupAndItem } from "@/functions/getModelGroupAndItem";
+import { useSelectModel } from "@/hooks/useSelectModel";
 
 type Tag = { label: string; color: "orange" | "red" | "blue" };
 
@@ -174,17 +169,7 @@ const rows: Row[] = [
 ];
 
 export default function ModelCompareTable() {
-  const router = useRouter();
-
-  const dispatch = useAppDispatch();
-
-  const handleModelClick = (model: string) => {
-    const found = getModelGroupAndItem(model);
-    if (!found) return;
-    dispatch(setSelectedModel(model));
-    dispatch(setSelectedModelGroup(found.group));
-    router.push("/");
-  };
+  const handleModelClick = useSelectModel();
   return (
     <div className="w-full overflow-x-auto rounded-xl border border-gray-200">
       <table className="w-full text-sm text-left">

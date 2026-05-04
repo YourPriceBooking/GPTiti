@@ -1,3 +1,44 @@
+.root {
+  display: flex;
+  flex-direction: column;
+}
+
+.lead {
+  margin: 0 0 32px;
+  color: #a9bedc;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.benefits {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.benefit {
+  margin-bottom: 9px;
+  color: #ffffff;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.benefit:last-child {
+  margin-bottom: 0;
+}
+
+.divider {
+  height: 1px;
+  width: 100%;
+  background: #243052;
+  margin: 16px 0;
+}
+
+.error {
+  color: #ffb4b4;
+  font-size: 13px;
+}
+
 .actionsRow {
   display: flex;
   justify-content: space-between;
@@ -9,6 +50,54 @@
 
 .googleWrap {
   width: 100%;
+  position: relative;
+}
+
+.googleWrapDisabled {
+  opacity: 0.5;
+  pointer-events: none;
+  filter: grayscale(1);
+}
+
+.checkboxRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkboxInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  border: 0;
+}
+
+.checkboxBox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: 1px solid #243052;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.checkboxInput:focus-visible + .checkboxBox {
+  outline: 2px solid #4a7dff;
+  outline-offset: 2px;
+}
+
+.checkboxLabel {
+  font-size: 14px;
+  color: #a9bedc;
 }
 
 .cancelButton {
@@ -19,6 +108,10 @@
   background: transparent;
   color: rgba(255, 255, 255, 0.85);
   cursor: pointer;
+}
+
+.link {
+  color: #4a7dff;
 }
 
 @media (max-width: 470px) {
