@@ -2,7 +2,8 @@
 
 import { useSelectModel } from "@/hooks/useSelectModel";
 
-type Tag = { label: string; color: "orange" | "red" | "blue" };
+type TagItem = { label: string; color: "orange" | "red" | "blue" };
+type Tag = TagItem[];
 
 type Row =
   | {
@@ -26,7 +27,7 @@ type Row =
       tag?: Tag;
     };
 
-const TAG_COLORS: Record<Tag["color"], string> = {
+const TAG_COLORS: Record<TagItem["color"], string> = {
   orange: "bg-orange-100 text-orange-700",
   red: "bg-red-100 text-red-700",
   blue: "bg-blue-100 text-blue-700",
@@ -65,7 +66,7 @@ const rows: Row[] = [
     reasoning: "⭐️⭐️⭐️⭐️",
     cost: "💲💲💲",
     highlight: true,
-    tag: { label: "Best value", color: "orange" },
+    tag: [{ label: "Best value", color: "orange" }],
   },
   {
     type: "model",
@@ -98,7 +99,7 @@ const rows: Row[] = [
     speed: "⚡️⚡️⚡️",
     reasoning: "⭐️⭐️⭐️⭐️⭐️",
     cost: "💲💲💲💲",
-    tag: { label: "Powerful", color: "orange" },
+    tag: [{ label: "Powerful", color: "orange" }],
   },
   {
     type: "model",
@@ -107,7 +108,10 @@ const rows: Row[] = [
     speed: "⚡️⚡️",
     reasoning: "⭐️⭐️⭐️⭐️⭐️",
     cost: "💲💲💲💲💲",
-    tag: { label: "New", color: "red" },
+    tag: [
+      { label: "New", color: "red" },
+      { label: "Premium", color: "orange" },
+    ],
   },
   {
     type: "model",
@@ -132,7 +136,7 @@ const rows: Row[] = [
     speed: "⚡️⚡️",
     reasoning: "⭐️⭐️⭐️⭐️⭐️",
     cost: "💲💲💲💲💲",
-    tag: { label: "Reasoning", color: "orange" },
+    tag: [{ label: "Reasoning", color: "orange" }],
   },
   { type: "divider", label: "AI Tools" },
   {
@@ -215,13 +219,14 @@ export default function ModelCompareTable() {
                 >
                   <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap">
                     {row.name}
-                    {row.tag && (
+                    {row.tag?.map((t) => (
                       <span
-                        className={`ml-2 inline-block text-xs font-semibold px-1.5 py-0.5 rounded ${TAG_COLORS[row.tag.color]}`}
+                        key={t.label}
+                        className={`ml-2 inline-block text-xs font-semibold px-1.5 py-0.5 rounded ${TAG_COLORS[t.color]}`}
                       >
-                        {row.tag.label}
+                        {t.label}
                       </span>
-                    )}
+                    ))}
                   </td>
                   <td className="px-4 py-3 text-gray-600">{row.bestFor}</td>
                   <td className="px-4 py-3">{row.speed}</td>
@@ -239,13 +244,14 @@ export default function ModelCompareTable() {
               >
                 <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap">
                   {row.model}
-                  {row.tag && (
+                  {row.tag?.map((t) => (
                     <span
-                      className={`ml-2 inline-block text-xs font-semibold px-1.5 py-0.5 rounded ${TAG_COLORS[row.tag.color]}`}
+                      key={t.label}
+                      className={`ml-2 inline-block text-xs font-semibold px-1.5 py-0.5 rounded ${TAG_COLORS[t.color]}`}
                     >
-                      {row.tag.label}
+                      {t.label}
                     </span>
-                  )}
+                  ))}
                 </td>
                 <td className="px-4 py-3 text-gray-600">{row.bestFor}</td>
                 <td className="px-4 py-3">{row.speed}</td>
