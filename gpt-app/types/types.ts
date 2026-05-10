@@ -24,6 +24,7 @@ export type ModelType =
   | "gpt-4o"
   | "gpt-5.1"
   | "gpt-5.4"
+  | "gpt-5.5"
   | "0-Series"
   | "AI tools";
 

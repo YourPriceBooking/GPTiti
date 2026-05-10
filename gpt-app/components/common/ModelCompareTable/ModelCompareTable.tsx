@@ -94,11 +94,20 @@ const rows: Row[] = [
   {
     type: "model",
     model: "gpt-5.4",
-    bestFor: "Top performance",
+    bestFor: "High performance",
     speed: "⚡️⚡️⚡️",
     reasoning: "⭐️⭐️⭐️⭐️⭐️",
     cost: "💲💲💲💲",
-    tag: { label: "Top", color: "red" },
+    tag: { label: "Powerful", color: "orange" },
+  },
+  {
+    type: "model",
+    model: "gpt-5.5",
+    bestFor: "Advanced work",
+    speed: "⚡️⚡️",
+    reasoning: "⭐️⭐️⭐️⭐️⭐️",
+    cost: "💲💲💲💲💲",
+    tag: { label: "New", color: "red" },
   },
   {
     type: "model",

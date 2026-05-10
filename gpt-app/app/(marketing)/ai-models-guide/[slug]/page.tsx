@@ -27,8 +27,11 @@ import TextToSpeech from "@/components/AIModelGuide/models/TextToSpeech";
 import CompareVoiceVsTextOutput from "@/components/AIModelGuide/models/CompareVoiceVsTextOutput";
 import ImageCreateFast from "@/components/AIModelGuide/models/ImageCreateFast";
 import ImageCreateHD from "@/components/AIModelGuide/models/ImageCreateHD";
+import Gpt55 from "@/components/AIModelGuide/models/Gpt55";
+import CompareGpt55VsGpt54 from "@/components/AIModelGuide/models/CompareGpt55VsGpt54";
 
 import { buildMetadata } from "@/lib/metadata";
+import CompareGpt55VsO1 from "@/components/AIModelGuide/models/CompareGpt55VsO1";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -40,6 +43,15 @@ type ModelEntry = {
 };
 
 const modelData: Record<string, ModelEntry> = {
+  "gpt-5-5": {
+    title: "GPT-5.5 AI Model — Premium Intelligence for Advanced Work",
+    content: <Gpt55 />,
+    model: "gpt-5.5",
+    meta: {
+      title: "GPT-5.5 — Premium AI Model for Advanced Work | GPTiti",
+      desc: "GPT-5.5 is a premium AI model for advanced reasoning, coding, analysis, writing, and professional work. Learn when to use GPT-5.5, its pros, cons, token cost, and best alternatives.",
+    },
+  },
   "gpt-5-4": {
     title: "GPT-5.4 AI Model — Maximum Performance",
     content: <Gpt54 />,
@@ -153,12 +165,30 @@ const modelData: Record<string, ModelEntry> = {
       desc: "Compare GPT-5.4 vs O1. Learn which AI model is better for coding, reasoning, and complex tasks. Choose the right model based on cost, speed, and performance.",
     },
   },
+  "compare-gpt-5-5-vs-gpt-5-4": {
+    title: "GPT-5.5 vs GPT-5.4 — Which AI Model Should You Choose?",
+    content: <CompareGpt55VsGpt54 />,
+    model: "gpt-5.5",
+    meta: {
+      title: "GPT-5.5 vs GPT-5.4 — Which AI Model Should You Choose? | GPTiti",
+      desc: "Compare GPT-5.5 vs GPT-5.4 in GPTiti. Learn the difference in quality, reasoning, coding, speed, cost, token usage, best use cases, pros and cons.",
+    },
+  },
   "compare-gpt-5-4-mini-vs-gpt-4o-mini": {
     title: "GPT-5.4-mini vs GPT-4o-mini — Which AI Model Should You Choose?",
     content: <CompareGpt54MiniVsGpt4oMini />,
     meta: {
       title: "GPT-5.4-mini vs GPT-4o-mini — Comparison | GPTiti",
       desc: "Compare GPT-5.4-mini vs GPT-4o-mini. Learn the difference in cost, quality, and performance to choose the best AI model for your needs.",
+    },
+  },
+  "compare-gpt-5-5-vs-o1": {
+    title: "GPT-5.5 vs O1 — Premium AI Model vs Deep Reasoning Model",
+    content: <CompareGpt55VsO1 />,
+    model: "gpt-5.5",
+    meta: {
+      title: "GPT-5.5 vs O1 — Premium AI vs Deep Reasoning Model | GPTiti",
+      desc: "Compare GPT-5.5 vs O1 in GPTiti. Learn which AI model is better for reasoning, coding, analysis, writing, complex tasks, speed, cost, and professional work.",
     },
   },
   "compare-gpt-4o-vs-gpt-5-1": {

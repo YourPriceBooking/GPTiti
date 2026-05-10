@@ -24,6 +24,7 @@ const MODEL_IMAGES: Record<string, string[]> = {
 };
 
 const MODEL_GUIDE_SLUG: Record<string, string> = {
+  "GPT-5.5": "gpt-5-5",
   "GPT-5.4": "gpt-5-4",
   "GPT-5.4 mini": "gpt-5-4-mini",
   "GPT-5.1": "gpt-5-1",

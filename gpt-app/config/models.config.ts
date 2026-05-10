@@ -28,40 +28,21 @@ export const modelConfig: Record<ModelType, ModelConfig> = {
     ],
   },
 
-  "gpt-5.1": {
+  "gpt-5.5": {
     list: [
       {
-        title: "gpt-5.1",
-        tokens: 600,
-        desc: "Reasoning, creativity, long context",
+        title: "gpt-5.5",
+        tokens: 3000,
+        desc: "Sharper answers. Better coding. More consistent outputs. Great for advanced work, long prompts and high-value tasks.",
         tooltip: {
-          title: "GPT-5.1",
-          intro:
-            "Think deeper. Go further. Handles complex reasoning and long context.",
-          pros: ["Exceptional reasoning", "Best quality output"],
-          cons: ["Slower", "Higher cost"],
-        },
-      },
-      {
-        title: "gpt-5.1-mini",
-        tokens: 110,
-        desc: "Fast & cost-efficient",
-        tooltip: {
-          title: "GPT-5.1 mini",
-          intro: "Fast. Smart. Efficient.",
-          pros: ["Very fast", "Cost-efficient"],
-          cons: ["Less reasoning"],
-        },
-      },
-      {
-        title: "gpt-5.1-realtime",
-        tokens: 600,
-        desc: "Voice + stream reasoning",
-        tooltip: {
-          title: "GPT-5.1 realtime",
-          intro: "Talk. Think. Respond instantly.",
-          pros: ["Real-time responses", "Voice ready"],
-          cons: ["Less depth"],
+          title: "GPT-5.5",
+          intro: "Advanced intelligence. Sharper answers for serious work.",
+          pros: [
+            "Excellent reasoning",
+            "Better coding and writing",
+            "More consistent results",
+          ],
+          cons: ["Premium cost", "Not needed for simple chat"],
         },
       },
     ],
@@ -127,10 +108,48 @@ export const modelConfig: Record<ModelType, ModelConfig> = {
         desc: "Turn text into natural voice",
         tooltip: {
           title: "Text → Speech",
-          intro:
-            "Listen instead of reading. Turn text into natural AI voice.",
+          intro: "Listen instead of reading. Turn text into natural AI voice.",
           pros: ["Hands-free experience", "Instant audio output"],
           cons: ["Less emotional than human", "Higher cost"],
+        },
+      },
+    ],
+  },
+
+  "gpt-5.1": {
+    list: [
+      {
+        title: "gpt-5.1",
+        tokens: 600,
+        desc: "Reasoning, creativity, long context",
+        tooltip: {
+          title: "GPT-5.1",
+          intro:
+            "Think deeper. Go further. Handles complex reasoning and long context.",
+          pros: ["Exceptional reasoning", "Best quality output"],
+          cons: ["Slower", "Higher cost"],
+        },
+      },
+      {
+        title: "gpt-5.1-mini",
+        tokens: 110,
+        desc: "Fast & cost-efficient",
+        tooltip: {
+          title: "GPT-5.1 mini",
+          intro: "Fast. Smart. Efficient.",
+          pros: ["Very fast", "Cost-efficient"],
+          cons: ["Less reasoning"],
+        },
+      },
+      {
+        title: "gpt-5.1-realtime",
+        tokens: 600,
+        desc: "Voice + stream reasoning",
+        tooltip: {
+          title: "GPT-5.1 realtime",
+          intro: "Talk. Think. Respond instantly.",
+          pros: ["Real-time responses", "Voice ready"],
+          cons: ["Less depth"],
         },
       },
     ],

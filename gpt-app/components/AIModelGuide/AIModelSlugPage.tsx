@@ -31,8 +31,7 @@ const AIModelSlugPage = ({ title, content, model }: Props) => {
   return (
     <motion.section
       initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.1 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease: "easeOut" }}
       className="w-full max-w-3xl mx-auto space-y-10 p-6"
     >
