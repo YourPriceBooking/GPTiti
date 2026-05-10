@@ -98,7 +98,12 @@ export default function ModalWindow({
                 setClickedGroup(group);
               }}
             >
-              {group}
+              <span className={styles.groupLabel}>
+                {group}
+                {group === "gpt-5.5" && (
+                  <span className={styles.newBadge}>New</span>
+                )}
+              </span>
             </button>
           ))}
         </div>

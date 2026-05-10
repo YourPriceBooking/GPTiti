@@ -1,5 +1,5 @@
 .modalContainer {
-  width: clamp(320px, 90vw, 370px);
+  width: clamp(320px, 90vw, 530px);
   padding: 16px;
   border-radius: 22px;
   background: var(--foreground);
@@ -47,12 +47,13 @@
 /* ---------- Tabs (groups) ---------- */
 
 .btn {
+  position: relative;
   font-family: var(--font-family);
   font-weight: 500;
   font-size: 16px;
   color: #b8bbc0;
 
-  width: clamp(65px, 15vw, 85px);
+  width: clamp(65px, 15vw, 75px);
   flex-shrink: 0;
 
   border-radius: 11px;
@@ -84,6 +85,28 @@
 
   border: 2px solid #3b82f6;
   box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.15);
+}
+
+.groupLabel {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.newBadge {
+  position: absolute;
+  top: -2px;
+  right: 0px;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 2px 5px;
+  border-radius: 6px;
+  background: #3b82f6;
+  color: #ffffff;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  pointer-events: none;
 }
 
 .mainSection {
@@ -159,7 +182,8 @@
 }
 
 .btn2Span2 {
-  max-width: 170px;
+  margin-top: 10px;
+  max-width: 200px;
   text-align: start;
 }
 .btn2Span1 {

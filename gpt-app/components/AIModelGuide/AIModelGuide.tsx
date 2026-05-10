@@ -157,13 +157,46 @@ const AIModelGuide = () => {
         <ul className="list-disc list-inside text-gray-700 text-lg leading-relaxed space-y-3 pl-5">
           <li>
             <Link
+              href="/ai-models-guide/gpt-5-5"
+              className="text-blue-600 hover:underline font-medium"
+            >
+              GPT-5.5{" "}
+              <span className="inline-block bg-blue-100 text-blue-700 text-xs font-semibold px-2 py-0.5 rounded ml-1">
+                New
+              </span>{" "}
+              <span className="inline-block bg-amber-100 text-amber-700 text-xs font-semibold px-2 py-0.5 rounded ml-1">
+                Premium
+              </span>
+            </Link>
+            <br />
+            <span className="text-sm pl-4 text-gray-500">
+              Best for advanced reasoning, serious work, coding, analysis, and
+              high-quality answers
+            </span>
+            <br />
+            <span className="text-sm pl-4">
+              <Link
+                href="/ai-models-guide/compare-gpt-5-5-vs-gpt-5-4"
+                className="text-gray-500 hover:underline"
+              >
+                Compare with GPT-5.4
+              </Link>
+            </span>
+            <span className="block text-sm pl-4">
+              <Link
+                href="/ai-models-guide/compare-gpt-5-5-vs-o1"
+                className="text-gray-500 hover:underline"
+              >
+                Compare with O1
+              </Link>
+            </span>
+          </li>
+          <li>
+            <Link
               href="/ai-models-guide/gpt-5-4"
               className="text-blue-600 hover:underline font-medium"
             >
               GPT-5.4{" "}
-              <span className="inline-block bg-blue-100 text-blue-700 text-xs font-semibold px-2 py-0.5 rounded ml-1">
-                New
-              </span>
             </Link>
             <br />
             <span className="text-sm pl-4">
@@ -181,9 +214,6 @@ const AIModelGuide = () => {
               className="text-blue-600 hover:underline font-medium"
             >
               GPT-5.4-mini{" "}
-              <span className="inline-block bg-blue-100 text-blue-700 text-xs font-semibold px-2 py-0.5 rounded ml-1">
-                New
-              </span>{" "}
               <span className="inline-block bg-orange-100 text-orange-700 text-xs font-semibold px-2 py-0.5 rounded ml-1">
                 Best value 🔥
               </span>
