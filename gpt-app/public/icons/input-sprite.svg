@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  
+  <symbol id="ib-plus" viewBox="0 0 29 29" fill="none">
+    <path d="M18.5 0.5H10.5C4.97715 0.5 0.5 4.97715 0.5 10.5V18.5C0.5 24.0228 4.97715 28.5 10.5 28.5H18.5C24.0228 28.5 28.5 24.0228 28.5 18.5V10.5C28.5 4.97715 24.0228 0.5 18.5 0.5Z" fill="currentColor" fill-opacity="0.1" stroke="currentColor" stroke-opacity="0.3"/>
+    <path d="M14.5 8.5V20.5M8.5 14.5H20.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+  </symbol>
+
+  <symbol id="ib-microphone" viewBox="0 0 35 35" fill="none">
+    <path d="M17.4998 5.10413C18.8123 5.10413 19.8332 6.12496 19.8332 7.43746V15.3125C19.8332 16.625 18.8123 17.6458 17.4998 17.6458C16.1873 17.6458 15.1665 16.625 15.1665 15.3125V7.43746C15.1665 6.12496 16.1873 5.10413 17.4998 5.10413Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M27.7082 16.7708C27.7082 20.8541 23.9165 24.0624 17.4998 24.0624C11.0832 24.0624 7.2915 20.8541 7.2915 16.7708" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M17.5 26.25V30.625" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M13.125 30.625H21.875" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M24.7915 9.47913H29.4582" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M24.7915 13.8541H29.4582" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M24.7915 18.2291H29.4582" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+
+  <symbol id="ib-voice" viewBox="0 0 35 35" fill="none">
+    <path d="M29.1668 8.75H8.75016C7.97661 8.75 7.23475 9.05729 6.68777 9.60427C6.14079 10.1513 5.8335 10.8931 5.8335 11.6667V21.875C5.8335 22.6485 6.14079 23.3904 6.68777 23.9374C7.23475 24.4844 7.97661 24.7917 8.75016 24.7917H23.3335L29.1668 29.1667V11.6667C29.1668 10.8931 28.8595 10.1513 28.3126 9.60427C27.7656 9.05729 27.0237 8.75 26.2502 8.75H29.1668Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M16.3337 13.4166C16.9899 13.4166 17.5003 13.9416 17.5003 14.5833V17.2083C17.5003 17.85 16.9899 18.375 16.3337 18.375C15.6774 18.375 15.167 17.85 15.167 17.2083V14.5833C15.167 13.9416 15.6774 13.4166 16.3337 13.4166Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M14 16.0416C14 17.9375 15.4583 19.3958 17.5 19.3958C19.5417 19.3958 21 17.9375 21 16.0416" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M17.5 20.4166V22.6041" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M25.0835 14.2916C26.2502 15.6041 26.2502 17.7916 25.0835 19.1041" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M27.417 11.9584C29.7503 14.5834 29.7503 18.6667 27.417 21.2917" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+
+  <symbol id="ib-send" viewBox="0 0 44 44" fill="none">
+    <circle cx="22" cy="22" r="22" fill="currentColor"/>
+    <path d="M22 13V31" stroke="white" stroke-width="2.6" stroke-linecap="round"/>
+    <path d="M15 21L22 14L29 21" stroke="white" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+</svg>

@@ -27,6 +27,7 @@
 
 .input:focus {
   outline: none;
+  border-color: var(--flow-fill);
 }
 
 .input::placeholder {
@@ -52,11 +53,18 @@
   justify-content: center;
   outline: none;
   cursor: pointer;
+  color: var(--flow-fill);
   transition:
     top 0.2s ease,
     bottom 0.2s ease,
     transform 0.2s ease;
   z-index: 1;
+}
+
+.inputIcon,
+.sendIcon {
+  display: block;
+  color: var(--flow-fill);
 }
 
 .multiline .iconWrapper,
@@ -85,7 +93,7 @@
   width: 39px;
   height: 39px;
   border-radius: 50%;
-  background: #f3f7fb;
+  background: var(--flow-bg);
   opacity: 0;
   transition: opacity 0.3s ease;
   z-index: -1;
