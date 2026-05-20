@@ -31,6 +31,33 @@
   /* typography */
   --font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   --second-family: "Segoe UI", sans-serif;
+
+  /* model flow theme — default (balanced) */
+  --flow-fill: #2563eb;
+  --flow-bg: rgba(37, 99, 235, 0.1);
+}
+
+/* Per-model flow themes. The flow class/attribute is set on a root
+   container; child CSS modules just read var(--flow-fill) / var(--flow-bg). */
+[data-flow="premium"] {
+  --flow-fill: #2f6bff;
+  --flow-bg: rgba(47, 107, 255, 0.08);
+}
+[data-flow="balanced"] {
+  --flow-fill: #14b86e;
+  --flow-bg: rgba(20, 184, 110, 0.08);
+}
+[data-flow="reasoning"] {
+  --flow-fill: #8b5cf6;
+  --flow-bg: rgba(139, 92, 246, 0.01);
+}
+[data-flow="realtime"] {
+  --flow-fill: #ea580c;
+  --flow-bg: rgba(249, 115, 22, 0.08);
+}
+[data-flow="tools"] {
+  --flow-fill: #10aee8;
+  --flow-bg: rgba(228, 248, 255, 1);
 }
 
 /* Tailwind v4 theme bridge — keeps `bg-background`/`text-foreground` working */

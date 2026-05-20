@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useSelectModel } from "@/hooks/useSelectModel";
 
 type TagItem = { label: string; color: "orange" | "red" | "blue" };
@@ -13,6 +15,7 @@ type Row =
       speed: string;
       reasoning: string;
       cost: string;
+      slug: string;
       highlight?: boolean;
       tag?: Tag;
     }
@@ -24,6 +27,7 @@ type Row =
       speed: string;
       reasoning: string;
       cost: string;
+      slug: string;
       tag?: Tag;
     };
 
@@ -41,6 +45,7 @@ const rows: Row[] = [
     speed: "⚡️⚡️⚡️⚡️⚡️",
     reasoning: "⭐️",
     cost: "💲",
+    slug: "gpt-4o-mini",
   },
   {
     type: "model",
@@ -49,6 +54,7 @@ const rows: Row[] = [
     speed: "⚡️⚡️⚡️⚡️",
     reasoning: "⭐️⭐️",
     cost: "💲💲",
+    slug: "gpt-4o",
   },
   {
     type: "model",
@@ -57,6 +63,7 @@ const rows: Row[] = [
     speed: "⚡️⚡️⚡️⚡️⚡️",
     reasoning: "⭐️",
     cost: "💲💲💲",
+    slug: "gpt-4o-realtime",
   },
   {
     type: "model",
@@ -65,6 +72,7 @@ const rows: Row[] = [
     speed: "⚡️⚡️⚡️⚡️",
     reasoning: "⭐️⭐️⭐️⭐️",
     cost: "💲💲💲",
+    slug: "gpt-5-4-mini",
     highlight: true,
     tag: [{ label: "Best value", color: "orange" }],
   },
@@ -75,6 +83,7 @@ const rows: Row[] = [
     speed: "⚡️⚡️⚡️⚡️",
     reasoning: "⭐️⭐️⭐️",
     cost: "💲💲",
+    slug: "gpt-5-1-mini",
   },
   {
     type: "model",
@@ -83,6 +92,7 @@ const rows: Row[] = [
     speed: "⚡️⚡️⚡️",
     reasoning: "⭐️⭐️⭐️⭐️",
     cost: "💲💲💲",
+    slug: "gpt-5-1",
   },
   {
     type: "model",
@@ -91,6 +101,7 @@ const rows: Row[] = [
     speed: "⚡️⚡️⚡️⚡️⚡️",
     reasoning: "⭐️⭐️",
     cost: "💲💲💲💲",
+    slug: "gpt-5-1-realtime",
   },
   {
     type: "model",
@@ -99,6 +110,7 @@ const rows: Row[] = [
     speed: "⚡️⚡️⚡️",
     reasoning: "⭐️⭐️⭐️⭐️⭐️",
     cost: "💲💲💲💲",
+    slug: "gpt-5-4",
     tag: [{ label: "Powerful", color: "orange" }],
   },
   {
@@ -108,6 +120,7 @@ const rows: Row[] = [
     speed: "⚡️⚡️",
     reasoning: "⭐️⭐️⭐️⭐️⭐️",
     cost: "💲💲💲💲💲",
+    slug: "gpt-5-5",
     tag: [
       { label: "New", color: "red" },
       { label: "Premium", color: "orange" },
@@ -120,6 +133,7 @@ const rows: Row[] = [
     speed: "⚡️⚡️⚡️⚡️",
     reasoning: "⭐️⭐️⭐️",
     cost: "💲💲",
+    slug: "o3-mini",
   },
   {
     type: "model",
@@ -128,6 +142,7 @@ const rows: Row[] = [
     speed: "⚡️⚡️⚡️",
     reasoning: "⭐️⭐️⭐️⭐️",
     cost: "💲💲💲",
+    slug: "o1-mini",
   },
   {
     type: "model",
@@ -136,6 +151,7 @@ const rows: Row[] = [
     speed: "⚡️⚡️",
     reasoning: "⭐️⭐️⭐️⭐️⭐️",
     cost: "💲💲💲💲💲",
+    slug: "o1",
     tag: [{ label: "Reasoning", color: "orange" }],
   },
   { type: "divider", label: "AI Tools" },
@@ -146,6 +162,7 @@ const rows: Row[] = [
     speed: "⚡️⚡️⚡️⚡️",
     reasoning: "⭐️⭐️⭐️",
     cost: "💲",
+    slug: "smart-search",
   },
   {
     type: "tool",
@@ -154,6 +171,7 @@ const rows: Row[] = [
     speed: "⚡️⚡️⚡️⚡️⚡️",
     reasoning: "⭐️",
     cost: "💲💲",
+    slug: "voice-to-text",
   },
   {
     type: "tool",
@@ -162,6 +180,7 @@ const rows: Row[] = [
     speed: "⚡️⚡️⚡️⚡️",
     reasoning: "⭐️",
     cost: "💲💲",
+    slug: "text-to-speech",
   },
   {
     type: "tool",
@@ -170,6 +189,7 @@ const rows: Row[] = [
     speed: "⚡️⚡️⚡️",
     reasoning: "⭐️⭐️⭐️⭐️",
     cost: "💲💲💲💲",
+    slug: "image-create-hd",
   },
   {
     type: "tool",
@@ -178,6 +198,7 @@ const rows: Row[] = [
     speed: "⚡️⚡️⚡️⚡️⚡️",
     reasoning: "⭐️⭐️",
     cost: "💲💲",
+    slug: "image-create-fast",
   },
 ];
 
@@ -215,18 +236,27 @@ export default function ModelCompareTable() {
                 <tr
                   key={i}
                   onClick={() => handleModelClick(row.name)}
-                  className="cursor-pointer transition-colors hover:bg-blue-50"
+                  className="group cursor-pointer transition-colors hover:bg-blue-50"
                 >
                   <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap">
-                    {row.name}
-                    {row.tag?.map((t) => (
-                      <span
-                        key={t.label}
-                        className={`ml-2 inline-block text-xs font-semibold px-1.5 py-0.5 rounded ${TAG_COLORS[t.color]}`}
-                      >
-                        {t.label}
-                      </span>
-                    ))}
+                    <div className="flex items-center gap-2">
+                      {row.name}
+                      {row.tag?.map((t) => (
+                        <span
+                          key={t.label}
+                          className={`inline-block text-xs font-semibold px-1.5 py-0.5 rounded ${TAG_COLORS[t.color]}`}
+                        >
+                          {t.label}
+                        </span>
+                      ))}
+                    </div>
+                    <Link
+                      href={`/ai-models-guide/${row.slug}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="mt-2 inline-block text-xs font-medium text-blue-600 hover:underline opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
+                    >
+                      Read more →
+                    </Link>
                   </td>
                   <td className="px-4 py-3 text-gray-600">{row.bestFor}</td>
                   <td className="px-4 py-3">{row.speed}</td>
@@ -240,18 +270,27 @@ export default function ModelCompareTable() {
               <tr
                 key={i}
                 onClick={() => handleModelClick(row.model)}
-                className={`cursor-pointer transition-colors hover:bg-blue-50 ${row.highlight ? "bg-orange-50" : ""}`}
+                className={`group cursor-pointer transition-colors hover:bg-blue-50 ${row.highlight ? "bg-orange-50" : ""}`}
               >
                 <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap">
-                  {row.model}
-                  {row.tag?.map((t) => (
-                    <span
-                      key={t.label}
-                      className={`ml-2 inline-block text-xs font-semibold px-1.5 py-0.5 rounded ${TAG_COLORS[t.color]}`}
-                    >
-                      {t.label}
-                    </span>
-                  ))}
+                  <div className="flex items-center gap-2">
+                    {row.model}
+                    {row.tag?.map((t) => (
+                      <span
+                        key={t.label}
+                        className={`inline-block text-xs font-semibold px-1.5 py-0.5 rounded ${TAG_COLORS[t.color]}`}
+                      >
+                        {t.label}
+                      </span>
+                    ))}
+                  </div>
+                  <Link
+                    href={`/ai-models-guide/${row.slug}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="mt-1 inline-block text-xs font-medium text-blue-600 hover:underline opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
+                  >
+                    Read more →
+                  </Link>
                 </td>
                 <td className="px-4 py-3 text-gray-600">{row.bestFor}</td>
                 <td className="px-4 py-3">{row.speed}</td>

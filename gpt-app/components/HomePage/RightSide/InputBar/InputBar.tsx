@@ -1,7 +1,5 @@
 import { useState, useLayoutEffect, useEffect, useRef } from "react";
 
-import Image from "next/image";
-
 import AddSomethingToInput from "../AddSomethingToInput/AddSomethingToInput";
 import LoginModal from "@/components/HomePage/common/LoginModal/LoginModal";
 import ErrorPatchImgModal from "@/components/HomePage/common/ErrorPatchImgModal/ErrorPatchImgModal";
@@ -219,7 +217,15 @@ export default function InputBar({
           setShowAddInput((prev) => !prev);
         }}
       >
-        <Image width={28} height={28} src="/icons/plus.svg" alt="plus" />
+        <svg
+          className={styles.inputIcon}
+          width={28}
+          height={28}
+          viewBox="0 0 29 29"
+          aria-hidden="true"
+        >
+          <use href="/icons/input-sprite.svg#ib-plus" />
+        </svg>
       </div>
       {showAddInput && (
         <div
@@ -264,12 +270,15 @@ export default function InputBar({
       />
 
       <div className={styles.iconWrapper1} tabIndex={0}>
-        <Image
+        <svg
+          className={styles.inputIcon}
           width={35}
           height={35}
-          src="/icons/microphone.svg"
-          alt="microphone"
-        />
+          viewBox="0 0 35 35"
+          aria-hidden="true"
+        >
+          <use href="/icons/input-sprite.svg#ib-microphone" />
+        </svg>
       </div>
 
       {hasInput || images.length > 0 ? (
@@ -277,11 +286,29 @@ export default function InputBar({
           className={`${styles.iconWrapper2} ${styles.disabledHover}`}
           onClick={handleSend}
         >
-          <Image src="/icons/send.svg" width={35} height={35} alt="send" />
+          <svg
+            className={styles.sendIcon}
+            width={35}
+            height={35}
+            viewBox="0 0 44 44"
+            role="img"
+            aria-label="send"
+          >
+            <use href="/icons/input-sprite.svg#ib-send" />
+          </svg>
         </div>
       ) : (
         <div className={styles.iconWrapper2} tabIndex={0}>
-          <Image src="/icons/voice.svg" width={35} height={35} alt="voice" />
+          <svg
+            className={styles.inputIcon}
+            width={35}
+            height={35}
+            viewBox="0 0 35 35"
+            role="img"
+            aria-label="voice"
+          >
+            <use href="/icons/input-sprite.svg#ib-voice" />
+          </svg>
         </div>
       )}
 

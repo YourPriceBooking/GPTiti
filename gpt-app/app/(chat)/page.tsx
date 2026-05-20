@@ -11,6 +11,7 @@ import ModelModalOverlay from "@/components/ModelModalOverlay/ModelModalOverlay"
 
 import { useModelMode } from "@/hooks/useModelMode";
 import { useScrollDirection } from "@/hooks/useScrollDirection";
+import { getFlowType } from "@/config/modelFlows.config";
 
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
@@ -200,7 +201,7 @@ export default function Home() {
         setSelectedModelGroup={(g) => dispatch(setSelectedModelGroup(g))}
       />
 
-      <div className={styles.appContainer}>
+      <div className={styles.appContainer} data-flow={getFlowType(selectedModel)}>
         <div className={styles.leftSideContainer}>
           <LeftSide
             onNewChat={() => dispatch(handleNewChat())}
