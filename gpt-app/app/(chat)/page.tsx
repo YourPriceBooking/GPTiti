@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useCallback } from "react";
+import { useRef, useEffect, useCallback, useState, useMemo } from "react";
 
 import LeftSide from "@/components/HomePage/LeftSide/LeftSide";
 import MessageList from "@/components/HomePage/RightSide/MessageList/MessageList";
@@ -12,6 +12,7 @@ import ModelModalOverlay from "@/components/ModelModalOverlay/ModelModalOverlay"
 import { useModelMode } from "@/hooks/useModelMode";
 import { useScrollDirection } from "@/hooks/useScrollDirection";
 import { getFlowType } from "@/config/modelFlows.config";
+import { getEstimatedTokens } from "@/config/modelPricing.config";
 
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
@@ -87,6 +88,15 @@ export default function Home() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
+  const [inputCharCount, setInputCharCount] = useState(0);
+  const [inputImageCount, setInputImageCount] = useState(0);
+
+  const estimatedTokens = useMemo(
+    () => getEstimatedTokens(selectedModel, inputCharCount, inputImageCount),
+    [selectedModel, inputCharCount, inputImageCount],
+  );
+  const showEstimate = estimatedTokens !== null;
+
   useScrollDirection(scrollContainerRef);
 
   const isNewChat = !activeChat || activeChat.messages.length === 0;
@@ -115,7 +125,9 @@ export default function Home() {
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement | null>) => {
-      dispatch(setHasInput(e.target?.value.trim().length ? true : false));
+      const value = e.target?.value ?? "";
+      dispatch(setHasInput(value.trim().length ? true : false));
+      setInputCharCount(value.length);
     },
     [dispatch],
   );
@@ -126,6 +138,7 @@ export default function Home() {
       inputRef.current.value = template;
       inputRef.current.scrollTop = 0;
       dispatch(setHasInput(template.trim().length > 0));
+      setInputCharCount(template.length);
       dispatch(bumpTemplateTick());
       inputRef.current.focus();
     },
@@ -149,6 +162,8 @@ export default function Home() {
       dispatch(setHasInput(false));
       dispatch(setIsTyping(true));
       inputRef.current.value = "";
+      setInputCharCount(0);
+      setInputImageCount(0);
 
       const delay = Math.random() * 1000 + 1500;
       await new Promise((resolve) => setTimeout(resolve, delay));
@@ -271,6 +286,7 @@ export default function Home() {
                 hasFirstRequest={hasFirstRequest}
                 isOverlay={false}
                 selectedModel={selectedModel}
+                onImagesChange={setInputImageCount}
               />
             )}
 
@@ -331,6 +347,7 @@ export default function Home() {
                     hasFirstRequest={hasFirstRequest}
                     isOverlay={true}
                     selectedModel={selectedModel}
+                    onImagesChange={setInputImageCount}
                   />
                 </div>
               </div>
@@ -376,24 +393,26 @@ export default function Home() {
                     }}
                     hasFirstRequest={hasFirstRequest}
                     selectedModel={selectedModel}
+                    onImagesChange={setInputImageCount}
                   />
 
                   <div className={styles.spanContainer}>
-                    {!hasFirstRequest ? (
-                      <span className={styles.inputSpan}>
-                        AI systems may make mistakes, so we recommend verifying
-                        important information.
-                      </span>
-                    ) : (
+                    {showEstimate ? (
                       <div className={styles.spanContainerFirstRequest}>
                         <span className={styles.inputSpan1}>
-                          ≈ Estimated cost: ~120 tokens
+                          ≈ Estimated cost: ~
+                          {estimatedTokens?.toLocaleString("en-US")} tokens
                         </span>
                         <span className={styles.inputSpan}>
                           AI systems may make mistakes, so we recommend
                           verifying important information.
                         </span>
                       </div>
+                    ) : (
+                      <span className={styles.inputSpan}>
+                        AI systems may make mistakes, so we recommend verifying
+                        important information.
+                      </span>
                     )}
                   </div>
                 </div>
