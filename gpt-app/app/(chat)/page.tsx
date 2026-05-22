@@ -13,6 +13,7 @@ import { useModelMode } from "@/hooks/useModelMode";
 import { useScrollDirection } from "@/hooks/useScrollDirection";
 import { getFlowType } from "@/config/modelFlows.config";
 import { getEstimatedTokens } from "@/config/modelPricing.config";
+import { getModelLimits } from "@/config/modelLimits.config";
 
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
@@ -123,6 +124,21 @@ export default function Home() {
     return () => clearTimeout(t);
   }, [activeChatId, activeChat?.messages.length, activeChat, dispatch]);
 
+  useEffect(() => {
+    const maxChars = getModelLimits(selectedModel).maxTextChars;
+    if (maxChars === null) return;
+    const textarea = inputRef.current;
+    if (!textarea) return;
+    const current = textarea.value;
+    if (current.length <= maxChars) return;
+
+    const clipped = current.slice(0, maxChars);
+    textarea.value = clipped;
+    dispatch(setHasInput(clipped.trim().length > 0));
+    setInputCharCount(clipped.length);
+    dispatch(bumpTemplateTick());
+  }, [selectedModel, dispatch]);
+
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement | null>) => {
       const value = e.target?.value ?? "";
@@ -135,14 +151,19 @@ export default function Home() {
   const insertTemplate = useCallback(
     (template: string) => {
       if (!inputRef.current) return;
-      inputRef.current.value = template;
+      const maxChars = getModelLimits(selectedModel).maxTextChars;
+      const clipped =
+        maxChars !== null && template.length > maxChars
+          ? template.slice(0, maxChars)
+          : template;
+      inputRef.current.value = clipped;
       inputRef.current.scrollTop = 0;
-      dispatch(setHasInput(template.trim().length > 0));
-      setInputCharCount(template.length);
+      dispatch(setHasInput(clipped.trim().length > 0));
+      setInputCharCount(clipped.length);
       dispatch(bumpTemplateTick());
       inputRef.current.focus();
     },
-    [dispatch],
+    [dispatch, selectedModel],
   );
 
   const handleSendClick = useCallback(
@@ -183,14 +204,19 @@ export default function Home() {
   );
 
   const insertTemplateToInput = (template: string) => {
+    const maxChars = getModelLimits(selectedModel).maxTextChars;
+    const clipped =
+      maxChars !== null && template.length > maxChars
+        ? template.slice(0, maxChars)
+        : template;
     if (inputRef.current) {
-      inputRef.current.value = template;
+      inputRef.current.value = clipped;
       inputRef.current.focus();
       handleChange({
         target: inputRef.current,
       } as React.ChangeEvent<HTMLTextAreaElement>);
     } else {
-      pendingTemplateRef.current = template;
+      pendingTemplateRef.current = clipped;
     }
   };
 

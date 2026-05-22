@@ -1,13 +1,20 @@
-import { useState, useLayoutEffect, useEffect, useRef } from "react";
+import { useState, useLayoutEffect, useEffect, useRef, useMemo } from "react";
 
 import AddSomethingToInput from "../AddSomethingToInput/AddSomethingToInput";
 import LoginModal from "@/components/HomePage/common/LoginModal/LoginModal";
-import ErrorPatchImgModal from "@/components/HomePage/common/ErrorPatchImgModal/ErrorPatchImgModal";
+import ErrorPatchImgModal, {
+  ErrorPatchImgVariant,
+} from "@/components/HomePage/common/ErrorPatchImgModal/ErrorPatchImgModal";
 
 import { useAppSelector } from "@/redux/hooks";
 import { selectIsLoggedIn } from "@/redux/auth/selectors";
 
+import { getModelLimits } from "@/config/modelLimits.config";
+import { compressImage } from "@/lib/compressImage";
+
 import styles from "./InputBar.module.css";
+
+const MB = 1024 * 1024;
 
 export default function InputBar({
   hasInput,
@@ -41,17 +48,20 @@ export default function InputBar({
   const [showAddInput, setShowAddInput] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isImgErrorOpen, setIsImgErrorOpen] = useState(false);
+  const [imgErrorVariant, setImgErrorVariant] =
+    useState<ErrorPatchImgVariant>("unsupported");
   const [images, setImages] = useState<
     { id: string; url: string; file: File }[]
   >([]);
 
-  const aviableModelImgPaste = [
-    "o1",
-    "o1-mini",
-    "o3-mini",
-    "gpt-5.1-realtime",
-    "gpt-4o-realtime",
-  ];
+  const limits = useMemo(() => getModelLimits(selectedModel), [selectedModel]);
+  const isImageBlocked = limits.maxImages === 0;
+  const maxImageBytes = limits.maxImageSizeMb * MB;
+
+  const openImgError = (variant: ErrorPatchImgVariant) => {
+    setImgErrorVariant(variant);
+    setIsImgErrorOpen(true);
+  };
 
   const resizeTextarea = () => {
     const textarea = inputRef.current;
@@ -131,30 +141,70 @@ export default function InputBar({
     resizeTextarea();
   };
 
-  const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
-    const items = Array.from(e.clipboardData.items);
-    const hasImage = items.some(
-      (item) => item.kind === "file" && item.type.startsWith("image/"),
-    );
+  const addImageFiles = async (incoming: File[]) => {
+    if (incoming.length === 0) return;
 
-    if (hasImage && aviableModelImgPaste.includes(selectedModel)) {
-      e.preventDefault();
-      setIsImgErrorOpen(true);
+    if (isImageBlocked) {
+      openImgError("unsupported");
       return;
     }
 
-    items.forEach((item) => {
-      if (item.kind === "file" && item.type.startsWith("image/")) {
-        const file = item.getAsFile();
+    const remaining = Math.max(0, limits.maxImages - images.length);
+    if (remaining === 0) {
+      openImgError("tooMany");
+      return;
+    }
 
-        const url = URL.createObjectURL(file as any);
+    const accepted: File[] = [];
+    let trimmedForCount = false;
+    let rejectedForSize = false;
 
-        setImages((prevs): any => [
-          ...prevs,
-          { id: crypto.randomUUID(), url, file },
-        ]);
+    for (const file of incoming) {
+      if (accepted.length >= remaining) {
+        trimmedForCount = true;
+        break;
       }
-    });
+      if (maxImageBytes > 0 && file.size > maxImageBytes) {
+        rejectedForSize = true;
+        continue;
+      }
+      accepted.push(file);
+    }
+
+    if (accepted.length === 0) {
+      if (rejectedForSize) openImgError("tooLarge");
+      else if (trimmedForCount) openImgError("tooMany");
+      return;
+    }
+
+    const processed = await Promise.all(
+      accepted.map(async (file) => {
+        const compressed = await compressImage(file).catch(() => file);
+        return {
+          id: crypto.randomUUID(),
+          url: URL.createObjectURL(compressed),
+          file: compressed,
+        };
+      }),
+    );
+
+    setImages((prev) => [...prev, ...processed]);
+
+    if (rejectedForSize) openImgError("tooLarge");
+    else if (trimmedForCount) openImgError("tooMany");
+  };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    const items = Array.from(e.clipboardData.items);
+    const pastedImages = items
+      .filter((item) => item.kind === "file" && item.type.startsWith("image/"))
+      .map((item) => item.getAsFile())
+      .filter((f): f is File => f !== null);
+
+    if (pastedImages.length === 0) return;
+
+    e.preventDefault();
+    void addImageFiles(pastedImages);
   };
 
   const removeImage = (id: string) => {
@@ -165,13 +215,8 @@ export default function InputBar({
   };
 
   const handleImageSelect = (files: File[]) => {
-    const newImages = files.map((file) => ({
-      id: crypto.randomUUID(),
-      url: URL.createObjectURL(file),
-      file,
-    }));
-    setImages((prev) => [...prev, ...newImages]);
     setShowAddInput(false);
+    void addImageFiles(files);
   };
 
   const handleSend = () => {
@@ -183,11 +228,12 @@ export default function InputBar({
           setIsLoginOpen(true);
           return;
         }
-        if (
-          images.length > 0 &&
-          aviableModelImgPaste.includes(selectedModel)
-        ) {
-          setIsImgErrorOpen(true);
+        if (images.length > 0 && isImageBlocked) {
+          openImgError("unsupported");
+          return;
+        }
+        if (images.length > limits.maxImages) {
+          openImgError("tooMany");
           return;
         }
         onSend(
@@ -240,10 +286,10 @@ export default function InputBar({
         >
           <AddSomethingToInput
             onImageSelect={handleImageSelect}
-            isImageBlocked={aviableModelImgPaste.includes(selectedModel)}
+            isImageBlocked={isImageBlocked}
             onImageBlocked={() => {
               setShowAddInput(false);
-              setIsImgErrorOpen(true);
+              openImgError("unsupported");
             }}
           />
         </div>
@@ -273,6 +319,7 @@ export default function InputBar({
         onChange={handleChange}
         onPaste={handlePaste}
         rows={1}
+        maxLength={limits.maxTextChars ?? undefined}
       />
 
       <div className={styles.iconWrapper1} tabIndex={0}>
@@ -322,6 +369,9 @@ export default function InputBar({
       <ErrorPatchImgModal
         open={isImgErrorOpen}
         onClose={() => setIsImgErrorOpen(false)}
+        variant={imgErrorVariant}
+        maxImages={limits.maxImages}
+        maxImageSizeMb={limits.maxImageSizeMb}
       />
     </div>
   );
