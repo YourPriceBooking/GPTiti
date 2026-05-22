@@ -93,6 +93,7 @@ export type MainSectionRightSideProps = {
   hasFirstRequest: boolean;
   isOverlay?: boolean;
   selectedModel: string;
+  onImagesChange?: (count: number) => void;
 };
 
 export type ModelModalOverlayProps = {

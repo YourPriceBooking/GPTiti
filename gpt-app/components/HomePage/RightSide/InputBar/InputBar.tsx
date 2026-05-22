@@ -19,6 +19,7 @@ export default function InputBar({
   setHasFirstRequest,
   hasFirstRequest,
   selectedModel,
+  onImagesChange,
 }: {
   hasInput: boolean;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
@@ -29,6 +30,7 @@ export default function InputBar({
   setHasFirstRequest: React.Dispatch<React.SetStateAction<boolean>>;
   hasFirstRequest: boolean;
   selectedModel: string;
+  onImagesChange?: (count: number) => void;
 }) {
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
 
@@ -119,6 +121,10 @@ export default function InputBar({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [showAddInput]);
+
+  useEffect(() => {
+    onImagesChange?.(images.length);
+  }, [images.length, onImagesChange]);
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     onChange(e);

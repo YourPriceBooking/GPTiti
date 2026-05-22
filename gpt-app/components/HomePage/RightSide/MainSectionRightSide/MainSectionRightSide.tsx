@@ -20,6 +20,7 @@ export default function MainSectionRightSide(props: MainSectionRightSideProps) {
     hasFirstRequest,
     isOverlay = false,
     selectedModel,
+    onImagesChange,
   } = props;
 
   const flow = getModelFlow(selectedModel);
@@ -121,6 +122,7 @@ export default function MainSectionRightSide(props: MainSectionRightSideProps) {
               setHasFirstRequest={setHasFirstRequest}
               hasFirstRequest={hasFirstRequest}
               selectedModel={selectedModel}
+              onImagesChange={onImagesChange}
             />
             <div className={styles.spanContainer}>
               <span className={styles.inputSpan}>
