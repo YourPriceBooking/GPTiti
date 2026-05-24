@@ -3,6 +3,8 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 
+import ModelInputLimits from "@/components/common/ModelInputLimits/ModelInputLimits";
+
 const O3Mini = () => (
   <>
     <motion.p
@@ -162,6 +164,12 @@ const O3Mini = () => (
         <li>more expensive than basic models</li>
       </ul>
     </motion.div>
+
+    <hr className="border-gray-200" />
+
+    <ModelInputLimits model="o3-mini" />
+
+    <hr className="border-gray-200" />
 
     <motion.div
       initial={{ opacity: 0, y: 20 }}

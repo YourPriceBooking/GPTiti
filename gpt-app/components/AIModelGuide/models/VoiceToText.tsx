@@ -3,6 +3,8 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 
+import ModelInputLimits from "@/components/common/ModelInputLimits/ModelInputLimits";
+
 const VoiceToText = () => (
   <>
     <motion.p
@@ -139,6 +141,10 @@ const VoiceToText = () => (
         Most systems improve accuracy using AI post-processing.
       </p>
     </motion.div>
+
+    <hr className="border-gray-200" />
+
+    <ModelInputLimits model="Voice → Text" />
 
     <hr className="border-gray-200" />
 

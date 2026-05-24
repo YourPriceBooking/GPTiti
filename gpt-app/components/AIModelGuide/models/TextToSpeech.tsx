@@ -3,6 +3,8 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 
+import ModelInputLimits from "@/components/common/ModelInputLimits/ModelInputLimits";
+
 const TextToSpeech = () => (
   <>
     <motion.p
@@ -188,6 +190,10 @@ const TextToSpeech = () => (
         expressive.
       </p>
     </motion.div>
+
+    <hr className="border-gray-200" />
+
+    <ModelInputLimits model="Text → Voice" />
 
     <hr className="border-gray-200" />
 

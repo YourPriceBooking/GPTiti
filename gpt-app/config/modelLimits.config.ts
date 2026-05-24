@@ -1,20 +1,3 @@
-/**
- * Per-model upload / context limits enforced on the front-end.
- *
- *  - `maxImages` / `maxFiles` / `maxLinks`: zero means the model
- *    does NOT accept that kind of input (we block it in the UI).
- *  - `maxImageSizeMb` / `maxFileSizeMb`: hard ceiling per single file.
- *    Zero means the corresponding `max*` count is also zero
- *    (i.e. not applicable).
- *  - `maxTextChars`:
- *      * positive  → hard `maxLength` on the textarea,
- *      * `null`    → no text limit / not applicable
- *                    (e.g. a voice-only tool).
- *
- * The product spec also recommends client-side image compression
- * before upload — see `IMAGE_COMPRESSION` below + `lib/compressImage.ts`.
- */
-
 export type ModelLimits = {
   maxImages: number;
   maxImageSizeMb: number;

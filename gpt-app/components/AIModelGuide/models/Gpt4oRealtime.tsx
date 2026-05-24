@@ -3,6 +3,8 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 
+import ModelInputLimits from "@/components/common/ModelInputLimits/ModelInputLimits";
+
 const Gpt4oRealtime = () => (
   <>
     <motion.p
@@ -153,6 +155,12 @@ const Gpt4oRealtime = () => (
         </li>
       </ul>
     </motion.div>
+
+    <hr className="border-gray-200" />
+
+    <ModelInputLimits model="gpt-4o-realtime" />
+
+    <hr className="border-gray-200" />
 
     <motion.div
       initial={{ opacity: 0, y: 20 }}

@@ -2,6 +2,8 @@
 
 import { motion } from "framer-motion";
 
+import ModelInputLimits from "@/components/common/ModelInputLimits/ModelInputLimits";
+
 const ImageCreateFast = () => (
   <>
     <motion.p
@@ -202,6 +204,10 @@ const ImageCreateFast = () => (
         *Actual usage depends on prompt complexity.
       </p>
     </motion.div>
+
+    <hr className="border-gray-200" />
+
+    <ModelInputLimits model="Image → Create Fast" />
   </>
 );
 

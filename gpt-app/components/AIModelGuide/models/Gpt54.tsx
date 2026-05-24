@@ -3,6 +3,8 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 
+import ModelInputLimits from "@/components/common/ModelInputLimits/ModelInputLimits";
+
 const Gpt54 = () => (
   <>
     <motion.p
@@ -152,6 +154,12 @@ const Gpt54 = () => (
         <li>✔️ cheaper than o1 for most tasks</li>
       </ul>
     </motion.div>
+
+    <hr className="border-gray-200" />
+
+    <ModelInputLimits model="gpt-5.4" />
+
+    <hr className="border-gray-200" />
 
     <motion.div
       initial={{ opacity: 0, y: 20 }}
