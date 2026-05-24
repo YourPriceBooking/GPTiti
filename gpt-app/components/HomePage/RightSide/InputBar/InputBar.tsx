@@ -3,7 +3,7 @@ import { useState, useLayoutEffect, useEffect, useRef, useMemo } from "react";
 import AddSomethingToInput from "../AddSomethingToInput/AddSomethingToInput";
 import LoginModal from "@/components/HomePage/common/LoginModal/LoginModal";
 import ErrorPatchImgModal, {
-  ErrorPatchImgVariant,
+  LimitKind,
 } from "@/components/HomePage/common/ErrorPatchImgModal/ErrorPatchImgModal";
 
 import { useAppSelector } from "@/redux/hooks";
@@ -47,9 +47,9 @@ export default function InputBar({
   const [shouldScroll, setShouldScroll] = useState(false);
   const [showAddInput, setShowAddInput] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
-  const [isImgErrorOpen, setIsImgErrorOpen] = useState(false);
-  const [imgErrorVariant, setImgErrorVariant] =
-    useState<ErrorPatchImgVariant>("unsupported");
+  const [isLimitErrorOpen, setIsLimitErrorOpen] = useState(false);
+  const [limitErrorKind, setLimitErrorKind] =
+    useState<LimitKind>("imagesNotSupported");
   const [images, setImages] = useState<
     { id: string; url: string; file: File }[]
   >([]);
@@ -58,9 +58,9 @@ export default function InputBar({
   const isImageBlocked = limits.maxImages === 0;
   const maxImageBytes = limits.maxImageSizeMb * MB;
 
-  const openImgError = (variant: ErrorPatchImgVariant) => {
-    setImgErrorVariant(variant);
-    setIsImgErrorOpen(true);
+  const openLimitError = (kind: LimitKind) => {
+    setLimitErrorKind(kind);
+    setIsLimitErrorOpen(true);
   };
 
   const resizeTextarea = () => {
@@ -145,13 +145,13 @@ export default function InputBar({
     if (incoming.length === 0) return;
 
     if (isImageBlocked) {
-      openImgError("unsupported");
+      openLimitError("imagesNotSupported");
       return;
     }
 
     const remaining = Math.max(0, limits.maxImages - images.length);
     if (remaining === 0) {
-      openImgError("tooMany");
+      openLimitError("imagesCount");
       return;
     }
 
@@ -172,8 +172,8 @@ export default function InputBar({
     }
 
     if (accepted.length === 0) {
-      if (rejectedForSize) openImgError("tooLarge");
-      else if (trimmedForCount) openImgError("tooMany");
+      if (rejectedForSize) openLimitError("imageSize");
+      else if (trimmedForCount) openLimitError("imagesCount");
       return;
     }
 
@@ -185,13 +185,13 @@ export default function InputBar({
           url: URL.createObjectURL(compressed),
           file: compressed,
         };
-      }),
+      })
     );
 
     setImages((prev) => [...prev, ...processed]);
 
-    if (rejectedForSize) openImgError("tooLarge");
-    else if (trimmedForCount) openImgError("tooMany");
+    if (rejectedForSize) openLimitError("imageSize");
+    else if (trimmedForCount) openLimitError("imagesCount");
   };
 
   const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
@@ -201,10 +201,27 @@ export default function InputBar({
       .map((item) => item.getAsFile())
       .filter((f): f is File => f !== null);
 
-    if (pastedImages.length === 0) return;
+    if (pastedImages.length > 0) {
+      e.preventDefault();
+      void addImageFiles(pastedImages);
+      return;
+    }
 
-    e.preventDefault();
-    void addImageFiles(pastedImages);
+    if (limits.maxTextChars !== null) {
+      const pastedText = e.clipboardData.getData("text") ?? "";
+      if (pastedText.length === 0) return;
+
+      const ta = inputRef.current;
+      if (!ta) return;
+      const selStart = ta.selectionStart ?? ta.value.length;
+      const selEnd = ta.selectionEnd ?? selStart;
+      const selectionLen = Math.max(0, selEnd - selStart);
+      const projectedLen = ta.value.length - selectionLen + pastedText.length;
+
+      if (projectedLen > limits.maxTextChars) {
+        openLimitError("textLength");
+      }
+    }
   };
 
   const removeImage = (id: string) => {
@@ -229,16 +246,16 @@ export default function InputBar({
           return;
         }
         if (images.length > 0 && isImageBlocked) {
-          openImgError("unsupported");
+          openLimitError("imagesNotSupported");
           return;
         }
         if (images.length > limits.maxImages) {
-          openImgError("tooMany");
+          openLimitError("imagesCount");
           return;
         }
         onSend(
           message,
-          images.map((img) => img.url),
+          images.map((img) => img.url)
         );
         setImages([]);
         onHideSection();
@@ -281,7 +298,9 @@ export default function InputBar({
       </div>
       {showAddInput && (
         <div
-          className={`${styles.modalWrapper} ${showAddInput ? styles.visible : styles.hidden}`}
+          className={`${styles.modalWrapper} ${
+            showAddInput ? styles.visible : styles.hidden
+          }`}
           ref={modalRef}
         >
           <AddSomethingToInput
@@ -289,7 +308,7 @@ export default function InputBar({
             isImageBlocked={isImageBlocked}
             onImageBlocked={() => {
               setShowAddInput(false);
-              openImgError("unsupported");
+              openLimitError("imagesNotSupported");
             }}
           />
         </div>
@@ -367,11 +386,10 @@ export default function InputBar({
 
       <LoginModal open={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
       <ErrorPatchImgModal
-        open={isImgErrorOpen}
-        onClose={() => setIsImgErrorOpen(false)}
-        variant={imgErrorVariant}
-        maxImages={limits.maxImages}
-        maxImageSizeMb={limits.maxImageSizeMb}
+        open={isLimitErrorOpen}
+        onClose={() => setIsLimitErrorOpen(false)}
+        kind={limitErrorKind}
+        model={selectedModel}
       />
     </div>
   );

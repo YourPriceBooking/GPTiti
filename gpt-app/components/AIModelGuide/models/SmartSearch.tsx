@@ -3,6 +3,8 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 
+import ModelInputLimits from "@/components/common/ModelInputLimits/ModelInputLimits";
+
 const SmartSearch = () => (
   <>
     <motion.p
@@ -159,6 +161,10 @@ const SmartSearch = () => (
         structured databases.
       </p>
     </motion.div>
+
+    <hr className="border-gray-200" />
+
+    <ModelInputLimits model="Smart Search" />
 
     <hr className="border-gray-200" />
 

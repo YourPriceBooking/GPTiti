@@ -3,6 +3,8 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 
+import ModelInputLimits from "@/components/common/ModelInputLimits/ModelInputLimits";
+
 const Gpt55 = () => (
   <>
     <motion.p
@@ -294,6 +296,12 @@ const Gpt55 = () => (
         behavior, answer size, and additional context.
       </p>
     </motion.div>
+
+    <hr className="border-gray-200" />
+
+    <ModelInputLimits model="gpt-5.5" />
+
+    <hr className="border-gray-200" />
 
     <motion.div
       initial={{ opacity: 0, y: 20 }}

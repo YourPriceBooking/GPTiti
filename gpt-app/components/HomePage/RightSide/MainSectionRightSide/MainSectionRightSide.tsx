@@ -112,6 +112,10 @@ export default function MainSectionRightSide(props: MainSectionRightSideProps) {
         <>
           <div className={styles.noneContainer}></div>
           <div className={styles.focusInputWrap}>
+            <div className={styles.focusHeader}>
+              <h2 className={styles.focusTitle}>{flow.header}</h2>
+              <p className={styles.focusSubtitle}>{flow.subtitle}</p>
+            </div>
             <InputBar
               hasInput={hasInput}
               onChange={onChange}
