@@ -173,7 +173,18 @@ export default function HeaderRightSide({
       </div>
 
       <div className={styles.modelGptitiWrapper}>
-        <div className={styles.modelGptitiContainer}>
+        <div
+          className={styles.modelGptitiContainer}
+          onClick={() => setModelModalOpenSafe(true)}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              setModelModalOpenSafe(true);
+            }
+          }}
+        >
           <ModelGptitiTitleWithIcon
             modelRef={modelRef}
             selectedModel={selectedModel}

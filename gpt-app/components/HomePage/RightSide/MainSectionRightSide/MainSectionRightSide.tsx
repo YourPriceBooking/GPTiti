@@ -110,7 +110,6 @@ export default function MainSectionRightSide(props: MainSectionRightSideProps) {
         </section>
       ) : (
         <>
-          <div className={styles.noneContainer}></div>
           <div className={styles.focusInputWrap}>
             <div className={styles.focusHeader}>
               <h2 className={styles.focusTitle}>{flow.header}</h2>
