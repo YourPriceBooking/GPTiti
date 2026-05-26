@@ -103,6 +103,8 @@ export default function Home() {
   const isNewChat = !activeChat || activeChat.messages.length === 0;
   const isExistingChat = !!activeChat && !newChatOpened;
 
+  const dockHidden = (isSectionVisible && focusMode) || isOverlayOpen;
+
   useEffect(() => {
     if (activeChat && activeChat.messages.length > 0) {
       const t = setTimeout(() => dispatch(setNewChatOpened(false)), 0);
@@ -242,7 +244,10 @@ export default function Home() {
         setSelectedModelGroup={(g) => dispatch(setSelectedModelGroup(g))}
       />
 
-      <div className={styles.appContainer} data-flow={getFlowType(selectedModel)}>
+      <div
+        className={styles.appContainer}
+        data-flow={getFlowType(selectedModel)}
+      >
         <div className={styles.leftSideContainer}>
           <LeftSide
             onNewChat={() => dispatch(handleNewChat())}
@@ -263,7 +268,11 @@ export default function Home() {
             setSelectedModelGroup={(g) => dispatch(setSelectedModelGroup(g))}
           />
         </div>
-        <div className={styles.rightSection}>
+        <div
+          className={`${styles.rightSection} ${
+            dockHidden ? styles.dockHidden : ""
+          }`}
+        >
           <div className={styles.headerRightSectionContainer}>
             <HeaderRightSide
               chatTitle={activeChat?.title}

@@ -18,6 +18,10 @@
 
   --composer-height: 100px;
 }
+
+.rightSection.dockHidden {
+  --composer-height: 0px;
+}
 .headerRightSectionContainer {
   position: sticky;
   top: 9px;
