@@ -267,7 +267,7 @@
 .focusTitle {
   margin: 0;
   font-family: var(--font-family);
-  font-style: italic;
+  font-style: normal;
   font-weight: 700;
   font-size: 18px;
   color: #fcfdff;
@@ -276,7 +276,7 @@
 .focusSubtitle {
   margin: 0;
   font-family: var(--font-family);
-  font-style: italic;
+  font-style: normal;
   font-weight: 700;
   font-size: 13px;
   color: rgba(252, 253, 255, 0.75);

@@ -29,17 +29,47 @@ export interface ChatStreamRequest {
 }
 
 export interface Conversation {
-  id: string;
+  _id: string;
   title: string | null;
+  modelId?: string;
+  summary?: string;
+  archived?: boolean;
+  lastMessageAt?: string;
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
 }
 
 export interface ConversationMessage {
-  id: string;
+  _id: string;
   role: "user" | "assistant";
   content: string;
+  modelId?: string;
+  tokens?: number;
   createdAt: string;
+}
+
+export interface ChatHistoryMessage {
+  _id: string;
+  role: "user" | "assistant";
+  content: string;
+  modelId: string;
+  createdAt: string;
+}
+
+export interface ChatHistoryResponse {
+  messages: ChatHistoryMessage[];
+}
+
+export interface UploadResponse {
+  success: boolean;
+  file: {
+    url: string;
+    publicId: string;
+    mimetype: string;
+    size: number;
+    originalName: string;
+    expiresAt: string;
+  };
 }
 
 export interface PricePackage {

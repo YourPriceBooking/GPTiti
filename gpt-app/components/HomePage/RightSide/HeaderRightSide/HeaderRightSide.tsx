@@ -12,11 +12,16 @@ import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { selectIsLoggedIn } from "@/redux/auth/selectors";
 import { selectActiveChatId, selectChatList } from "@/redux/chat/selectors";
 import {
-  deleteChat,
+  deleteDraftChat,
   handleNewChat,
+  isDraftId,
   renameChat,
   setActiveChatId,
 } from "@/redux/chat/slice";
+import {
+  fetchConversationMessages,
+  removeConversation,
+} from "@/redux/chat/operations";
 
 import { useModelMode } from "@/hooks/useModelMode";
 
@@ -39,10 +44,10 @@ export default function HeaderRightSide({
   isModalOpen,
   setIsModalOpen,
   onOpenQuickActions,
-  hasFirstRequest,
+  quickActionsEnabled,
 }: HeaderRightSideProps & {
   onOpenQuickActions: () => void;
-  hasFirstRequest: boolean;
+  quickActionsEnabled: boolean;
 }) {
   const dispatch = useAppDispatch();
 
@@ -57,6 +62,18 @@ export default function HeaderRightSide({
 
   const result = getModelGroupAndItem(selectedModel);
   const { modelMode, setModelMode } = useModelMode();
+
+  const handleSelectChat = (id: string) => {
+    dispatch(setActiveChatId(id));
+    if (isDraftId(id)) return;
+    const chat = chatList.find((c) => c.id === id);
+    if (chat && !chat.messagesLoaded) dispatch(fetchConversationMessages(id));
+  };
+
+  const handleDeleteChat = (id: string) => {
+    if (isDraftId(id)) dispatch(deleteDraftChat(id));
+    else dispatch(removeConversation(id));
+  };
 
   const ANIM_MS = 220;
 
@@ -139,8 +156,8 @@ export default function HeaderRightSide({
                 modelMode={modelMode}
                 setModelMode={setModelMode}
                 chatList={chatList}
-                setActiveChatId={(id) => dispatch(setActiveChatId(id))}
-                deleteChat={(id) => dispatch(deleteChat(id))}
+                setActiveChatId={handleSelectChat}
+                deleteChat={handleDeleteChat}
                 renameChat={(chatId, newTitle) =>
                   dispatch(renameChat({ chatId, newTitle }))
                 }
@@ -235,7 +252,7 @@ export default function HeaderRightSide({
         <p
           className={styles.quickActionsContainer}
           onClick={onOpenQuickActions}
-          style={{ opacity: hasFirstRequest ? 1 : 0.5 }}
+          style={{ opacity: quickActionsEnabled ? 1 : 0.5 }}
         >
           <Image
             src="/icons/quick-actions.svg"

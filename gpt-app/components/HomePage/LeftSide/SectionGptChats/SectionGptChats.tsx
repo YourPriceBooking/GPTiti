@@ -16,6 +16,19 @@ export default function SectionGptChats({
   const [menuPosition, setMenuPosition] = useState<{ top: number; left: number } | null>(null);
   const [renamingChatId, setRenamingChatId] = useState<string | null>(null);
   const [deletingChatId, setDeletingChatId] = useState<string | null>(null);
+  const [isChatsOpen, setIsChatsOpen] = useState(true);
+  const [showAllChats, setShowAllChats] = useState(false);
+
+  const MAX_VISIBLE_CHATS = 5;
+  const titledChats = chatList.filter((chat) => chat.title !== null);
+  const hasChats = titledChats.length > 0;
+  const showOpenState = hasChats && isChatsOpen;
+  const hasMoreChats = titledChats.length > MAX_VISIBLE_CHATS;
+  const visibleChats =
+    showAllChats || !hasMoreChats
+      ? titledChats
+      : titledChats.slice(0, MAX_VISIBLE_CHATS);
+  const hiddenChatsCount = titledChats.length - MAX_VISIBLE_CHATS;
   const menuRef = useRef<HTMLDivElement | null>(null);
   const titleRefs = useRef<Record<string, HTMLSpanElement | null>>({});
 
@@ -61,21 +74,38 @@ export default function SectionGptChats({
         </button>
       </article>
 
-      <article className={styles.yourChats}>
-        <Image width={38} height={38} src="/icons/chat-bubble.svg" alt="chat-bubble" />
+      <article
+        className={styles.yourChats}
+        onClick={hasChats ? () => setIsChatsOpen((open) => !open) : undefined}
+        role={hasChats ? "button" : undefined}
+        tabIndex={hasChats ? 0 : undefined}
+      >
+        <Image
+          width={36}
+          height={36}
+          src={showOpenState ? "/icons/folder-icon.svg" : "/icons/chat-bubble.svg"}
+          alt="your-chats"
+        />
         <div className={styles.labelWrapper}>
           <button className={styles.span}>Your Chats</button>
-          <div className={styles.icon}>
-            <Image width={15} height={15} src="/icons/chevron-down.svg" alt="chevron-down" />
-          </div>
+          {hasChats && (
+            <div
+              className={`${styles.icon} ${isChatsOpen ? styles.iconOpen : ""}`}
+            >
+              <Image width={15} height={15} src="/icons/chevron-down.svg" alt="chevron-down" />
+            </div>
+          )}
         </div>
       </article>
 
-      <div className={styles.chatsScrollArea}>
-        <ul className={styles.chatsList}>
-          {chatList
-            .filter(chat => chat.title !== null)
-            .map(chat => (
+      {showOpenState && (
+        <div
+          className={`${styles.chatsScrollArea} ${
+            showAllChats && hasMoreChats ? styles.chatsScrollAreaScroll : ""
+          }`}
+        >
+          <ul className={styles.chatsList}>
+            {visibleChats.map(chat => (
               <li
                 key={chat.id}
                 className={styles.chatsListItem}
@@ -116,8 +146,35 @@ export default function SectionGptChats({
                 ></span>
               </li>
             ))}
-        </ul>
-      </div>
+          </ul>
+        </div>
+      )}
+
+      {showOpenState && hasMoreChats && (
+        <button
+          type="button"
+          className={styles.showMoreBtn}
+          onClick={() => setShowAllChats((prev) => !prev)}
+          aria-label={showAllChats ? "Show fewer chats" : "Show more chats"}
+        >
+          {!showAllChats && (
+            <span className={styles.showMoreDots}>
+              {Array.from({ length: hiddenChatsCount }).map((_, i) => (
+                <span key={i} className={styles.showMoreDot} />
+              ))}
+            </span>
+          )}
+          <Image
+            className={`${styles.showMoreChevron} ${
+              showAllChats ? styles.showMoreChevronUp : ""
+            }`}
+            width={15}
+            height={15}
+            src="/icons/chevron-down.svg"
+            alt="toggle chats"
+          />
+        </button>
+      )}
 
       {openMenuChatId && menuPosition && (
         <div

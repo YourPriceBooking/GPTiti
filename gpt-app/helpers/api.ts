@@ -7,6 +7,7 @@ import type {
   ChatPreviewRequest,
   ChatPreviewResponse,
   ChatStreamRequest,
+  ChatHistoryResponse,
   Conversation,
   ConversationMessage,
   PricePackage,
@@ -51,16 +52,24 @@ export const api = {
     });
     return res.data;
   },
-  createConversation: async (title?: string) => {
-    const res = await axiosInstance.post<Conversation>("/conversations", { title });
+  createConversation: async (modelId: string, title?: string) => {
+    const res = await axiosInstance.post<Conversation>("/conversations", { title, modelId });
     return res.data;
   },
   getConversations: async () => {
     const res = await axiosInstance.get<Conversation[]>("/conversations");
     return res.data;
   },
+  deleteConversation: async (id: string) => {
+    const res = await axiosInstance.delete<{ success: boolean }>(`/conversations/${id}`);
+    return res.data;
+  },
   getConversationMessages: async (id: string) => {
     const res = await axiosInstance.get<ConversationMessage[]>(`/conversations/${id}/messages`);
+    return res.data;
+  },
+  getChatHistory: async () => {
+    const res = await axiosInstance.get<ChatHistoryResponse>("/chat/history");
     return res.data;
   },
   regenerateLastMessage: async (conversationId: string, model: string) => {
