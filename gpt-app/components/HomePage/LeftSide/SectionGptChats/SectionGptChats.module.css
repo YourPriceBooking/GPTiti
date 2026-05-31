@@ -1,50 +1,52 @@
-
- .gptChats {
+.gptChats {
   margin-top: 24px;
   display: flex;
   flex-direction: column;
-  flex-shrink: 0;   /* важливо */
-    min-height: 0; 
-   overflow: hidden; 
+  flex-shrink: 0;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .yourChats,
 .gptNewChat {
-    flex-shrink: 0;
-    display: flex;
-    gap: 13px;
-    align-items: center;
-    padding-left: 28px;
-    border-radius: 11px;
-    max-width: 288px;
-    width: 100%;
-    min-height: 40px;
-    transition: background 1s ease-in;
+  flex-shrink: 0;
+  display: flex;
+  gap: 13px;
+  align-items: center;
+  padding-left: 28px;
+  border-radius: 11px;
+  max-width: 288px;
+  width: 100%;
+  min-height: 40px;
+  transition: background 1s ease-in;
 }
 
-.gptNewChat:hover, .gptNewChat:focus {
-    background: var(--main-gray);
-    cursor: pointer;
+.gptNewChat:hover,
+.gptNewChat:focus,
+.yourChats:hover,
+.yourChats:focus {
+  background: var(--main-gray);
+  cursor: pointer;
 }
 .span {
-    font-family: var(--font-family);
-    font-weight: 300;
-    font-size: 14px;
-    color: var(--main-white);
-    padding-bottom: 4px;
+  font-family: var(--font-family);
+  font-weight: 300;
+  font-size: 14px;
+  color: var(--main-white);
+  padding-bottom: 4px;
 }
 
 .chatsSpan {
-    font-family: var(--font-family);
-    font-weight: 500;
-    font-size: 14px;
-    color: var(--main-white);
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--main-white);
 }
 
 .labelWrapper {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
 }
 
 .icon {
@@ -52,10 +54,67 @@
   top: 50%;
   transform: translate(-50%);
   right: -33px;
+  transition: transform 0.2s ease;
+}
+.iconOpen {
+  transform: translate(-50%) rotate(180deg);
 }
 .chatsList {
   display: flex;
   flex-direction: column;
+}
+
+.chatsScrollAreaScroll {
+  max-height: 50vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--main-gray) transparent;
+}
+.chatsScrollAreaScroll::-webkit-scrollbar {
+  width: 6px;
+}
+.chatsScrollAreaScroll::-webkit-scrollbar-thumb {
+  background: var(--main-gray);
+  border-radius: 3px;
+}
+
+.showMoreBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  width: 100%;
+  max-width: 288px;
+  margin-top: 6px;
+  padding: 10px 16px;
+  background: var(--main-gray);
+  border: none;
+  border-radius: 11px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.showMoreBtn:hover {
+  background: #4a484c;
+}
+.showMoreDots {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 6px;
+}
+.showMoreDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--main-gray2);
+}
+.showMoreChevron {
+  align-self: center;
+  transition: transform 0.2s ease;
+}
+.showMoreChevronUp {
+  transform: rotate(180deg);
 }
 
 .chatsListItem {
@@ -80,15 +139,15 @@
   cursor: pointer;
 }
 
-.chatsListItem:focus{
-    background: var(--main-gray);
-    cursor: pointer;
+.chatsListItem:focus {
+  background: var(--main-gray);
+  cursor: pointer;
 }
 
 .dotsIcon {
   width: 28px;
   height: 24px;
-  background-image: url('/icons/three-points.svg');
+  background-image: url("/icons/three-points.svg");
   background-size: contain;
   background-repeat: no-repeat;
   opacity: 0;
@@ -99,11 +158,11 @@
 }
 .chatsListItem:hover .dotsIcon {
   opacity: 1;
-  }
+}
 
 .menuContainer {
-  position: fixed; 
-  transform: translateY(-50%); 
+  position: fixed;
+  transform: translateY(-50%);
   z-index: 1000;
 }
 .chatTitle {
@@ -120,11 +179,7 @@
   cursor: text;
 }
 
-@media (max-width:767px) and (min-width:320px) {
- 
-.menuContainer{
-  
-  
-}
-
+@media (max-width: 767px) and (min-width: 320px) {
+  .menuContainer {
+  }
 }

@@ -401,7 +401,7 @@ const AIModelGuide = () => {
           No subscriptions • Tokens never expire.
         </p>
         <Link
-          href="/sign-in"
+          href="/"
           className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold text-lg px-6 py-3 rounded-xl transition-colors"
         >
           Try GPTiti now

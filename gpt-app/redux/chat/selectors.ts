@@ -8,3 +8,5 @@ export const selectIsTyping = (state: RootState) => state.chat.isTyping;
 export const selectInputSent = (state: RootState) => state.chat.inputSent;
 export const selectHasInput = (state: RootState) => state.chat.hasInput;
 export const selectTemplateTick = (state: RootState) => state.chat.templateTick;
+export const selectChatStatus = (state: RootState) => state.chat.status;
+export const selectChatError = (state: RootState) => state.chat.error;

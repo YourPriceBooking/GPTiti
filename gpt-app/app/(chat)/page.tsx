@@ -26,17 +26,29 @@ import {
   selectTemplateTick,
 } from "@/redux/chat/selectors";
 import {
-  appendAiMessage,
+  appendAssistantChunk,
   appendUserMessage,
   bumpTemplateTick,
-  deleteChat,
+  deleteDraftChat,
+  finishAssistantMessage,
   handleNewChat,
+  isDraftId,
+  promoteDraft,
   renameChat,
   setActiveChatId,
   setHasInput,
   setInputSent,
   setIsTyping,
+  startAssistantMessage,
 } from "@/redux/chat/slice";
+import {
+  createConversation,
+  fetchConversationMessages,
+  fetchConversations,
+  removeConversation,
+} from "@/redux/chat/operations";
+import { selectIsLoggedIn } from "@/redux/auth/selectors";
+import { useSocket } from "@/context/SocketContext";
 import {
   selectSelectedModel,
   selectSelectedModelGroup,
@@ -81,13 +93,16 @@ export default function Home() {
   const isOverlayOpen = useAppSelector(selectIsOverlayOpen);
   const hasFirstRequest = useAppSelector(selectHasFirstRequest);
   const newChatOpened = useAppSelector(selectNewChatOpened);
+  const isLoggedIn = useAppSelector(selectIsLoggedIn);
 
   const { modelMode, setModelMode, modelRef } = useModelMode();
+  const { socket } = useSocket();
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const pendingTemplateRef = useRef<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const pendingConvIdRef = useRef<string | null>(null);
 
   const [inputCharCount, setInputCharCount] = useState(0);
   const [inputImageCount, setInputImageCount] = useState(0);
@@ -168,16 +183,54 @@ export default function Home() {
     [dispatch, selectedModel],
   );
 
+  const handleSelectModel = useCallback(
+    (model: string) => {
+      const changed = model !== selectedModel;
+      dispatch(setSelectedModel(model));
+      if (changed && activeChat && activeChat.messages.length > 0) {
+        dispatch(handleNewChat());
+        if (inputRef.current) inputRef.current.value = "";
+        setInputCharCount(0);
+        setInputImageCount(0);
+        dispatch(setHasInput(false));
+        dispatch(bumpTemplateTick());
+      }
+    },
+    [dispatch, selectedModel, activeChat],
+  );
+
   const handleSendClick = useCallback(
     async (_hasFirstRequest: boolean, imageUrls: string[] = []) => {
       if (!inputRef.current || !activeChatId) return;
       const userText = inputRef.current.value.trim();
       if (!userText && imageUrls.length === 0) return;
 
+      let convId = activeChatId;
+      if (isDraftId(convId)) {
+        try {
+          const conv = await dispatch(
+            createConversation({
+              modelId: selectedModel,
+              title: userText.slice(0, 60) || undefined,
+            }),
+          ).unwrap();
+          dispatch(
+            promoteDraft({
+              draftId: convId,
+              realId: conv._id,
+              title: conv.title ?? (userText || null),
+            }),
+          );
+          convId = conv._id;
+        } catch {
+          return;
+        }
+      }
+
       dispatch(
         appendUserMessage({
-          chatId: activeChatId,
-          user: userText,
+          chatId: convId,
+          content: userText,
           images: imageUrls,
         }),
       );
@@ -188,22 +241,84 @@ export default function Home() {
       setInputCharCount(0);
       setInputImageCount(0);
 
-      const delay = Math.random() * 1000 + 1500;
-      await new Promise((resolve) => setTimeout(resolve, delay));
+      dispatch(startAssistantMessage({ chatId: convId }));
+      pendingConvIdRef.current = convId;
 
-      const usedTokens = Math.floor(Math.random() * 100) + 50;
-
-      dispatch(
-        appendAiMessage({
-          chatId: activeChatId,
-          ai: "default",
-          tokens: usedTokens,
-        }),
-      );
-      dispatch(setIsTyping(false));
+      // 3. Send over the socket; the reply streams back via chat:stream / chat:end.
+      try {
+        socket?.emit("chat:send", {
+          event: "chat:send",
+          type: "send-request",
+          payload: {
+            message: userText,
+            conversationId: convId,
+            modelId: selectedModel,
+          },
+        });
+      } catch {
+        dispatch(finishAssistantMessage({ chatId: convId }));
+        dispatch(setIsTyping(false));
+        pendingConvIdRef.current = null;
+      }
     },
-    [dispatch, activeChatId],
+    [dispatch, activeChatId, selectedModel, socket],
   );
+
+  const handleSelectChat = useCallback(
+    (id: string) => {
+      dispatch(setActiveChatId(id));
+      if (isDraftId(id)) return;
+      const chat = chatList.find((c) => c.id === id);
+      if (chat && !chat.messagesLoaded) {
+        dispatch(fetchConversationMessages(id));
+      }
+    },
+    [dispatch, chatList],
+  );
+
+  const handleDeleteChat = useCallback(
+    (id: string) => {
+      if (isDraftId(id)) dispatch(deleteDraftChat(id));
+      else dispatch(removeConversation(id));
+    },
+    [dispatch],
+  );
+
+  useEffect(() => {
+    if (isLoggedIn) dispatch(fetchConversations());
+  }, [isLoggedIn, dispatch]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const onStream = (data: { chunk?: string }) => {
+      const chatId = pendingConvIdRef.current;
+      if (!chatId || !data?.chunk) return;
+      dispatch(appendAssistantChunk({ chatId, chunk: data.chunk }));
+    };
+    const onEnd = () => {
+      const chatId = pendingConvIdRef.current;
+      if (chatId) dispatch(finishAssistantMessage({ chatId }));
+      dispatch(setIsTyping(false));
+      pendingConvIdRef.current = null;
+    };
+    const onError = (err: unknown) => {
+      const chatId = pendingConvIdRef.current;
+      if (chatId) dispatch(finishAssistantMessage({ chatId }));
+      dispatch(setIsTyping(false));
+      pendingConvIdRef.current = null;
+      console.error("chat:error", err);
+    };
+
+    socket.on("chat:stream", onStream);
+    socket.on("chat:end", onEnd);
+    socket.on("chat:error", onError);
+    return () => {
+      socket.off("chat:stream", onStream);
+      socket.off("chat:end", onEnd);
+      socket.off("chat:error", onError);
+    };
+  }, [socket, dispatch]);
 
   const insertTemplateToInput = (template: string) => {
     const maxChars = getModelLimits(selectedModel).maxTextChars;
@@ -239,7 +354,7 @@ export default function Home() {
         isModalOpen={isModalOpen}
         setIsModalOpen={(open) => dispatch(setIsModalOpen(open))}
         selectedModel={selectedModel}
-        setSelectedModel={(m) => dispatch(setSelectedModel(m))}
+        setSelectedModel={handleSelectModel}
         selectedModelGroup={selectedModelGroup}
         setSelectedModelGroup={(g) => dispatch(setSelectedModelGroup(g))}
       />
@@ -256,14 +371,14 @@ export default function Home() {
             modelMode={modelMode}
             setModelMode={setModelMode}
             chatList={chatList}
-            setActiveChatId={(id) => dispatch(setActiveChatId(id))}
-            deleteChat={(id) => dispatch(deleteChat(id))}
+            setActiveChatId={handleSelectChat}
+            deleteChat={handleDeleteChat}
             renameChat={(chatId, newTitle) =>
               dispatch(renameChat({ chatId, newTitle }))
             }
             modelRef={modelRef}
             selectedModel={selectedModel}
-            setSelectedModel={(m) => dispatch(setSelectedModel(m))}
+            setSelectedModel={handleSelectModel}
             selectedModelGroup={selectedModelGroup}
             setSelectedModelGroup={(g) => dispatch(setSelectedModelGroup(g))}
           />
@@ -278,14 +393,15 @@ export default function Home() {
               chatTitle={activeChat?.title}
               modelRef={modelRef}
               selectedModel={selectedModel}
-              setSelectedModel={(m) => dispatch(setSelectedModel(m))}
+              setSelectedModel={handleSelectModel}
               selectedModelGroup={selectedModelGroup}
               setSelectedModelGroup={(g) => dispatch(setSelectedModelGroup(g))}
               isModalOpen={isModalOpen}
               setIsModalOpen={(open) => dispatch(setIsModalOpen(open))}
-              hasFirstRequest={hasFirstRequest}
+              quickActionsEnabled={hasFirstRequest || focusMode}
               onOpenQuickActions={() => {
-                if (hasFirstRequest) dispatch(setIsOverlayOpen(true));
+                if (hasFirstRequest || focusMode)
+                  dispatch(setIsOverlayOpen(true));
               }}
             />
           </div>
