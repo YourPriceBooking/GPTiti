@@ -1,27 +1,28 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import { claimTokens } from "./operations";
+import { loginUser, logoutUser } from "../auth/operations";
 
 interface TokensState {
   balance: number;
   /** ISO string so persist stays serialisable */
   nextClaimTime: string | null;
   countdown: string;
+  claiming: boolean;
+  claimError: string | null;
 }
 
 const initialState: TokensState = {
   balance: 10000,
   nextClaimTime: null,
-  countdown: "7 days 00:00",
+  countdown: "Available now",
+  claiming: false,
+  claimError: null,
 };
 
 const tokensSlice = createSlice({
   name: "tokens",
   initialState,
   reducers: {
-    claim(state) {
-      const next = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-      state.balance += 10000;
-      state.nextClaimTime = next.toISOString();
-    },
     setCountdown(state, { payload }: PayloadAction<string>) {
       state.countdown = payload;
     },
@@ -29,7 +30,34 @@ const tokensSlice = createSlice({
       state.balance = payload;
     },
   },
+  extraReducers: (builder) =>
+    builder
+      .addCase(loginUser.fulfilled, (state, { payload }) => {
+        if (typeof payload.user.appTokens === "number") {
+          state.balance = payload.user.appTokens;
+        }
+        state.nextClaimTime = payload.user.nextClaimDate ?? null;
+        state.claimError = null;
+      })
+      .addCase(logoutUser.fulfilled, (state) => {
+        state.balance = initialState.balance;
+        state.nextClaimTime = null;
+        state.claimError = null;
+      })
+      .addCase(claimTokens.pending, (state) => {
+        state.claiming = true;
+        state.claimError = null;
+      })
+      .addCase(claimTokens.fulfilled, (state, { payload }) => {
+        state.claiming = false;
+        state.balance = payload.appTokens;
+        state.nextClaimTime = payload.nextClaimDate;
+      })
+      .addCase(claimTokens.rejected, (state, { payload }) => {
+        state.claiming = false;
+        state.claimError = payload ?? "Failed to claim tokens";
+      }),
 });
 
-export const { claim, setCountdown, setBalance } = tokensSlice.actions;
+export const { setCountdown, setBalance } = tokensSlice.actions;
 export const tokensReducer = tokensSlice.reducer;

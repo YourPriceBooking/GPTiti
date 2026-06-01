@@ -8,10 +8,13 @@ import Link from "next/link";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
   selectBalance,
+  selectClaimError,
+  selectClaiming,
   selectCountdown,
   selectNextClaimTime,
 } from "@/redux/tokens/selectors";
-import { claim, setCountdown } from "@/redux/tokens/slice";
+import { setCountdown } from "@/redux/tokens/slice";
+import { claimTokens } from "@/redux/tokens/operations";
 import { selectIsLoggedIn } from "@/redux/auth/selectors";
 
 import LoginModal from "@/components/HomePage/common/LoginModal/LoginModal";
@@ -55,13 +58,34 @@ export default function TokensPage() {
   const balance = useAppSelector(selectBalance);
   const countdown = useAppSelector(selectCountdown);
   const nextClaimTime = useAppSelector(selectNextClaimTime);
+  const claiming = useAppSelector(selectClaiming);
+  const claimError = useAppSelector(selectClaimError);
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
-  const [clicked, setClicked] = useState(false);
+  const [justClaimed, setJustClaimed] = useState(false);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
 
-  const handleClaim = () => dispatch(claim());
+  const isClaimAvailable =
+    !nextClaimTime || new Date(nextClaimTime).getTime() <= Date.now();
+
+  const handleClaim = async () => {
+    if (!isLoggedIn) {
+      setIsLoginOpen(true);
+      return;
+    }
+    try {
+      const res = await dispatch(claimTokens()).unwrap();
+      if (res.success) setJustClaimed(true);
+    } catch {
+      // claimError is surfaced from the store; the button re-enables for retry.
+    }
+  };
 
   useEffect(() => {
-    if (!nextClaimTime) return;
+    // No cooldown set (never claimed / can claim now) → the button is available.
+    if (!nextClaimTime) {
+      dispatch(setCountdown("Available now"));
+      return;
+    }
     const target = new Date(nextClaimTime).getTime();
 
     const tick = () => {
@@ -90,7 +114,6 @@ export default function TokensPage() {
 
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
-  const [isLoginOpen, setIsLoginOpen] = useState(false);
 
   const openPayment = (plan: Plan) => {
     if (!isLoggedIn) {
@@ -310,17 +333,14 @@ export default function TokensPage() {
 
             <button
               className={`${styles.claimButton} ${
-                clicked ? styles.clicked : ""
+                justClaimed ? styles.clicked : ""
               }`}
-              onClick={() => {
-                setClicked(true);
-                handleClaim();
-              }}
-              disabled={clicked}
+              onClick={handleClaim}
+              disabled={claiming || !isClaimAvailable}
               type="button"
             >
               <div className={styles.buyButtonContent}>
-                {clicked ? (
+                {justClaimed ? (
                   <>
                     <span className={styles.buyButtonSpan}>Claimed ✓</span>
                     <Image
@@ -334,7 +354,7 @@ export default function TokensPage() {
                 ) : (
                   <>
                     <span className={styles.buyButtonSpan}>
-                      Claim 10K Tokens
+                      {claiming ? "Claiming…" : "Claim 10K Tokens"}
                     </span>
                     <Image
                       className={styles.claimButtonIcon}
@@ -348,7 +368,13 @@ export default function TokensPage() {
               </div>
             </button>
 
-            <p className={styles.claimParagraph}>Next claim in: {countdown}</p>
+            {claimError ? (
+              <p className={styles.claimParagraph} style={{ color: "#f87171" }}>
+                {claimError}
+              </p>
+            ) : (
+              <p className={styles.claimParagraph}>Next claim in: {countdown}</p>
+            )}
           </div>
         </article>
       </section>

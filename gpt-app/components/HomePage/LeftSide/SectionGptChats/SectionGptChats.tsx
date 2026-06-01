@@ -16,19 +16,24 @@ export default function SectionGptChats({
   const [menuPosition, setMenuPosition] = useState<{ top: number; left: number } | null>(null);
   const [renamingChatId, setRenamingChatId] = useState<string | null>(null);
   const [deletingChatId, setDeletingChatId] = useState<string | null>(null);
-  const [isChatsOpen, setIsChatsOpen] = useState(true);
+  const [isChatsOpen, setIsChatsOpen] = useState(false);
   const [showAllChats, setShowAllChats] = useState(false);
 
   const MAX_VISIBLE_CHATS = 5;
   const titledChats = chatList.filter((chat) => chat.title !== null);
-  const hasChats = titledChats.length > 0;
-  const showOpenState = hasChats && isChatsOpen;
-  const hasMoreChats = titledChats.length > MAX_VISIBLE_CHATS;
+  const chatsCount = titledChats.length;
+  const hasChats = chatsCount > 0;
+  // Header toggles the list only with fewer than 5 chats; with 5+ it is always shown.
+  const isCollapsible = hasChats && chatsCount < MAX_VISIBLE_CHATS;
+  const hasMoreChats = chatsCount > MAX_VISIBLE_CHATS;
+  const listVisible = hasChats && (isCollapsible ? isChatsOpen : true);
   const visibleChats =
-    showAllChats || !hasMoreChats
-      ? titledChats
-      : titledChats.slice(0, MAX_VISIBLE_CHATS);
-  const hiddenChatsCount = titledChats.length - MAX_VISIBLE_CHATS;
+    hasMoreChats && !showAllChats
+      ? titledChats.slice(0, MAX_VISIBLE_CHATS)
+      : titledChats;
+  const hiddenChatsCount = chatsCount - MAX_VISIBLE_CHATS;
+  // Folder icon appears only when the >5 list is expanded via the show-more button.
+  const showFolderIcon = hasMoreChats && showAllChats;
   const menuRef = useRef<HTMLDivElement | null>(null);
   const titleRefs = useRef<Record<string, HTMLSpanElement | null>>({});
 
@@ -76,19 +81,19 @@ export default function SectionGptChats({
 
       <article
         className={styles.yourChats}
-        onClick={hasChats ? () => setIsChatsOpen((open) => !open) : undefined}
-        role={hasChats ? "button" : undefined}
-        tabIndex={hasChats ? 0 : undefined}
+        onClick={isCollapsible ? () => setIsChatsOpen((open) => !open) : undefined}
+        role={isCollapsible ? "button" : undefined}
+        tabIndex={isCollapsible ? 0 : undefined}
       >
         <Image
           width={36}
           height={36}
-          src={showOpenState ? "/icons/folder-icon.svg" : "/icons/chat-bubble.svg"}
+          src={showFolderIcon ? "/icons/folder-icon.svg" : "/icons/chat-bubble.svg"}
           alt="your-chats"
         />
         <div className={styles.labelWrapper}>
           <button className={styles.span}>Your Chats</button>
-          {hasChats && (
+          {isCollapsible && (
             <div
               className={`${styles.icon} ${isChatsOpen ? styles.iconOpen : ""}`}
             >
@@ -98,7 +103,7 @@ export default function SectionGptChats({
         </div>
       </article>
 
-      {showOpenState && (
+      {listVisible && (
         <div
           className={`${styles.chatsScrollArea} ${
             showAllChats && hasMoreChats ? styles.chatsScrollAreaScroll : ""
@@ -150,7 +155,7 @@ export default function SectionGptChats({
         </div>
       )}
 
-      {showOpenState && hasMoreChats && (
+      {hasMoreChats && (
         <button
           type="button"
           className={styles.showMoreBtn}
