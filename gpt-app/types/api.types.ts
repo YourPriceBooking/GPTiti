@@ -72,6 +72,14 @@ export interface UploadResponse {
   };
 }
 
+export interface ClaimTokenResponse {
+  code: number;
+  success: boolean;
+  message: string;
+  nextClaimDate: string;
+  appTokens: number;
+}
+
 export interface PricePackage {
   id: string;
   tokens: number;

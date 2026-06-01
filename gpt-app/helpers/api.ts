@@ -12,6 +12,7 @@ import type {
   ConversationMessage,
   PricePackage,
   CheckoutResponse,
+  ClaimTokenResponse,
 } from "@/types/api.types";
 
 export const api = {
@@ -129,5 +130,9 @@ export const api = {
     } catch (error) {
       console.warn("Logout request failed:", error);
     }
+  },
+  claimToken: async () => {
+    const res = await axiosInstance.post<ClaimTokenResponse>("/users/claim-token");
+    return res.data;
   },
 };
