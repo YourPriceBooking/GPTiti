@@ -1,5 +1,6 @@
 import axios from "axios";
 import type { AppStore } from "@/redux/store";
+import { isAuthExpiredError } from "@/lib/authError";
 
 export const axiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_BACKEND_API_URL,
@@ -8,6 +9,7 @@ export const axiosInstance = axios.create({
 
 interface RetryableConfig {
   _retry?: boolean;
+  url?: string;
   headers?: Record<string, string>;
   [key: string]: unknown;
 }
@@ -23,13 +25,14 @@ export const setupInterceptors = (store: AppStore) => {
   axiosInstance.interceptors.response.use(
     (res) => res,
     async (error) => {
-      const { response, config } = error as {
-        response?: { status?: number };
-        config?: RetryableConfig;
-      };
-      if (!response || !config) throw error;
+      const config = (error as { config?: RetryableConfig }).config;
+      if (!config || !isAuthExpiredError(error)) throw error;
 
-      if (response.status === 401 && !config._retry) {
+      const isRefreshCall = config.url?.includes("/users/refresh") ?? false;
+      const hasRefreshToken = Boolean(store.getState().auth.refreshToken);
+
+      // Try once to silently refresh the access token.
+      if (hasRefreshToken && !isRefreshCall && !config._retry) {
         config._retry = true;
         try {
           const { refreshUser } = await import("@/redux/auth/operations");
@@ -42,13 +45,15 @@ export const setupInterceptors = (store: AppStore) => {
             Authorization: `Bearer ${accessToken}`,
           };
           return axiosInstance.request(config);
-        } catch (refreshErr) {
-          const { refreshError } = await import("@/redux/auth/slice");
-          store.dispatch(refreshError());
-          throw refreshErr;
+        } catch {
+          // refresh failed → fall through to force a logout
         }
       }
 
+      // Unrecoverable expiry (no refresh token / refresh failed / already retried)
+      // → log out and surface the login window.
+      const { refreshError } = await import("@/redux/auth/slice");
+      store.dispatch(refreshError());
       throw error;
     },
   );

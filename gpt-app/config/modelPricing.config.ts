@@ -86,8 +86,6 @@ export const MODEL_PRICING: Record<string, ModelPricing> = Object.fromEntries(
   ])
 );
 
-console.log("MODEL_PRICING", MODEL_PRICING);
-
 const ESTIMATE_HIDDEN_FOR: ReadonlySet<string> = new Set([
   "Smart Search",
   "Voice → Text",

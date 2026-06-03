@@ -21,6 +21,7 @@ import {
 import {
   fetchConversationMessages,
   removeConversation,
+  renameConversation,
 } from "@/redux/chat/operations";
 
 import { useModelMode } from "@/hooks/useModelMode";
@@ -73,6 +74,13 @@ export default function HeaderRightSide({
   const handleDeleteChat = (id: string) => {
     if (isDraftId(id)) dispatch(deleteDraftChat(id));
     else dispatch(removeConversation(id));
+  };
+
+  const handleRenameChat = (chatId: string, newTitle: string) => {
+    dispatch(renameChat({ chatId, newTitle })); // optimistic local update
+    if (!isDraftId(chatId)) {
+      dispatch(renameConversation({ id: chatId, title: newTitle }));
+    }
   };
 
   const ANIM_MS = 220;
@@ -158,9 +166,7 @@ export default function HeaderRightSide({
                 chatList={chatList}
                 setActiveChatId={handleSelectChat}
                 deleteChat={handleDeleteChat}
-                renameChat={(chatId, newTitle) =>
-                  dispatch(renameChat({ chatId, newTitle }))
-                }
+                renameChat={handleRenameChat}
                 modelRef={modelRef}
                 selectedModel={selectedModel}
                 setSelectedModel={setSelectedModel}

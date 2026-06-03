@@ -20,7 +20,9 @@ export const fetchConversations = createAsyncThunk<
   try {
     return await api.getConversations();
   } catch (e) {
-    return thunkApi.rejectWithValue(errMessage(e, "Failed to load conversations"));
+    return thunkApi.rejectWithValue(
+      errMessage(e, "Failed to load conversations"),
+    );
   }
 });
 
@@ -33,7 +35,9 @@ export const createConversation = createAsyncThunk<
   try {
     return await api.createConversation(modelId, title);
   } catch (e) {
-    return thunkApi.rejectWithValue(errMessage(e, "Failed to create conversation"));
+    return thunkApi.rejectWithValue(
+      errMessage(e, "Failed to create conversation"),
+    );
   }
 });
 
@@ -61,7 +65,24 @@ export const removeConversation = createAsyncThunk<
     await api.deleteConversation(id);
     return id;
   } catch (e) {
-    return thunkApi.rejectWithValue(errMessage(e, "Failed to delete conversation"));
+    return thunkApi.rejectWithValue(
+      errMessage(e, "Failed to delete conversation"),
+    );
+  }
+});
+
+export const renameConversation = createAsyncThunk<
+  { id: string; title: string },
+  { id: string; title: string },
+  { rejectValue: string }
+>("chat/renameConversation", async ({ id, title }, thunkApi) => {
+  try {
+    await api.renameConversation(id, title);
+    return { id, title };
+  } catch (e) {
+    return thunkApi.rejectWithValue(
+      errMessage(e, "Failed to rename conversation"),
+    );
   }
 });
 
@@ -74,6 +95,8 @@ export const fetchChatHistory = createAsyncThunk<
   try {
     return await api.getChatHistory();
   } catch (e) {
-    return thunkApi.rejectWithValue(errMessage(e, "Failed to load chat history"));
+    return thunkApi.rejectWithValue(
+      errMessage(e, "Failed to load chat history"),
+    );
   }
 });

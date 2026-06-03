@@ -7,22 +7,19 @@ export interface CustomScrollBarProps {
 export type ChatRole = "user" | "assistant";
 
 export type Message = {
-  /** Backend message `_id`. Absent for optimistic local messages (e.g. a reply still streaming). */
   id?: string;
   role: ChatRole;
   content: string;
   tokens?: number;
   images?: string[];
-  /** Assistant message currently receiving stream chunks over the socket. */
+  modelId?: string;
   streaming?: boolean;
 };
 
 export type Chat = {
-  /** Backend conversation `_id`, or a `draft-*` id for a chat not yet created on the server. */
   id: string;
   title: string | null;
   messages: Message[];
-  /** Whether this chat's messages were already fetched from the backend. */
   messagesLoaded?: boolean;
 };
 

@@ -8,6 +8,7 @@ export interface BackendAuthResponse {
     avatar?: string;
     appTokens?: number;
     role?: string;
-    nextClaimDate?: string;
+    dateClaimToken?: string;
+    nextDateClaimToken?: string;
   };
 }
