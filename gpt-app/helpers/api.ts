@@ -65,6 +65,13 @@ export const api = {
     const res = await axiosInstance.delete<{ success: boolean }>(`/conversations/${id}`);
     return res.data;
   },
+  renameConversation: async (id: string, title: string) => {
+    const res = await axiosInstance.patch("/conversations/rename-conversation", {
+      id,
+      title,
+    });
+    return res.data;
+  },
   getConversationMessages: async (id: string) => {
     const res = await axiosInstance.get<ConversationMessage[]>(`/conversations/${id}/messages`);
     return res.data;

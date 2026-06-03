@@ -1,6 +1,7 @@
-import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, isAnyOf, type PayloadAction } from "@reduxjs/toolkit";
 import { claimTokens } from "./operations";
-import { loginUser, logoutUser } from "../auth/operations";
+import { loginUser, logoutUser, refreshUser } from "../auth/operations";
+import { refreshError } from "../auth/slice";
 
 interface TokensState {
   balance: number;
@@ -36,12 +37,7 @@ const tokensSlice = createSlice({
         if (typeof payload.user.appTokens === "number") {
           state.balance = payload.user.appTokens;
         }
-        state.nextClaimTime = payload.user.nextClaimDate ?? null;
-        state.claimError = null;
-      })
-      .addCase(logoutUser.fulfilled, (state) => {
-        state.balance = initialState.balance;
-        state.nextClaimTime = null;
+        state.nextClaimTime = payload.user.nextDateClaimToken ?? null;
         state.claimError = null;
       })
       .addCase(claimTokens.pending, (state) => {
@@ -56,7 +52,17 @@ const tokensSlice = createSlice({
       .addCase(claimTokens.rejected, (state, { payload }) => {
         state.claiming = false;
         state.claimError = payload ?? "Failed to claim tokens";
-      }),
+      })
+
+      .addMatcher(
+        isAnyOf(logoutUser.fulfilled, refreshError, refreshUser.rejected),
+        (state) => {
+          state.balance = initialState.balance;
+          state.nextClaimTime = null;
+          state.claimError = null;
+          state.claiming = false;
+        },
+      ),
 });
 
 export const { setCountdown, setBalance } = tokensSlice.actions;

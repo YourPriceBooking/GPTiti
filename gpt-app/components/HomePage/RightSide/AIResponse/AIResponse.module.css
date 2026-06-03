@@ -21,6 +21,17 @@
   color: #0b1220;
 }
 
+.aiModel {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 11px;
+  color: #64748b;
+  background: #f1f5f9;
+  border-radius: 6px;
+  padding: 2px 7px;
+  margin-left: 6px;
+}
+
 .aiContent {
   margin-top: 8px;
   padding-right: 8px;

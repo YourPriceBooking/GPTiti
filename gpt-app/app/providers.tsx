@@ -8,6 +8,7 @@ import { store, persistor } from "@/redux/store";
 
 import { SocketProvider } from "@/context/SocketContext";
 import { WsProvider } from "@/context/WsContext";
+import SessionExpiredModal from "./SessionExpiredModal";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -19,6 +20,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
           <SocketProvider>
             <WsProvider>{children}</WsProvider>
           </SocketProvider>
+          <SessionExpiredModal />
         </GoogleOAuthProvider>
       </PersistGate>
     </Provider>

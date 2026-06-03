@@ -14,6 +14,7 @@ interface AuthState {
   refreshToken: string | null;
   isLoggedIn: boolean;
   error: string | null;
+  sessionExpired: boolean;
 }
 
 const initialState: AuthState = {
@@ -22,6 +23,7 @@ const initialState: AuthState = {
   refreshToken: null,
   isLoggedIn: false,
   error: null,
+  sessionExpired: false,
 };
 
 const authSlice = createSlice({
@@ -37,6 +39,10 @@ const authSlice = createSlice({
       state.accessToken = null;
       state.refreshToken = null;
       state.isLoggedIn = false;
+      state.sessionExpired = true;
+    },
+    clearSessionExpired(state) {
+      state.sessionExpired = false;
     },
   },
   extraReducers: (builder) =>
@@ -47,6 +53,7 @@ const authSlice = createSlice({
         state.refreshToken = payload.refreshToken;
         state.isLoggedIn = true;
         state.error = null;
+        state.sessionExpired = false;
       })
       .addCase(loginUser.rejected, (state, { payload }) => {
         state.error = payload ?? "Login failed";
@@ -60,6 +67,7 @@ const authSlice = createSlice({
         state.accessToken = null;
         state.refreshToken = null;
         state.isLoggedIn = false;
+        state.sessionExpired = true;
       })
       .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
@@ -67,8 +75,10 @@ const authSlice = createSlice({
         state.refreshToken = null;
         state.isLoggedIn = false;
         state.error = null;
+        state.sessionExpired = false;
       }),
 });
 
-export const { resetToken, refreshError } = authSlice.actions;
+export const { resetToken, refreshError, clearSessionExpired } =
+  authSlice.actions;
 export const authReducer = authSlice.reducer;

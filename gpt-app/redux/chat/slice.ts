@@ -1,11 +1,13 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { Chat, Message } from "@/types/types";
+import { isAnyOf } from "@reduxjs/toolkit";
 import {
   fetchConversations,
   fetchConversationMessages,
   removeConversation,
 } from "./operations";
-import { logoutUser } from "../auth/operations";
+import { logoutUser, refreshUser } from "../auth/operations";
+import { refreshError } from "../auth/slice";
 
 interface ChatState {
   chatList: Chat[];
@@ -25,11 +27,9 @@ const randomId = () =>
 
 const makeDraftId = () => `draft-${randomId()}`;
 
-/** A draft chat exists only on the client until its first message creates a server conversation. */
 export const isDraftId = (id: string | null | undefined): boolean =>
   typeof id === "string" && id.startsWith("draft-");
 
-/** Remove a chat by id and keep `activeChatId` pointing at a valid chat (or a fresh draft). */
 const removeChatById = (state: ChatState, id: string) => {
   state.chatList = state.chatList.filter((c) => c.id !== id);
 
@@ -85,12 +85,15 @@ const chatSlice = createSlice({
       state.isTyping = false;
     },
 
-    /** Swap a draft chat's local id for the real conversation `_id` after the server created it. */
     promoteDraft(
       state,
       {
         payload,
-      }: PayloadAction<{ draftId: string; realId: string; title: string | null }>,
+      }: PayloadAction<{
+        draftId: string;
+        realId: string;
+        title: string | null;
+      }>,
     ) {
       const chat = state.chatList.find((c) => c.id === payload.draftId);
       if (!chat) return;
@@ -121,11 +124,18 @@ const chatSlice = createSlice({
       chat.messages.push(msg);
     },
 
-    /** Push an empty assistant message that renders a typing placeholder until chunks arrive. */
-    startAssistantMessage(state, { payload }: PayloadAction<{ chatId: string }>) {
+    startAssistantMessage(
+      state,
+      { payload }: PayloadAction<{ chatId: string; modelId?: string }>,
+    ) {
       const chat = state.chatList.find((c) => c.id === payload.chatId);
       if (!chat) return;
-      chat.messages.push({ role: "assistant", content: "", streaming: true });
+      chat.messages.push({
+        role: "assistant",
+        content: "",
+        streaming: true,
+        modelId: payload.modelId,
+      });
     },
 
     appendAssistantChunk(
@@ -218,6 +228,7 @@ const chatSlice = createSlice({
           role: m.role,
           content: m.content,
           tokens: m.tokens,
+          modelId: m.modelId,
         }));
         chat.messagesLoaded = true;
       })
@@ -230,17 +241,20 @@ const chatSlice = createSlice({
       .addCase(removeConversation.rejected, (state, { payload }) => {
         state.error = payload ?? "Failed to delete conversation";
       })
-      // Drop all loaded chats when the user logs out.
-      .addCase(logoutUser.fulfilled, (state) => {
-        const draftId = makeDraftId();
-        state.chatList = [{ id: draftId, title: null, messages: [] }];
-        state.activeChatId = draftId;
-        state.isTyping = false;
-        state.inputSent = false;
-        state.hasInput = false;
-        state.status = "idle";
-        state.error = null;
-      }),
+
+      .addMatcher(
+        isAnyOf(logoutUser.fulfilled, refreshError, refreshUser.rejected),
+        (state) => {
+          const draftId = makeDraftId();
+          state.chatList = [{ id: draftId, title: null, messages: [] }];
+          state.activeChatId = draftId;
+          state.isTyping = false;
+          state.inputSent = false;
+          state.hasInput = false;
+          state.status = "idle";
+          state.error = null;
+        },
+      ),
 });
 
 export const {

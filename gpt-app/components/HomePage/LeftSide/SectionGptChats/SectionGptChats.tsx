@@ -1,9 +1,9 @@
-import { useState, useRef, useEffect } from 'react';
-import styles from './SectionGptChats.module.css';
-import Image from 'next/image';
-import { SectionGptChatsProps } from '@/types/types';
-import ChatsMenu from '../ChatsMenu/ChatsMenu';
-import DeleteModalWindow from '../DeleteModalWindow/DeleteModalWindow';
+import { useState, useRef, useEffect } from "react";
+import styles from "./SectionGptChats.module.css";
+import Image from "next/image";
+import { SectionGptChatsProps } from "@/types/types";
+import ChatsMenu from "../ChatsMenu/ChatsMenu";
+import DeleteModalWindow from "../DeleteModalWindow/DeleteModalWindow";
 
 export default function SectionGptChats({
   onNewChat,
@@ -13,7 +13,10 @@ export default function SectionGptChats({
   renameChat,
 }: SectionGptChatsProps) {
   const [openMenuChatId, setOpenMenuChatId] = useState<string | null>(null);
-  const [menuPosition, setMenuPosition] = useState<{ top: number; left: number } | null>(null);
+  const [menuPosition, setMenuPosition] = useState<{
+    top: number;
+    left: number;
+  } | null>(null);
   const [renamingChatId, setRenamingChatId] = useState<string | null>(null);
   const [deletingChatId, setDeletingChatId] = useState<string | null>(null);
   const [isChatsOpen, setIsChatsOpen] = useState(false);
@@ -23,7 +26,6 @@ export default function SectionGptChats({
   const titledChats = chatList.filter((chat) => chat.title !== null);
   const chatsCount = titledChats.length;
   const hasChats = chatsCount > 0;
-  // Header toggles the list only with fewer than 5 chats; with 5+ it is always shown.
   const isCollapsible = hasChats && chatsCount < MAX_VISIBLE_CHATS;
   const hasMoreChats = chatsCount > MAX_VISIBLE_CHATS;
   const listVisible = hasChats && (isCollapsible ? isChatsOpen : true);
@@ -32,12 +34,16 @@ export default function SectionGptChats({
       ? titledChats.slice(0, MAX_VISIBLE_CHATS)
       : titledChats;
   const hiddenChatsCount = chatsCount - MAX_VISIBLE_CHATS;
-  // Folder icon appears only when the >5 list is expanded via the show-more button.
   const showFolderIcon = hasMoreChats && showAllChats;
+  const isHeaderInteractive = isCollapsible || hasMoreChats;
+  const headerExpanded = isCollapsible ? isChatsOpen : showAllChats;
+  const handleYourChatsClick = () => {
+    if (isCollapsible) setIsChatsOpen((open) => !open);
+    else if (hasMoreChats) setShowAllChats((prev) => !prev);
+  };
   const menuRef = useRef<HTMLDivElement | null>(null);
   const titleRefs = useRef<Record<string, HTMLSpanElement | null>>({});
 
- 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
@@ -46,34 +52,38 @@ export default function SectionGptChats({
         setDeletingChatId(null);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
   useEffect(() => {
-  if (!renamingChatId) return;
+    if (!renamingChatId) return;
 
-  const el = titleRefs.current[renamingChatId];
-  if (!el) return;
+    const el = titleRefs.current[renamingChatId];
+    if (!el) return;
 
-  el.focus();
+    el.focus();
 
-  
-  const range = document.createRange();
-  const selection = window.getSelection();
+    const range = document.createRange();
+    const selection = window.getSelection();
 
-  range.selectNodeContents(el);
-  range.collapse(false);
+    range.selectNodeContents(el);
+    range.collapse(false);
 
-  selection?.removeAllRanges();
-  selection?.addRange(range);
-}, [renamingChatId]);
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+  }, [renamingChatId]);
 
   return (
     <section className={styles.gptChats}>
       <article className={styles.gptNewChat} tabIndex={0}>
-        <Image width={36} height={36} src="/icons/new-chat.svg" alt="new-chat" />
+        <Image
+          width={36}
+          height={36}
+          src="/icons/new-chat.svg"
+          alt="new-chat"
+        />
         <button className={styles.chatsSpan} onClick={onNewChat}>
           Start New Chat
         </button>
@@ -81,23 +91,30 @@ export default function SectionGptChats({
 
       <article
         className={styles.yourChats}
-        onClick={isCollapsible ? () => setIsChatsOpen((open) => !open) : undefined}
-        role={isCollapsible ? "button" : undefined}
-        tabIndex={isCollapsible ? 0 : undefined}
+        onClick={isHeaderInteractive ? handleYourChatsClick : undefined}
+        role={isHeaderInteractive ? "button" : undefined}
+        tabIndex={isHeaderInteractive ? 0 : undefined}
       >
         <Image
           width={36}
           height={36}
-          src={showFolderIcon ? "/icons/folder-icon.svg" : "/icons/chat-bubble.svg"}
+          src={
+            showFolderIcon ? "/icons/folder-icon.svg" : "/icons/chat-bubble.svg"
+          }
           alt="your-chats"
         />
         <div className={styles.labelWrapper}>
           <button className={styles.span}>Your Chats</button>
-          {isCollapsible && (
+          {isHeaderInteractive && (
             <div
-              className={`${styles.icon} ${isChatsOpen ? styles.iconOpen : ""}`}
+              className={`${styles.icon} ${headerExpanded ? styles.iconOpen : ""}`}
             >
-              <Image width={15} height={15} src="/icons/chevron-down.svg" alt="chevron-down" />
+              <Image
+                width={15}
+                height={15}
+                src="/icons/chevron-down.svg"
+                alt="chevron-down"
+              />
             </div>
           )}
         </div>
@@ -110,7 +127,7 @@ export default function SectionGptChats({
           }`}
         >
           <ul className={styles.chatsList}>
-            {visibleChats.map(chat => (
+            {visibleChats.map((chat) => (
               <li
                 key={chat.id}
                 className={styles.chatsListItem}
@@ -134,15 +151,17 @@ export default function SectionGptChats({
                   }}
                 >
                   {chat.title && chat.title.length > 24
-                    ? chat.title.slice(0, 24) + '...'
+                    ? chat.title.slice(0, 24) + "..."
                     : chat.title}
                 </span>
 
                 <span
                   className={styles.dotsIcon}
-                  onClick={e => {
+                  onClick={(e) => {
                     e.stopPropagation();
-                    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                    const rect = (
+                      e.currentTarget as HTMLElement
+                    ).getBoundingClientRect();
                     const centerY = rect.top + rect.height / 2;
                     const offsetX = rect.right + 8;
                     setMenuPosition({ top: centerY, left: offsetX });

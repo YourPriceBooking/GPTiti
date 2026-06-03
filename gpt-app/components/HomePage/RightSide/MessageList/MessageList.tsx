@@ -51,7 +51,7 @@ export default function MessageList({
               <TypingPlaceholder />
             ) : (
               <>
-                <AIResponse content={message.content} />
+                <AIResponse content={message.content} modelId={message.modelId} />
                 {hasFirstRequest && message.tokens !== undefined && (
                   <div className={styles.costInfo}>
                     <span className={styles.costSpan}>

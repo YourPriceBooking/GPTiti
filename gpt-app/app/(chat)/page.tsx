@@ -46,6 +46,7 @@ import {
   fetchConversationMessages,
   fetchConversations,
   removeConversation,
+  renameConversation,
 } from "@/redux/chat/operations";
 import { selectIsLoggedIn } from "@/redux/auth/selectors";
 import { useSocket } from "@/context/SocketContext";
@@ -70,6 +71,8 @@ import {
   setIsSectionVisible,
   setNewChatOpened,
 } from "@/redux/ui/slice";
+import { refreshError } from "@/redux/auth/slice";
+import { isAuthExpiredError } from "@/lib/authError";
 
 import styles from "./page.module.css";
 
@@ -241,7 +244,7 @@ export default function Home() {
       setInputCharCount(0);
       setInputImageCount(0);
 
-      dispatch(startAssistantMessage({ chatId: convId }));
+      dispatch(startAssistantMessage({ chatId: convId, modelId: selectedModel }));
       pendingConvIdRef.current = convId;
 
       // 3. Send over the socket; the reply streams back via chat:stream / chat:end.
@@ -284,6 +287,16 @@ export default function Home() {
     [dispatch],
   );
 
+  const handleRenameChat = useCallback(
+    (chatId: string, newTitle: string) => {
+      dispatch(renameChat({ chatId, newTitle })); // optimistic local update
+      if (!isDraftId(chatId)) {
+        dispatch(renameConversation({ id: chatId, title: newTitle }));
+      }
+    },
+    [dispatch],
+  );
+
   useEffect(() => {
     if (isLoggedIn) dispatch(fetchConversations());
   }, [isLoggedIn, dispatch]);
@@ -307,7 +320,8 @@ export default function Home() {
       if (chatId) dispatch(finishAssistantMessage({ chatId }));
       dispatch(setIsTyping(false));
       pendingConvIdRef.current = null;
-      console.error("chat:error", err);
+
+      if (isAuthExpiredError(err)) dispatch(refreshError());
     };
 
     socket.on("chat:stream", onStream);
@@ -373,9 +387,7 @@ export default function Home() {
             chatList={chatList}
             setActiveChatId={handleSelectChat}
             deleteChat={handleDeleteChat}
-            renameChat={(chatId, newTitle) =>
-              dispatch(renameChat({ chatId, newTitle }))
-            }
+            renameChat={handleRenameChat}
             modelRef={modelRef}
             selectedModel={selectedModel}
             setSelectedModel={handleSelectModel}
