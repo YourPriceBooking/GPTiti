@@ -67,7 +67,7 @@ export default function HeaderRightSide({
   const handleSelectChat = (id: string) => {
     dispatch(setActiveChatId(id));
     if (isDraftId(id)) return;
-    const chat = chatList.find((c) => c.id === id);
+    const chat = chatList.find((c: any) => c.id === id);
     if (chat && !chat.messagesLoaded) dispatch(fetchConversationMessages(id));
   };
 
