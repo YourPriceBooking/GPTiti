@@ -11,7 +11,7 @@ import ModelModalOverlay from "@/components/ModelModalOverlay/ModelModalOverlay"
 
 import { useModelMode } from "@/hooks/useModelMode";
 import { useScrollDirection } from "@/hooks/useScrollDirection";
-import { getFlowType } from "@/config/modelFlows.config";
+import { getFlowThemeId } from "@/config/modelFlows.config";
 import { getEstimatedTokens } from "@/config/modelPricing.config";
 import { getModelLimits } from "@/config/modelLimits.config";
 
@@ -387,7 +387,7 @@ export default function Home() {
 
       <div
         className={styles.appContainer}
-        data-flow={getFlowType(selectedModel)}
+        data-flow={getFlowThemeId(selectedModel)}
       >
         <div className={styles.leftSideContainer}>
           <LeftSide
