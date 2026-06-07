@@ -1,10 +1,3 @@
-export type FlowType =
-  | "premium"
-  | "balanced"
-  | "reasoning"
-  | "realtime"
-  | "tools";
-
 export type FlowButton = {
   label: string;
   desc: string;
@@ -15,16 +8,20 @@ export type FlowButton = {
 };
 
 export type ModelFlow = {
-  type: FlowType;
+  /** Model group, e.g. "gpt-5.4". */
+  type: string;
+  /** Specific selectable model id, e.g. "gpt-5.4-mini". */
+  modelId: string;
   header: string;
   subtitle: string;
   buttons: FlowButton[];
   examples: string[];
 };
 
-const flows: Record<FlowType, ModelFlow> = {
-  premium: {
-    type: "premium",
+const flows: Record<string, ModelFlow> = {
+  "gpt-5.5": {
+    type: "gpt-5.5",
+    modelId: "gpt-5.5",
     header: "What advanced task do you want to solve?",
     subtitle:
       "Best for reasoning, coding, analysis, writing, and serious work.",
@@ -80,8 +77,9 @@ const flows: Record<FlowType, ModelFlow> = {
     ],
   },
 
-  balanced: {
-    type: "balanced",
+  "gpt-5.4": {
+    type: "gpt-5.4",
+    modelId: "gpt-5.4",
     header: "What do you want to do faster?",
     subtitle:
       "Great for everyday AI tasks, writing, summaries, and quick help.",
@@ -132,8 +130,9 @@ const flows: Record<FlowType, ModelFlow> = {
     ],
   },
 
-  reasoning: {
-    type: "reasoning",
+  "gpt-5.4-mini": {
+    type: "gpt-5.4",
+    modelId: "gpt-5.4-mini",
     header: "What complex problem should we reason through?",
     subtitle:
       "Built for deep thinking, logic, planning, and step-by-step reasoning.",
@@ -188,8 +187,276 @@ const flows: Record<FlowType, ModelFlow> = {
     ],
   },
 
-  realtime: {
-    type: "realtime",
+  "gpt-5.1": {
+    type: "gpt-5.1",
+    modelId: "gpt-5.1",
+    header: "What do you want to work on?",
+    subtitle:
+      "GPT-5.1 is great for writing, analysis, planning, and structured professional work.",
+    buttons: [
+      {
+        label: "Write report",
+        desc: "Create clear professional drafts.",
+        template: "Write a clear professional report or draft about:",
+        icon: "write-report",
+      },
+      {
+        label: "Plan strategy",
+        desc: "Turn ideas into structured plans.",
+        template: "Turn these ideas into a structured plan for:",
+        icon: "plan-strategy",
+      },
+      {
+        label: "Analyze document",
+        desc: "Break down long content clearly.",
+        template: "Break down this long content clearly and summarize:",
+        icon: "analyze-document",
+      },
+      {
+        label: "Improve email",
+        desc: "Rewrite tone and sharpen wording.",
+        template: "Rewrite this email with a sharper tone and clearer wording:",
+        icon: "improve-email",
+      },
+      {
+        label: "Explain concept",
+        desc: "Understand difficult topics better.",
+        template: "Explain this difficult concept in clear, structured terms:",
+        icon: "explain-concept",
+      },
+      {
+        label: "Code helper",
+        desc: "Draft, debug, and explain code.",
+        template: "Help me draft, debug, and explain code for:",
+        icon: "code-helper",
+      },
+    ],
+    examples: [
+      "Write a project brief…",
+      "Summarize this article…",
+      "Improve this email…",
+      "Build a simple plan…",
+    ],
+  },
+
+  "gpt-5.1-mini": {
+    type: "gpt-5.1",
+    modelId: "gpt-5.1-mini",
+    header: "What do you want to do faster?",
+    subtitle:
+      "Great for quick daily tasks, concise writing, summaries, and simple help.",
+    buttons: [
+      {
+        label: "Summarize",
+        desc: "Get a short clean summary.",
+        template: "Summarize the following text into clear bullet points:",
+        icon: "summarize-mini",
+      },
+      {
+        label: "Write / Improve",
+        desc: "Rewrite, fix tone, make it clearer.",
+        template:
+          "Rewrite this to sound clearer and more professional (keep the meaning):",
+        icon: "write-improve-mini",
+      },
+      {
+        label: "Translate",
+        desc: "Any language, preserving meaning.",
+        template: "Translate this to English. Keep the tone and formatting:",
+        icon: "translate-mini",
+      },
+      {
+        label: "Brainstorm",
+        desc: "Ideas, names, concepts.",
+        template: "Give me 15 creative ideas for:",
+        icon: "brainstorm-mini",
+      },
+      {
+        label: "Create content",
+        desc: "Posts, emails, product text.",
+        template: "Write engaging content for this (post, email, or product text):",
+        icon: "create-content-mini",
+      },
+      {
+        label: "Explain simply",
+        desc: "Understand anything faster.",
+        template: "Explain this in simple terms anyone can understand:",
+        icon: "explain-simply-mini",
+      },
+    ],
+    examples: [
+      "Summarize this article…",
+      "Make this more professional…",
+      "Write a short email…",
+      "Translate this text…",
+    ],
+  },
+
+  "gpt-5.1-realtime": {
+    type: "gpt-5.1",
+    modelId: "gpt-5.1-realtime",
+    header: "How do you want to talk live?",
+    subtitle:
+      "Best for voice conversations, instant replies, live collaboration, and realtime help.",
+    buttons: [
+      {
+        label: "Live conversation",
+        desc: "Talk naturally and get instant replies.",
+        template: "Start a live voice chat and talk naturally about:",
+        icon: "talk-live",
+      },
+      {
+        label: "Meeting notes",
+        desc: "Turn live meetings into summaries.",
+        template: "Summarize this live meeting and capture the key points from:",
+        icon: "meeting-notes",
+      },
+      {
+        label: "Voice translator",
+        desc: "Speak across languages in real time.",
+        template: "Translate my speech in real time between languages about:",
+        icon: "voice-translator",
+      },
+      {
+        label: "Interview practice",
+        desc: "Train with instant spoken feedback.",
+        template:
+          "Help me practice an interview with instant spoken feedback on:",
+        icon: "interview-practice",
+      },
+      {
+        label: "Voice memo",
+        desc: "Capture ideas and turn them into text.",
+        template: "Turn this voice memo into clear, structured text about:",
+        icon: "voice-memo",
+      },
+      {
+        label: "Call assistant",
+        desc: "Handle live help and quick decisions.",
+        template: "Act as my call assistant and help with live decisions about:",
+        icon: "call-assistant",
+      },
+    ],
+    examples: [
+      "Start a live voice chat…",
+      "Summarize this meeting…",
+      "Translate my speech…",
+      "Practice an interview…",
+    ],
+  },
+
+  "gpt-4o": {
+    type: "gpt-4o",
+    modelId: "gpt-4o",
+    header: "What do you want to work on?",
+    subtitle:
+      "Use GPT-4o for writing, images, documents, analysis, and smart everyday work.",
+    buttons: [
+      {
+        label: "Analyze image",
+        desc: "Understand screenshots, photos, and visuals.",
+        template: "Analyze this image and explain what you see in:",
+        icon: "gpt4o-analyze-image",
+      },
+      {
+        label: "Review document",
+        desc: "Summarize, explain, or extract details.",
+        template:
+          "Review this document. Summarize, explain, or extract key details from:",
+        icon: "gpt4o-review-document",
+      },
+      {
+        label: "Write better",
+        desc: "Create polished text with stronger structure.",
+        template:
+          "Improve this text and create polished writing with stronger structure about:",
+        icon: "gpt4o-write-better",
+      },
+      {
+        label: "Explain clearly",
+        desc: "Turn complex topics into simple answers.",
+        template: "Explain this clearly in simple terms:",
+        icon: "gpt4o-explain-clearly",
+      },
+      {
+        label: "Compare options",
+        desc: "Find pros, cons, and best choices.",
+        template:
+          "Compare these options and find pros, cons, and the best choice for:",
+        icon: "gpt4o-compare-options",
+      },
+      {
+        label: "Create with context",
+        desc: "Use text, files, and images together.",
+        template:
+          "Create content using text, files, and images together about:",
+        icon: "gpt4o-create-context",
+      },
+    ],
+    examples: [
+      "Analyze this image…",
+      "Review this document…",
+      "Improve this text…",
+      "Compare these options…",
+    ],
+  },
+
+  "gpt-4o-mini": {
+    type: "gpt-4o",
+    modelId: "gpt-4o-mini",
+    header: "What do you want to do faster?",
+    subtitle:
+      "Great for everyday AI tasks, writing, summaries, and quick help.",
+    buttons: [
+      {
+        label: "Summarize",
+        desc: "Get a short clean summary.",
+        template: "Summarize the following text into clear bullet points:",
+        icon: "gpt4omini-summarize",
+      },
+      {
+        label: "Write / Improve",
+        desc: "Rewrite, fix tone, make it clearer.",
+        template:
+          "Rewrite this to sound clearer and more professional (keep the meaning):",
+        icon: "gpt4omini-write-improve",
+      },
+      {
+        label: "Translate",
+        desc: "Any language, preserving meaning.",
+        template: "Translate this to English. Keep the tone and formatting:",
+        icon: "gpt4omini-translate",
+      },
+      {
+        label: "Brainstorm",
+        desc: "Ideas, names, concepts.",
+        template: "Give me 15 creative ideas for:",
+        icon: "gpt4omini-brainstorm",
+      },
+      {
+        label: "Create content",
+        desc: "Posts, emails, product text.",
+        template: "Write engaging content for this (post, email, or product text):",
+        icon: "gpt4omini-create-content",
+      },
+      {
+        label: "Quick answer",
+        desc: "Ask simple questions fast.",
+        template: "Give me a quick, clear answer to:",
+        icon: "gpt4omini-quick-answer",
+      },
+    ],
+    examples: [
+      "Summarize this text…",
+      "Make this clearer…",
+      "Translate this…",
+      "Give me quick ideas…",
+    ],
+  },
+
+  "gpt-4o-realtime": {
+    type: "gpt-4o",
+    modelId: "gpt-4o-realtime",
     header: "What do you want to talk about?",
     subtitle:
       "Best for live voice conversations, practice, and instant feedback.",
@@ -242,90 +509,442 @@ const flows: Record<FlowType, ModelFlow> = {
     ],
   },
 
-  tools: {
-    type: "tools",
-    header: "What AI tool do you want to use?",
-    subtitle: "Search, speak, listen, and create images with GPTiti tools.",
+  o1: {
+    type: "0-Series",
+    modelId: "o1",
+    header: "What hard problem do you want to solve?",
+    subtitle:
+      "Use o1 for deliberate reasoning, complex decisions, advanced logic, and deep problem solving.",
     buttons: [
       {
-        label: "Smart Search",
-        desc: "Search your data with AI.",
-        template: "Search my data with AI for:",
-        icon: "smart-search",
-      },
-      {
-        label: "Voice → Text",
-        desc: "Speak. Get text instantly.",
-        template: "Convert this voice recording into accurate text:",
-        icon: "voice-to-text",
-      },
-      {
-        label: "Text → Voice",
-        desc: "Turn text into natural voice.",
-        template: "Turn this text into natural-sounding voice:",
-        icon: "text-to-voice",
-      },
-      {
-        label: "Image → Create HD",
-        desc: "Best quality images.",
-        template: "Create a high-quality HD image of:",
-        icon: "image-create-hd",
-      },
-      {
-        label: "Image → Create Fast",
-        desc: "Fast & cheaper images.",
-        template: "Quickly generate an image of:",
-        icon: "image-create-fast",
-      },
-      {
-        label: "Analyze content",
-        desc: "Use files, images, or text.",
+        label: "Break down a complex problem",
+        desc: "Use careful step-by-step reasoning.",
         template:
-          "Analyze this content (file, image, or text) and summarize the key points:",
-        icon: "analyze-content",
+          "Break down this complex problem step by step with careful reasoning:",
+        icon: "o1-break-down-problem",
+      },
+      {
+        label: "Test my assumptions",
+        desc: "Find weak points before I act.",
+        template:
+          "Test my assumptions and find weak points before I act on:",
+        icon: "o1-test-assumptions",
+      },
+      {
+        label: "Plan a difficult project",
+        desc: "Turn chaos into a clear strategy.",
+        template:
+          "Plan this difficult project and turn chaos into a clear strategy for:",
+        icon: "o1-plan-difficult-project",
+      },
+      {
+        label: "Solve logic or math",
+        desc: "Work through hard reasoning tasks.",
+        template:
+          "Solve this logic or math problem with rigorous step-by-step reasoning:",
+        icon: "o1-solve-logic-math",
+      },
+      {
+        label: "Review a big decision",
+        desc: "Compare risks, tradeoffs, and outcomes.",
+        template:
+          "Review this big decision and compare risks, tradeoffs, and outcomes for:",
+        icon: "o1-review-decision",
+      },
+      {
+        label: "Improve a serious answer",
+        desc: "Make the final response stronger.",
+        template:
+          "Improve this serious answer and make the final response stronger on:",
+        icon: "o1-improve-answer",
+      },
+    ],
+    examples: [
+      "Break down this complex problem…",
+      "Check my assumptions…",
+      "Create a serious action plan…",
+      "Find the best decision…",
+    ],
+  },
+
+  "o1-mini": {
+    type: "0-Series",
+    modelId: "o1-mini",
+    header: "What should we think through quickly?",
+    subtitle:
+      "Use o1-mini for affordable reasoning, structured analysis, planning, logic, and practical problem solving.",
+    buttons: [
+      {
+        label: "Quick reasoning",
+        desc: "Work through ideas fast and clearly.",
+        template: "Reason through this quickly with clear step-by-step logic:",
+        icon: "o1mini-quick-reasoning",
+      },
+      {
+        label: "Step-by-step plan",
+        desc: "Turn goals into a simple action plan.",
+        template: "Make a step-by-step plan for:",
+        icon: "o1mini-step-plan",
+      },
+      {
+        label: "Compare options",
+        desc: "Weigh choices and pick the best one.",
+        template: "Compare these options carefully and recommend:",
+        icon: "o1mini-compare-options",
+      },
+      {
+        label: "Check logic",
+        desc: "Find flaws in reasoning or calculations.",
+        template: "Check the logic in this and find mistakes in:",
+        icon: "o1mini-check-logic",
+      },
+      {
+        label: "Study help",
+        desc: "Understand topics more clearly.",
+        template: "Help me study and explain this clearly:",
+        icon: "o1mini-study-help",
+      },
+      {
+        label: "Code reasoning",
+        desc: "Think through code and logic problems.",
+        template: "Reason through this code problem step by step:",
+        icon: "o1mini-code-reasoning",
+      },
+    ],
+    examples: [
+      "Reason through this quickly…",
+      "Make a step-by-step plan…",
+      "Compare these options…",
+      "Check my logic…",
+    ],
+  },
+
+  "o3-mini": {
+    type: "0-Series",
+    modelId: "o3-mini",
+    header: "What smart task do you want to solve?",
+    subtitle:
+      "Use o3-mini for high-IQ compact reasoning, technical questions, coding logic, and precise analysis.",
+    buttons: [
+      {
+        label: "Technical reasoning",
+        desc: "Analyze systems, bugs, and logic.",
+        template:
+          "Analyze the systems, bugs, and logic behind:",
+        icon: "o3mini-technical-reasoning",
+      },
+      {
+        label: "Debug code idea",
+        desc: "Find why something may fail.",
+        template: "Debug this code idea and find why it may fail:",
+        icon: "o3mini-debug-code",
+      },
+      {
+        label: "Algorithm plan",
+        desc: "Design a clean solution path.",
+        template: "Design a clean algorithm plan for:",
+        icon: "o3mini-algorithm-plan",
+      },
+      {
+        label: "Explain a concept",
+        desc: "Get a precise simple answer.",
+        template: "Explain this concept with a precise simple answer about:",
+        icon: "o3mini-explain-concept",
+      },
+      {
+        label: "Data interpretation",
+        desc: "Understand patterns and meaning.",
+        template: "Interpret this data and explain patterns and meaning in:",
+        icon: "o3mini-data-interpretation",
+      },
+      {
+        label: "Fast problem solving",
+        desc: "Use a smart model at low cost.",
+        template: "Solve this problem quickly with compact high-IQ reasoning:",
+        icon: "o3mini-fast-problem-solving",
+      },
+    ],
+    examples: [
+      "Debug this logic…",
+      "Explain this technical issue…",
+      "Design an algorithm…",
+      "Analyze this data…",
+    ],
+  },
+
+  "Smart Search": {
+    type: "AI tools",
+    modelId: "Smart Search",
+    header: "What do you want to search?",
+    subtitle:
+      "Search your data with AI across files, documents, and the web.",
+    buttons: [
+      {
+        label: "Search documents",
+        desc: "Find answers in PDFs and files.",
+        template: "Search my documents and find answers about:",
+        icon: "search-documents",
+      },
+      {
+        label: "Analyze a website",
+        desc: "Extract information from a page.",
+        template: "Analyze this website and extract information about:",
+        icon: "analyze-website",
+      },
+      {
+        label: "Search spreadsheets",
+        desc: "Find data inside Excel or Sheets.",
+        template: "Search my spreadsheet and find data about:",
+        icon: "search-spreadsheets",
+      },
+      {
+        label: "Compare documents",
+        desc: "Find differences and similarities.",
+        template:
+          "Compare these documents and find differences and similarities in:",
+        icon: "compare-documents",
+      },
+      {
+        label: "Summarize files",
+        desc: "Get key insights instantly.",
+        template: "Summarize these files and extract key insights from:",
+        icon: "summarize-files",
+      },
+      {
+        label: "Ask about your data",
+        desc: "Chat with your documents.",
+        template: "Ask questions about my data regarding:",
+        icon: "ask-about-data",
       },
     ],
     examples: [
       "Search my data…",
-      "Convert voice to text…",
-      "Create an image…",
+      "Summarize this document…",
+      "Search across uploaded files…",
+      "Compare these documents…",
+    ],
+  },
+
+  "Voice → Text": {
+    type: "AI tools",
+    modelId: "Voice → Text",
+    header: "What AI tool do you want to use?",
+    subtitle:
+      "Speak, record, and turn audio into clear text with GPTiti tools.",
+    buttons: [
+      {
+        label: "Transcribe recording",
+        desc: "Convert audio into text.",
+        template: "Transcribe this audio recording into clear text about:",
+        icon: "transcribe-recording",
+      },
+      {
+        label: "Meeting notes",
+        desc: "Turn meetings into summaries.",
+        template: "Create meeting notes and summarize the key points from:",
+        icon: "vtt-meeting-notes",
+      },
+      {
+        label: "Voice memo",
+        desc: "Capture quick thoughts.",
+        template: "Turn this voice memo into clean, readable text about:",
+        icon: "capture-voice-memo",
+      },
+      {
+        label: "Interview transcript",
+        desc: "Extract spoken conversations.",
+        template: "Create an interview transcript from this spoken conversation about:",
+        icon: "interview-transcript",
+      },
+      {
+        label: "Lecture notes",
+        desc: "Turn lessons into text.",
+        template: "Turn this lecture recording into structured notes about:",
+        icon: "lecture-notes",
+      },
+      {
+        label: "Speech to document",
+        desc: "Create editable content.",
+        template: "Convert this speech into an editable document about:",
+        icon: "speech-to-document",
+      },
+    ],
+    examples: [
+      "Transcribe this audio…",
+      "Create meeting notes…",
+      "Turn voice into text…",
+      "Summarize this recording…",
+    ],
+  },
+
+  "Text → Voice": {
+    type: "AI tools",
+    modelId: "Text → Voice",
+    header: "What AI tool do you want to use?",
+    subtitle:
+      "Write, customize, and turn text into natural voice with GPTiti tools.",
+    buttons: [
+      {
+        label: "Narrate article",
+        desc: "Turn written content into audio.",
+        template: "Read this article aloud in a natural voice about:",
+        icon: "narrate-article",
+      },
+      {
+        label: "Voice for video",
+        desc: "Create clean voiceovers fast.",
+        template: "Create a clean voiceover for this video script about:",
+        icon: "voice-for-video",
+      },
+      {
+        label: "Podcast intro",
+        desc: "Generate short spoken intros.",
+        template: "Generate a short spoken podcast intro about:",
+        icon: "podcast-intro",
+      },
+      {
+        label: "Social clip voiceover",
+        desc: "Read short scripts naturally.",
+        template: "Read this short social media script naturally about:",
+        icon: "social-clip-voiceover",
+      },
+      {
+        label: "Multi-voice script",
+        desc: "Prepare scenes and dialogue.",
+        template: "Prepare a multi-voice script with scenes and dialogue about:",
+        icon: "multi-voice-script",
+      },
+      {
+        label: "Customer reply",
+        desc: "Turn support text into audio.",
+        template: "Turn this customer support text into a natural spoken reply about:",
+        icon: "customer-reply",
+      },
+    ],
+    examples: [
       "Turn this text into voice…",
+      "Read this article aloud…",
+      "Create a voiceover…",
+      "Make an audio version…",
+    ],
+  },
+
+  "Image → Create HD": {
+    type: "AI tools",
+    modelId: "Image → Create HD",
+    header: "What do you want to create in HD?",
+    subtitle:
+      "Generate detailed, high-quality visuals with GPTiti Image → Create HD.",
+    buttons: [
+      {
+        label: "Marketing image",
+        desc: "Create polished campaign visuals.",
+        template: "Create a polished HD marketing image for:",
+        icon: "marketing-image",
+      },
+      {
+        label: "Product concept",
+        desc: "Visualize premium product ideas.",
+        template: "Visualize a premium HD product concept for:",
+        icon: "product-concept",
+      },
+      {
+        label: "Website hero",
+        desc: "Generate beautiful site visuals.",
+        template: "Generate a beautiful HD website hero image for:",
+        icon: "website-hero",
+      },
+      {
+        label: "Photorealistic scene",
+        desc: "Create realistic HD images.",
+        template: "Create a photorealistic HD scene of:",
+        icon: "photorealistic-scene",
+      },
+      {
+        label: "Social media visual",
+        desc: "Make posts, covers, and ads.",
+        template: "Create an HD social media visual for:",
+        icon: "social-media-visual",
+      },
+      {
+        label: "Fantasy artwork",
+        desc: "Build cinematic visual worlds.",
+        template: "Create cinematic HD fantasy artwork of:",
+        icon: "fantasy-artwork",
+      },
+    ],
+    examples: [
+      "Create a product mockup…",
+      "Generate a fantasy scene…",
+      "Create a website hero image…",
+      "Make a realistic visual…",
+    ],
+  },
+
+  "Image → Create Fast": {
+    type: "AI tools",
+    modelId: "Image → Create Fast",
+    header: "What do you want to create fast?",
+    subtitle:
+      "Generate quick, affordable image drafts with GPTiti Image → Create Fast.",
+    buttons: [
+      {
+        label: "Quick concept",
+        desc: "Visualize an idea in seconds.",
+        template: "Quickly visualize this concept as an image draft of:",
+        icon: "fast-quick-concept",
+      },
+      {
+        label: "Social post draft",
+        desc: "Create content for today.",
+        template: "Create a quick social media image draft for:",
+        icon: "fast-social-post",
+      },
+      {
+        label: "Thumbnail",
+        desc: "Make attention-grabbing visuals.",
+        template: "Generate an attention-grabbing thumbnail for:",
+        icon: "fast-thumbnail",
+      },
+      {
+        label: "Design inspiration",
+        desc: "Explore visual directions.",
+        template: "Explore visual design directions for:",
+        icon: "fast-design-inspiration",
+      },
+      {
+        label: "Icon ideas",
+        desc: "Generate simple visual concepts.",
+        template: "Generate simple icon ideas for:",
+        icon: "fast-icon-ideas",
+      },
+      {
+        label: "Image draft",
+        desc: "Create a starting point.",
+        template: "Create a quick image draft as a starting point for:",
+        icon: "fast-image-draft",
+      },
+    ],
+    examples: [
+      "Create a quick logo idea…",
+      "Generate a thumbnail…",
+      "Make a social media image…",
+      "Visualize this concept…",
     ],
   },
 };
 
-/** Maps every selectable model / tool to its flow. */
-const MODEL_TO_FLOW: Record<string, FlowType> = {
-  // Premium GPT-5
-  "gpt-5.5": "premium",
-  "gpt-5.4": "premium",
-  "gpt-5.1": "premium",
-  // Mini / Balanced
-  "gpt-5.4-mini": "balanced",
-  "gpt-5.1-mini": "balanced",
-  "gpt-4o-mini": "balanced",
-  "gpt-4o": "balanced",
-  // O-Series Reasoning
-  o1: "reasoning",
-  "o1-mini": "reasoning",
-  "o3-mini": "reasoning",
-  // Realtime / Voice
-  "gpt-4o-realtime": "realtime",
-  "gpt-5.1-realtime": "realtime",
-  // AI Tools
-  "Smart Search": "tools",
-  "Voice → Text": "tools",
-  "Text → Voice": "tools",
-  "Image → Create HD": "tools",
-  "Image → Create Fast": "tools",
-};
+const DEFAULT_FLOW_MODEL = "gpt-5.4-mini";
 
-const DEFAULT_FLOW: FlowType = "balanced";
-
-export function getFlowType(selectedModel: string): FlowType {
-  return MODEL_TO_FLOW[selectedModel] ?? DEFAULT_FLOW;
+export function getAllModelFlows(): ModelFlow[] {
+  return Object.values(flows);
 }
 
 export function getModelFlow(selectedModel: string): ModelFlow {
-  return flows[getFlowType(selectedModel)];
+  return flows[selectedModel] ?? flows[DEFAULT_FLOW_MODEL];
+}
+
+/** Used for per-model CSS theme via data-flow attribute. */
+export function getFlowThemeId(selectedModel: string): string {
+  return getModelFlow(selectedModel).modelId;
 }

@@ -8,7 +8,7 @@
   margin-top: 15px;
 }
 .additionalSectionContainer {
-  padding-top: 18px;
+  padding: 15px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -113,8 +113,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 36px;
-  height: 36px;
+  width: var(--flow-icon-box, 36px);
+  height: var(--flow-icon-box, 36px);
   color: var(--flow-fill);
   background: var(--flow-bg);
   border: 1px solid color-mix(in srgb, var(--flow-fill) 30%, transparent);
@@ -125,8 +125,8 @@
 }
 
 .cardIcon {
-  width: 24px;
-  height: 24px;
+  width: var(--flow-icon-size, 24px);
+  height: var(--flow-icon-size, 24px);
   color: var(--flow-fill);
 }
 
