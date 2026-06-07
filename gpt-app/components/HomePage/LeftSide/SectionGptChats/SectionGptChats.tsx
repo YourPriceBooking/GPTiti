@@ -4,6 +4,8 @@ import Image from "next/image";
 import { SectionGptChatsProps } from "@/types/types";
 import ChatsMenu from "../ChatsMenu/ChatsMenu";
 import DeleteModalWindow from "../DeleteModalWindow/DeleteModalWindow";
+import { useAppSelector } from "@/redux/hooks";
+import { selectActiveChatId } from "@/redux/chat/selectors";
 
 export default function SectionGptChats({
   onNewChat,
@@ -19,27 +21,25 @@ export default function SectionGptChats({
   } | null>(null);
   const [renamingChatId, setRenamingChatId] = useState<string | null>(null);
   const [deletingChatId, setDeletingChatId] = useState<string | null>(null);
-  const [isChatsOpen, setIsChatsOpen] = useState(false);
   const [showAllChats, setShowAllChats] = useState(false);
+  const activeChatId = useAppSelector(selectActiveChatId);
 
   const MAX_VISIBLE_CHATS = 5;
   const titledChats = chatList.filter((chat) => chat.title !== null);
   const chatsCount = titledChats.length;
   const hasChats = chatsCount > 0;
-  const isCollapsible = hasChats && chatsCount < MAX_VISIBLE_CHATS;
   const hasMoreChats = chatsCount > MAX_VISIBLE_CHATS;
-  const listVisible = hasChats && (isCollapsible ? isChatsOpen : true);
+  const listVisible = hasChats;
   const visibleChats =
     hasMoreChats && !showAllChats
       ? titledChats.slice(0, MAX_VISIBLE_CHATS)
       : titledChats;
   const hiddenChatsCount = chatsCount - MAX_VISIBLE_CHATS;
   const showFolderIcon = hasMoreChats && showAllChats;
-  const isHeaderInteractive = isCollapsible || hasMoreChats;
-  const headerExpanded = isCollapsible ? isChatsOpen : showAllChats;
+  const isHeaderInteractive = hasMoreChats;
+  const headerExpanded = showAllChats;
   const handleYourChatsClick = () => {
-    if (isCollapsible) setIsChatsOpen((open) => !open);
-    else if (hasMoreChats) setShowAllChats((prev) => !prev);
+    if (hasMoreChats) setShowAllChats((prev) => !prev);
   };
   const menuRef = useRef<HTMLDivElement | null>(null);
   const titleRefs = useRef<Record<string, HTMLSpanElement | null>>({});
@@ -130,7 +130,9 @@ export default function SectionGptChats({
             {visibleChats.map((chat) => (
               <li
                 key={chat.id}
-                className={styles.chatsListItem}
+                className={`${styles.chatsListItem} ${
+                  chat.id === activeChatId ? styles.chatsListItemActive : ""
+                }`}
                 tabIndex={0}
                 onClick={() => setActiveChatId(chat.id)}
               >

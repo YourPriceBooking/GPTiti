@@ -144,6 +144,14 @@
   cursor: pointer;
 }
 
+.chatsListItemActive {
+  background: var(--main-gray);
+}
+
+.chatsListItemActive .dotsIcon {
+  opacity: 1;
+}
+
 .dotsIcon {
   width: 28px;
   height: 24px;

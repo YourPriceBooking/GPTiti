@@ -28,22 +28,16 @@ export const loginUser = createAsyncThunk<
 export const refreshUser = createAsyncThunk<
   string,
   void,
-  { rejectValue: string; state: { auth: { refreshToken: string | null } } }
+  { rejectValue: string }
 >("auth/refresh", async (_, thunkApi) => {
   try {
-    const state = thunkApi.getState();
-    const refreshToken = state.auth.refreshToken;
-    if (!refreshToken) {
-      return thunkApi.rejectWithValue("No refresh token");
-    }
     const { data } = await axiosInstance.post<{ accessToken: string }>(
       "/users/refresh",
-      { refreshToken },
     );
     return data.accessToken;
   } catch (e) {
     const err = e as { response?: { status?: number } };
-    if (err.response?.status === 401) {
+    if (err.response?.status === 403) {
       return thunkApi.rejectWithValue("Session expired, please login again");
     }
     return thunkApi.rejectWithValue("Failed to refresh token");

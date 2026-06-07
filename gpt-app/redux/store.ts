@@ -21,7 +21,7 @@ import { setupInterceptors } from "@/lib/axiosInstance"; // ← додано
 const authPersistConfig = {
   key: "auth",
   storage,
-  whitelist: ["accessToken", "refreshToken", "user", "isLoggedIn"],
+  whitelist: ["accessToken", "user", "isLoggedIn"],
 };
 
 const modelPersistConfig = {
