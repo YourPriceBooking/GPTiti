@@ -11,7 +11,6 @@ export interface AuthUser {
 interface AuthState {
   user: AuthUser | null;
   accessToken: string | null;
-  refreshToken: string | null;
   isLoggedIn: boolean;
   error: string | null;
   sessionExpired: boolean;
@@ -20,7 +19,6 @@ interface AuthState {
 const initialState: AuthState = {
   user: null,
   accessToken: null,
-  refreshToken: null,
   isLoggedIn: false,
   error: null,
   sessionExpired: false,
@@ -37,7 +35,6 @@ const authSlice = createSlice({
     refreshError(state) {
       state.user = null;
       state.accessToken = null;
-      state.refreshToken = null;
       state.isLoggedIn = false;
       state.sessionExpired = true;
     },
@@ -50,7 +47,6 @@ const authSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, { payload }) => {
         state.user = payload.user;
         state.accessToken = payload.accessToken;
-        state.refreshToken = payload.refreshToken;
         state.isLoggedIn = true;
         state.error = null;
         state.sessionExpired = false;
@@ -65,14 +61,12 @@ const authSlice = createSlice({
       .addCase(refreshUser.rejected, (state) => {
         state.user = null;
         state.accessToken = null;
-        state.refreshToken = null;
         state.isLoggedIn = false;
         state.sessionExpired = true;
       })
       .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
         state.accessToken = null;
-        state.refreshToken = null;
         state.isLoggedIn = false;
         state.error = null;
         state.sessionExpired = false;

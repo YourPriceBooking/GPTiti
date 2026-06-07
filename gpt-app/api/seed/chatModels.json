@@ -1,0 +1,548 @@
+[
+  {
+    "modelId": "gpt-5.4",
+    "label": "gpt-5.4",
+    "type": "model",
+    "groupId": "gpt-5.4",
+    "category": "flagship",
+    "flow": "premium",
+    "tokens": 1000,
+    "amount": null,
+    "unit": null,
+    "default": false,
+    "enabled": true,
+    "order": 1,
+    "limits": {
+      "maxImages": 5,
+      "maxImageSizeMb": 10,
+      "maxFiles": 5,
+      "maxFileSizeMb": 20,
+      "maxLinks": 5,
+      "maxTextChars": 60000
+    },
+    "content": {
+      "desc": "Most. Powerful.",
+      "subDesc": null,
+      "tooltip": {
+        "title": "GPT-5.4",
+        "intro": "Next-level intelligence.",
+        "pros": ["Most powerful", "Best reasoning"],
+        "cons": ["Expensive usage"]
+      }
+    }
+  },
+  {
+    "modelId": "gpt-5.4-mini",
+    "label": "gpt-5.4-mini",
+    "type": "model",
+    "groupId": "gpt-5.4",
+    "category": "fast",
+    "flow": "balanced",
+    "tokens": 200,
+    "amount": null,
+    "unit": null,
+    "default": false,
+    "enabled": true,
+    "order": 2,
+    "limits": {
+      "maxImages": 3,
+      "maxImageSizeMb": 5,
+      "maxFiles": 3,
+      "maxFileSizeMb": 10,
+      "maxLinks": 3,
+      "maxTextChars": 25000
+    },
+    "content": {
+      "desc": "Best. Balance.",
+      "subDesc": null,
+      "tooltip": {
+        "title": "GPT-5.4 mini",
+        "intro": "Best balance of power.",
+        "pros": ["Fast", "Cost-efficient"],
+        "cons": ["Slightly less powerful than full model"]
+      }
+    }
+  },
+  {
+    "modelId": "gpt-5.5",
+    "label": "gpt-5.5",
+    "type": "model",
+    "groupId": "gpt-5.5",
+    "category": "flagship",
+    "flow": "premium",
+    "tokens": 3000,
+    "amount": null,
+    "unit": null,
+    "default": false,
+    "enabled": true,
+    "order": 1,
+    "limits": {
+      "maxImages": 5,
+      "maxImageSizeMb": 10,
+      "maxFiles": 5,
+      "maxFileSizeMb": 20,
+      "maxLinks": 5,
+      "maxTextChars": 80000
+    },
+    "content": {
+      "desc": "Sharper answers. Better coding. More consistent outputs. Great for advanced work, long prompts and high-value tasks.",
+      "subDesc": null,
+      "tooltip": {
+        "title": "GPT-5.5",
+        "intro": "Advanced intelligence. Sharper answers for serious work.",
+        "pros": ["Excellent reasoning", "Better coding and writing", "More consistent results"],
+        "cons": ["Premium cost", "Not needed for simple chat"]
+      }
+    }
+  },
+  {
+    "modelId": "smart-search",
+    "label": "Smart Search",
+    "type": "tool",
+    "groupId": "ai-tools",
+    "category": null,
+    "flow": "tools",
+    "tokens": 200,
+    "amount": null,
+    "unit": null,
+    "default": false,
+    "enabled": true,
+    "order": 1,
+    "limits": {
+      "maxImages": 0,
+      "maxImageSizeMb": 0,
+      "maxFiles": 10,
+      "maxFileSizeMb": 25,
+      "maxLinks": 10,
+      "maxTextChars": 100000
+    },
+    "content": {
+      "desc": "Smart Search [AI]",
+      "subDesc": "Search your data instantly",
+      "tooltip": {
+        "title": "Smart Search",
+        "intro": "Find answers instantly. Search your data with AI context.",
+        "pros": ["Fast and relevant results", "Works with your data"],
+        "cons": ["Depends on data quality", "Limited without context"]
+      }
+    }
+  },
+  {
+    "modelId": "image-create-hd",
+    "label": "Image → Create HD",
+    "type": "tool",
+    "groupId": "ai-tools",
+    "category": null,
+    "flow": "tools",
+    "engine": "gpt-image-1",
+    "tokens": 12000,
+    "amount": "1 image",
+    "unit": "image",
+    "default": false,
+    "enabled": true,
+    "order": 2,
+    "limits": {
+      "maxImages": 0,
+      "maxImageSizeMb": 0,
+      "maxFiles": 0,
+      "maxFileSizeMb": 0,
+      "maxLinks": 0,
+      "maxTextChars": 2000
+    },
+    "content": {
+      "desc": "Best quality images",
+      "subDesc": "(gpt-image-1)",
+      "tooltip": {
+        "title": "Image → Create HD",
+        "intro": "High-definition image generation.",
+        "pros": ["Best visual quality", "Detailed output"],
+        "cons": ["Higher cost", "Slower"]
+      }
+    }
+  },
+  {
+    "modelId": "image-create-fast",
+    "label": "Image → Create Fast",
+    "type": "tool",
+    "groupId": "ai-tools",
+    "category": null,
+    "flow": "tools",
+    "engine": "gpt-image-1-mini",
+    "tokens": 4000,
+    "amount": "1 image",
+    "unit": "image",
+    "default": false,
+    "enabled": true,
+    "order": 3,
+    "limits": {
+      "maxImages": 0,
+      "maxImageSizeMb": 0,
+      "maxFiles": 0,
+      "maxFileSizeMb": 0,
+      "maxLinks": 0,
+      "maxTextChars": 1500
+    },
+    "content": {
+      "desc": "Fast & Cheap",
+      "subDesc": "(gpt-image-1-mini)",
+      "tooltip": {
+        "title": "Image → Create Fast",
+        "intro": "Quick, affordable image generation.",
+        "pros": ["Fast", "Cost-efficient"],
+        "cons": ["Lower detail"]
+      }
+    }
+  },
+  {
+    "modelId": "voice-to-text",
+    "label": "Voice → Text",
+    "type": "tool",
+    "groupId": "ai-tools",
+    "category": null,
+    "flow": "tools",
+    "tokens": 1800,
+    "amount": "1 min",
+    "unit": "min",
+    "default": false,
+    "enabled": true,
+    "order": 4,
+    "limits": {
+      "maxImages": 0,
+      "maxImageSizeMb": 0,
+      "maxFiles": 0,
+      "maxFileSizeMb": 0,
+      "maxLinks": 0,
+      "maxTextChars": null
+    },
+    "content": {
+      "desc": "Speak. Get text instantly.",
+      "subDesc": null,
+      "tooltip": {
+        "title": "Voice → Text",
+        "intro": "Speak naturally. Get text instantly. Turn voice into accurate text.",
+        "pros": ["Fast and hands-free", "High accuracy"],
+        "cons": ["Affected by noise", "Needs clear speech"]
+      }
+    }
+  },
+  {
+    "modelId": "text-to-voice",
+    "label": "Text → Voice",
+    "type": "tool",
+    "groupId": "ai-tools",
+    "category": null,
+    "flow": "tools",
+    "tokens": 6000,
+    "amount": "1 min",
+    "unit": "min",
+    "default": false,
+    "enabled": true,
+    "order": 5,
+    "limits": {
+      "maxImages": 0,
+      "maxImageSizeMb": 0,
+      "maxFiles": 0,
+      "maxFileSizeMb": 0,
+      "maxLinks": 0,
+      "maxTextChars": 10000
+    },
+    "content": {
+      "desc": "Turn text into natural voice",
+      "subDesc": null,
+      "tooltip": {
+        "title": "Text → Speech",
+        "intro": "Listen instead of reading. Turn text into natural AI voice.",
+        "pros": ["Hands-free experience", "Instant audio output"],
+        "cons": ["Less emotional than human", "Higher cost"]
+      }
+    }
+  },
+  {
+    "modelId": "gpt-5.1",
+    "label": "gpt-5.1",
+    "type": "model",
+    "groupId": "gpt-5.1",
+    "category": "flagship",
+    "flow": "premium",
+    "tokens": 600,
+    "amount": null,
+    "unit": null,
+    "default": true,
+    "enabled": true,
+    "order": 1,
+    "limits": {
+      "maxImages": 5,
+      "maxImageSizeMb": 10,
+      "maxFiles": 5,
+      "maxFileSizeMb": 20,
+      "maxLinks": 5,
+      "maxTextChars": 50000
+    },
+    "content": {
+      "desc": "Reasoning, creativity, long context",
+      "subDesc": null,
+      "tooltip": {
+        "title": "GPT-5.1",
+        "intro": "Think deeper. Go further. Handles complex reasoning and long context.",
+        "pros": ["Exceptional reasoning", "Best quality output"],
+        "cons": ["Slower", "Higher cost"]
+      }
+    }
+  },
+  {
+    "modelId": "gpt-5.1-mini",
+    "label": "gpt-5.1-mini",
+    "type": "model",
+    "groupId": "gpt-5.1",
+    "category": "fast",
+    "flow": "balanced",
+    "tokens": 110,
+    "amount": null,
+    "unit": null,
+    "default": false,
+    "enabled": true,
+    "order": 2,
+    "limits": {
+      "maxImages": 3,
+      "maxImageSizeMb": 5,
+      "maxFiles": 3,
+      "maxFileSizeMb": 10,
+      "maxLinks": 3,
+      "maxTextChars": 25000
+    },
+    "content": {
+      "desc": "Fast & cost-efficient",
+      "subDesc": null,
+      "tooltip": {
+        "title": "GPT-5.1 mini",
+        "intro": "Fast. Smart. Efficient.",
+        "pros": ["Very fast", "Cost-efficient"],
+        "cons": ["Less reasoning"]
+      }
+    }
+  },
+  {
+    "modelId": "gpt-5.1-realtime",
+    "label": "gpt-5.1-realtime",
+    "type": "model",
+    "groupId": "gpt-5.1",
+    "category": "realtime",
+    "flow": "realtime",
+    "tokens": 600,
+    "amount": null,
+    "unit": null,
+    "default": false,
+    "enabled": true,
+    "order": 3,
+    "limits": {
+      "maxImages": 0,
+      "maxImageSizeMb": 0,
+      "maxFiles": 0,
+      "maxFileSizeMb": 0,
+      "maxLinks": 0,
+      "maxTextChars": 5000
+    },
+    "content": {
+      "desc": "Voice + stream reasoning",
+      "subDesc": null,
+      "tooltip": {
+        "title": "GPT-5.1 realtime",
+        "intro": "Talk. Think. Respond instantly.",
+        "pros": ["Real-time responses", "Voice ready"],
+        "cons": ["Less depth"]
+      }
+    }
+  },
+  {
+    "modelId": "o1",
+    "label": "o1",
+    "type": "model",
+    "groupId": "0-series",
+    "category": "reasoning",
+    "flow": "reasoning",
+    "tokens": 3800,
+    "amount": null,
+    "unit": null,
+    "default": false,
+    "enabled": true,
+    "order": 1,
+    "limits": {
+      "maxImages": 0,
+      "maxImageSizeMb": 0,
+      "maxFiles": 5,
+      "maxFileSizeMb": 20,
+      "maxLinks": 5,
+      "maxTextChars": 60000
+    },
+    "content": {
+      "desc": "Advanced deliberate reasoning",
+      "subDesc": null,
+      "tooltip": {
+        "title": "o1",
+        "intro": "Built to think.",
+        "pros": ["Deep logic", "High accuracy"],
+        "cons": ["Slower", "Expensive"]
+      }
+    }
+  },
+  {
+    "modelId": "o1-mini",
+    "label": "o1-mini",
+    "type": "model",
+    "groupId": "0-series",
+    "category": "reasoning-fast",
+    "flow": "reasoning",
+    "tokens": 750,
+    "amount": null,
+    "unit": null,
+    "default": false,
+    "enabled": true,
+    "order": 2,
+    "limits": {
+      "maxImages": 0,
+      "maxImageSizeMb": 0,
+      "maxFiles": 3,
+      "maxFileSizeMb": 10,
+      "maxLinks": 3,
+      "maxTextChars": 30000
+    },
+    "content": {
+      "desc": "Optimized small thinking model",
+      "subDesc": null,
+      "tooltip": {
+        "title": "o1 mini",
+        "intro": "Smart thinking, simplified.",
+        "pros": ["Faster", "Balanced"],
+        "cons": ["Less powerful"]
+      }
+    }
+  },
+  {
+    "modelId": "o3-mini",
+    "label": "o3-mini",
+    "type": "model",
+    "groupId": "0-series",
+    "category": "reasoning-fast",
+    "flow": "reasoning",
+    "tokens": 280,
+    "amount": null,
+    "unit": null,
+    "default": false,
+    "enabled": true,
+    "order": 3,
+    "limits": {
+      "maxImages": 0,
+      "maxImageSizeMb": 0,
+      "maxFiles": 3,
+      "maxFileSizeMb": 10,
+      "maxLinks": 3,
+      "maxTextChars": 25000
+    },
+    "content": {
+      "desc": "High-IQ tiny model",
+      "subDesc": null,
+      "tooltip": {
+        "title": "o3 mini",
+        "intro": "Tiny. Sharp. Fast.",
+        "pros": ["Lightweight", "Quick logic"],
+        "cons": ["Limited depth"]
+      }
+    }
+  },
+  {
+    "modelId": "gpt-4o",
+    "label": "gpt-4o",
+    "type": "model",
+    "groupId": "gpt-4o",
+    "category": "balanced",
+    "flow": "balanced",
+    "tokens": 500,
+    "amount": null,
+    "unit": null,
+    "default": false,
+    "enabled": true,
+    "order": 1,
+    "limits": {
+      "maxImages": 5,
+      "maxImageSizeMb": 10,
+      "maxFiles": 5,
+      "maxFileSizeMb": 20,
+      "maxLinks": 5,
+      "maxTextChars": 40000
+    },
+    "content": {
+      "desc": "Fast. Affordable. Powerful.",
+      "subDesc": null,
+      "tooltip": {
+        "title": "GPT-4o",
+        "intro": "Power meets speed.",
+        "pros": ["Fast", "Versatile"],
+        "cons": ["Less deep reasoning"]
+      }
+    }
+  },
+  {
+    "modelId": "gpt-4o-mini",
+    "label": "gpt-4o-mini",
+    "type": "model",
+    "groupId": "gpt-4o",
+    "category": "fast",
+    "flow": "balanced",
+    "tokens": 38,
+    "amount": null,
+    "unit": null,
+    "default": false,
+    "enabled": true,
+    "order": 2,
+    "limits": {
+      "maxImages": 3,
+      "maxImageSizeMb": 5,
+      "maxFiles": 3,
+      "maxFileSizeMb": 10,
+      "maxLinks": 3,
+      "maxTextChars": 20000
+    },
+    "content": {
+      "desc": "Smart. Efficient. Budget-friendly.",
+      "subDesc": null,
+      "tooltip": {
+        "title": "GPT-4o mini",
+        "intro": "Small. Capable. Ready.",
+        "pros": ["Extremely fast", "Low cost"],
+        "cons": ["Limited reasoning"]
+      }
+    }
+  },
+  {
+    "modelId": "gpt-4o-realtime",
+    "label": "gpt-4o-realtime",
+    "type": "model",
+    "groupId": "gpt-4o",
+    "category": "realtime",
+    "flow": "realtime",
+    "tokens": 1250,
+    "amount": null,
+    "unit": null,
+    "default": false,
+    "enabled": true,
+    "order": 3,
+    "limits": {
+      "maxImages": 0,
+      "maxImageSizeMb": 0,
+      "maxFiles": 0,
+      "maxFileSizeMb": 0,
+      "maxLinks": 0,
+      "maxTextChars": 5000
+    },
+    "content": {
+      "desc": "Stream chat. Interactive.",
+      "subDesc": null,
+      "tooltip": {
+        "title": "GPT-4o realtime",
+        "intro": "Live. Reactive. Instant.",
+        "pros": ["Real-time interaction"],
+        "cons": ["Less detailed"]
+      }
+    }
+  }
+]

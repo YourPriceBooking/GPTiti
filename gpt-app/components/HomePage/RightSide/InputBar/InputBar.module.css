@@ -76,13 +76,13 @@
 }
 
 .iconWrapper {
-  left: 3%;
+  left: 16px;
 }
 .iconWrapper1 {
-  right: 10%;
+  right: 56px;
 }
 .iconWrapper2 {
-  right: 3%;
+  right: 14px;
 }
 
 .iconWrapper::before,
@@ -264,23 +264,17 @@
   }
   .input::placeholder {
     position: relative;
-    top: 5;
+    top: 5px;
     font-size: 16px;
-  }
-  .iconWrapper,
-  .iconWrapper1,
-  .iconWrapper2 {
-    width: 30;
-    height: 30;
   }
 
   .iconWrapper {
-    left: 20;
+    left: 14px;
   }
   .iconWrapper1 {
-    right: 25%;
+    right: 54px;
   }
   .iconWrapper2 {
-    right: 10%;
+    right: 14px;
   }
 }

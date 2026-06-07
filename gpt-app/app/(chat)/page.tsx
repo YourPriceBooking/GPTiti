@@ -48,7 +48,7 @@ import {
   removeConversation,
   renameConversation,
 } from "@/redux/chat/operations";
-import { selectIsLoggedIn } from "@/redux/auth/selectors";
+import { selectIsLoggedIn, selectAccessToken } from "@/redux/auth/selectors";
 import { useSocket } from "@/context/SocketContext";
 import {
   selectSelectedModel,
@@ -73,6 +73,7 @@ import {
 } from "@/redux/ui/slice";
 import { refreshError } from "@/redux/auth/slice";
 import { isAuthExpiredError } from "@/lib/authError";
+import { api } from "@/helpers/api";
 
 import styles from "./page.module.css";
 
@@ -97,6 +98,7 @@ export default function Home() {
   const hasFirstRequest = useAppSelector(selectHasFirstRequest);
   const newChatOpened = useAppSelector(selectNewChatOpened);
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
+  const accessToken = useAppSelector(selectAccessToken);
 
   const { modelMode, setModelMode, modelRef } = useModelMode();
   const { socket } = useSocket();
@@ -132,7 +134,7 @@ export default function Home() {
 
   useEffect(() => {
     if (!activeChat || activeChat.messages.length === 0) return;
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({ behavior: "auto", block: "end" });
   }, [activeChat?.id, activeChat?.messages.length, activeChat]);
 
   useEffect(() => {
@@ -203,7 +205,11 @@ export default function Home() {
   );
 
   const handleSendClick = useCallback(
-    async (_hasFirstRequest: boolean, imageUrls: string[] = []) => {
+    async (
+      _hasFirstRequest: boolean,
+      imageUrls: string[] = [],
+      imageFiles: File[] = [],
+    ) => {
       if (!inputRef.current || !activeChatId) return;
       const userText = inputRef.current.value.trim();
       if (!userText && imageUrls.length === 0) return;
@@ -244,11 +250,16 @@ export default function Home() {
       setInputCharCount(0);
       setInputImageCount(0);
 
-      dispatch(startAssistantMessage({ chatId: convId, modelId: selectedModel }));
+      dispatch(
+        startAssistantMessage({ chatId: convId, modelId: selectedModel }),
+      );
       pendingConvIdRef.current = convId;
 
-      // 3. Send over the socket; the reply streams back via chat:stream / chat:end.
       try {
+        const uploadedFiles = await Promise.all(
+          imageFiles.map((file) => api.uploadImage(file).then((r) => r.file)),
+        );
+
         socket?.emit("chat:send", {
           event: "chat:send",
           type: "send-request",
@@ -256,6 +267,7 @@ export default function Home() {
             message: userText,
             conversationId: convId,
             modelId: selectedModel,
+            ...(uploadedFiles.length > 0 && { files: uploadedFiles }),
           },
         });
       } catch {
@@ -298,8 +310,8 @@ export default function Home() {
   );
 
   useEffect(() => {
-    if (isLoggedIn) dispatch(fetchConversations());
-  }, [isLoggedIn, dispatch]);
+    if (isLoggedIn && accessToken) dispatch(fetchConversations());
+  }, [isLoggedIn, accessToken, dispatch]);
 
   useEffect(() => {
     if (!socket) return;
@@ -433,8 +445,8 @@ export default function Home() {
                 isSectionVisible={isSectionVisible}
                 hasInput={hasInput}
                 onChange={handleChange}
-                onSend={(_message, imageUrls) => {
-                  handleSendClick(hasFirstRequest, imageUrls);
+                onSend={(_message, imageUrls, imageFiles) => {
+                  handleSendClick(hasFirstRequest, imageUrls, imageFiles);
                 }}
                 inputRef={inputRef}
                 onHideSection={() => dispatch(setIsSectionVisible(false))}
@@ -491,8 +503,8 @@ export default function Home() {
                     focusMode={false}
                     hasInput={hasInput}
                     onChange={handleChange}
-                    onSend={(_message, imageUrls) => {
-                      handleSendClick(hasFirstRequest, imageUrls);
+                    onSend={(_message, imageUrls, imageFiles) => {
+                      handleSendClick(hasFirstRequest, imageUrls, imageFiles);
                       dispatch(setIsOverlayOpen(false));
                     }}
                     inputRef={inputRef}
@@ -538,8 +550,8 @@ export default function Home() {
                   <InputBar
                     hasInput={hasInput}
                     onChange={handleChange}
-                    onSend={(_message, imageUrls) => {
-                      handleSendClick(hasFirstRequest, imageUrls);
+                    onSend={(_message, imageUrls, imageFiles) => {
+                      handleSendClick(hasFirstRequest, imageUrls, imageFiles);
                       if (!hasFirstRequest) dispatch(setHasFirstRequest(true));
                     }}
                     inputRef={inputRef}

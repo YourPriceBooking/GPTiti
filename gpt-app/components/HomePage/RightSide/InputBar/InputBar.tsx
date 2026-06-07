@@ -30,7 +30,7 @@ export default function InputBar({
 }: {
   hasInput: boolean;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-  onSend: (message: string, imageUrls?: string[]) => void;
+  onSend: (message: string, imageUrls?: string[], imageFiles?: File[]) => void;
   inputRef: React.RefObject<HTMLTextAreaElement | null>;
   onHideSection: () => void;
   templateTick: number;
@@ -255,7 +255,8 @@ export default function InputBar({
         }
         onSend(
           message,
-          images.map((img) => img.url)
+          images.map((img) => img.url),
+          images.map((img) => img.file)
         );
         setImages([]);
         onHideSection();

@@ -1,4 +1,3 @@
-
 import { axiosInstance } from "@/lib/axiosInstance";
 import { BackendAuthResponse } from "@/types/google.types";
 import type {
@@ -13,12 +12,15 @@ import type {
   PricePackage,
   CheckoutResponse,
   ClaimTokenResponse,
+  UploadFileResponse,
 } from "@/types/api.types";
 
 export const api = {
   loginWithGoogle: async (googleToken: string) => {
-     try {
-      const res = await axiosInstance.post<BackendAuthResponse>("/users/user", { idToken: googleToken });
+    try {
+      const res = await axiosInstance.post<BackendAuthResponse>("/users/user", {
+        idToken: googleToken,
+      });
       return res.data;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
@@ -36,15 +38,22 @@ export const api = {
     return res.data;
   },
   getUsageSummary: async () => {
-    const res = await axiosInstance.get<UsageSummaryResponse>("/users/usage/summary");
+    const res = await axiosInstance.get<UsageSummaryResponse>(
+      "/users/usage/summary",
+    );
     return res.data;
   },
   getUsageHistory: async (days: number = 7) => {
-    const res = await axiosInstance.get<UsageHistoryItem[]>(`/users/usage/history?days=${days}`);
+    const res = await axiosInstance.get<UsageHistoryItem[]>(
+      `/users/usage/history?days=${days}`,
+    );
     return res.data;
   },
   chatPreview: async (data: ChatPreviewRequest) => {
-    const res = await axiosInstance.post<ChatPreviewResponse>("/chat/preview", data);
+    const res = await axiosInstance.post<ChatPreviewResponse>(
+      "/chat/preview",
+      data,
+    );
     return res.data;
   },
   chatStream: async (data: ChatStreamRequest) => {
@@ -53,8 +62,21 @@ export const api = {
     });
     return res.data;
   },
+  uploadImage: async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await axiosInstance.post<UploadFileResponse>(
+      "/upload",
+      formData,
+      { headers: { "Content-Type": "multipart/form-data" } },
+    );
+    return res.data;
+  },
   createConversation: async (modelId: string, title?: string) => {
-    const res = await axiosInstance.post<Conversation>("/conversations", { title, modelId });
+    const res = await axiosInstance.post<Conversation>("/conversations", {
+      title,
+      modelId,
+    });
     return res.data;
   },
   getConversations: async () => {
@@ -62,18 +84,25 @@ export const api = {
     return res.data;
   },
   deleteConversation: async (id: string) => {
-    const res = await axiosInstance.delete<{ success: boolean }>(`/conversations/${id}`);
+    const res = await axiosInstance.delete<{ success: boolean }>(
+      `/conversations/${id}`,
+    );
     return res.data;
   },
   renameConversation: async (id: string, title: string) => {
-    const res = await axiosInstance.patch("/conversations/rename-conversation", {
-      id,
-      title,
-    });
+    const res = await axiosInstance.patch(
+      "/conversations/rename-conversation",
+      {
+        id,
+        title,
+      },
+    );
     return res.data;
   },
   getConversationMessages: async (id: string) => {
-    const res = await axiosInstance.get<ConversationMessage[]>(`/conversations/${id}/messages`);
+    const res = await axiosInstance.get<ConversationMessage[]>(
+      `/conversations/${id}/messages`,
+    );
     return res.data;
   },
   getChatHistory: async () => {
@@ -81,15 +110,28 @@ export const api = {
     return res.data;
   },
   regenerateLastMessage: async (conversationId: string, model: string) => {
-    const res = await axiosInstance.post(`/conversations/${conversationId}/regenerate`, { model });
+    const res = await axiosInstance.post(
+      `/conversations/${conversationId}/regenerate`,
+      { model },
+    );
     return res.data;
   },
   forkConversation: async (conversationId: string, messageId: string) => {
-    const res = await axiosInstance.post<{ conversationId: string }>(`/conversations/${conversationId}/fork`, { messageId });
+    const res = await axiosInstance.post<{ conversationId: string }>(
+      `/conversations/${conversationId}/fork`,
+      { messageId },
+    );
     return res.data;
   },
-  editAndRegenerate: async (messageId: string, newContent: string, model: string) => {
-    const res = await axiosInstance.post(`/messages/${messageId}/edit-and-regenerate`, { newContent, model });
+  editAndRegenerate: async (
+    messageId: string,
+    newContent: string,
+    model: string,
+  ) => {
+    const res = await axiosInstance.post(
+      `/messages/${messageId}/edit-and-regenerate`,
+      { newContent, model },
+    );
     return res.data;
   },
   getBillingPrices: async () => {
@@ -97,7 +139,10 @@ export const api = {
     return res.data;
   },
   createCheckout: async (packageId: string) => {
-    const res = await axiosInstance.post<CheckoutResponse>("/billing/checkout", { packageId });
+    const res = await axiosInstance.post<CheckoutResponse>(
+      "/billing/checkout",
+      { packageId },
+    );
     return res.data;
   },
   adminGetModels: async () => {
@@ -119,27 +164,30 @@ export const api = {
     const res = await axiosInstance.get("/admin/analytics/models");
     return res.data;
   },
-  refreshAccessToken: async (refreshToken: string) => {
+  refreshAccessToken: async () => {
     try {
-      const res = await axiosInstance.post<{ accessToken: string }>("/users/refresh", { refreshToken });
+      const res = await axiosInstance.post<{ accessToken: string }>(
+        "/users/refresh",
+      );
       return res.data;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      if (error.response?.status === 401) {
+      if (error.response?.status === 403) {
         throw new Error("Session expired, please login again");
       }
       throw new Error("Failed to refresh token");
     }
   },
   logout: async () => {
-     try {
+    try {
       await axiosInstance.get("/users/logout");
     } catch (error) {
       console.warn("Logout request failed:", error);
     }
   },
   claimToken: async () => {
-    const res = await axiosInstance.post<ClaimTokenResponse>("/users/claim-token");
+    const res =
+      await axiosInstance.post<ClaimTokenResponse>("/users/claim-token");
     return res.data;
   },
 };
