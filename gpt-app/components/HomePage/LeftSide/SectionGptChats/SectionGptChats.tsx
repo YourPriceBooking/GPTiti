@@ -30,10 +30,7 @@ export default function SectionGptChats({
   const hasChats = chatsCount > 0;
   const hasMoreChats = chatsCount > MAX_VISIBLE_CHATS;
   const listVisible = hasChats;
-  const visibleChats =
-    hasMoreChats && !showAllChats
-      ? titledChats.slice(0, MAX_VISIBLE_CHATS)
-      : titledChats;
+  const visibleChats = titledChats;
   const hiddenChatsCount = chatsCount - MAX_VISIBLE_CHATS;
   const showFolderIcon = hasMoreChats && showAllChats;
   const isHeaderInteractive = hasMoreChats;
