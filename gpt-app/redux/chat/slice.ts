@@ -93,12 +93,14 @@ const chatSlice = createSlice({
         draftId: string;
         realId: string;
         title: string | null;
+        modelId?: string;
       }>,
     ) {
       const chat = state.chatList.find((c) => c.id === payload.draftId);
       if (!chat) return;
       chat.id = payload.realId;
       if (payload.title) chat.title = payload.title;
+      if (payload.modelId) chat.modelId = payload.modelId;
       chat.messagesLoaded = true; // brand-new conversation, nothing to fetch
       if (state.activeChatId === payload.draftId) {
         state.activeChatId = payload.realId;
@@ -209,6 +211,7 @@ const chatSlice = createSlice({
               title: c.title,
               messages: [],
               messagesLoaded: false,
+              modelId: c.modelId,
             },
         );
         state.chatList = [...drafts, ...serverChats];
@@ -231,6 +234,10 @@ const chatSlice = createSlice({
           modelId: m.modelId,
         }));
         chat.messagesLoaded = true;
+        const lastModel = [...chat.messages]
+          .reverse()
+          .find((m) => m.modelId)?.modelId;
+        if (lastModel) chat.modelId = lastModel;
       })
       .addCase(fetchConversationMessages.rejected, (state, { payload }) => {
         state.error = payload ?? "Failed to load messages";

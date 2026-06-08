@@ -21,6 +21,7 @@ export type Chat = {
   title: string | null;
   messages: Message[];
   messagesLoaded?: boolean;
+  modelId?: string;
 };
 
 export type ModelType =

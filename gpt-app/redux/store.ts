@@ -35,9 +35,15 @@ const tokensPersistConfig = {
   whitelist: ["balance", "nextClaimTime"],
 };
 
+const chatPersistConfig = {
+  key: "chat",
+  storage,
+  whitelist: ["activeChatId"],
+};
+
 const rootReducer = combineReducers({
   auth: persistReducer(authPersistConfig, authReducer),
-  chat: chatReducer,
+  chat: persistReducer(chatPersistConfig, chatReducer),
   model: persistReducer(modelPersistConfig, modelReducer),
   tokens: persistReducer(tokensPersistConfig, tokensReducer),
   ui: uiReducer,
