@@ -14,6 +14,7 @@ import { useScrollDirection } from "@/hooks/useScrollDirection";
 import { getFlowThemeId } from "@/config/modelFlows.config";
 import { getEstimatedTokens } from "@/config/modelPricing.config";
 import { getModelLimits } from "@/config/modelLimits.config";
+import { getModelGroupAndItem } from "@/functions/getModelGroupAndItem";
 
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
@@ -108,9 +109,17 @@ export default function Home() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const pendingConvIdRef = useRef<string | null>(null);
+  const restoredActiveChatRef = useRef(false);
 
   const [inputCharCount, setInputCharCount] = useState(0);
   const [inputImageCount, setInputImageCount] = useState(0);
+
+  const [restoringActiveChat, setRestoringActiveChat] = useState(() => {
+    if (!isLoggedIn) return false;
+    if (!activeChatId || isDraftId(activeChatId)) return false;
+    const chat = chatList.find((c) => c.id === activeChatId);
+    return !chat?.messagesLoaded;
+  });
 
   const estimatedTokens = useMemo(
     () => getEstimatedTokens(selectedModel, inputCharCount, inputImageCount),
@@ -145,6 +154,17 @@ export default function Home() {
     }, 0);
     return () => clearTimeout(t);
   }, [activeChatId, activeChat?.messages.length, activeChat, dispatch]);
+
+  useEffect(() => {
+    if (!activeChat || isDraftId(activeChat.id)) return;
+    const model = activeChat.modelId;
+    if (!model || model === selectedModel) return;
+    const found = getModelGroupAndItem(model);
+    if (!found) return;
+    dispatch(setSelectedModel(model));
+    dispatch(setSelectedModelGroup(found.group));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeChat?.id, activeChat?.modelId, selectedModel, dispatch]);
 
   useEffect(() => {
     const maxChars = getModelLimits(selectedModel).maxTextChars;
@@ -228,6 +248,7 @@ export default function Home() {
               draftId: convId,
               realId: conv._id,
               title: conv.title ?? (userText || null),
+              modelId: conv.modelId ?? selectedModel,
             }),
           );
           convId = conv._id;
@@ -312,6 +333,47 @@ export default function Home() {
   useEffect(() => {
     if (isLoggedIn && accessToken) dispatch(fetchConversations());
   }, [isLoggedIn, accessToken, dispatch]);
+
+  useEffect(() => {
+    if (restoredActiveChatRef.current) return;
+    if (chatList.length === 0) return;
+
+    if (!activeChatId || isDraftId(activeChatId)) {
+      if (!chatList.some((c) => c.id === activeChatId)) {
+        dispatch(setActiveChatId(chatList[0].id));
+      }
+      restoredActiveChatRef.current = true;
+      return;
+    }
+
+    const chat = chatList.find((c) => c.id === activeChatId);
+    if (!chat) return;
+    restoredActiveChatRef.current = true;
+    if (!chat.messagesLoaded) dispatch(fetchConversationMessages(activeChatId));
+  }, [activeChatId, chatList, dispatch]);
+
+  useEffect(() => {
+    if (!restoringActiveChat) return;
+    if (
+      !isLoggedIn ||
+      !activeChatId ||
+      isDraftId(activeChatId) ||
+      activeChat?.messagesLoaded
+    ) {
+      setRestoringActiveChat(false);
+    }
+  }, [
+    restoringActiveChat,
+    isLoggedIn,
+    activeChatId,
+    activeChat?.messagesLoaded,
+  ]);
+
+  useEffect(() => {
+    if (!restoringActiveChat) return;
+    const t = setTimeout(() => setRestoringActiveChat(false), 6000);
+    return () => clearTimeout(t);
+  }, [restoringActiveChat]);
 
   useEffect(() => {
     if (!socket) return;
@@ -431,7 +493,7 @@ export default function Home() {
           </div>
 
           <div className={styles.scrollableContent} ref={scrollContainerRef}>
-            {!isOverlayOpen && (
+            {!restoringActiveChat && !isOverlayOpen && (
               <MainSectionRightSide
                 insertTemplate={insertTemplate}
                 setFocusMode={(updater) => {
@@ -465,13 +527,15 @@ export default function Home() {
               />
             )}
 
-            {activeChat && activeChat.messages.length > 0 && (
-              <MessageList
-                messages={activeChat.messages}
-                isTyping={isTyping}
-                hasFirstRequest={hasFirstRequest}
-              />
-            )}
+            {!restoringActiveChat &&
+              activeChat &&
+              activeChat.messages.length > 0 && (
+                <MessageList
+                  messages={activeChat.messages}
+                  isTyping={isTyping}
+                  hasFirstRequest={hasFirstRequest}
+                />
+              )}
 
             <div ref={messagesEndRef} />
           </div>
@@ -529,7 +593,10 @@ export default function Home() {
             </>
           )}
 
-          <div className={styles.inputDock}>
+          <div
+            className={styles.inputDock}
+            style={restoringActiveChat ? { display: "none" } : undefined}
+          >
             <div
               className={
                 isExistingChat

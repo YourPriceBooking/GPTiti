@@ -31,6 +31,12 @@ export default function ModalWindow({
     selectedModelGroup;
   const balance = useAppSelector(selectBalance);
 
+  const [viewGroup, setViewGroup] = useState<ModelType>(appliedGroup);
+
+  useEffect(() => {
+    setViewGroup(appliedGroup);
+  }, [appliedGroup]);
+
   // Стан для hover (desktop)
   const [hoveredModel, setHoveredModel] = useState<string | null>(null);
   // Стан для видимості тултіпа
@@ -97,6 +103,7 @@ export default function ModalWindow({
               type="button"
               className={getGroupBtnClass(group)}
               onClick={() => {
+                setViewGroup(group as ModelType);
                 setSelectedModelGroup(group as ModelType);
                 setClickedGroup(group);
               }}
@@ -114,7 +121,7 @@ export default function ModalWindow({
 
       <section className={styles.mainSection}>
         <div className={styles.btnsContainer2}>
-          {modelConfig[selectedModelGroup].list.map((item) => (
+          {modelConfig[viewGroup].list.map((item) => (
             <div
               key={item.title}
               className={styles.modelWrapper}
