@@ -73,6 +73,7 @@ import {
   setNewChatOpened,
 } from "@/redux/ui/slice";
 import { refreshError } from "@/redux/auth/slice";
+import { setBalance } from "@/redux/tokens/slice";
 import { isAuthExpiredError } from "@/lib/authError";
 import { api } from "@/helpers/api";
 
@@ -383,9 +384,19 @@ export default function Home() {
       if (!chatId || !data?.chunk) return;
       dispatch(appendAssistantChunk({ chatId, chunk: data.chunk }));
     };
-    const onEnd = () => {
+    const onEnd = (data?: {
+      payload?: {
+        appTokensSpent?: number;
+        totalTokens?: number;
+        balance?: number;
+      };
+    }) => {
       const chatId = pendingConvIdRef.current;
-      if (chatId) dispatch(finishAssistantMessage({ chatId }));
+      const tokens = data?.payload?.appTokensSpent;
+      if (chatId) dispatch(finishAssistantMessage({ chatId, tokens }));
+      if (typeof data?.payload?.balance === "number") {
+        dispatch(setBalance(data.payload.balance));
+      }
       dispatch(setIsTyping(false));
       pendingConvIdRef.current = null;
     };
