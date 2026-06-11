@@ -5,6 +5,7 @@ import LoginModal from "@/components/HomePage/common/LoginModal/LoginModal";
 import ErrorPatchImgModal, {
   LimitKind,
 } from "@/components/HomePage/common/ErrorPatchImgModal/ErrorPatchImgModal";
+import ImageEditorModal from "@/components/HomePage/common/ImageEditorModal/ImageEditorModal";
 
 import { useAppSelector } from "@/redux/hooks";
 import { selectIsLoggedIn } from "@/redux/auth/selectors";
@@ -53,6 +54,11 @@ export default function InputBar({
   const [images, setImages] = useState<
     { id: string; url: string; file: File }[]
   >([]);
+  const [editingImage, setEditingImage] = useState<{
+    id: string;
+    url: string;
+    file: File;
+  } | null>(null);
 
   const limits = useMemo(() => getModelLimits(selectedModel), [selectedModel]);
   const isImageBlocked = limits.maxImages === 0;
@@ -231,6 +237,20 @@ export default function InputBar({
     setImages((prev) => prev.filter((img) => img.id !== id));
   };
 
+  const handleEditedImage = (file: File, url: string) => {
+    const editedId = editingImage?.id;
+    if (!editedId) return;
+
+    setImages((prev) =>
+      prev.map((img) => {
+        if (img.id !== editedId) return img;
+        URL.revokeObjectURL(img.url);
+        return { ...img, url, file };
+      })
+    );
+    setEditingImage(null);
+  };
+
   const handleImageSelect = (files: File[]) => {
     setShowAddInput(false);
     void addImageFiles(files);
@@ -319,7 +339,24 @@ export default function InputBar({
         <div className={styles.imagePreviewRow}>
           {images.map((img) => (
             <div key={img.id} className={styles.imageChip}>
-              <img src={img.url} alt="pasted preview" />
+              <img
+                src={img.url}
+                alt="pasted preview"
+                onClick={() => setEditingImage(img)}
+              />
+              <button
+                type="button"
+                aria-label="Edit image"
+                className={styles.editImageBtn}
+                onClick={() => setEditingImage(img)}
+              >
+                <svg width={10} height={10} viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    fill="currentColor"
+                    d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+                  />
+                </svg>
+              </button>
               <button
                 type="button"
                 aria-label="Remove image"
@@ -383,6 +420,16 @@ export default function InputBar({
             <use href="/icons/input-sprite.svg#ib-voice" />
           </svg>
         </div>
+      )}
+
+      {editingImage && (
+        <ImageEditorModal
+          open
+          source={editingImage.url}
+          fileName={editingImage.file.name}
+          onSave={handleEditedImage}
+          onClose={() => setEditingImage(null)}
+        />
       )}
 
       <LoginModal open={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
