@@ -94,6 +94,10 @@ const ESTIMATE_HIDDEN_FOR: ReadonlySet<string> = new Set([
   "Image → Create Fast",
 ]);
 
+export function modelSupportsEstimate(model: string): boolean {
+  return !ESTIMATE_HIDDEN_FOR.has(model) && model in MODEL_PRICING;
+}
+
 export function getEstimatedTokens(
   model: string,
   charCount: number,

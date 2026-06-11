@@ -2,16 +2,25 @@ import { useRef } from "react";
 import styles from "./AddSomethingToInput.module.css";
 import Image from "next/image";
 
+const FILE_ACCEPT = ".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,.md,.json,.ppt,.pptx";
+
 export default function AddSomethingToInput({
   onImageSelect,
   onImageBlocked,
   isImageBlocked = false,
+  onFileSelect,
+  onFileBlocked,
+  isFileBlocked = false,
 }: {
   onImageSelect: (files: File[]) => void;
   onImageBlocked?: () => void;
   isImageBlocked?: boolean;
+  onFileSelect: (files: File[]) => void;
+  onFileBlocked?: () => void;
+  isFileBlocked?: boolean;
 }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const docInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageClick = () => {
     if (isImageBlocked) {
@@ -21,10 +30,25 @@ export default function AddSomethingToInput({
     fileInputRef.current?.click();
   };
 
+  const handleDocClick = () => {
+    if (isFileBlocked) {
+      onFileBlocked?.();
+      return;
+    }
+    docInputRef.current?.click();
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
     if (files.length === 0) return;
     onImageSelect(files);
+    e.target.value = "";
+  };
+
+  const handleDocChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    if (files.length === 0) return;
+    onFileSelect(files);
     e.target.value = "";
   };
 
@@ -40,7 +64,16 @@ export default function AddSomethingToInput({
           style={{ display: "none" }}
           onChange={handleFileChange}
         />
-        <div className={styles.InfoContainer}>
+        {/* input для файлів */}
+        <input
+          ref={docInputRef}
+          type="file"
+          accept={FILE_ACCEPT}
+          multiple
+          style={{ display: "none" }}
+          onChange={handleDocChange}
+        />
+        <div className={styles.InfoContainer} onClick={handleDocClick}>
           <Image
             className={styles.InfoContainerIcon}
             width={14}
@@ -51,7 +84,7 @@ export default function AddSomethingToInput({
           <div>
             <p className={styles.InfoContainerParagraph}>Add files</p>
             <span className={styles.InfoContainerSpan}>
-              PDFs, docs, spreadsheets
+              PDFs, Word, Excel, text, code
             </span>
           </div>
         </div>

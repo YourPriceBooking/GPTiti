@@ -15,6 +15,7 @@ type TextItem = {
   y: number;
   value: string;
   color: string;
+  onLight: boolean;
 };
 
 type HandleId = "nw" | "n" | "ne" | "e" | "se" | "s" | "sw" | "w" | "move";
@@ -50,6 +51,7 @@ const PALETTE = [
 const MIN_CROP = 32;
 const STROKE_WIDTH = 4;
 const TEXT_FONT_SIZE = 20;
+const TEXT_LINE_HEIGHT = 1.25;
 const TEXT_PAD = 7;
 
 const clamp = (v: number, min: number, max: number) =>
@@ -156,6 +158,8 @@ export default function ImageEditor({
     ox: number;
     oy: number;
   } | null>(null);
+  const sampleCtxRef = useRef<CanvasRenderingContext2D | null>(null);
+  const activeTextIdRef = useRef<string | null>(null);
 
   const workingSrcRef = useRef(workingSrc);
   workingSrcRef.current = workingSrc;
@@ -181,6 +185,47 @@ export default function ImageEditor({
     const h = el.clientHeight;
     setDisplaySize({ w, h });
     setCrop({ x: 0, y: 0, w, h });
+  };
+
+  useEffect(() => {
+    if (!displaySize) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const img = await loadImage(workingSrc);
+        if (cancelled) return;
+        const c = document.createElement("canvas");
+        c.width = displaySize.w;
+        c.height = displaySize.h;
+        const ctx = c.getContext("2d", { willReadFrequently: true });
+        if (!ctx) return;
+        ctx.drawImage(img, 0, 0, displaySize.w, displaySize.h);
+        sampleCtxRef.current = ctx;
+      } catch {
+        sampleCtxRef.current = null;
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [workingSrc, displaySize]);
+
+  const isLightAt = (x: number, y: number) => {
+    const ctx = sampleCtxRef.current;
+    if (!ctx || !displaySize) return false;
+    const sx = clamp(Math.round(x), 0, displaySize.w - 1);
+    const sy = clamp(Math.round(y), 0, displaySize.h - 1);
+    const sw = Math.max(1, Math.min(90, displaySize.w - sx));
+    const sh = Math.max(
+      1,
+      Math.min(TEXT_FONT_SIZE + TEXT_PAD * 2, displaySize.h - sy),
+    );
+    const data = ctx.getImageData(sx, sy, sw, sh).data;
+    let sum = 0;
+    for (let i = 0; i < data.length; i += 4) {
+      sum += 0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2];
+    }
+    return sum / (data.length / 4) > 128;
   };
 
   /* --- drawing (marker) --- */
@@ -238,7 +283,9 @@ export default function ImageEditor({
         y: p.y,
         value: "",
         color,
+        onLight: isLightAt(p.x, p.y),
       };
+      activeTextIdRef.current = item.id;
       setTexts((prev) => [...prev, item]);
       setUndoStack((prev) => [...prev, { type: "text", text: item }]);
       setRedoStack([]);
@@ -246,6 +293,7 @@ export default function ImageEditor({
     }
     /* Drawing moves focus back to the editor so shortcuts keep working
        even right after typing in a text item. */
+    activeTextIdRef.current = null;
     editorRef.current?.focus();
     e.currentTarget.setPointerCapture(e.pointerId);
     activeStrokeRef.current = { color, points: [getCanvasPos(e)] };
@@ -403,7 +451,11 @@ export default function ImageEditor({
     const nx = clamp(drag.ox + e.clientX - drag.startX, 0, displaySize.w - 24);
     const ny = clamp(drag.oy + e.clientY - drag.startY, 0, displaySize.h - 24);
     setTexts((prev) =>
-      prev.map((t) => (t.id === drag.id ? { ...t, x: nx, y: ny } : t)),
+      prev.map((t) =>
+        t.id === drag.id
+          ? { ...t, x: nx, y: ny, onLight: isLightAt(nx, ny) }
+          : t,
+      ),
     );
   };
 
@@ -431,6 +483,16 @@ export default function ImageEditor({
       replaceWorkingSrc(URL.createObjectURL(blob));
     } finally {
       setBusy(false);
+    }
+  };
+
+  const pickColor = (c: string) => {
+    setColor(c);
+    const id = activeTextIdRef.current;
+    if (id) {
+      setTexts((prev) =>
+        prev.map((t) => (t.id === id ? { ...t, color: c } : t)),
+      );
     }
   };
 
@@ -490,11 +552,13 @@ export default function ImageEditor({
       ctx.font = `600 ${TEXT_FONT_SIZE * ratio}px system-ui, -apple-system, sans-serif`;
       for (const t of validTexts) {
         ctx.fillStyle = t.color;
-        ctx.fillText(
-          t.value,
-          (t.x + TEXT_PAD) * ratio,
-          (t.y + TEXT_PAD) * ratio,
-        );
+        t.value.split("\n").forEach((line, i) => {
+          ctx.fillText(
+            line,
+            (t.x + TEXT_PAD) * ratio,
+            (t.y + TEXT_PAD + i * TEXT_FONT_SIZE * TEXT_LINE_HEIGHT) * ratio,
+          );
+        });
       }
 
       const blob = await canvasToBlob(canvas, "image/png");
@@ -633,16 +697,34 @@ export default function ImageEditor({
                 <div
                   key={t.id}
                   className={css.textItem}
-                  style={{ left: t.x, top: t.y, color: t.color }}
+                  style={
+                    {
+                      left: t.x,
+                      top: t.y,
+                      color: t.color,
+                      "--frameColor": t.onLight
+                        ? "rgba(0, 0, 0, 0.85)"
+                        : "rgba(255, 255, 255, 0.85)",
+                    } as React.CSSProperties
+                  }
                   onPointerDown={startTextDrag(t.id)}
                   onPointerMove={moveTextDrag}
                   onPointerUp={endTextDrag}
                 >
-                  <input
+                  <textarea
                     autoFocus
+                    rows={t.value.split("\n").length}
                     value={t.value}
                     placeholder="Text"
-                    style={{ width: `${Math.max(t.value.length, 4)}ch` }}
+                    style={{
+                      width: `${Math.max(
+                        ...t.value.split("\n").map((l) => l.length),
+                        4,
+                      )}ch`,
+                    }}
+                    onFocus={() => {
+                      activeTextIdRef.current = t.id;
+                    }}
                     onPointerDown={(e) => e.stopPropagation()}
                     onChange={(e) =>
                       setTexts((prev) =>
@@ -853,7 +935,7 @@ export default function ImageEditor({
                 aria-label={`Color ${c}`}
                 className={`${css.swatch} ${color === c ? css.swatchActive : ""}`}
                 style={{ background: c }}
-                onClick={() => setColor(c)}
+                onClick={() => pickColor(c)}
               />
             ))}
           </div>

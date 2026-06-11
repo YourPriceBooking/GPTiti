@@ -17,6 +17,16 @@ import styles from "./InputBar.module.css";
 
 const MB = 1024 * 1024;
 
+const formatFileSize = (bytes: number) => {
+  if (bytes >= MB) return `${(bytes / MB).toFixed(1)} MB`;
+  return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+};
+
+const fileExtension = (name: string) => {
+  const dot = name.lastIndexOf(".");
+  return dot > 0 ? name.slice(dot + 1).toUpperCase() : "FILE";
+};
+
 export default function InputBar({
   hasInput,
   onChange,
@@ -43,9 +53,12 @@ export default function InputBar({
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
 
   const modalRef = useRef<HTMLDivElement | null>(null);
+  const bodyRef = useRef<HTMLDivElement | null>(null);
+  const leftControlsRef = useRef<HTMLDivElement | null>(null);
+  const rightControlsRef = useRef<HTMLDivElement | null>(null);
+  const measureRef = useRef<HTMLSpanElement | null>(null);
 
   const [isMultiline, setIsMultiline] = useState(false);
-  const [shouldScroll, setShouldScroll] = useState(false);
   const [showAddInput, setShowAddInput] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isLimitErrorOpen, setIsLimitErrorOpen] = useState(false);
@@ -54,6 +67,7 @@ export default function InputBar({
   const [images, setImages] = useState<
     { id: string; url: string; file: File }[]
   >([]);
+  const [files, setFiles] = useState<{ id: string; file: File }[]>([]);
   const [editingImage, setEditingImage] = useState<{
     id: string;
     url: string;
@@ -63,6 +77,8 @@ export default function InputBar({
   const limits = useMemo(() => getModelLimits(selectedModel), [selectedModel]);
   const isImageBlocked = limits.maxImages === 0;
   const maxImageBytes = limits.maxImageSizeMb * MB;
+  const isFileBlocked = limits.maxFiles === 0;
+  const maxFileBytes = limits.maxFileSizeMb * MB;
 
   const openLimitError = (kind: LimitKind) => {
     setLimitErrorKind(kind);
@@ -73,56 +89,71 @@ export default function InputBar({
     const textarea = inputRef.current;
     if (!textarea) return;
 
-    const hasImages = images.length > 0;
-    const BASE = hasImages ? 140 : 68;
-    const MAX = hasImages ? 320 : 240;
+    const MAX_HEIGHT = 240;
 
-    const PB_NORMAL = hasImages ? 24 : 20;
-    const PB_MULTI = 60;
-
-    textarea.style.overflowY = "hidden";
-    textarea.style.paddingBottom = `${PB_NORMAL}px`;
-    textarea.style.height = `${BASE}px`;
-    textarea.style.minHeight = "";
-    textarea.scrollTop = 0;
-
-    if (!textarea.value.trim()) {
-      setIsMultiline(false);
-      setShouldScroll(false);
-      return;
-    }
-
-    const overflows = textarea.scrollHeight > textarea.clientHeight;
-
-    if (!overflows) {
-      setIsMultiline(false);
-      setShouldScroll(false);
-      return;
-    }
-
-    textarea.style.paddingBottom = `${PB_MULTI}px`;
-    textarea.style.height = "auto";
-
+    textarea.style.height = "0px";
     const full = textarea.scrollHeight;
-    const next = Math.min(full + 2, MAX);
-    textarea.style.height = `${next}px`;
+    textarea.style.height = `${Math.min(full, MAX_HEIGHT)}px`;
+    textarea.style.overflowY = full > MAX_HEIGHT ? "auto" : "hidden";
+  };
 
-    const needScroll = full > MAX;
-    textarea.style.overflowY = needScroll ? "auto" : "hidden";
-    textarea.scrollTop = 0;
+  const fitsSingleLine = () => {
+    const textarea = inputRef.current;
+    const body = bodyRef.current;
+    const left = leftControlsRef.current;
+    const right = rightControlsRef.current;
+    const measure = measureRef.current;
+    if (!textarea || !body || !left || !right || !measure) return true;
 
-    setIsMultiline(true);
-    setShouldScroll(needScroll);
+    const value = textarea.value;
+    if (!value) return true;
+    if (value.includes("\n")) return false;
+
+    const taStyle = getComputedStyle(textarea);
+    measure.style.fontFamily = taStyle.fontFamily;
+    measure.style.fontSize = taStyle.fontSize;
+    measure.style.fontWeight = taStyle.fontWeight;
+    measure.style.fontStyle = taStyle.fontStyle;
+    measure.style.letterSpacing = taStyle.letterSpacing;
+    measure.textContent = value;
+
+    const bodyStyle = getComputedStyle(body);
+    const available =
+      body.clientWidth -
+      parseFloat(bodyStyle.paddingLeft) -
+      parseFloat(bodyStyle.paddingRight) -
+      left.offsetWidth -
+      right.offsetWidth -
+      2 * (parseFloat(bodyStyle.columnGap) || 0);
+
+    return measure.getBoundingClientRect().width <= available - 2;
+  };
+
+  const syncComposer = () => {
+    setIsMultiline(!fitsSingleLine());
+    resizeTextarea();
   };
 
   useLayoutEffect(() => {
-    resizeTextarea();
+    syncComposer();
 
     requestAnimationFrame(() => {
-      resizeTextarea();
+      syncComposer();
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [templateTick, images.length]);
+  }, [templateTick]);
+
+  useLayoutEffect(() => {
+    resizeTextarea();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isMultiline]);
+
+  useEffect(() => {
+    const onWindowResize = () => syncComposer();
+    window.addEventListener("resize", onWindowResize);
+    return () => window.removeEventListener("resize", onWindowResize);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -144,7 +175,7 @@ export default function InputBar({
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     onChange(e);
-    resizeTextarea();
+    syncComposer();
   };
 
   const addImageFiles = async (incoming: File[]) => {
@@ -191,13 +222,58 @@ export default function InputBar({
           url: URL.createObjectURL(compressed),
           file: compressed,
         };
-      })
+      }),
     );
 
     setImages((prev) => [...prev, ...processed]);
 
     if (rejectedForSize) openLimitError("imageSize");
     else if (trimmedForCount) openLimitError("imagesCount");
+  };
+
+  const addFiles = (incoming: File[]) => {
+    if (incoming.length === 0) return;
+
+    if (isFileBlocked) {
+      openLimitError("filesNotSupported");
+      return;
+    }
+
+    const remaining = Math.max(0, limits.maxFiles - files.length);
+    if (remaining === 0) {
+      openLimitError("filesCount");
+      return;
+    }
+
+    const accepted: File[] = [];
+    let trimmedForCount = false;
+    let rejectedForSize = false;
+
+    for (const file of incoming) {
+      if (accepted.length >= remaining) {
+        trimmedForCount = true;
+        break;
+      }
+      if (maxFileBytes > 0 && file.size > maxFileBytes) {
+        rejectedForSize = true;
+        continue;
+      }
+      accepted.push(file);
+    }
+
+    if (accepted.length === 0) {
+      if (rejectedForSize) openLimitError("fileSize");
+      else if (trimmedForCount) openLimitError("filesCount");
+      return;
+    }
+
+    setFiles((prev) => [
+      ...prev,
+      ...accepted.map((file) => ({ id: crypto.randomUUID(), file })),
+    ]);
+
+    if (rejectedForSize) openLimitError("fileSize");
+    else if (trimmedForCount) openLimitError("filesCount");
   };
 
   const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
@@ -246,7 +322,7 @@ export default function InputBar({
         if (img.id !== editedId) return img;
         URL.revokeObjectURL(img.url);
         return { ...img, url, file };
-      })
+      }),
     );
     setEditingImage(null);
   };
@@ -256,10 +332,20 @@ export default function InputBar({
     void addImageFiles(files);
   };
 
+  const handleFileSelect = (selected: File[]) => {
+    setShowAddInput(false);
+    addFiles(selected);
+  };
+
+  const removeFile = (id: string) => {
+    setFiles((prev) => prev.filter((f) => f.id !== id));
+  };
+
   const handleSend = () => {
     if (inputRef.current) {
       const message = inputRef.current.value;
-      const hasContent = message.trim() !== "" || images.length > 0;
+      const hasContent =
+        message.trim() !== "" || images.length > 0 || files.length > 0;
       if (hasContent) {
         if (!isLoggedIn) {
           setIsLoginOpen(true);
@@ -273,50 +359,38 @@ export default function InputBar({
           openLimitError("imagesCount");
           return;
         }
+        if (files.length > 0 && isFileBlocked) {
+          openLimitError("filesNotSupported");
+          return;
+        }
+        if (files.length > limits.maxFiles) {
+          openLimitError("filesCount");
+          return;
+        }
         onSend(
           message,
           images.map((img) => img.url),
-          images.map((img) => img.file)
+          images.map((img) => img.file),
         );
         setImages([]);
+        setFiles([]);
         onHideSection();
         if (!hasFirstRequest) {
           setHasFirstRequest(true);
         }
       }
       inputRef.current.value = "";
-      inputRef.current.style.height = "68px";
       setIsMultiline(false);
-      setShouldScroll(false);
+      resizeTextarea();
     }
   };
 
   return (
     <div
-      className={`
-    ${styles.inputContainer}
-    ${isMultiline ? styles.multiline : ""}
-    ${shouldScroll ? styles.scrollable : ""}
-    ${images.length > 0 ? styles.hasImages : ""}
-  `}
+      className={`${styles.inputContainer} ${
+        isMultiline ? styles.multiline : ""
+      }`}
     >
-      <div
-        className={styles.iconWrapper}
-        tabIndex={0}
-        onClick={() => {
-          setShowAddInput((prev) => !prev);
-        }}
-      >
-        <svg
-          className={styles.inputIcon}
-          width={28}
-          height={28}
-          viewBox="0 0 29 29"
-          aria-hidden="true"
-        >
-          <use href="/icons/input-sprite.svg#ib-plus" />
-        </svg>
-      </div>
       {showAddInput && (
         <div
           className={`${styles.modalWrapper} ${
@@ -330,6 +404,12 @@ export default function InputBar({
             onImageBlocked={() => {
               setShowAddInput(false);
               openLimitError("imagesNotSupported");
+            }}
+            onFileSelect={handleFileSelect}
+            isFileBlocked={isFileBlocked}
+            onFileBlocked={() => {
+              setShowAddInput(false);
+              openLimitError("filesNotSupported");
             }}
           />
         </div>
@@ -350,7 +430,12 @@ export default function InputBar({
                 className={styles.editImageBtn}
                 onClick={() => setEditingImage(img)}
               >
-                <svg width={10} height={10} viewBox="0 0 24 24" aria-hidden="true">
+                <svg
+                  width={12}
+                  height={12}
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
                   <path
                     fill="currentColor"
                     d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
@@ -369,58 +454,112 @@ export default function InputBar({
         </div>
       )}
 
-      <textarea
-        ref={inputRef}
-        className={styles.input}
-        placeholder="Ask anything..."
-        onChange={handleChange}
-        onPaste={handlePaste}
-        rows={1}
-        maxLength={limits.maxTextChars ?? undefined}
-      />
-
-      <div className={styles.iconWrapper1} tabIndex={0}>
-        <svg
-          className={styles.inputIcon}
-          width={35}
-          height={35}
-          viewBox="0 0 35 35"
-          aria-hidden="true"
-        >
-          <use href="/icons/input-sprite.svg#ib-microphone" />
-        </svg>
-      </div>
-
-      {hasInput || images.length > 0 ? (
-        <div
-          className={`${styles.iconWrapper2} ${styles.disabledHover}`}
-          onClick={handleSend}
-        >
-          <svg
-            className={styles.sendIcon}
-            width={35}
-            height={35}
-            viewBox="0 0 44 44"
-            role="img"
-            aria-label="send"
-          >
-            <use href="/icons/input-sprite.svg#ib-send" />
-          </svg>
-        </div>
-      ) : (
-        <div className={styles.iconWrapper2} tabIndex={0}>
-          <svg
-            className={styles.inputIcon}
-            width={35}
-            height={35}
-            viewBox="0 0 35 35"
-            role="img"
-            aria-label="voice"
-          >
-            <use href="/icons/input-sprite.svg#ib-voice" />
-          </svg>
+      {files.length > 0 && (
+        <div className={styles.filePreviewRow}>
+          {files.map((f) => (
+            <div key={f.id} className={styles.fileChip}>
+              <span className={styles.fileChipExt}>
+                {fileExtension(f.file.name)}
+              </span>
+              <div className={styles.fileChipInfo}>
+                <span className={styles.fileChipName} title={f.file.name}>
+                  {f.file.name}
+                </span>
+                <span className={styles.fileChipSize}>
+                  {formatFileSize(f.file.size)}
+                </span>
+              </div>
+              <button
+                type="button"
+                aria-label="Remove file"
+                className={styles.fileChipRemove}
+                onClick={() => removeFile(f.id)}
+              >
+                ×
+              </button>
+            </div>
+          ))}
         </div>
       )}
+
+      <div className={styles.composerBody} ref={bodyRef}>
+        <div className={styles.leftControls} ref={leftControlsRef}>
+          <div
+            className={styles.iconWrapper}
+            tabIndex={0}
+            onClick={() => {
+              setShowAddInput((prev) => !prev);
+            }}
+          >
+            <svg
+              className={styles.inputIcon}
+              width={28}
+              height={28}
+              viewBox="0 0 29 29"
+              aria-hidden="true"
+            >
+              <use href="/icons/input-sprite.svg#ib-plus" />
+            </svg>
+          </div>
+        </div>
+
+        <textarea
+          ref={inputRef}
+          className={styles.input}
+          placeholder="Ask anything..."
+          onChange={handleChange}
+          onPaste={handlePaste}
+          rows={1}
+          maxLength={limits.maxTextChars ?? undefined}
+        />
+
+        <div className={styles.rightControls} ref={rightControlsRef}>
+          <div className={styles.iconWrapper1} tabIndex={0}>
+            <svg
+              className={styles.inputIcon}
+              width={35}
+              height={35}
+              viewBox="0 0 35 35"
+              aria-hidden="true"
+            >
+              <use href="/icons/input-sprite.svg#ib-microphone" />
+            </svg>
+          </div>
+
+          {hasInput || images.length > 0 || files.length > 0 ? (
+            <div
+              className={`${styles.iconWrapper2} ${styles.disabledHover}`}
+              onClick={handleSend}
+            >
+              <svg
+                className={styles.sendIcon}
+                width={35}
+                height={35}
+                viewBox="0 0 44 44"
+                role="img"
+                aria-label="send"
+              >
+                <use href="/icons/input-sprite.svg#ib-send" />
+              </svg>
+            </div>
+          ) : (
+            <div className={styles.iconWrapper2} tabIndex={0}>
+              <svg
+                className={styles.inputIcon}
+                width={35}
+                height={35}
+                viewBox="0 0 35 35"
+                role="img"
+                aria-label="voice"
+              >
+                <use href="/icons/input-sprite.svg#ib-voice" />
+              </svg>
+            </div>
+          )}
+        </div>
+
+        <span className={styles.measure} ref={measureRef} aria-hidden="true" />
+      </div>
 
       {editingImage && (
         <ImageEditorModal

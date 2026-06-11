@@ -12,7 +12,10 @@ import ModelModalOverlay from "@/components/ModelModalOverlay/ModelModalOverlay"
 import { useModelMode } from "@/hooks/useModelMode";
 import { useScrollDirection } from "@/hooks/useScrollDirection";
 import { getFlowThemeId } from "@/config/modelFlows.config";
-import { getEstimatedTokens } from "@/config/modelPricing.config";
+import {
+  getEstimatedTokens,
+  modelSupportsEstimate,
+} from "@/config/modelPricing.config";
 import { getModelLimits } from "@/config/modelLimits.config";
 import { getModelGroupAndItem } from "@/functions/getModelGroupAndItem";
 
@@ -127,6 +130,7 @@ export default function Home() {
     [selectedModel, inputCharCount, inputImageCount],
   );
   const showEstimate = estimatedTokens !== null;
+  const estimateSupported = modelSupportsEstimate(selectedModel);
 
   useScrollDirection(scrollContainerRef);
 
@@ -431,6 +435,7 @@ export default function Home() {
       handleChange({
         target: inputRef.current,
       } as React.ChangeEvent<HTMLTextAreaElement>);
+      dispatch(bumpTemplateTick());
     } else {
       pendingTemplateRef.current = clipped;
     }
@@ -443,9 +448,10 @@ export default function Home() {
       handleChange({
         target: inputRef.current,
       } as React.ChangeEvent<HTMLTextAreaElement>);
+      dispatch(bumpTemplateTick());
       pendingTemplateRef.current = null;
     }
-  }, [isOverlayOpen, handleChange]);
+  }, [isOverlayOpen, handleChange, dispatch]);
 
   return (
     <>
@@ -650,11 +656,16 @@ export default function Home() {
                   />
 
                   <div className={styles.spanContainer}>
-                    {showEstimate ? (
+                    {estimateSupported ? (
                       <div className={styles.spanContainerFirstRequest}>
-                        <span className={styles.inputSpan1}>
+                        <span
+                          className={`${styles.inputSpan1} ${
+                            showEstimate ? "" : styles.estimateHidden
+                          }`}
+                        >
                           ≈ Estimated cost: ~
-                          {estimatedTokens?.toLocaleString("en-US")} tokens
+                          {(estimatedTokens ?? 0).toLocaleString("en-US")}{" "}
+                          tokens
                         </span>
                         <span className={styles.inputSpan}>
                           AI systems may make mistakes, so we recommend
