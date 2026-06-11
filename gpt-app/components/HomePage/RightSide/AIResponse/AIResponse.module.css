@@ -40,8 +40,163 @@
   font-size: 14px;
   line-height: 1.55;
   color: #0b1220;
-  white-space: pre-wrap;
   word-break: break-word;
+}
+
+/* --- Markdown typography --- */
+
+.aiContent p {
+  margin: 0 0 10px;
+}
+
+.aiContent > *:last-child {
+  margin-bottom: 0;
+}
+
+.aiContent h1,
+.aiContent h2,
+.aiContent h3,
+.aiContent h4 {
+  margin: 18px 0 8px;
+  font-weight: 700;
+  color: #0b1220;
+  line-height: 1.3;
+}
+
+.aiContent h1 {
+  font-size: 19px;
+}
+
+.aiContent h2 {
+  font-size: 17px;
+}
+
+.aiContent h3 {
+  font-size: 15px;
+}
+
+.aiContent h4 {
+  font-size: 14px;
+}
+
+.aiContent ul,
+.aiContent ol {
+  margin: 8px 0 12px;
+  padding-left: 24px;
+}
+
+.aiContent li {
+  margin: 4px 0;
+}
+
+.aiContent strong {
+  font-weight: 700;
+}
+
+.aiContent a {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.aiContent blockquote {
+  margin: 10px 0;
+  padding: 4px 0 4px 14px;
+  border-left: 3px solid #cbd5e1;
+  color: #475569;
+}
+
+.aiContent hr {
+  margin: 16px 0;
+  border: none;
+  border-top: 1px solid #e2e8f0;
+}
+
+.aiContent table {
+  margin: 12px 0;
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 13px;
+}
+
+.aiContent th,
+.aiContent td {
+  border: 1px solid #e2e8f0;
+  padding: 6px 10px;
+  text-align: left;
+}
+
+.aiContent th {
+  background: #f8fafc;
+  font-weight: 700;
+}
+
+/* --- Inline code --- */
+
+.aiContent code {
+  font-family: ui-monospace, SFMono-Regular, "Cascadia Code", Menlo, Consolas,
+    monospace;
+  font-size: 13px;
+  background: #eef2f7;
+  color: #0b1220;
+  border-radius: 5px;
+  padding: 2px 5px;
+}
+
+/* --- Code blocks (ChatGPT-like) --- */
+
+.aiContent :global(.code-block) {
+  margin: 12px 0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #0d1117;
+}
+
+.aiContent :global(.code-header) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 14px;
+  background: #1c2128;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.aiContent :global(.code-lang) {
+  font-family: var(--font-family);
+  font-size: 12px;
+  color: #8b949e;
+  text-transform: lowercase;
+}
+
+.aiContent :global(.code-copy-btn) {
+  border: none;
+  background: none;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-family: var(--font-family);
+  font-size: 12px;
+  color: #c9d1d9;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.aiContent :global(.code-copy-btn):hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.aiContent pre {
+  margin: 0;
+  padding: 14px;
+  overflow-x: auto;
+}
+
+.aiContent pre code {
+  background: none;
+  padding: 0;
+  border-radius: 0;
+  color: #e6edf3;
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre;
 }
 
 .aiList {

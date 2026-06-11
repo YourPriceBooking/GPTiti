@@ -190,6 +190,7 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  cursor: pointer;
 }
 
 .imageChip button {
@@ -214,6 +215,27 @@
 
 .imageChip button:hover {
   background: #0f172a;
+}
+
+.imageChip button.editImageBtn {
+  top: auto;
+  bottom: 2px;
+  right: 2px;
+}
+
+.hasImages .iconWrapper,
+.hasImages .iconWrapper1,
+.hasImages .iconWrapper2 {
+  top: auto;
+  bottom: 14px;
+  transform: translateY(0);
+}
+
+.hasImages .iconWrapper::after,
+.hasImages .iconWrapper1::after,
+.hasImages .iconWrapper2::after {
+  top: auto;
+  bottom: 45px;
 }
 
 .hasImages .input {
