@@ -1,6 +1,6 @@
 import styles from "./LeftSide.module.css";
 import FooterLeftSide from "./FooterLeftSide/FooterLeftSide";
-import { LeftSideProps } from "@/types/types";
+import { LeftSideProps, Project } from "@/types/types";
 import SectionGptUser from "./SectionGptUser/SectionGptUser";
 import SectionGptChats from "./SectionGptChats/SectionGptChats";
 import SectionGptTokens from "./SectionGptTokens/SectionGptTokens";
@@ -8,8 +8,17 @@ import { useState } from "react";
 import Image from "next/image";
 import WsDebugPanel from "@/components/common/WsDebugPanel/WsDebugPanel";
 
+// TODO: replace with redux project data
+const TEMP_PROJECTS: Project[] = [
+  { id: "p1", title: "Website Redesign" },
+  { id: "p2", title: "Mobile App" },
+  { id: "p3", title: "API Integration" },
+  { id: "p4", title: "API Integration1" },
+];
+
 export default function LeftSide({
   onNewChat,
+  onNewProject,
   chatList,
   setActiveChatId,
   deleteChat,
@@ -73,6 +82,8 @@ export default function LeftSide({
 
             <SectionGptChats
               onNewChat={onNewChat}
+              onNewProject={onNewProject}
+              projectList={TEMP_PROJECTS}
               chatList={chatList}
               setActiveChatId={setActiveChatId}
               deleteChat={deleteChat}
