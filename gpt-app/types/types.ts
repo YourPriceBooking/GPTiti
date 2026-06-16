@@ -24,6 +24,11 @@ export type Chat = {
   modelId?: string;
 };
 
+export type Project = {
+  id: string;
+  title: string;
+};
+
 export type ModelType =
   | "gpt-4o"
   | "gpt-5.1"
@@ -57,6 +62,8 @@ export type ModelMode = "idle" | "hover" | "click";
 
 export type LeftSideProps = {
   onNewChat: () => void;
+  onNewProject?: () => void;
+  projectList?: Project[];
   chatList: Chat[];
   setActiveChatId: (id: string) => void;
 
@@ -79,7 +86,7 @@ export type LeftSideProps = {
 
 export type SectionGptChatsProps = Pick<
   LeftSideProps,
-  "onNewChat" | "chatList" | "setActiveChatId" | "deleteChat" | "renameChat"
+  "onNewChat" | "onNewProject" | "projectList" | "chatList" | "setActiveChatId" | "deleteChat" | "renameChat"
 >;
 
 export type MainSectionRightSideProps = {

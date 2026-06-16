@@ -2,6 +2,7 @@
   margin-top: 24px;
   display: flex;
   flex-direction: column;
+  gap: 4px;
   flex-shrink: 0;
   min-height: 0;
   overflow: hidden;
@@ -21,12 +22,50 @@
   transition: background 1s ease-in;
 }
 
+.gptNewProject {
+  flex-shrink: 0;
+  display: flex;
+  gap: 13px;
+  align-items: center;
+  padding-left: 28px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  border-radius: 11px;
+  max-width: 288px;
+  width: 100%;
+  min-height: 54px;
+  transition: background 1s ease-in;
+}
+
 .gptNewChat:hover,
 .gptNewChat:focus,
+.gptNewProject:hover,
+.gptNewProject:focus,
 .yourChats:hover,
 .yourChats:focus {
   background: var(--main-gray);
   cursor: pointer;
+}
+
+.newProjectLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.newProjectTitle {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--main-white);
+}
+
+.newProjectSubtitle {
+  font-family: var(--font-family);
+  font-weight: 300;
+  font-size: 11px;
+  color: var(--main-white);
+  opacity: 0.6;
 }
 .span {
   font-family: var(--font-family);
@@ -49,6 +88,43 @@
   align-items: center;
 }
 
+.projectsLabelWrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.projectItemContent {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
+
+.badge {
+  background: var(--main-gray);
+  color: var(--main-white);
+  font-family: var(--font-family);
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 20px;
+  padding: 2px 8px;
+  min-width: 24px;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.projectsChevron {
+  display: flex;
+  align-items: center;
+  transition: transform 0.2s ease;
+}
+
+.projectsChevronOpen {
+  transform: rotate(180deg);
+}
+
 .icon {
   position: absolute;
   top: 50%;
@@ -62,10 +138,11 @@
 .chatsList {
   display: flex;
   flex-direction: column;
+  gap: 4px;
 }
 
 .chatsScrollArea {
-  max-height: 210px;
+  max-height: 226px;
   overflow: hidden;
   transition: max-height 0.4s ease;
 }
@@ -80,6 +157,26 @@
   width: 6px;
 }
 .chatsScrollAreaScroll::-webkit-scrollbar-thumb {
+  background: var(--main-gray);
+  border-radius: 3px;
+}
+
+.projectsScrollArea {
+  max-height: 134px;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+
+.projectsScrollAreaScroll {
+  max-height: 50vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--main-gray) transparent;
+}
+.projectsScrollAreaScroll::-webkit-scrollbar {
+  width: 6px;
+}
+.projectsScrollAreaScroll::-webkit-scrollbar-thumb {
   background: var(--main-gray);
   border-radius: 3px;
 }
@@ -129,6 +226,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 16px;
+  max-width: 288px;
+  width: 100%;
   min-height: 42px;
   font-family: var(--font-family);
   font-weight: 500;
@@ -158,18 +257,47 @@
   opacity: 1;
 }
 
+.chatAction {
+  position: relative;
+  width: 28px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.pinSmall {
+  position: absolute;
+  inset: 0;
+  background-image: url("/icons/pin-small.svg");
+  background-size: 14px 14px;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 1;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.chatsListItem:hover .pinSmall {
+  opacity: 0;
+}
+
 .dotsIcon {
   width: 28px;
   height: 24px;
   background-image: url("/icons/three-points.svg");
   background-size: contain;
   background-repeat: no-repeat;
+  background-position: center;
   opacity: 0;
   transition: opacity 0.2s ease;
 }
-.chatsListItem:has(.dotsIcon:hover) {
-  background: transparent;
+
+.chatAction .dotsIcon {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }
+
 .chatsListItem:hover .dotsIcon {
   opacity: 1;
 }

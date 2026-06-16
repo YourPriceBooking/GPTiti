@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import styles from "./SectionGptChats.module.css";
 import Image from "next/image";
-import { SectionGptChatsProps } from "@/types/types";
+import { SectionGptChatsProps, Chat } from "@/types/types";
 import ChatsMenu from "../ChatsMenu/ChatsMenu";
 import DeleteModalWindow from "../DeleteModalWindow/DeleteModalWindow";
 import { useAppSelector } from "@/redux/hooks";
@@ -9,13 +9,32 @@ import { selectActiveChatId } from "@/redux/chat/selectors";
 
 export default function SectionGptChats({
   onNewChat,
+  onNewProject,
+  projectList = [],
   chatList,
   setActiveChatId,
   deleteChat,
   renameChat,
 }: SectionGptChatsProps) {
+  const [showAllProjects, setShowAllProjects] = useState(false);
+  const projectsCount = projectList.length;
+  const hasProjects = projectsCount > 0;
+  const MAX_VISIBLE_PROJECTS = 3;
+  const hasMoreProjects = projectsCount > MAX_VISIBLE_PROJECTS;
+  const hiddenProjectsCount = projectsCount - MAX_VISIBLE_PROJECTS;
+  const isProjectsInteractive = hasMoreProjects;
+  const showProjectsOpen = hasMoreProjects && showAllProjects;
+
+  const [pinnedChatIds, setPinnedChatIds] = useState<string[]>([]);
+  const [pinnedProjectIds, setPinnedProjectIds] = useState<string[]>([]);
+
   const [openMenuChatId, setOpenMenuChatId] = useState<string | null>(null);
   const [menuPosition, setMenuPosition] = useState<{
+    top: number;
+    left: number;
+  } | null>(null);
+  const [openMenuProjectId, setOpenMenuProjectId] = useState<string | null>(null);
+  const [projectMenuPosition, setProjectMenuPosition] = useState<{
     top: number;
     left: number;
   } | null>(null);
@@ -26,11 +45,19 @@ export default function SectionGptChats({
 
   const MAX_VISIBLE_CHATS = 5;
   const titledChats = chatList.filter((chat) => chat.title !== null);
-  const chatsCount = titledChats.length;
+  const pinnedChats = [...pinnedChatIds]
+    .reverse()
+    .map((id) => titledChats.find((c) => c.id === id))
+    .filter((c): c is Chat => c !== undefined);
+  const unpinnedChats = titledChats.filter(
+    (c) => !pinnedChatIds.includes(c.id)
+  );
+  const sortedChats = [...pinnedChats, ...unpinnedChats];
+  const chatsCount = sortedChats.length;
   const hasChats = chatsCount > 0;
   const hasMoreChats = chatsCount > MAX_VISIBLE_CHATS;
   const listVisible = hasChats;
-  const visibleChats = titledChats;
+  const visibleChats = sortedChats;
   const hiddenChatsCount = chatsCount - MAX_VISIBLE_CHATS;
   const showFolderIcon = hasMoreChats && showAllChats;
   const isHeaderInteractive = hasMoreChats;
@@ -39,14 +66,31 @@ export default function SectionGptChats({
     if (hasMoreChats) setShowAllChats((prev) => !prev);
   };
   const menuRef = useRef<HTMLDivElement | null>(null);
+  const projectMenuRef = useRef<HTMLDivElement | null>(null);
   const titleRefs = useRef<Record<string, HTMLSpanElement | null>>({});
+
+  const togglePinChat = (id: string) => {
+    setPinnedChatIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
+  const togglePinProject = (id: string) => {
+    setPinnedProjectIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      if (menuRef.current && !menuRef.current.contains(target)) {
+      const insideAnyMenu =
+        menuRef.current?.contains(target) ||
+        projectMenuRef.current?.contains(target);
+
+      if (!insideAnyMenu) {
         setOpenMenuChatId(null);
         setDeletingChatId(null);
+        setOpenMenuProjectId(null);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -87,6 +131,25 @@ export default function SectionGptChats({
       </article>
 
       <article
+        className={styles.gptNewProject}
+        tabIndex={0}
+        onClick={onNewProject}
+      >
+        <Image
+          width={36}
+          height={36}
+          src="/icons/new-project.svg"
+          alt="new-project"
+        />
+        <div className={styles.newProjectLabel}>
+          <span className={styles.newProjectTitle}>Start New Project</span>
+          <span className={styles.newProjectSubtitle}>
+            Group chats by task, client, or idea
+          </span>
+        </div>
+      </article>
+
+      <article
         className={styles.yourChats}
         onClick={isHeaderInteractive ? handleYourChatsClick : undefined}
         role={isHeaderInteractive ? "button" : undefined}
@@ -101,7 +164,7 @@ export default function SectionGptChats({
           alt="your-chats"
         />
         <div className={styles.labelWrapper}>
-          <button className={styles.span}>Your Chats</button>
+          <button className={styles.span}>My Chats</button>
           {isHeaderInteractive && (
             <div
               className={`${styles.icon} ${headerExpanded ? styles.iconOpen : ""}`}
@@ -154,19 +217,24 @@ export default function SectionGptChats({
                     : chat.title}
                 </span>
 
-                <span
-                  className={styles.dotsIcon}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const rect = (
-                      e.currentTarget as HTMLElement
-                    ).getBoundingClientRect();
-                    const centerY = rect.top + rect.height / 2;
-                    const offsetX = rect.right + 8;
-                    setMenuPosition({ top: centerY, left: offsetX });
-                    setOpenMenuChatId(chat.id);
-                  }}
-                ></span>
+                <div className={styles.chatAction}>
+                  {pinnedChatIds.includes(chat.id) && (
+                    <span className={styles.pinSmall} />
+                  )}
+                  <span
+                    className={styles.dotsIcon}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const rect = (
+                        e.currentTarget as HTMLElement
+                      ).getBoundingClientRect();
+                      const centerY = rect.top + rect.height / 2;
+                      const offsetX = rect.right + 8;
+                      setMenuPosition({ top: centerY, left: offsetX });
+                      setOpenMenuChatId(chat.id);
+                    }}
+                  />
+                </div>
               </li>
             ))}
           </ul>
@@ -199,6 +267,85 @@ export default function SectionGptChats({
         </button>
       )}
 
+      <article
+        className={styles.yourChats}
+        onClick={isProjectsInteractive ? () => setShowAllProjects((prev) => !prev) : undefined}
+        role={isProjectsInteractive ? "button" : undefined}
+        tabIndex={isProjectsInteractive ? 0 : undefined}
+      >
+        <Image
+          width={36}
+          height={36}
+          src={showProjectsOpen ? "/icons/my-projects-open.svg" : "/icons/my-projects-closed.svg"}
+          alt="my-projects"
+        />
+        <div className={styles.projectsLabelWrapper}>
+          <span className={styles.span}>My Projects</span>
+          {hasProjects && (
+            <span className={styles.badge}>{projectsCount}</span>
+          )}
+          {isProjectsInteractive && (
+            <div className={`${styles.projectsChevron} ${showAllProjects ? styles.projectsChevronOpen : ""}`}>
+              <Image width={15} height={15} src="/icons/chevron-down.svg" alt="chevron-down" />
+            </div>
+          )}
+        </div>
+      </article>
+
+      {hasProjects && (
+        <div className={`${styles.projectsScrollArea} ${
+          showAllProjects && hasMoreProjects ? styles.projectsScrollAreaScroll : ""
+        }`}>
+          <ul className={styles.chatsList}>
+            {projectList.map((project) => (
+              <li key={project.id} className={styles.chatsListItem} tabIndex={0}>
+                <div className={styles.projectItemContent}>
+                  <Image width={28} height={28} src="/icons/project-item.svg" alt="project" />
+                  <span className={styles.chatTitle}>
+                    {project.title.length > 16
+                      ? project.title.slice(0, 16) + "..."
+                      : project.title}
+                  </span>
+                </div>
+                <span
+                  className={styles.dotsIcon}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                    setProjectMenuPosition({ top: rect.top + rect.height / 2, left: rect.right + 8 });
+                    setOpenMenuProjectId(project.id);
+                  }}
+                />
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {hasMoreProjects && (
+        <button
+          type="button"
+          className={styles.showMoreBtn}
+          onClick={() => setShowAllProjects((prev) => !prev)}
+          aria-label={showAllProjects ? "Show fewer projects" : "Show more projects"}
+        >
+          {!showAllProjects && (
+            <span className={styles.showMoreDots}>
+              {Array.from({ length: hiddenProjectsCount }).map((_, i) => (
+                <span key={i} className={styles.showMoreDot} />
+              ))}
+            </span>
+          )}
+          <Image
+            className={`${styles.showMoreChevron} ${showAllProjects ? styles.showMoreChevronUp : ""}`}
+            width={15}
+            height={15}
+            src="/icons/chevron-down.svg"
+            alt="toggle projects"
+          />
+        </button>
+      )}
+
       {openMenuChatId && menuPosition && (
         <div
           ref={menuRef}
@@ -206,6 +353,13 @@ export default function SectionGptChats({
           style={{ top: menuPosition.top, left: menuPosition.left }}
         >
           <ChatsMenu
+            isPinned={pinnedChatIds.includes(openMenuChatId)}
+            onPinToggle={() => {
+              togglePinChat(openMenuChatId);
+              setOpenMenuChatId(null);
+            }}
+            showCreateProject={true}
+            onCreateProject={() => setOpenMenuChatId(null)}
             onRenameRequest={() => {
               setRenamingChatId(openMenuChatId);
               setOpenMenuChatId(null);
@@ -214,6 +368,26 @@ export default function SectionGptChats({
               setDeletingChatId(openMenuChatId);
               setOpenMenuChatId(null);
             }}
+          />
+        </div>
+      )}
+
+      {openMenuProjectId && projectMenuPosition && (
+        <div
+          ref={projectMenuRef}
+          className={styles.menuContainer}
+          style={{ top: projectMenuPosition.top, left: projectMenuPosition.left }}
+        >
+          <ChatsMenu
+            isProject={true}
+            isPinned={pinnedProjectIds.includes(openMenuProjectId)}
+            onPinToggle={() => {
+              togglePinProject(openMenuProjectId);
+              setOpenMenuProjectId(null);
+            }}
+            onAddChats={() => setOpenMenuProjectId(null)}
+            onRenameRequest={() => setOpenMenuProjectId(null)}
+            onDeleteRequest={() => setOpenMenuProjectId(null)}
           />
         </div>
       )}
