@@ -1,68 +1,65 @@
 .container {
-    max-width: 380px;
-    width: 100%;
-    min-height: 200px;
-    padding: 24px;
-    border-radius: 11px;
-    background-color: #0f172a;
+  max-width: 380px;
+  width: 100%;
+  min-height: 200px;
+  padding: 24px;
+  border-radius: 11px;
+  background-color: #0f172a;
 
-    display: flex;
-    gap: 16px;
-
+  display: flex;
+  gap: 16px;
 }
 .title {
-    font-family: var(--font-family);
-    font-style: italic;
-    font-weight: 700;
-    font-size: 18px;
-    color: #eee;
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 18px;
+  color: #eee;
 }
 .paragraph {
-    font-family: var(--font-family);
-    font-weight: 400;
-    font-size: 14px;
-    color: #eee;
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 14px;
+  color: #eee;
 }
-.buttonsContainer{
-    margin-top: 33px;
-    display: flex;
-    }
+.buttonsContainer {
+  margin-top: 33px;
+  display: flex;
+}
 
 .cancelButton {
-    padding: 14px 32px 13px 40px;
-    background-color: #fff;
-    border-radius: 14px;
-    margin-right: 12px;
+  padding: 14px 32px 13px 40px;
+  background-color: #fff;
+  border-radius: 14px;
+  margin-right: 12px;
 }
 
 .cancelButton:hover {
-    background-color: #ded5d5;
-    cursor: pointer;
+  background-color: #ded5d5;
+  cursor: pointer;
 }
-
 
 .deleteButton {
-    padding: 14px 47px 13px 48px;
-    background-color: #dc2626;
-    border-radius: 14px;
-    transition: all 0.3s ease;
+  padding: 14px 47px 13px 48px;
+  background-color: #dc2626;
+  border-radius: 14px;
+  transition: all 0.3s ease;
 }
 .deleteButton:hover {
-    background-color: #f85959;
-    cursor: pointer;
+  background-color: #f85959;
+  cursor: pointer;
 }
 
-.deleteButtonText, .cancelButtonText {
-    font-family: var(--font-family);
-    font-style: italic;
-    font-weight: 700;
-    font-size: 14px;
-    }
+.deleteButtonText,
+.cancelButtonText {
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 14px;
+}
 
 .cancelButtonText {
-   color: #334155;
+  color: #334155;
 }
 
-.deleteButtonText{
-    color: #fff;
+.deleteButtonText {
+  color: #fff;
 }
