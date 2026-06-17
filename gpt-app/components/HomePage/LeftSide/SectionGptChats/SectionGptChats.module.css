@@ -15,11 +15,12 @@
   gap: 13px;
   align-items: center;
   padding-left: 28px;
+  padding-right: 12px;
   border-radius: 11px;
   max-width: 288px;
   width: 100%;
   min-height: 40px;
-  transition: background 1s ease-in;
+  transition: background 0.3s ease-in;
 }
 
 .gptNewProject {
@@ -34,7 +35,7 @@
   max-width: 288px;
   width: 100%;
   min-height: 54px;
-  transition: background 1s ease-in;
+  transition: background 0.2s ease-in;
 }
 
 .gptNewChat:hover,
@@ -42,7 +43,7 @@
 .gptNewProject:hover,
 .gptNewProject:focus,
 .yourChats:hover,
-.yourChats:focus {
+.yourChats:focus-visible {
   background: var(--main-gray);
   cursor: pointer;
 }
@@ -82,14 +83,16 @@
   color: var(--main-white);
 }
 
-.labelWrapper {
-  position: relative;
-  display: inline-flex;
+.labelWrapper,
+.projectsLabelWrapper {
+  flex: 1;
+  display: flex;
   align-items: center;
+  justify-content: space-between;
 }
 
-.projectsLabelWrapper {
-  display: inline-flex;
+.labelLeft {
+  display: flex;
   align-items: center;
   gap: 8px;
 }
@@ -125,15 +128,14 @@
   transform: rotate(180deg);
 }
 
-.icon {
-  position: absolute;
-  top: 50%;
-  transform: translate(-50%);
-  right: -33px;
+.chatsChevron {
+  display: flex;
+  align-items: center;
   transition: transform 0.2s ease;
 }
-.iconOpen {
-  transform: translate(-50%) rotate(180deg);
+
+.chatsChevronOpen {
+  transform: rotate(180deg);
 }
 .chatsList {
   display: flex;
@@ -244,17 +246,25 @@
   cursor: pointer;
 }
 
-.chatsListItem:focus {
+.chatsListItem:focus-visible {
   background: var(--main-gray);
   cursor: pointer;
 }
 
-.chatsListItemActive {
-  background: var(--main-gray);
+.chatRight {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
 }
 
-.chatsListItemActive {
-  opacity: 1;
+.activeIndicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #3b82f6;
+  flex-shrink: 0;
+  pointer-events: none;
 }
 
 .chatAction {
@@ -267,10 +277,9 @@
 .pinSmall {
   position: absolute;
   inset: 0;
-  background-image: url("/icons/pin-small.svg");
-  background-size: 14px 14px;
-  background-repeat: no-repeat;
-  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   opacity: 1;
   transition: opacity 0.2s ease;
   pointer-events: none;

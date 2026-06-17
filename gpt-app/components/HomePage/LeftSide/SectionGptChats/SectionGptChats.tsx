@@ -40,6 +40,7 @@ export default function SectionGptChats({
   } | null>(null);
   const [renamingChatId, setRenamingChatId] = useState<string | null>(null);
   const [deletingChatId, setDeletingChatId] = useState<string | null>(null);
+  const [deletingProjectId, setDeletingProjectId] = useState<string | null>(null);
   const [showAllChats, setShowAllChats] = useState(false);
   const activeChatId = useAppSelector(selectActiveChatId);
 
@@ -91,6 +92,7 @@ export default function SectionGptChats({
         setOpenMenuChatId(null);
         setDeletingChatId(null);
         setOpenMenuProjectId(null);
+        setDeletingProjectId(null);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -164,17 +166,13 @@ export default function SectionGptChats({
           alt="your-chats"
         />
         <div className={styles.labelWrapper}>
-          <button className={styles.span}>My Chats</button>
+          <div className={styles.labelLeft}>
+            <button className={styles.span}>My Chats</button>
+            {hasChats && <span className={styles.badge}>{chatsCount}</span>}
+          </div>
           {isHeaderInteractive && (
-            <div
-              className={`${styles.icon} ${headerExpanded ? styles.iconOpen : ""}`}
-            >
-              <Image
-                width={15}
-                height={15}
-                src="/icons/chevron-down.svg"
-                alt="chevron-down"
-              />
+            <div className={`${styles.chatsChevron} ${headerExpanded ? styles.chatsChevronOpen : ""}`}>
+              <Image width={15} height={15} src="/icons/chevron-down.svg" alt="chevron-down" />
             </div>
           )}
         </div>
@@ -212,14 +210,20 @@ export default function SectionGptChats({
                     setOpenMenuChatId(null);
                   }}
                 >
-                  {chat.title && chat.title.length > 24
-                    ? chat.title.slice(0, 24) + "..."
+                  {chat.title && chat.title.length > 18
+                    ? chat.title.slice(0, 18) + "..."
                     : chat.title}
                 </span>
 
-                <div className={styles.chatAction}>
+                <div className={styles.chatRight}>
+                  {chat.id === activeChatId && (
+                    <span className={styles.activeIndicator} />
+                  )}
+                  <div className={styles.chatAction}>
                   {pinnedChatIds.includes(chat.id) && (
-                    <span className={styles.pinSmall} />
+                    <span className={styles.pinSmall}>
+                      <Image src="/icons/pin.svg" alt="pinned" width={14} height={15} />
+                    </span>
                   )}
                   <span
                     className={styles.dotsIcon}
@@ -234,6 +238,7 @@ export default function SectionGptChats({
                       setOpenMenuChatId(chat.id);
                     }}
                   />
+                </div>
                 </div>
               </li>
             ))}
@@ -280,10 +285,10 @@ export default function SectionGptChats({
           alt="my-projects"
         />
         <div className={styles.projectsLabelWrapper}>
-          <span className={styles.span}>My Projects</span>
-          {hasProjects && (
-            <span className={styles.badge}>{projectsCount}</span>
-          )}
+          <div className={styles.labelLeft}>
+            <span className={styles.span}>My Projects</span>
+            {hasProjects && <span className={styles.badge}>{projectsCount}</span>}
+          </div>
           {isProjectsInteractive && (
             <div className={`${styles.projectsChevron} ${showAllProjects ? styles.projectsChevronOpen : ""}`}>
               <Image width={15} height={15} src="/icons/chevron-down.svg" alt="chevron-down" />
@@ -302,8 +307,8 @@ export default function SectionGptChats({
                 <div className={styles.projectItemContent}>
                   <Image width={28} height={28} src="/icons/project-item.svg" alt="project" />
                   <span className={styles.chatTitle}>
-                    {project.title.length > 16
-                      ? project.title.slice(0, 16) + "..."
+                    {project.title.length > 12
+                      ? project.title.slice(0, 12) + "..."
                       : project.title}
                   </span>
                 </div>
@@ -387,7 +392,10 @@ export default function SectionGptChats({
             }}
             onAddChats={() => setOpenMenuProjectId(null)}
             onRenameRequest={() => setOpenMenuProjectId(null)}
-            onDeleteRequest={() => setOpenMenuProjectId(null)}
+            onDeleteRequest={() => {
+              setDeletingProjectId(openMenuProjectId);
+              setOpenMenuProjectId(null);
+            }}
           />
         </div>
       )}
@@ -404,6 +412,20 @@ export default function SectionGptChats({
               deleteChat(deletingChatId);
               setDeletingChatId(null);
             }}
+          />
+        </div>
+      )}
+
+      {deletingProjectId && projectMenuPosition && (
+        <div
+          ref={projectMenuRef}
+          className={styles.menuContainer}
+          style={{ top: projectMenuPosition.top, left: projectMenuPosition.left }}
+        >
+          <DeleteModalWindow
+            type="project"
+            onCancel={() => setDeletingProjectId(null)}
+            onConfirm={() => setDeletingProjectId(null)}
           />
         </div>
       )}
