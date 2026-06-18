@@ -7,6 +7,8 @@ import DeleteModalWindow from "../DeleteModalWindow/DeleteModalWindow";
 import { useAppSelector } from "@/redux/hooks";
 import { selectActiveChatId } from "@/redux/chat/selectors";
 
+const PINNED_CHATS_KEY = "pinnedChatIds";
+
 export default function SectionGptChats({
   onNewChat,
   onNewProject,
@@ -25,22 +27,33 @@ export default function SectionGptChats({
   const isProjectsInteractive = hasMoreProjects;
   const showProjectsOpen = hasMoreProjects && showAllProjects;
 
-  const [pinnedChatIds, setPinnedChatIds] = useState<string[]>([]);
+  const [pinnedChatIds, setPinnedChatIds] = useState<string[]>(() => {
+    if (typeof window === "undefined") return [];
+    return JSON.parse(localStorage.getItem(PINNED_CHATS_KEY) || "[]");
+  });
   const [pinnedProjectIds, setPinnedProjectIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    localStorage.setItem(PINNED_CHATS_KEY, JSON.stringify(pinnedChatIds));
+  }, [pinnedChatIds]);
 
   const [openMenuChatId, setOpenMenuChatId] = useState<string | null>(null);
   const [menuPosition, setMenuPosition] = useState<{
     top: number;
     left: number;
   } | null>(null);
-  const [openMenuProjectId, setOpenMenuProjectId] = useState<string | null>(null);
+  const [openMenuProjectId, setOpenMenuProjectId] = useState<string | null>(
+    null,
+  );
   const [projectMenuPosition, setProjectMenuPosition] = useState<{
     top: number;
     left: number;
   } | null>(null);
   const [renamingChatId, setRenamingChatId] = useState<string | null>(null);
   const [deletingChatId, setDeletingChatId] = useState<string | null>(null);
-  const [deletingProjectId, setDeletingProjectId] = useState<string | null>(null);
+  const [deletingProjectId, setDeletingProjectId] = useState<string | null>(
+    null,
+  );
   const [showAllChats, setShowAllChats] = useState(false);
   const activeChatId = useAppSelector(selectActiveChatId);
 
@@ -51,7 +64,7 @@ export default function SectionGptChats({
     .map((id) => titledChats.find((c) => c.id === id))
     .filter((c): c is Chat => c !== undefined);
   const unpinnedChats = titledChats.filter(
-    (c) => !pinnedChatIds.includes(c.id)
+    (c) => !pinnedChatIds.includes(c.id),
   );
   const sortedChats = [...pinnedChats, ...unpinnedChats];
   const chatsCount = sortedChats.length;
@@ -72,12 +85,12 @@ export default function SectionGptChats({
 
   const togglePinChat = (id: string) => {
     setPinnedChatIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
   };
   const togglePinProject = (id: string) => {
     setPinnedProjectIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
   };
 
@@ -171,8 +184,15 @@ export default function SectionGptChats({
             {hasChats && <span className={styles.badge}>{chatsCount}</span>}
           </div>
           {isHeaderInteractive && (
-            <div className={`${styles.chatsChevron} ${headerExpanded ? styles.chatsChevronOpen : ""}`}>
-              <Image width={15} height={15} src="/icons/chevron-down.svg" alt="chevron-down" />
+            <div
+              className={`${styles.chatsChevron} ${headerExpanded ? styles.chatsChevronOpen : ""}`}
+            >
+              <Image
+                width={15}
+                height={15}
+                src="/icons/chevron-down.svg"
+                alt="chevron-down"
+              />
             </div>
           )}
         </div>
@@ -220,25 +240,30 @@ export default function SectionGptChats({
                     <span className={styles.activeIndicator} />
                   )}
                   <div className={styles.chatAction}>
-                  {pinnedChatIds.includes(chat.id) && (
-                    <span className={styles.pinSmall}>
-                      <Image src="/icons/pin.svg" alt="pinned" width={14} height={15} />
-                    </span>
-                  )}
-                  <span
-                    className={styles.dotsIcon}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      const rect = (
-                        e.currentTarget as HTMLElement
-                      ).getBoundingClientRect();
-                      const centerY = rect.top + rect.height / 2;
-                      const offsetX = rect.right + 8;
-                      setMenuPosition({ top: centerY, left: offsetX });
-                      setOpenMenuChatId(chat.id);
-                    }}
-                  />
-                </div>
+                    {pinnedChatIds.includes(chat.id) && (
+                      <span className={styles.pinSmall}>
+                        <Image
+                          src="/icons/pin.svg"
+                          alt="pinned"
+                          width={14}
+                          height={15}
+                        />
+                      </span>
+                    )}
+                    <span
+                      className={styles.dotsIcon}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const rect = (
+                          e.currentTarget as HTMLElement
+                        ).getBoundingClientRect();
+                        const centerY = rect.top + rect.height / 2;
+                        const offsetX = rect.right + 8;
+                        setMenuPosition({ top: centerY, left: offsetX });
+                        setOpenMenuChatId(chat.id);
+                      }}
+                    />
+                  </div>
                 </div>
               </li>
             ))}
@@ -274,38 +299,68 @@ export default function SectionGptChats({
 
       <article
         className={styles.yourChats}
-        onClick={isProjectsInteractive ? () => setShowAllProjects((prev) => !prev) : undefined}
+        onClick={
+          isProjectsInteractive
+            ? () => setShowAllProjects((prev) => !prev)
+            : undefined
+        }
         role={isProjectsInteractive ? "button" : undefined}
         tabIndex={isProjectsInteractive ? 0 : undefined}
       >
         <Image
           width={36}
           height={36}
-          src={showProjectsOpen ? "/icons/my-projects-open.svg" : "/icons/my-projects-closed.svg"}
+          src={
+            showProjectsOpen
+              ? "/icons/my-projects-open.svg"
+              : "/icons/my-projects-closed.svg"
+          }
           alt="my-projects"
         />
         <div className={styles.projectsLabelWrapper}>
           <div className={styles.labelLeft}>
             <span className={styles.span}>My Projects</span>
-            {hasProjects && <span className={styles.badge}>{projectsCount}</span>}
+            {hasProjects && (
+              <span className={styles.badge}>{projectsCount}</span>
+            )}
           </div>
           {isProjectsInteractive && (
-            <div className={`${styles.projectsChevron} ${showAllProjects ? styles.projectsChevronOpen : ""}`}>
-              <Image width={15} height={15} src="/icons/chevron-down.svg" alt="chevron-down" />
+            <div
+              className={`${styles.projectsChevron} ${showAllProjects ? styles.projectsChevronOpen : ""}`}
+            >
+              <Image
+                width={15}
+                height={15}
+                src="/icons/chevron-down.svg"
+                alt="chevron-down"
+              />
             </div>
           )}
         </div>
       </article>
 
       {hasProjects && (
-        <div className={`${styles.projectsScrollArea} ${
-          showAllProjects && hasMoreProjects ? styles.projectsScrollAreaScroll : ""
-        }`}>
+        <div
+          className={`${styles.projectsScrollArea} ${
+            showAllProjects && hasMoreProjects
+              ? styles.projectsScrollAreaScroll
+              : ""
+          }`}
+        >
           <ul className={styles.chatsList}>
             {projectList.map((project) => (
-              <li key={project.id} className={styles.chatsListItem} tabIndex={0}>
+              <li
+                key={project.id}
+                className={styles.chatsListItem}
+                tabIndex={0}
+              >
                 <div className={styles.projectItemContent}>
-                  <Image width={28} height={28} src="/icons/project-item.svg" alt="project" />
+                  <Image
+                    width={28}
+                    height={28}
+                    src="/icons/project-item.svg"
+                    alt="project"
+                  />
                   <span className={styles.chatTitle}>
                     {project.title.length > 12
                       ? project.title.slice(0, 12) + "..."
@@ -316,8 +371,13 @@ export default function SectionGptChats({
                   className={styles.dotsIcon}
                   onClick={(e) => {
                     e.stopPropagation();
-                    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-                    setProjectMenuPosition({ top: rect.top + rect.height / 2, left: rect.right + 8 });
+                    const rect = (
+                      e.currentTarget as HTMLElement
+                    ).getBoundingClientRect();
+                    setProjectMenuPosition({
+                      top: rect.top + rect.height / 2,
+                      left: rect.right + 8,
+                    });
                     setOpenMenuProjectId(project.id);
                   }}
                 />
@@ -332,7 +392,9 @@ export default function SectionGptChats({
           type="button"
           className={styles.showMoreBtn}
           onClick={() => setShowAllProjects((prev) => !prev)}
-          aria-label={showAllProjects ? "Show fewer projects" : "Show more projects"}
+          aria-label={
+            showAllProjects ? "Show fewer projects" : "Show more projects"
+          }
         >
           {!showAllProjects && (
             <span className={styles.showMoreDots}>
@@ -381,7 +443,10 @@ export default function SectionGptChats({
         <div
           ref={projectMenuRef}
           className={styles.menuContainer}
-          style={{ top: projectMenuPosition.top, left: projectMenuPosition.left }}
+          style={{
+            top: projectMenuPosition.top,
+            left: projectMenuPosition.left,
+          }}
         >
           <ChatsMenu
             isProject={true}
@@ -420,7 +485,10 @@ export default function SectionGptChats({
         <div
           ref={projectMenuRef}
           className={styles.menuContainer}
-          style={{ top: projectMenuPosition.top, left: projectMenuPosition.left }}
+          style={{
+            top: projectMenuPosition.top,
+            left: projectMenuPosition.left,
+          }}
         >
           <DeleteModalWindow
             type="project"

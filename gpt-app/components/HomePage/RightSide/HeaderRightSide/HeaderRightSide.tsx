@@ -23,6 +23,7 @@ import {
   removeConversation,
   renameConversation,
 } from "@/redux/chat/operations";
+import { setIsCreateProjectModalOpen } from "@/redux/ui/slice";
 
 import { useModelMode } from "@/hooks/useModelMode";
 
@@ -118,6 +119,18 @@ export default function HeaderRightSide({
     setIsModalOpen(true);
   };
 
+  const openCreateProjectSafe = () => {
+    if (isModalMounted) {
+      closeLeftPanel();
+      window.setTimeout(() => {
+        dispatch(setIsCreateProjectModalOpen(true));
+      }, ANIM_MS);
+      return;
+    }
+
+    dispatch(setIsCreateProjectModalOpen(true));
+  };
+
   useEffect(() => {
     if (isModalMounted) closeLeftPanel();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -159,6 +172,7 @@ export default function HeaderRightSide({
 
               <LeftSide
                 onNewChat={() => dispatch(handleNewChat())}
+                onNewProject={openCreateProjectSafe}
                 isModalOpen={isModalOpen}
                 setIsModalOpen={setModelModalOpenSafe}
                 modelMode={modelMode}

@@ -2,6 +2,7 @@ import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
 interface UiState {
   isModalOpen: boolean;
+  isCreateProjectModalOpen: boolean;
   focusMode: boolean;
   isSectionVisible: boolean;
   isOverlayOpen: boolean;
@@ -11,6 +12,7 @@ interface UiState {
 
 const initialState: UiState = {
   isModalOpen: false,
+  isCreateProjectModalOpen: false,
   focusMode: false,
   isSectionVisible: true,
   isOverlayOpen: false,
@@ -24,6 +26,9 @@ const uiSlice = createSlice({
   reducers: {
     setIsModalOpen(state, { payload }: PayloadAction<boolean>) {
       state.isModalOpen = payload;
+    },
+    setIsCreateProjectModalOpen(state, { payload }: PayloadAction<boolean>) {
+      state.isCreateProjectModalOpen = payload;
     },
     setFocusMode(state, { payload }: PayloadAction<boolean>) {
       state.focusMode = payload;
@@ -45,6 +50,7 @@ const uiSlice = createSlice({
 
 export const {
   setIsModalOpen,
+  setIsCreateProjectModalOpen,
   setFocusMode,
   setIsSectionVisible,
   setIsOverlayOpen,
