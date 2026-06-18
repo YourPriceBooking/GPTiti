@@ -8,6 +8,7 @@ import InputBar from "@/components/HomePage/RightSide/InputBar/InputBar";
 import HeaderRightSide from "@/components/HomePage/RightSide/HeaderRightSide/HeaderRightSide";
 import MainSectionRightSide from "@/components/HomePage/RightSide/MainSectionRightSide/MainSectionRightSide";
 import ModelModalOverlay from "@/components/ModelModalOverlay/ModelModalOverlay";
+import CreateProjectModalOverlay from "@/components/HomePage/LeftSide/CreateProjectModalWindow/CreateProjectModalOverlay";
 
 import { useModelMode } from "@/hooks/useModelMode";
 import { useScrollDirection } from "@/hooks/useScrollDirection";
@@ -24,6 +25,7 @@ import {
   selectActiveChat,
   selectActiveChatId,
   selectChatList,
+  selectSortedChatList,
   selectHasInput,
   selectInputSent,
   selectIsTyping,
@@ -63,6 +65,7 @@ import {
   selectFocusMode,
   selectHasFirstRequest,
   selectIsModalOpen,
+  selectIsCreateProjectModalOpen,
   selectIsOverlayOpen,
   selectIsSectionVisible,
   selectNewChatOpened,
@@ -71,6 +74,7 @@ import {
   setFocusMode,
   setHasFirstRequest,
   setIsModalOpen,
+  setIsCreateProjectModalOpen,
   setIsOverlayOpen,
   setIsSectionVisible,
   setNewChatOpened,
@@ -86,6 +90,7 @@ export default function Home() {
   const dispatch = useAppDispatch();
 
   const chatList = useAppSelector(selectChatList);
+  const sortedChatList = useAppSelector(selectSortedChatList);
   const activeChat = useAppSelector(selectActiveChat);
   const activeChatId = useAppSelector(selectActiveChatId);
   const hasInput = useAppSelector(selectHasInput);
@@ -99,6 +104,9 @@ export default function Home() {
   const focusMode = useAppSelector(selectFocusMode);
   const isSectionVisible = useAppSelector(selectIsSectionVisible);
   const isModalOpen = useAppSelector(selectIsModalOpen);
+  const isCreateProjectModalOpen = useAppSelector(
+    selectIsCreateProjectModalOpen,
+  );
   const isOverlayOpen = useAppSelector(selectIsOverlayOpen);
   const hasFirstRequest = useAppSelector(selectHasFirstRequest);
   const newChatOpened = useAppSelector(selectNewChatOpened);
@@ -464,6 +472,15 @@ export default function Home() {
         setSelectedModelGroup={(g) => dispatch(setSelectedModelGroup(g))}
       />
 
+      <CreateProjectModalOverlay
+        isOpen={isCreateProjectModalOpen}
+        setIsOpen={(open) => dispatch(setIsCreateProjectModalOpen(open))}
+        onCreate={() => {
+          // TODO: створення проєкту (Redux), поки що просто закриваємо
+          dispatch(setIsCreateProjectModalOpen(false));
+        }}
+      />
+
       <div
         className={styles.appContainer}
         data-flow={getFlowThemeId(selectedModel)}
@@ -471,11 +488,12 @@ export default function Home() {
         <div className={styles.leftSideContainer}>
           <LeftSide
             onNewChat={() => dispatch(handleNewChat())}
+            onNewProject={() => dispatch(setIsCreateProjectModalOpen(true))}
             isModalOpen={isModalOpen}
             setIsModalOpen={(open) => dispatch(setIsModalOpen(open))}
             modelMode={modelMode}
             setModelMode={setModelMode}
-            chatList={chatList}
+            chatList={sortedChatList}
             setActiveChatId={handleSelectChat}
             deleteChat={handleDeleteChat}
             renameChat={handleRenameChat}

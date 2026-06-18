@@ -1,0 +1,373 @@
+.container {
+  width: 100%;
+  max-width: 480px;
+  padding: 28px;
+  padding-bottom: 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  /* background: linear-gradient(135deg, #0c1b3a 0%, #07152e 45%, #050d1e 100%); */
+  background: #061127;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.headerIcon {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(100deg, #102e69 0%, #0d1d46 100%);
+  border: 1px solid rgba(59, 130, 246, 0.32);
+}
+
+.headerText {
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 20px;
+  color: #f7faff;
+  margin: 0;
+}
+
+.subtitle {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 14px;
+  color: #a5b5d9;
+  margin: 4px 0 0;
+}
+
+.closeButton {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  background: transparent;
+  border: 1px solid rgba(59, 130, 246, 0.32);
+  cursor: pointer;
+  padding: 8px;
+  transition: opacity 0.2s ease;
+}
+
+.closeButton:hover {
+  opacity: 0.75;
+}
+
+.fieldLabel {
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 14px;
+  color: #f2f6ff;
+  margin-top: 26px;
+  margin-bottom: 10px;
+}
+
+.input {
+  width: 100%;
+  padding: 16px 18px;
+  border-radius: 10px;
+  border: 1px solid #306bff;
+  background-color: transparent;
+  color: #f8fafc;
+  font-family: var(--font-family);
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.input::placeholder {
+  color: #64748b;
+}
+
+.input:focus {
+  border-color: #3b82f6;
+}
+
+.infoBox {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  gap: 16px;
+  margin-top: 22px;
+  padding: 20px;
+  border-radius: 14px;
+  border: 1px solid rgba(59, 130, 246, 0.22);
+  background: rgba(14, 27, 52, 0.55);
+}
+
+.infoBox::after {
+  content: "";
+  position: absolute;
+  top: 18px;
+  right: 14px;
+  bottom: 19px;
+  width: 140px;
+  background-image:
+    radial-gradient(circle, rgba(62, 124, 255, 0.45) 1px, transparent 1.5px),
+    radial-gradient(
+      ellipse at 78% 50%,
+      rgba(43, 105, 255, 0.3) 0%,
+      transparent 65%
+    );
+  background-size:
+    16px 16px,
+    100% 100%;
+  background-repeat: repeat, no-repeat;
+  background-position: center, center;
+  pointer-events: none;
+}
+
+.infoIcon {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #2f80ff;
+  border-radius: 50%;
+}
+
+.infoText {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-width: 0;
+}
+
+.infoTitle {
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 15px;
+  color: #f4f8ff;
+  margin: 0 0 6px;
+}
+
+.infoParagraph {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 2.3;
+  color: #a7b6d8;
+  margin: 0;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 28px;
+  margin-left: -28px;
+  margin-right: -28px;
+  padding: 20px 28px 0;
+  border-top: 1px solid rgba(59, 130, 246, 0.22);
+}
+
+.cancelButton {
+  position: relative;
+  isolation: isolate;
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 15px;
+  color: #fff;
+  background: linear-gradient(135deg, #0b1730 0%, #081221 100%);
+  border: 1px solid rgba(70, 98, 133, 0.25);
+  border-radius: 10px;
+  padding: 14px 55px;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.cancelButton::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(100deg, #102245 0%, #0e1727 100%);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.cancelButton:hover {
+  border-color: rgba(111, 160, 255, 0.88);
+}
+
+.cancelButton:hover::before {
+  opacity: 1;
+}
+
+.cancelButton:active {
+  border-color: rgba(70, 98, 133, 0.25);
+}
+
+.cancelButton:active::before {
+  opacity: 0;
+}
+
+.createButton {
+  position: relative;
+  isolation: isolate;
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 15px;
+  color: #fff;
+  padding: 14px 65px;
+  border-radius: 12px;
+  border: 1px solid rgba(125, 168, 255, 0.42);
+  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+  cursor: pointer;
+}
+
+.createButton::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(135deg, #4a8dff 0%, #2f73ff 25%, #1a5dff 100%);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.createButton:hover:not(:disabled)::before {
+  opacity: 1;
+}
+
+.createButton:disabled {
+  color: #c2cbdc;
+  background: linear-gradient(135deg, #3c465b 0%, #2d374a 100%);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.createButton:active:not(:disabled)::before {
+  background: #0c3593;
+}
+
+/* --- Adaptive --- */
+@media (max-width: 560px) {
+  .overlay {
+    padding: 16px;
+  }
+
+  .container {
+    max-width: 100%;
+    padding: 22px;
+    padding-bottom: 16px;
+    border-radius: 16px;
+  }
+
+  .header {
+    gap: 12px;
+  }
+
+  .headerIcon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+  }
+
+  .title {
+    font-size: 18px;
+  }
+
+  .subtitle {
+    font-size: 13px;
+  }
+
+  .fieldLabel {
+    margin-top: 22px;
+  }
+
+  .input {
+    padding: 14px 16px;
+  }
+
+  .infoBox {
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .infoIcon {
+    width: 46px;
+    height: 46px;
+  }
+
+  .infoParagraph {
+    line-height: 1.9;
+  }
+
+  .footer {
+    gap: 12px;
+    margin-left: -22px;
+    margin-right: -22px;
+    padding: 18px 22px 0;
+  }
+
+  .cancelButton,
+  .createButton {
+    flex: 1;
+    padding-left: 0;
+    padding-right: 0;
+    text-align: center;
+  }
+}
+
+@media (max-width: 380px) {
+  .overlay {
+    padding: 10px;
+  }
+
+  .container {
+    padding: 18px;
+    padding-bottom: 14px;
+  }
+
+  .title {
+    font-size: 17px;
+  }
+
+  .header {
+    gap: 10px;
+  }
+
+  .headerIcon {
+    width: 44px;
+    height: 44px;
+  }
+
+  .infoBox::after {
+    display: none;
+  }
+
+  .footer {
+    margin-left: -18px;
+    margin-right: -18px;
+    padding: 16px 18px 0;
+  }
+
+  .cancelButton,
+  .createButton {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    font-size: 14px;
+  }
+}

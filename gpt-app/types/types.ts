@@ -22,6 +22,7 @@ export type Chat = {
   messages: Message[];
   messagesLoaded?: boolean;
   modelId?: string;
+  lastMessageAt?: string;
 };
 
 export type Project = {

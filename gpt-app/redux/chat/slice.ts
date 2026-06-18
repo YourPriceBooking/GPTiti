@@ -124,6 +124,7 @@ const chatSlice = createSlice({
         images: payload.images,
       };
       chat.messages.push(msg);
+      chat.lastMessageAt = new Date().toISOString();
     },
 
     startAssistantMessage(
@@ -165,6 +166,7 @@ const chatSlice = createSlice({
         last.streaming = false;
         if (payload.tokens !== undefined) last.tokens = payload.tokens;
       }
+      chat.lastMessageAt = new Date().toISOString();
     },
 
     deleteDraftChat(state, { payload }: PayloadAction<string>) {
@@ -204,16 +206,21 @@ const chatSlice = createSlice({
         // Preserve local drafts and any already-loaded chats; merge in server chats.
         const drafts = state.chatList.filter((c) => isDraftId(c.id));
         const existingById = new Map(state.chatList.map((c) => [c.id, c]));
-        const serverChats = payload.map(
-          (c) =>
-            existingById.get(c._id) ?? {
-              id: c._id,
-              title: c.title,
-              messages: [],
-              messagesLoaded: false,
-              modelId: c.modelId,
-            },
-        );
+        const serverChats = payload.map((c) => {
+          const existing = existingById.get(c._id);
+          if (existing) {
+            if (c.lastMessageAt) existing.lastMessageAt = c.lastMessageAt;
+            return existing;
+          }
+          return {
+            id: c._id,
+            title: c.title,
+            messages: [],
+            messagesLoaded: false,
+            modelId: c.modelId,
+            lastMessageAt: c.lastMessageAt,
+          };
+        });
         state.chatList = [...drafts, ...serverChats];
         if (!state.chatList.some((c) => c.id === state.activeChatId)) {
           state.activeChatId = state.chatList[0]?.id ?? null;
