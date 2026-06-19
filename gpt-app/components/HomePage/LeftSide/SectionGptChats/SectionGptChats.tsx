@@ -6,6 +6,7 @@ import ChatsMenu from "../ChatsMenu/ChatsMenu";
 import DeleteModalWindow from "../DeleteModalWindow/DeleteModalWindow";
 import { useAppSelector } from "@/redux/hooks";
 import { selectActiveChatId } from "@/redux/chat/selectors";
+import { selectActiveProjectId } from "@/redux/ui/selectors";
 
 const PINNED_CHATS_KEY = "pinnedChatIds";
 
@@ -13,6 +14,9 @@ export default function SectionGptChats({
   onNewChat,
   onNewProject,
   projectList = [],
+  setActiveProject,
+  deleteProject,
+  renameProject,
   chatList,
   setActiveChatId,
   deleteChat,
@@ -50,12 +54,16 @@ export default function SectionGptChats({
     left: number;
   } | null>(null);
   const [renamingChatId, setRenamingChatId] = useState<string | null>(null);
+  const [renamingProjectId, setRenamingProjectId] = useState<string | null>(
+    null,
+  );
   const [deletingChatId, setDeletingChatId] = useState<string | null>(null);
   const [deletingProjectId, setDeletingProjectId] = useState<string | null>(
     null,
   );
   const [showAllChats, setShowAllChats] = useState(false);
   const activeChatId = useAppSelector(selectActiveChatId);
+  const activeProjectId = useAppSelector(selectActiveProjectId);
 
   const MAX_VISIBLE_CHATS = 5;
   const titledChats = chatList.filter((chat) => chat.title !== null);
@@ -82,6 +90,7 @@ export default function SectionGptChats({
   const menuRef = useRef<HTMLDivElement | null>(null);
   const projectMenuRef = useRef<HTMLDivElement | null>(null);
   const titleRefs = useRef<Record<string, HTMLSpanElement | null>>({});
+  const projectTitleRefs = useRef<Record<string, HTMLSpanElement | null>>({});
 
   const togglePinChat = (id: string) => {
     setPinnedChatIds((prev) =>
@@ -130,6 +139,24 @@ export default function SectionGptChats({
     selection?.removeAllRanges();
     selection?.addRange(range);
   }, [renamingChatId]);
+
+  useEffect(() => {
+    if (!renamingProjectId) return;
+
+    const el = projectTitleRefs.current[renamingProjectId];
+    if (!el) return;
+
+    el.focus();
+
+    const range = document.createRange();
+    const selection = window.getSelection();
+
+    range.selectNodeContents(el);
+    range.collapse(false);
+
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+  }, [renamingProjectId]);
 
   return (
     <section className={styles.gptChats}>
@@ -236,20 +263,17 @@ export default function SectionGptChats({
                 </span>
 
                 <div className={styles.chatRight}>
-                  {chat.id === activeChatId && (
-                    <span className={styles.activeIndicator} />
+                  {pinnedChatIds.includes(chat.id) && (
+                    <span className={styles.pinSmall}>
+                      <Image
+                        src="/icons/pin.svg"
+                        alt="pinned"
+                        width={14}
+                        height={15}
+                      />
+                    </span>
                   )}
                   <div className={styles.chatAction}>
-                    {pinnedChatIds.includes(chat.id) && (
-                      <span className={styles.pinSmall}>
-                        <Image
-                          src="/icons/pin.svg"
-                          alt="pinned"
-                          width={14}
-                          height={15}
-                        />
-                      </span>
-                    )}
                     <span
                       className={styles.dotsIcon}
                       onClick={(e) => {
@@ -264,6 +288,9 @@ export default function SectionGptChats({
                       }}
                     />
                   </div>
+                  {chat.id === activeChatId && (
+                    <span className={styles.activeIndicator} />
+                  )}
                 </div>
               </li>
             ))}
@@ -351,8 +378,13 @@ export default function SectionGptChats({
             {projectList.map((project) => (
               <li
                 key={project.id}
-                className={styles.chatsListItem}
+                className={`${styles.chatsListItem} ${
+                  project.id === activeProjectId
+                    ? styles.chatsListItemActive
+                    : ""
+                }`}
                 tabIndex={0}
+                onClick={() => setActiveProject?.(project.id)}
               >
                 <div className={styles.projectItemContent}>
                   <Image
@@ -361,10 +393,32 @@ export default function SectionGptChats({
                     src="/icons/project-item.svg"
                     alt="project"
                   />
-                  <span className={styles.chatTitle}>
-                    {project.title.length > 12
-                      ? project.title.slice(0, 12) + "..."
-                      : project.title}
+                  <span
+                    ref={(el) => {
+                      if (el) projectTitleRefs.current[project.id] = el;
+                    }}
+                    contentEditable={renamingProjectId === project.id}
+                    suppressContentEditableWarning
+                    className={styles.chatTitle}
+                    onClick={
+                      renamingProjectId === project.id
+                        ? (e) => e.stopPropagation()
+                        : undefined
+                    }
+                    onBlur={(e) => {
+                      const newTitle = e.currentTarget.textContent?.trim();
+                      if (newTitle && newTitle !== project.title) {
+                        renameProject?.(project.id, newTitle);
+                      }
+                      setRenamingProjectId(null);
+                      setOpenMenuProjectId(null);
+                    }}
+                  >
+                    {renamingProjectId === project.id
+                      ? project.title
+                      : project.title.length > 12
+                        ? project.title.slice(0, 12) + "..."
+                        : project.title}
                   </span>
                 </div>
                 <span
@@ -456,7 +510,10 @@ export default function SectionGptChats({
               setOpenMenuProjectId(null);
             }}
             onAddChats={() => setOpenMenuProjectId(null)}
-            onRenameRequest={() => setOpenMenuProjectId(null)}
+            onRenameRequest={() => {
+              setRenamingProjectId(openMenuProjectId);
+              setOpenMenuProjectId(null);
+            }}
             onDeleteRequest={() => {
               setDeletingProjectId(openMenuProjectId);
               setOpenMenuProjectId(null);
@@ -493,7 +550,10 @@ export default function SectionGptChats({
           <DeleteModalWindow
             type="project"
             onCancel={() => setDeletingProjectId(null)}
-            onConfirm={() => setDeletingProjectId(null)}
+            onConfirm={() => {
+              deleteProject?.(deletingProjectId);
+              setDeletingProjectId(null);
+            }}
           />
         </div>
       )}

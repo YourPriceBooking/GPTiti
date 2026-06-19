@@ -16,6 +16,7 @@ import { chatReducer } from "./chat/slice";
 import { modelReducer } from "./model/slice";
 import { tokensReducer } from "./tokens/slice";
 import { uiReducer } from "./ui/slice";
+import { projectsReducer } from "./projects/slice";
 import { setupInterceptors } from "@/lib/axiosInstance"; // ← додано
 
 const authPersistConfig = {
@@ -41,11 +42,18 @@ const chatPersistConfig = {
   whitelist: ["activeChatId"],
 };
 
+const projectsPersistConfig = {
+  key: "projects",
+  storage,
+  whitelist: ["list"],
+};
+
 const rootReducer = combineReducers({
   auth: persistReducer(authPersistConfig, authReducer),
   chat: persistReducer(chatPersistConfig, chatReducer),
   model: persistReducer(modelPersistConfig, modelReducer),
   tokens: persistReducer(tokensPersistConfig, tokensReducer),
+  projects: persistReducer(projectsPersistConfig, projectsReducer),
   ui: uiReducer,
 });
 

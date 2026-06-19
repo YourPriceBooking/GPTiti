@@ -81,6 +81,7 @@ export default function CreateProjectModalWindow({
           className={styles.input}
           type="text"
           placeholder="Example: Website Redesign"
+          maxLength={30}
           value={name}
           onChange={(e) => setName(e.target.value)}
           onKeyDown={(e) => {

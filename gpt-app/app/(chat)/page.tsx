@@ -3,10 +3,12 @@
 import { useRef, useEffect, useCallback, useState, useMemo } from "react";
 
 import LeftSide from "@/components/HomePage/LeftSide/LeftSide";
+import LeftSideDrawer from "@/components/HomePage/LeftSide/LeftSideDrawer/LeftSideDrawer";
 import MessageList from "@/components/HomePage/RightSide/MessageList/MessageList";
 import InputBar from "@/components/HomePage/RightSide/InputBar/InputBar";
 import HeaderRightSide from "@/components/HomePage/RightSide/HeaderRightSide/HeaderRightSide";
 import MainSectionRightSide from "@/components/HomePage/RightSide/MainSectionRightSide/MainSectionRightSide";
+import ProjectWorkspace from "@/components/HomePage/RightSide/ProjectWorkspace/ProjectWorkspace";
 import ModelModalOverlay from "@/components/ModelModalOverlay/ModelModalOverlay";
 import CreateProjectModalOverlay from "@/components/HomePage/LeftSide/CreateProjectModalWindow/CreateProjectModalOverlay";
 
@@ -66,6 +68,7 @@ import {
   selectHasFirstRequest,
   selectIsModalOpen,
   selectIsCreateProjectModalOpen,
+  selectActiveProjectId,
   selectIsOverlayOpen,
   selectIsSectionVisible,
   selectNewChatOpened,
@@ -75,10 +78,13 @@ import {
   setHasFirstRequest,
   setIsModalOpen,
   setIsCreateProjectModalOpen,
+  setActiveProjectId,
   setIsOverlayOpen,
   setIsSectionVisible,
   setNewChatOpened,
 } from "@/redux/ui/slice";
+import { selectProjectList } from "@/redux/projects/selectors";
+import { addProject } from "@/redux/projects/slice";
 import { refreshError } from "@/redux/auth/slice";
 import { setBalance } from "@/redux/tokens/slice";
 import { isAuthExpiredError } from "@/lib/authError";
@@ -107,6 +113,9 @@ export default function Home() {
   const isCreateProjectModalOpen = useAppSelector(
     selectIsCreateProjectModalOpen,
   );
+  const activeProjectId = useAppSelector(selectActiveProjectId);
+  const projectList = useAppSelector(selectProjectList);
+  const activeProject = projectList.find((p) => p.id === activeProjectId);
   const isOverlayOpen = useAppSelector(selectIsOverlayOpen);
   const hasFirstRequest = useAppSelector(selectHasFirstRequest);
   const newChatOpened = useAppSelector(selectNewChatOpened);
@@ -315,6 +324,7 @@ export default function Home() {
 
   const handleSelectChat = useCallback(
     (id: string) => {
+      dispatch(setActiveProjectId(null));
       dispatch(setActiveChatId(id));
       if (isDraftId(id)) return;
       const chat = chatList.find((c) => c.id === id);
@@ -475,8 +485,10 @@ export default function Home() {
       <CreateProjectModalOverlay
         isOpen={isCreateProjectModalOpen}
         setIsOpen={(open) => dispatch(setIsCreateProjectModalOpen(open))}
-        onCreate={() => {
-          // TODO: створення проєкту (Redux), поки що просто закриваємо
+        onCreate={(name) => {
+          const id = crypto.randomUUID();
+          dispatch(addProject({ id, title: name }));
+          dispatch(setActiveProjectId(id));
           dispatch(setIsCreateProjectModalOpen(false));
         }}
       />
@@ -487,7 +499,10 @@ export default function Home() {
       >
         <div className={styles.leftSideContainer}>
           <LeftSide
-            onNewChat={() => dispatch(handleNewChat())}
+            onNewChat={() => {
+              dispatch(setActiveProjectId(null));
+              dispatch(handleNewChat());
+            }}
             onNewProject={() => dispatch(setIsCreateProjectModalOpen(true))}
             isModalOpen={isModalOpen}
             setIsModalOpen={(open) => dispatch(setIsModalOpen(open))}
@@ -509,6 +524,63 @@ export default function Home() {
             dockHidden ? styles.dockHidden : ""
           }`}
         >
+          {activeProject ? (
+            <>
+              <LeftSideDrawer
+                className={styles.projectMenuTrigger}
+                onNewChat={() => {
+                  dispatch(setActiveProjectId(null));
+                  dispatch(handleNewChat());
+                }}
+                onNewProject={() =>
+                  dispatch(setIsCreateProjectModalOpen(true))
+                }
+                isModalOpen={isModalOpen}
+                setIsModalOpen={(open) => dispatch(setIsModalOpen(open))}
+                modelMode={modelMode}
+                setModelMode={setModelMode}
+                chatList={sortedChatList}
+                setActiveChatId={handleSelectChat}
+                deleteChat={handleDeleteChat}
+                renameChat={handleRenameChat}
+                modelRef={modelRef}
+                selectedModel={selectedModel}
+                setSelectedModel={handleSelectModel}
+                selectedModelGroup={selectedModelGroup}
+                setSelectedModelGroup={(g) =>
+                  dispatch(setSelectedModelGroup(g))
+                }
+              />
+              <div className={styles.projectWorkspaceScroll}>
+                <ProjectWorkspace
+                  name={activeProject.title}
+                onCreateFirstChat={() => inputRef.current?.focus()}
+                inputProps={{
+                  hasInput,
+                  onChange: handleChange,
+                  onSend: (_message, imageUrls, imageFiles) =>
+                    handleSendClick(hasFirstRequest, imageUrls, imageFiles),
+                  inputRef,
+                  onHideSection: () => {},
+                  templateTick,
+                  setHasFirstRequest: (updater) => {
+                    const next =
+                      typeof updater === "function"
+                        ? (updater as (prev: boolean) => boolean)(
+                            hasFirstRequest,
+                          )
+                        : updater;
+                    dispatch(setHasFirstRequest(next));
+                  },
+                  hasFirstRequest,
+                  selectedModel,
+                  onImagesChange: setInputImageCount,
+                }}
+                />
+              </div>
+            </>
+          ) : (
+            <>
           <div className={styles.headerRightSectionContainer}>
             <HeaderRightSide
               chatTitle={activeChat?.title}
@@ -701,6 +773,8 @@ export default function Home() {
               )}
             </div>
           </div>
+            </>
+          )}
         </div>
       </div>
     </>

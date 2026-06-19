@@ -196,6 +196,9 @@
   .openModal {
     margin-left: 15px;
   }
+  .menuTrigger {
+    margin-left: 15px;
+  }
 
   .modalOverlay {
     position: fixed;
