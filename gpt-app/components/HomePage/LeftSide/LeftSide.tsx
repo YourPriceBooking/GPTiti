@@ -1,20 +1,17 @@
 import styles from "./LeftSide.module.css";
 import FooterLeftSide from "./FooterLeftSide/FooterLeftSide";
-import { LeftSideProps, Project } from "@/types/types";
+import { LeftSideProps } from "@/types/types";
 import SectionGptUser from "./SectionGptUser/SectionGptUser";
 import SectionGptChats from "./SectionGptChats/SectionGptChats";
 import SectionGptTokens from "./SectionGptTokens/SectionGptTokens";
 import { useState } from "react";
 import Image from "next/image";
 import WsDebugPanel from "@/components/common/WsDebugPanel/WsDebugPanel";
-
-// TODO: replace with redux project data
-const TEMP_PROJECTS: Project[] = [
-  { id: "p1", title: "Website Redesign" },
-  { id: "p2", title: "Mobile App" },
-  { id: "p3", title: "API Integration" },
-  { id: "p4", title: "API Integration1" },
-];
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { selectProjectList } from "@/redux/projects/selectors";
+import { removeProject, renameProject } from "@/redux/projects/slice";
+import { selectActiveProjectId } from "@/redux/ui/selectors";
+import { setActiveProjectId } from "@/redux/ui/slice";
 
 export default function LeftSide({
   onNewChat,
@@ -34,6 +31,20 @@ export default function LeftSide({
   setIsModalOpen,
 }: LeftSideProps) {
   const [isOpen, setIsOpen] = useState(true);
+
+  const dispatch = useAppDispatch();
+  const projectList = useAppSelector(selectProjectList);
+  const activeProjectId = useAppSelector(selectActiveProjectId);
+
+  const handleSelectProject = (id: string) => dispatch(setActiveProjectId(id));
+
+  const handleDeleteProject = (id: string) => {
+    dispatch(removeProject(id));
+    if (id === activeProjectId) dispatch(setActiveProjectId(null));
+  };
+
+  const handleRenameProject = (id: string, title: string) =>
+    dispatch(renameProject({ id, title }));
 
   return (
     <div
@@ -83,7 +94,10 @@ export default function LeftSide({
             <SectionGptChats
               onNewChat={onNewChat}
               onNewProject={onNewProject}
-              projectList={TEMP_PROJECTS}
+              projectList={projectList}
+              setActiveProject={handleSelectProject}
+              deleteProject={handleDeleteProject}
+              renameProject={handleRenameProject}
               chatList={chatList}
               setActiveChatId={setActiveChatId}
               deleteChat={deleteChat}

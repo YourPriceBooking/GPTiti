@@ -38,6 +38,8 @@ export default function InputBar({
   hasFirstRequest,
   selectedModel,
   onImagesChange,
+  placeholder = "Ask anything...",
+  variant = "default",
 }: {
   hasInput: boolean;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
@@ -49,6 +51,8 @@ export default function InputBar({
   hasFirstRequest: boolean;
   selectedModel: string;
   onImagesChange?: (count: number) => void;
+  placeholder?: string;
+  variant?: "default" | "project";
 }) {
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
 
@@ -389,7 +393,7 @@ export default function InputBar({
     <div
       className={`${styles.inputContainer} ${
         isMultiline ? styles.multiline : ""
-      }`}
+      } ${variant === "project" ? styles.project : ""}`}
     >
       {showAddInput && (
         <div
@@ -506,7 +510,7 @@ export default function InputBar({
         <textarea
           ref={inputRef}
           className={styles.input}
-          placeholder="Ask anything..."
+          placeholder={placeholder}
           onChange={handleChange}
           onPaste={handlePaste}
           rows={1}

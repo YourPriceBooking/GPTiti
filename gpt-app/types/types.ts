@@ -88,7 +88,11 @@ export type LeftSideProps = {
 export type SectionGptChatsProps = Pick<
   LeftSideProps,
   "onNewChat" | "onNewProject" | "projectList" | "chatList" | "setActiveChatId" | "deleteChat" | "renameChat"
->;
+> & {
+  setActiveProject?: (id: string) => void;
+  deleteProject?: (id: string) => void;
+  renameProject?: (id: string, title: string) => void;
+};
 
 export type MainSectionRightSideProps = {
   insertTemplate: (text: string) => void;
