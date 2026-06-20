@@ -52,7 +52,7 @@
   {
     "type": "gpt-5.4",
     "modelId": "gpt-5.4",
-    "header": "What do you want to do faster?",
+    "header": "Choose a quick task",
     "subtitle": "Great for everyday AI tasks, writing, summaries, and quick help.",
     "buttons": [
       {
@@ -87,7 +87,7 @@
       },
       {
         "label": "Explain simply",
-        "desc": "Understand anything faster.",
+        "desc": "Choose a quick task",
         "template": "Explain this in simple terms anyone can understand:",
         "icon": "explain-simply"
       }
@@ -202,7 +202,7 @@
   {
     "type": "gpt-5.1",
     "modelId": "gpt-5.1-mini",
-    "header": "What do you want to do faster?",
+    "header": "Choose a quick task",
     "subtitle": "Great for quick daily tasks, concise writing, summaries, and simple help.",
     "buttons": [
       {
@@ -237,7 +237,7 @@
       },
       {
         "label": "Explain simply",
-        "desc": "Understand anything faster.",
+        "desc": "Choose a quick task",
         "template": "Explain this in simple terms anyone can understand:",
         "icon": "explain-simply-mini"
       }
@@ -352,7 +352,7 @@
   {
     "type": "gpt-4o",
     "modelId": "gpt-4o-mini",
-    "header": "What do you want to do faster?",
+    "header": "Choose a quick task",
     "subtitle": "Great for everyday AI tasks, writing, summaries, and quick help.",
     "buttons": [
       {

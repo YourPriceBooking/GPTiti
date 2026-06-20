@@ -110,6 +110,8 @@ export type MainSectionRightSideProps = {
   isOverlay?: boolean;
   selectedModel: string;
   onImagesChange?: (count: number) => void;
+  showEstimate: boolean;
+  onChooseModel: () => void;
 };
 
 export type ModelModalOverlayProps = {

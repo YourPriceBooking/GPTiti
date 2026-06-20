@@ -43,53 +43,17 @@
   gap: 6px;
 }
 
-.quickActionsContainer {
+.userAvatarContainer {
   margin-right: 33px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding-left: 14px;
-
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.14) 0%,
-    rgba(255, 255, 255, 0.08) 100%
-  );
+  justify-content: center;
+  flex-shrink: 0;
+}
+.userAvatar {
+  border-radius: 50%;
+  object-fit: cover;
   border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 12px;
-  max-width: 180px;
-  width: 100%;
-  min-height: 34px;
-  transition: 0.3ms all ease-in-out;
-}
-.quickActionsContainer:hover {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.18) 0%,
-    rgba(255, 255, 255, 0.1) 100%
-  );
-  cursor: pointer;
-}
-.quickActionsContainer:active {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.12) 0%,
-    rgba(255, 255, 255, 0.06) 100%
-  );
-}
-.quickActionsContainer:focus {
-  background-color: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.13) 0%,
-    rgba(255, 255, 255, 0.08) 100%
-  );
-  border-color: rgba(47, 107, 255, 0.55);
-}
-.quickActionsSpan {
-  font-family: var(--font-family);
-  font-weight: 400;
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.92);
 }
 
 .modelGptitiWrapper {
@@ -161,7 +125,7 @@
   .containerGroupLogos {
     margin-left: 0;
   }
-  .quickActionsContainer {
+  .userAvatarContainer {
     margin-right: 0;
   }
   .modelGptitiContainer {
@@ -181,17 +145,8 @@
   .containerGroupLogos {
     margin-left: 20px;
   }
-  .quickActionsSpan {
-    display: none;
-  }
-  .quickActionsContainer {
+  .userAvatarContainer {
     margin-right: 10px;
-    max-width: 40px;
-    width: 100%;
-    padding-left: 0;
-  }
-  .quickActionsIcon {
-    margin: 0 auto;
   }
   .openModal {
     margin-left: 15px;

@@ -105,12 +105,18 @@
   font-family: var(--font-family);
   font-weight: 300;
   font-size: 12px;
+  margin-top: 10px;
   color: var(--main-white);
 }
 
 .spanContainerFirstRequest {
   display: flex;
   flex-direction: column;
+}
+
+.spanContainerFirstRequestTop {
+  display: flex;
+  justify-content: space-between;
 }
 
 .inputSpan1 {
