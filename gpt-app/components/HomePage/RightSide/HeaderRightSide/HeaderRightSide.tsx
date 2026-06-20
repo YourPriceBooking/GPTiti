@@ -8,7 +8,7 @@ import LoginModal from "@/components/HomePage/common/LoginModal/LoginModal";
 import LeftSideDrawer from "../../LeftSide/LeftSideDrawer/LeftSideDrawer";
 
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { selectIsLoggedIn } from "@/redux/auth/selectors";
+import { selectIsLoggedIn, selectUser } from "@/redux/auth/selectors";
 import { selectChatList } from "@/redux/chat/selectors";
 import {
   deleteDraftChat,
@@ -44,15 +44,11 @@ export default function HeaderRightSide({
   setSelectedModelGroup,
   isModalOpen,
   setIsModalOpen,
-  onOpenQuickActions,
-  quickActionsEnabled,
-}: HeaderRightSideProps & {
-  onOpenQuickActions: () => void;
-  quickActionsEnabled: boolean;
-}) {
+}: HeaderRightSideProps) {
   const dispatch = useAppDispatch();
 
   const isAuthed = useAppSelector(selectIsLoggedIn);
+  const user = useAppSelector(selectUser);
   const chatList = useAppSelector(selectChatList);
 
   const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -177,20 +173,15 @@ export default function HeaderRightSide({
           />
         </>
       ) : (
-        <p
-          className={styles.quickActionsContainer}
-          onClick={onOpenQuickActions}
-          style={{ opacity: quickActionsEnabled ? 1 : 0.5 }}
-        >
+        <div className={styles.userAvatarContainer}>
           <Image
-            src="/icons/quick-actions.svg"
-            width={21}
-            height={21}
-            alt="quick-actions-icon"
-            className={styles.quickActionsIcon}
+            className={styles.userAvatar}
+            src={user?.avatar || "/icons/ghost-user.svg"}
+            width={36}
+            height={36}
+            alt={user?.email || "user-avatar"}
           />
-          <span className={styles.quickActionsSpan}>Quick actions</span>
-        </p>
+        </div>
       )}
     </div>
   );

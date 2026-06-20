@@ -80,7 +80,7 @@ const flows: Record<string, ModelFlow> = {
   "gpt-5.4": {
     type: "gpt-5.4",
     modelId: "gpt-5.4",
-    header: "What do you want to do faster?",
+    header: "Choose a quick task",
     subtitle:
       "Great for everyday AI tasks, writing, summaries, and quick help.",
     buttons: [
@@ -112,12 +112,13 @@ const flows: Record<string, ModelFlow> = {
       {
         label: "Create content",
         desc: "Posts, emails, product text.",
-        template: "Write engaging content for this (post, email, or product text):",
+        template:
+          "Write engaging content for this (post, email, or product text):",
         icon: "create-content",
       },
       {
         label: "Explain simply",
-        desc: "Understand anything faster.",
+        desc: "Choose a quick task",
         template: "Explain this in simple terms anyone can understand:",
         icon: "explain-simply",
       },
@@ -242,7 +243,7 @@ const flows: Record<string, ModelFlow> = {
   "gpt-5.1-mini": {
     type: "gpt-5.1",
     modelId: "gpt-5.1-mini",
-    header: "What do you want to do faster?",
+    header: "Choose a quick task",
     subtitle:
       "Great for quick daily tasks, concise writing, summaries, and simple help.",
     buttons: [
@@ -274,12 +275,13 @@ const flows: Record<string, ModelFlow> = {
       {
         label: "Create content",
         desc: "Posts, emails, product text.",
-        template: "Write engaging content for this (post, email, or product text):",
+        template:
+          "Write engaging content for this (post, email, or product text):",
         icon: "create-content-mini",
       },
       {
         label: "Explain simply",
-        desc: "Understand anything faster.",
+        desc: "Choose a quick task",
         template: "Explain this in simple terms anyone can understand:",
         icon: "explain-simply-mini",
       },
@@ -308,7 +310,8 @@ const flows: Record<string, ModelFlow> = {
       {
         label: "Meeting notes",
         desc: "Turn live meetings into summaries.",
-        template: "Summarize this live meeting and capture the key points from:",
+        template:
+          "Summarize this live meeting and capture the key points from:",
         icon: "meeting-notes",
       },
       {
@@ -333,7 +336,8 @@ const flows: Record<string, ModelFlow> = {
       {
         label: "Call assistant",
         desc: "Handle live help and quick decisions.",
-        template: "Act as my call assistant and help with live decisions about:",
+        template:
+          "Act as my call assistant and help with live decisions about:",
         icon: "call-assistant",
       },
     ],
@@ -404,7 +408,7 @@ const flows: Record<string, ModelFlow> = {
   "gpt-4o-mini": {
     type: "gpt-4o",
     modelId: "gpt-4o-mini",
-    header: "What do you want to do faster?",
+    header: "Choose a quick task",
     subtitle:
       "Great for everyday AI tasks, writing, summaries, and quick help.",
     buttons: [
@@ -436,7 +440,8 @@ const flows: Record<string, ModelFlow> = {
       {
         label: "Create content",
         desc: "Posts, emails, product text.",
-        template: "Write engaging content for this (post, email, or product text):",
+        template:
+          "Write engaging content for this (post, email, or product text):",
         icon: "gpt4omini-create-content",
       },
       {
@@ -483,8 +488,7 @@ const flows: Record<string, ModelFlow> = {
       {
         label: "Role practice",
         desc: "Sales, support, tutoring.",
-        template:
-          "Let's roleplay this scenario (sales, support, or tutoring):",
+        template: "Let's roleplay this scenario (sales, support, or tutoring):",
         icon: "role-practice",
       },
       {
@@ -526,8 +530,7 @@ const flows: Record<string, ModelFlow> = {
       {
         label: "Test my assumptions",
         desc: "Find weak points before I act.",
-        template:
-          "Test my assumptions and find weak points before I act on:",
+        template: "Test my assumptions and find weak points before I act on:",
         icon: "o1-test-assumptions",
       },
       {
@@ -629,8 +632,7 @@ const flows: Record<string, ModelFlow> = {
       {
         label: "Technical reasoning",
         desc: "Analyze systems, bugs, and logic.",
-        template:
-          "Analyze the systems, bugs, and logic behind:",
+        template: "Analyze the systems, bugs, and logic behind:",
         icon: "o3mini-technical-reasoning",
       },
       {
@@ -676,8 +678,7 @@ const flows: Record<string, ModelFlow> = {
     type: "AI tools",
     modelId: "Smart Search",
     header: "What do you want to search?",
-    subtitle:
-      "Search your data with AI across files, documents, and the web.",
+    subtitle: "Search your data with AI across files, documents, and the web.",
     buttons: [
       {
         label: "Search documents",
@@ -753,7 +754,8 @@ const flows: Record<string, ModelFlow> = {
       {
         label: "Interview transcript",
         desc: "Extract spoken conversations.",
-        template: "Create an interview transcript from this spoken conversation about:",
+        template:
+          "Create an interview transcript from this spoken conversation about:",
         icon: "interview-transcript",
       },
       {
@@ -811,13 +813,15 @@ const flows: Record<string, ModelFlow> = {
       {
         label: "Multi-voice script",
         desc: "Prepare scenes and dialogue.",
-        template: "Prepare a multi-voice script with scenes and dialogue about:",
+        template:
+          "Prepare a multi-voice script with scenes and dialogue about:",
         icon: "multi-voice-script",
       },
       {
         label: "Customer reply",
         desc: "Turn support text into audio.",
-        template: "Turn this customer support text into a natural spoken reply about:",
+        template:
+          "Turn this customer support text into a natural spoken reply about:",
         icon: "customer-reply",
       },
     ],

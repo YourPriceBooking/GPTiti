@@ -8,6 +8,7 @@ import MessageList from "@/components/HomePage/RightSide/MessageList/MessageList
 import InputBar from "@/components/HomePage/RightSide/InputBar/InputBar";
 import HeaderRightSide from "@/components/HomePage/RightSide/HeaderRightSide/HeaderRightSide";
 import MainSectionRightSide from "@/components/HomePage/RightSide/MainSectionRightSide/MainSectionRightSide";
+import ChooseModelColumn from "@/components/HomePage/RightSide/ChooseModelColumn/ChooseModelColumn";
 import ProjectWorkspace from "@/components/HomePage/RightSide/ProjectWorkspace/ProjectWorkspace";
 import ModelModalOverlay from "@/components/ModelModalOverlay/ModelModalOverlay";
 import CreateProjectModalOverlay from "@/components/HomePage/LeftSide/CreateProjectModalWindow/CreateProjectModalOverlay";
@@ -532,9 +533,7 @@ export default function Home() {
                   dispatch(setActiveProjectId(null));
                   dispatch(handleNewChat());
                 }}
-                onNewProject={() =>
-                  dispatch(setIsCreateProjectModalOpen(true))
-                }
+                onNewProject={() => dispatch(setIsCreateProjectModalOpen(true))}
                 isModalOpen={isModalOpen}
                 setIsModalOpen={(open) => dispatch(setIsModalOpen(open))}
                 modelMode={modelMode}
@@ -554,134 +553,16 @@ export default function Home() {
               <div className={styles.projectWorkspaceScroll}>
                 <ProjectWorkspace
                   name={activeProject.title}
-                onCreateFirstChat={() => inputRef.current?.focus()}
-                inputProps={{
-                  hasInput,
-                  onChange: handleChange,
-                  onSend: (_message, imageUrls, imageFiles) =>
-                    handleSendClick(hasFirstRequest, imageUrls, imageFiles),
-                  inputRef,
-                  onHideSection: () => {},
-                  templateTick,
-                  setHasFirstRequest: (updater) => {
-                    const next =
-                      typeof updater === "function"
-                        ? (updater as (prev: boolean) => boolean)(
-                            hasFirstRequest,
-                          )
-                        : updater;
-                    dispatch(setHasFirstRequest(next));
-                  },
-                  hasFirstRequest,
-                  selectedModel,
-                  onImagesChange: setInputImageCount,
-                }}
-                />
-              </div>
-            </>
-          ) : (
-            <>
-          <div className={styles.headerRightSectionContainer}>
-            <HeaderRightSide
-              chatTitle={activeChat?.title}
-              modelRef={modelRef}
-              selectedModel={selectedModel}
-              setSelectedModel={handleSelectModel}
-              selectedModelGroup={selectedModelGroup}
-              setSelectedModelGroup={(g) => dispatch(setSelectedModelGroup(g))}
-              isModalOpen={isModalOpen}
-              setIsModalOpen={(open) => dispatch(setIsModalOpen(open))}
-              quickActionsEnabled={hasFirstRequest || focusMode}
-              onOpenQuickActions={() => {
-                if (hasFirstRequest || focusMode)
-                  dispatch(setIsOverlayOpen(true));
-              }}
-            />
-          </div>
-
-          <div className={styles.scrollableContent} ref={scrollContainerRef}>
-            {!restoringActiveChat && !isOverlayOpen && (
-              <MainSectionRightSide
-                insertTemplate={insertTemplate}
-                setFocusMode={(updater) => {
-                  const next =
-                    typeof updater === "function"
-                      ? (updater as (prev: boolean) => boolean)(focusMode)
-                      : updater;
-                  dispatch(setFocusMode(next));
-                }}
-                focusMode={focusMode}
-                isSectionVisible={isSectionVisible}
-                hasInput={hasInput}
-                onChange={handleChange}
-                onSend={(_message, imageUrls, imageFiles) => {
-                  handleSendClick(hasFirstRequest, imageUrls, imageFiles);
-                }}
-                inputRef={inputRef}
-                onHideSection={() => dispatch(setIsSectionVisible(false))}
-                templateTick={templateTick}
-                setHasFirstRequest={(updater) => {
-                  const next =
-                    typeof updater === "function"
-                      ? (updater as (prev: boolean) => boolean)(hasFirstRequest)
-                      : updater;
-                  dispatch(setHasFirstRequest(next));
-                }}
-                hasFirstRequest={hasFirstRequest}
-                isOverlay={false}
-                selectedModel={selectedModel}
-                onImagesChange={setInputImageCount}
-              />
-            )}
-
-            {!restoringActiveChat &&
-              activeChat &&
-              activeChat.messages.length > 0 && (
-                <MessageList
-                  messages={activeChat.messages}
-                  isTyping={isTyping}
-                  hasFirstRequest={hasFirstRequest}
-                />
-              )}
-
-            <div ref={messagesEndRef} />
-          </div>
-
-          {isOverlayOpen && (
-            <>
-              <div
-                className={styles.overlay}
-                onClick={() => dispatch(setIsOverlayOpen(false))}
-              />
-              <div className={styles.overlayContent}>
-                <div
-                  className={styles.overlayContentInner}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <MainSectionRightSide
-                    insertTemplate={(template) => {
-                      insertTemplateToInput(template);
-                      dispatch(setIsOverlayOpen(false));
-                    }}
-                    setFocusMode={(updater) => {
-                      const next =
-                        typeof updater === "function"
-                          ? (updater as (prev: boolean) => boolean)(focusMode)
-                          : updater;
-                      dispatch(setFocusMode(next));
-                    }}
-                    isSectionVisible={true}
-                    focusMode={false}
-                    hasInput={hasInput}
-                    onChange={handleChange}
-                    onSend={(_message, imageUrls, imageFiles) => {
-                      handleSendClick(hasFirstRequest, imageUrls, imageFiles);
-                      dispatch(setIsOverlayOpen(false));
-                    }}
-                    inputRef={inputRef}
-                    onHideSection={() => dispatch(setIsOverlayOpen(false))}
-                    templateTick={templateTick}
-                    setHasFirstRequest={(updater) => {
+                  onCreateFirstChat={() => inputRef.current?.focus()}
+                  inputProps={{
+                    hasInput,
+                    onChange: handleChange,
+                    onSend: (_message, imageUrls, imageFiles) =>
+                      handleSendClick(hasFirstRequest, imageUrls, imageFiles),
+                    inputRef,
+                    onHideSection: () => {},
+                    templateTick,
+                    setHasFirstRequest: (updater) => {
                       const next =
                         typeof updater === "function"
                           ? (updater as (prev: boolean) => boolean)(
@@ -689,44 +570,51 @@ export default function Home() {
                             )
                           : updater;
                       dispatch(setHasFirstRequest(next));
-                    }}
-                    hasFirstRequest={hasFirstRequest}
-                    isOverlay={true}
-                    selectedModel={selectedModel}
-                    onImagesChange={setInputImageCount}
-                  />
-                </div>
+                    },
+                    hasFirstRequest,
+                    selectedModel,
+                    onImagesChange: setInputImageCount,
+                  }}
+                />
               </div>
             </>
-          )}
+          ) : (
+            <>
+              <div className={styles.headerRightSectionContainer}>
+                <HeaderRightSide
+                  chatTitle={activeChat?.title}
+                  modelRef={modelRef}
+                  selectedModel={selectedModel}
+                  setSelectedModel={handleSelectModel}
+                  selectedModelGroup={selectedModelGroup}
+                  setSelectedModelGroup={(g) =>
+                    dispatch(setSelectedModelGroup(g))
+                  }
+                  isModalOpen={isModalOpen}
+                  setIsModalOpen={(open) => dispatch(setIsModalOpen(open))}
+                />
+              </div>
 
-          <div
-            className={styles.inputDock}
-            style={restoringActiveChat ? { display: "none" } : undefined}
-          >
-            <div
-              className={
-                isExistingChat
-                  ? styles.inputBottom
-                  : newChatOpened && isNewChat
-                    ? styles.inputBottom
-                    : focusMode && inputSent
-                      ? styles.inputBottom
-                      : focusMode
-                        ? styles.inputBottom
-                        : inputSent
-                          ? styles.inputBottom
-                          : styles.inputWrapper
-              }
-            >
-              {!(isSectionVisible && focusMode) && !isOverlayOpen && (
-                <div className={styles.inputBottomInner}>
-                  <InputBar
+              <div
+                className={styles.scrollableContent}
+                ref={scrollContainerRef}
+              >
+                {!restoringActiveChat && !isOverlayOpen && (
+                  <MainSectionRightSide
+                    insertTemplate={insertTemplate}
+                    setFocusMode={(updater) => {
+                      const next =
+                        typeof updater === "function"
+                          ? (updater as (prev: boolean) => boolean)(focusMode)
+                          : updater;
+                      dispatch(setFocusMode(next));
+                    }}
+                    focusMode={focusMode}
+                    isSectionVisible={isSectionVisible}
                     hasInput={hasInput}
                     onChange={handleChange}
                     onSend={(_message, imageUrls, imageFiles) => {
                       handleSendClick(hasFirstRequest, imageUrls, imageFiles);
-                      if (!hasFirstRequest) dispatch(setHasFirstRequest(true));
                     }}
                     inputRef={inputRef}
                     onHideSection={() => dispatch(setIsSectionVisible(false))}
@@ -741,38 +629,179 @@ export default function Home() {
                       dispatch(setHasFirstRequest(next));
                     }}
                     hasFirstRequest={hasFirstRequest}
+                    isOverlay={false}
                     selectedModel={selectedModel}
                     onImagesChange={setInputImageCount}
+                    showEstimate={showEstimate}
+                    onChooseModel={() => dispatch(setIsModalOpen(true))}
                   />
+                )}
 
-                  <div className={styles.spanContainer}>
-                    {estimateSupported ? (
-                      <div className={styles.spanContainerFirstRequest}>
-                        <span
-                          className={`${styles.inputSpan1} ${
-                            showEstimate ? "" : styles.estimateHidden
-                          }`}
-                        >
-                          ≈ Estimated cost: ~
-                          {(estimatedTokens ?? 0).toLocaleString("en-US")}{" "}
-                          tokens
-                        </span>
-                        <span className={styles.inputSpan}>
-                          AI systems may make mistakes, so we recommend
-                          verifying important information.
-                        </span>
-                      </div>
-                    ) : (
-                      <span className={styles.inputSpan}>
-                        AI systems may make mistakes, so we recommend verifying
-                        important information.
-                      </span>
-                    )}
+                {!restoringActiveChat &&
+                  activeChat &&
+                  activeChat.messages.length > 0 && (
+                    <MessageList
+                      messages={activeChat.messages}
+                      isTyping={isTyping}
+                      hasFirstRequest={hasFirstRequest}
+                    />
+                  )}
+
+                <div ref={messagesEndRef} />
+              </div>
+
+              {isOverlayOpen && (
+                <>
+                  <div
+                    className={styles.overlay}
+                    onClick={() => dispatch(setIsOverlayOpen(false))}
+                  />
+                  <div className={styles.overlayContent}>
+                    <div
+                      className={styles.overlayContentInner}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <MainSectionRightSide
+                        insertTemplate={(template) => {
+                          insertTemplateToInput(template);
+                          dispatch(setIsOverlayOpen(false));
+                        }}
+                        setFocusMode={(updater) => {
+                          const next =
+                            typeof updater === "function"
+                              ? (updater as (prev: boolean) => boolean)(
+                                  focusMode,
+                                )
+                              : updater;
+                          dispatch(setFocusMode(next));
+                        }}
+                        isSectionVisible={true}
+                        focusMode={false}
+                        hasInput={hasInput}
+                        onChange={handleChange}
+                        onSend={(_message, imageUrls, imageFiles) => {
+                          handleSendClick(
+                            hasFirstRequest,
+                            imageUrls,
+                            imageFiles,
+                          );
+                          dispatch(setIsOverlayOpen(false));
+                        }}
+                        inputRef={inputRef}
+                        onHideSection={() => dispatch(setIsOverlayOpen(false))}
+                        templateTick={templateTick}
+                        setHasFirstRequest={(updater) => {
+                          const next =
+                            typeof updater === "function"
+                              ? (updater as (prev: boolean) => boolean)(
+                                  hasFirstRequest,
+                                )
+                              : updater;
+                          dispatch(setHasFirstRequest(next));
+                        }}
+                        hasFirstRequest={hasFirstRequest}
+                        isOverlay={true}
+                        selectedModel={selectedModel}
+                        onImagesChange={setInputImageCount}
+                        showEstimate={showEstimate}
+                        onChooseModel={() => dispatch(setIsModalOpen(true))}
+                      />
+                    </div>
                   </div>
-                </div>
+                </>
               )}
-            </div>
-          </div>
+
+              <div
+                className={styles.inputDock}
+                style={restoringActiveChat ? { display: "none" } : undefined}
+              >
+                <div
+                  className={
+                    isExistingChat
+                      ? styles.inputBottom
+                      : newChatOpened && isNewChat
+                        ? styles.inputBottom
+                        : focusMode && inputSent
+                          ? styles.inputBottom
+                          : focusMode
+                            ? styles.inputBottom
+                            : inputSent
+                              ? styles.inputBottom
+                              : styles.inputWrapper
+                  }
+                >
+                  {!(isSectionVisible && focusMode) && !isOverlayOpen && (
+                    <div className={styles.inputBottomInner}>
+                      <InputBar
+                        hasInput={hasInput}
+                        onChange={handleChange}
+                        onSend={(_message, imageUrls, imageFiles) => {
+                          handleSendClick(
+                            hasFirstRequest,
+                            imageUrls,
+                            imageFiles,
+                          );
+                          if (!hasFirstRequest)
+                            dispatch(setHasFirstRequest(true));
+                        }}
+                        inputRef={inputRef}
+                        onHideSection={() =>
+                          dispatch(setIsSectionVisible(false))
+                        }
+                        templateTick={templateTick}
+                        setHasFirstRequest={(updater) => {
+                          const next =
+                            typeof updater === "function"
+                              ? (updater as (prev: boolean) => boolean)(
+                                  hasFirstRequest,
+                                )
+                              : updater;
+                          dispatch(setHasFirstRequest(next));
+                        }}
+                        hasFirstRequest={hasFirstRequest}
+                        selectedModel={selectedModel}
+                        onImagesChange={setInputImageCount}
+                      />
+
+                      <div className={styles.spanContainer}>
+                        {estimateSupported ? (
+                          <div className={styles.spanContainerFirstRequest}>
+                            <div
+                              className={styles.spanContainerFirstRequestTop}
+                            >
+                              <span
+                                className={`${styles.inputSpan1} ${
+                                  showEstimate ? "" : styles.estimateHidden
+                                }`}
+                              >
+                                ≈ Estimated cost: ~
+                                {(estimatedTokens ?? 0).toLocaleString("en-US")}{" "}
+                                tokens
+                              </span>
+                              <ChooseModelColumn
+                                selectedModel={selectedModel}
+                                showEstimate={showEstimate}
+                                onChoose={() =>
+                                  dispatch(setIsModalOpen(true))
+                                }
+                              />
+                            </div>
+                            <span className={styles.inputSpan}>
+                              AI systems may make mistakes, so we recommen
+                              verifying important information.
+                            </span>
+                          </div>
+                        ) : (
+                          <span className={styles.inputSpan}>
+                            AI systems may make mistakes, so we recommend
+                            verifying important information.
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
             </>
           )}
         </div>
