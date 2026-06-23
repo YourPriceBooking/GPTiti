@@ -1,7 +1,7 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, type CSSProperties } from "react";
 import styles from "./SectionGptChats.module.css";
 import Image from "next/image";
-import { SectionGptChatsProps, Chat } from "@/types/types";
+import { SectionGptChatsProps, Chat, Project } from "@/types/types";
 import ChatsMenu from "../ChatsMenu/ChatsMenu";
 import DeleteModalWindow from "../DeleteModalWindow/DeleteModalWindow";
 import { useAppSelector } from "@/redux/hooks";
@@ -9,6 +9,10 @@ import { selectActiveChatId } from "@/redux/chat/selectors";
 import { selectActiveProjectId } from "@/redux/ui/selectors";
 
 const PINNED_CHATS_KEY = "pinnedChatIds";
+const PINNED_PROJECTS_KEY = "pinnedProjectIds";
+const NARROW_VIEWPORT = 640;
+const VIEWPORT_EDGE_GAP = 8;
+const DELETE_MODAL_SHIFT = 28;
 
 export default function SectionGptChats({
   onNewChat,
@@ -35,23 +39,32 @@ export default function SectionGptChats({
     if (typeof window === "undefined") return [];
     return JSON.parse(localStorage.getItem(PINNED_CHATS_KEY) || "[]");
   });
-  const [pinnedProjectIds, setPinnedProjectIds] = useState<string[]>([]);
+  const [pinnedProjectIds, setPinnedProjectIds] = useState<string[]>(() => {
+    if (typeof window === "undefined") return [];
+    return JSON.parse(localStorage.getItem(PINNED_PROJECTS_KEY) || "[]");
+  });
 
   useEffect(() => {
     localStorage.setItem(PINNED_CHATS_KEY, JSON.stringify(pinnedChatIds));
   }, [pinnedChatIds]);
 
+  useEffect(() => {
+    localStorage.setItem(PINNED_PROJECTS_KEY, JSON.stringify(pinnedProjectIds));
+  }, [pinnedProjectIds]);
+
   const [openMenuChatId, setOpenMenuChatId] = useState<string | null>(null);
   const [menuPosition, setMenuPosition] = useState<{
     top: number;
-    left: number;
+    left?: number;
+    right?: number;
   } | null>(null);
   const [openMenuProjectId, setOpenMenuProjectId] = useState<string | null>(
     null,
   );
   const [projectMenuPosition, setProjectMenuPosition] = useState<{
     top: number;
-    left: number;
+    left?: number;
+    right?: number;
   } | null>(null);
   const [renamingChatId, setRenamingChatId] = useState<string | null>(null);
   const [renamingProjectId, setRenamingProjectId] = useState<string | null>(
@@ -75,6 +88,14 @@ export default function SectionGptChats({
     (c) => !pinnedChatIds.includes(c.id),
   );
   const sortedChats = [...pinnedChats, ...unpinnedChats];
+  const pinnedProjects = [...pinnedProjectIds]
+    .reverse()
+    .map((id) => projectList.find((p) => p.id === id))
+    .filter((p): p is Project => p !== undefined);
+  const unpinnedProjects = projectList.filter(
+    (p) => !pinnedProjectIds.includes(p.id),
+  );
+  const sortedProjects = [...pinnedProjects, ...unpinnedProjects];
   const chatsCount = sortedChats.length;
   const hasChats = chatsCount > 0;
   const hasMoreChats = chatsCount > MAX_VISIBLE_CHATS;
@@ -102,6 +123,19 @@ export default function SectionGptChats({
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
   };
+
+  const deleteModalStyle = (pos: {
+    top: number;
+    left?: number;
+    right?: number;
+  }): CSSProperties => ({
+    top: pos.top,
+    left: pos.left != null ? pos.left + DELETE_MODAL_SHIFT : undefined,
+    right:
+      pos.right != null
+        ? Math.max(0, pos.right - DELETE_MODAL_SHIFT)
+        : undefined,
+  });
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -282,8 +316,13 @@ export default function SectionGptChats({
                           e.currentTarget as HTMLElement
                         ).getBoundingClientRect();
                         const centerY = rect.top + rect.height / 2;
-                        const offsetX = rect.right + 8;
-                        setMenuPosition({ top: centerY, left: offsetX });
+                        const isNarrow = window.innerWidth <= NARROW_VIEWPORT;
+                        setMenuPosition({
+                          top: centerY,
+                          ...(isNarrow
+                            ? { right: VIEWPORT_EDGE_GAP }
+                            : { left: rect.right + 8 }),
+                        });
                         setOpenMenuChatId(chat.id);
                       }}
                     />
@@ -375,7 +414,7 @@ export default function SectionGptChats({
           }`}
         >
           <ul className={styles.chatsList}>
-            {projectList.map((project) => (
+            {sortedProjects.map((project) => (
               <li
                 key={project.id}
                 className={`${styles.chatsListItem} ${
@@ -421,20 +460,38 @@ export default function SectionGptChats({
                         : project.title}
                   </span>
                 </div>
-                <span
-                  className={styles.dotsIcon}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const rect = (
-                      e.currentTarget as HTMLElement
-                    ).getBoundingClientRect();
-                    setProjectMenuPosition({
-                      top: rect.top + rect.height / 2,
-                      left: rect.right + 8,
-                    });
-                    setOpenMenuProjectId(project.id);
-                  }}
-                />
+                <div className={styles.chatRight}>
+                  {pinnedProjectIds.includes(project.id) && (
+                    <span className={styles.pinSmall}>
+                      <Image
+                        src="/icons/pin.svg"
+                        alt="pinned"
+                        width={14}
+                        height={15}
+                      />
+                    </span>
+                  )}
+                  <span
+                    className={styles.dotsIcon}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const rect = (
+                        e.currentTarget as HTMLElement
+                      ).getBoundingClientRect();
+                      const isNarrow = window.innerWidth <= NARROW_VIEWPORT;
+                      setProjectMenuPosition({
+                        top: rect.top + rect.height / 2,
+                        ...(isNarrow
+                          ? { right: VIEWPORT_EDGE_GAP }
+                          : { left: rect.right + 8 }),
+                      });
+                      setOpenMenuProjectId(project.id);
+                    }}
+                  />
+                  {project.id === activeProjectId && (
+                    <span className={styles.activeIndicator} />
+                  )}
+                </div>
               </li>
             ))}
           </ul>
@@ -471,7 +528,11 @@ export default function SectionGptChats({
         <div
           ref={menuRef}
           className={styles.menuContainer}
-          style={{ top: menuPosition.top, left: menuPosition.left }}
+          style={{
+            top: menuPosition.top,
+            left: menuPosition.left,
+            right: menuPosition.right,
+          }}
         >
           <ChatsMenu
             isPinned={pinnedChatIds.includes(openMenuChatId)}
@@ -500,6 +561,7 @@ export default function SectionGptChats({
           style={{
             top: projectMenuPosition.top,
             left: projectMenuPosition.left,
+            right: projectMenuPosition.right,
           }}
         >
           <ChatsMenu
@@ -526,7 +588,7 @@ export default function SectionGptChats({
         <div
           ref={menuRef}
           className={styles.menuContainer}
-          style={{ top: menuPosition.top, left: menuPosition.left }}
+          style={deleteModalStyle(menuPosition)}
         >
           <DeleteModalWindow
             onCancel={() => setDeletingChatId(null)}
@@ -542,10 +604,7 @@ export default function SectionGptChats({
         <div
           ref={projectMenuRef}
           className={styles.menuContainer}
-          style={{
-            top: projectMenuPosition.top,
-            left: projectMenuPosition.left,
-          }}
+          style={deleteModalStyle(projectMenuPosition)}
         >
           <DeleteModalWindow
             type="project"
