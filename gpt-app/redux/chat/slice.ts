@@ -93,12 +93,14 @@ const chatSlice = createSlice({
         draftId: string;
         realId: string;
         title: string | null;
+        modelId?: string;
       }>,
     ) {
       const chat = state.chatList.find((c) => c.id === payload.draftId);
       if (!chat) return;
       chat.id = payload.realId;
       if (payload.title) chat.title = payload.title;
+      if (payload.modelId) chat.modelId = payload.modelId;
       chat.messagesLoaded = true; // brand-new conversation, nothing to fetch
       if (state.activeChatId === payload.draftId) {
         state.activeChatId = payload.realId;
@@ -122,6 +124,7 @@ const chatSlice = createSlice({
         images: payload.images,
       };
       chat.messages.push(msg);
+      chat.lastMessageAt = new Date().toISOString();
     },
 
     startAssistantMessage(
@@ -163,6 +166,7 @@ const chatSlice = createSlice({
         last.streaming = false;
         if (payload.tokens !== undefined) last.tokens = payload.tokens;
       }
+      chat.lastMessageAt = new Date().toISOString();
     },
 
     deleteDraftChat(state, { payload }: PayloadAction<string>) {
@@ -202,15 +206,21 @@ const chatSlice = createSlice({
         // Preserve local drafts and any already-loaded chats; merge in server chats.
         const drafts = state.chatList.filter((c) => isDraftId(c.id));
         const existingById = new Map(state.chatList.map((c) => [c.id, c]));
-        const serverChats = payload.map(
-          (c) =>
-            existingById.get(c._id) ?? {
-              id: c._id,
-              title: c.title,
-              messages: [],
-              messagesLoaded: false,
-            },
-        );
+        const serverChats = payload.map((c) => {
+          const existing = existingById.get(c._id);
+          if (existing) {
+            if (c.lastMessageAt) existing.lastMessageAt = c.lastMessageAt;
+            return existing;
+          }
+          return {
+            id: c._id,
+            title: c.title,
+            messages: [],
+            messagesLoaded: false,
+            modelId: c.modelId,
+            lastMessageAt: c.lastMessageAt,
+          };
+        });
         state.chatList = [...drafts, ...serverChats];
         if (!state.chatList.some((c) => c.id === state.activeChatId)) {
           state.activeChatId = state.chatList[0]?.id ?? null;
@@ -231,6 +241,10 @@ const chatSlice = createSlice({
           modelId: m.modelId,
         }));
         chat.messagesLoaded = true;
+        const lastModel = [...chat.messages]
+          .reverse()
+          .find((m) => m.modelId)?.modelId;
+        if (lastModel) chat.modelId = lastModel;
       })
       .addCase(fetchConversationMessages.rejected, (state, { payload }) => {
         state.error = payload ?? "Failed to load messages";

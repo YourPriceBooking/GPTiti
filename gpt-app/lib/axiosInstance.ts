@@ -4,6 +4,7 @@ import { isAuthExpiredError } from "@/lib/authError";
 
 export const axiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_BACKEND_API_URL,
+  withCredentials: true,
   headers: { "Content-Type": "application/json" },
 });
 
@@ -17,8 +18,11 @@ interface RetryableConfig {
 // Викликається один раз з store.ts після configureStore()
 export const setupInterceptors = (store: AppStore) => {
   axiosInstance.interceptors.request.use((config) => {
+    const isRefreshCall = config.url?.includes("/users/refresh") ?? false;
     const token = store.getState().auth.accessToken;
-    if (token) config.headers.Authorization = `Bearer ${token}`;
+    if (token && !isRefreshCall) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   });
 
@@ -29,10 +33,9 @@ export const setupInterceptors = (store: AppStore) => {
       if (!config || !isAuthExpiredError(error)) throw error;
 
       const isRefreshCall = config.url?.includes("/users/refresh") ?? false;
-      const hasRefreshToken = Boolean(store.getState().auth.refreshToken);
+      const isLoggedIn = store.getState().auth.isLoggedIn;
 
-      // Try once to silently refresh the access token.
-      if (hasRefreshToken && !isRefreshCall && !config._retry) {
+      if (isLoggedIn && !isRefreshCall && !config._retry) {
         config._retry = true;
         try {
           const { refreshUser } = await import("@/redux/auth/operations");
@@ -50,8 +53,6 @@ export const setupInterceptors = (store: AppStore) => {
         }
       }
 
-      // Unrecoverable expiry (no refresh token / refresh failed / already retried)
-      // → log out and surface the login window.
       const { refreshError } = await import("@/redux/auth/slice");
       store.dispatch(refreshError());
       throw error;

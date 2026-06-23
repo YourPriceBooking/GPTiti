@@ -21,6 +21,13 @@ export type Chat = {
   title: string | null;
   messages: Message[];
   messagesLoaded?: boolean;
+  modelId?: string;
+  lastMessageAt?: string;
+};
+
+export type Project = {
+  id: string;
+  title: string;
 };
 
 export type ModelType =
@@ -56,6 +63,8 @@ export type ModelMode = "idle" | "hover" | "click";
 
 export type LeftSideProps = {
   onNewChat: () => void;
+  onNewProject?: () => void;
+  projectList?: Project[];
   chatList: Chat[];
   setActiveChatId: (id: string) => void;
 
@@ -74,12 +83,19 @@ export type LeftSideProps = {
 
   isModalOpen: boolean;
   setIsModalOpen: (open: boolean) => void;
+
+  /** Optional: fires after a project is selected (used to close the mobile drawer). */
+  onSelectProject?: () => void;
 };
 
 export type SectionGptChatsProps = Pick<
   LeftSideProps,
-  "onNewChat" | "chatList" | "setActiveChatId" | "deleteChat" | "renameChat"
->;
+  "onNewChat" | "onNewProject" | "projectList" | "chatList" | "setActiveChatId" | "deleteChat" | "renameChat"
+> & {
+  setActiveProject?: (id: string) => void;
+  deleteProject?: (id: string) => void;
+  renameProject?: (id: string, title: string) => void;
+};
 
 export type MainSectionRightSideProps = {
   insertTemplate: (text: string) => void;
@@ -88,7 +104,7 @@ export type MainSectionRightSideProps = {
   isSectionVisible: boolean;
   hasInput: boolean;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-  onSend: (message: string, imageUrls?: string[]) => void;
+  onSend: (message: string, imageUrls?: string[], imageFiles?: File[]) => void;
   inputRef: React.RefObject<HTMLTextAreaElement | null>;
   onHideSection: () => void;
   templateTick: number;
@@ -97,6 +113,8 @@ export type MainSectionRightSideProps = {
   isOverlay?: boolean;
   selectedModel: string;
   onImagesChange?: (count: number) => void;
+  showEstimate: boolean;
+  onChooseModel: () => void;
 };
 
 export type ModelModalOverlayProps = {

@@ -1,0 +1,38 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(15, 23, 42, 0.6);
+  pointer-events: auto;
+  touch-action: none;
+  overscroll-behavior: contain;
+}
+
+.editorBox {
+  display: flex;
+  width: min(560px, 100%);
+  z-index: 1400;
+  max-height: 100%;
+  padding: 20px;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #202a38f0;
+  box-shadow: 0 8px 32px rgba(5, 9, 16, 0.5);
+}
+
+@media (max-width: 767px) {
+  .overlay {
+    padding: 0;
+  }
+
+  .editorBox {
+    width: 90%;
+    height: 70%;
+    max-height: none;
+    padding: 14px;
+  }
+}

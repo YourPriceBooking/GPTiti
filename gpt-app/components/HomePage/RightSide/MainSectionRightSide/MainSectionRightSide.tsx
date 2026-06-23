@@ -3,6 +3,7 @@ import Image from "next/image";
 import { MainSectionRightSideProps } from "@/types/types";
 import InputBar from "@/components/HomePage/RightSide/InputBar/InputBar";
 import { getModelFlow } from "@/config/modelFlows.config";
+import ChooseModelColumn from "../ChooseModelColumn/ChooseModelColumn";
 
 export default function MainSectionRightSide(props: MainSectionRightSideProps) {
   const {
@@ -21,6 +22,8 @@ export default function MainSectionRightSide(props: MainSectionRightSideProps) {
     isOverlay = false,
     selectedModel,
     onImagesChange,
+    showEstimate,
+    onChooseModel,
   } = props;
 
   const flow = getModelFlow(selectedModel);
@@ -48,7 +51,9 @@ export default function MainSectionRightSide(props: MainSectionRightSideProps) {
                 height={12}
                 alt="ready"
               />
-              <span className={styles.additionalSectionSpan1}>Ready</span>
+              <span className={styles.additionalSectionSpan1}>
+                Hide quick tasks
+              </span>
             </p>
           ) : (
             <button className={styles.closeButton}>
@@ -128,6 +133,11 @@ export default function MainSectionRightSide(props: MainSectionRightSideProps) {
               onImagesChange={onImagesChange}
             />
             <div className={styles.spanContainer}>
+              <ChooseModelColumn
+                selectedModel={selectedModel}
+                showEstimate={showEstimate}
+                onChoose={onChooseModel}
+              />
               <span className={styles.inputSpan}>
                 AI systems may make mistakes, so we recommend verifying
                 important information.

@@ -1,0 +1,75 @@
+.openModal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+/* The static left panel is visible from 768px, so the trigger is only needed below it */
+@media (min-width: 768px) {
+  .openModal {
+    display: none;
+  }
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.44);
+  z-index: 999;
+  display: flex;
+  justify-content: flex-start;
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+
+.modalOverlayOpen {
+  opacity: 1;
+}
+
+.modalOverlayClosing {
+  opacity: 0;
+}
+
+.modalContent {
+  width: 330px;
+  height: 100vh;
+  background: #0a101c;
+  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.5);
+  position: relative;
+  transform: translateX(-100%);
+  opacity: 0;
+  transition:
+    transform 220ms ease,
+    opacity 220ms ease;
+  will-change: transform, opacity;
+}
+
+.modalContentOpen {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.modalContentClosing {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+.closeButton {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1001;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: 0.5ms all ease-in-out;
+}
+
+.closeButton:hover {
+  background: rgba(255, 255, 255, 0.2);
+}

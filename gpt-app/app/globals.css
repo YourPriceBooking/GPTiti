@@ -39,25 +39,75 @@
 
 /* Per-model flow themes. The flow class/attribute is set on a root
    container; child CSS modules just read var(--flow-fill) / var(--flow-bg). */
-[data-flow="premium"] {
+[data-flow="gpt-5.5"] {
   --flow-fill: #2f6bff;
   --flow-bg: rgba(47, 107, 255, 0.08);
 }
-[data-flow="balanced"] {
+[data-flow="gpt-5.4"] {
   --flow-fill: #14b86e;
   --flow-bg: rgba(20, 184, 110, 0.08);
 }
-[data-flow="reasoning"] {
+[data-flow="gpt-5.4-mini"] {
   --flow-fill: #8b5cf6;
   --flow-bg: rgba(139, 92, 246, 0.01);
 }
-[data-flow="realtime"] {
+[data-flow="gpt-4o-realtime"] {
   --flow-fill: #ea580c;
   --flow-bg: rgba(249, 115, 22, 0.08);
 }
-[data-flow="tools"] {
+[data-flow="gpt-4o"] {
+  --flow-fill: #3b82f6;
+  --flow-bg: rgba(59, 130, 246, 0.08);
+}
+[data-flow="gpt-4o-mini"] {
+  --flow-fill: #22c55e;
+  --flow-bg: rgba(34, 197, 94, 0.08);
+}
+[data-flow="o1"] {
+  --flow-fill: #be123c;
+  --flow-bg: rgba(190, 18, 60, 0.08);
+}
+[data-flow="o1-mini"] {
+  --flow-fill: #d97706;
+  --flow-bg: rgba(217, 119, 6, 0.08);
+}
+[data-flow="o3-mini"] {
+  --flow-fill: #0284c7;
+  --flow-bg: rgba(2, 132, 199, 0.08);
+}
+[data-flow="gpt-5.1"] {
+  --flow-fill: #2563eb;
+  --flow-bg: rgba(37, 99, 235, 0.08);
+}
+[data-flow="gpt-5.1-mini"] {
+  --flow-fill: #16a34a;
+  --flow-bg: rgba(22, 163, 74, 0.08);
+}
+[data-flow="gpt-5.1-realtime"] {
+  --flow-fill: #0d9488;
+  --flow-bg: rgba(13, 148, 136, 0.08);
+}
+[data-flow="Smart Search"] {
   --flow-fill: #10aee8;
-  --flow-bg: rgba(228, 248, 255, 1);
+  --flow-bg: rgba(16, 174, 232, 0.08);
+}
+[data-flow="Voice → Text"] {
+  --flow-fill: #059669;
+  --flow-bg: rgba(5, 150, 105, 0.08);
+}
+[data-flow="Text → Voice"] {
+  --flow-fill: #9333ea;
+  --flow-bg: rgba(147, 51, 234, 0.08);
+}
+[data-flow="Image → Create HD"] {
+  --flow-fill: #2563eb;
+  --flow-bg: rgba(37, 99, 235, 0.08);
+}
+[data-flow="Image → Create Fast"] {
+  --flow-fill: #f97316;
+  --flow-bg: rgba(249, 115, 22, 0.08);
+  --flow-icon-size: 30px;
+  /* --flow-icon-box: 42px; */
 }
 
 /* Tailwind v4 theme bridge — keeps `bg-background`/`text-foreground` working */

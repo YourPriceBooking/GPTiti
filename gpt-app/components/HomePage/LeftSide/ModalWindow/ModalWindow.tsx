@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import clsx from "clsx";
 import styles from "./ModalWindow.module.css";
 import Image from "next/image";
@@ -8,6 +8,8 @@ import { ModelType } from "@/types/types";
 import { modelConfig, TOKENS_SUFFIX } from "@/config/models.config";
 import { getModelGroupAndItem } from "@/functions/getModelGroupAndItem";
 import TooltipModalWindow from "../../TooltipModalWindow/TooltipModalWindow";
+import { useAppSelector } from "@/redux/hooks";
+import { selectBalance } from "@/redux/tokens/selectors";
 
 type Props = {
   selectedModelGroup: ModelType;
@@ -27,6 +29,21 @@ export default function ModalWindow({
   const appliedGroup =
     (getModelGroupAndItem(selectedModel)?.group as ModelType | undefined) ??
     selectedModelGroup;
+  const balance = useAppSelector(selectBalance);
+
+  const [viewGroup, setViewGroup] = useState<ModelType>(appliedGroup);
+
+  const closeTimerRef = useRef<NodeJS.Timeout | null>(null);
+  useEffect(
+    () => () => {
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    },
+    [],
+  );
+
+  useEffect(() => {
+    setViewGroup(appliedGroup);
+  }, [appliedGroup]);
 
   // Стан для hover (desktop)
   const [hoveredModel, setHoveredModel] = useState<string | null>(null);
@@ -94,6 +111,7 @@ export default function ModalWindow({
               type="button"
               className={getGroupBtnClass(group)}
               onClick={() => {
+                setViewGroup(group as ModelType);
                 setSelectedModelGroup(group as ModelType);
                 setClickedGroup(group);
               }}
@@ -111,7 +129,7 @@ export default function ModalWindow({
 
       <section className={styles.mainSection}>
         <div className={styles.btnsContainer2}>
-          {modelConfig[selectedModelGroup].list.map((item) => (
+          {modelConfig[viewGroup].list.map((item) => (
             <div
               key={item.title}
               className={styles.modelWrapper}
@@ -125,6 +143,12 @@ export default function ModalWindow({
                 }`}
                 onClick={() => {
                   setSelectedModel(item.title);
+                  if (closeTimerRef.current)
+                    clearTimeout(closeTimerRef.current);
+                  closeTimerRef.current = setTimeout(
+                    () => setIsModalOpen(false),
+                    1000,
+                  );
                 }}
               >
                 <div className={styles.mainContainerbtn2}>
@@ -173,7 +197,7 @@ export default function ModalWindow({
         <article className={styles.gptBalance}>
           <h2 className={styles.title3}>Balance</h2>
           <div className={styles.balanceContainer}>
-            <span className={styles.gptSpan1}>10 000</span>
+            <span className={styles.gptSpan1}>{balance.toLocaleString()}</span>
             <Link href="/top-up-your-tokens" className={styles.badgeLink}>
               <Image
                 width={24}

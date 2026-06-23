@@ -1,6 +1,10 @@
 import type { RootState } from "../store";
 
 export const selectIsModalOpen = (state: RootState) => state.ui.isModalOpen;
+export const selectIsCreateProjectModalOpen = (state: RootState) =>
+  state.ui.isCreateProjectModalOpen;
+export const selectActiveProjectId = (state: RootState) =>
+  state.ui.activeProjectId;
 export const selectFocusMode = (state: RootState) => state.ui.focusMode;
 export const selectIsSectionVisible = (state: RootState) =>
   state.ui.isSectionVisible;

@@ -1,23 +1,189 @@
 .inputContainer {
-  display: flex;
-  align-items: flex-end;
   position: relative;
+  display: flex;
+  flex-direction: column;
   max-width: 900px;
   min-width: 380px;
-  height: auto;
   width: 100%;
+  border: 0.2px solid #3e3d40;
+  border-radius: 33px;
+  background: var(--main-white);
+  box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.25);
+}
+
+.inputContainer:focus-within {
+  border-color: var(--flow-fill);
+}
+
+/* Project workspace variant — fixed accent, independent of the chat flow theme */
+.inputContainer.project {
+  --flow-fill: #3e7cff;
+  --flow-bg: rgba(62, 124, 255, 0.14);
+  max-width: none;
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  background: rgba(13, 29, 70, 0.35);
+  box-shadow: none;
+}
+
+.inputContainer.project .input {
+  color: #f7faff;
+}
+
+.inputContainer.project .input::placeholder {
+  color: #8a9ac0;
+}
+
+.imagePreviewRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 14px 14px 0 14px;
+}
+
+.imageChip {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #f3f7fb;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
+.imageChip img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  cursor: pointer;
+}
+
+.imageChip button {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.85);
+  color: #fff;
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.15s ease;
+}
+
+.imageChip button:hover {
+  background: #0f172a;
+}
+
+.imageChip button.editImageBtn {
+  top: auto;
+  bottom: 6px;
+  right: 6px;
+}
+
+.filePreviewRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 14px 14px 0 14px;
+}
+
+.fileChip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 260px;
+  padding: 8px 10px;
+  border-radius: 14px;
+  background: #f3f7fb;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
+.fileChipExt {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 38px;
+  height: 38px;
+  padding: 0 4px;
+  border-radius: 10px;
+  background: var(--flow-fill);
+  color: var(--main-white);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.fileChipInfo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.fileChipName {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--foreground);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fileChipSize {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.fileChipRemove {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.85);
+  color: #fff;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.15s ease;
+}
+
+.fileChipRemove:hover {
+  background: #0f172a;
+}
+
+.composerBody {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 12px;
+  row-gap: 10px;
+  padding: 14px 14px 14px 18px;
 }
 
 .input {
-  border: 0.2px solid #3e3d40;
-  border-radius: 33px;
-  width: 100%;
-  height: 68px;
+  flex: 1 1 0;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  min-height: 28px;
   max-height: 240px;
-  padding: 20px 100px 20px 60px;
+  padding: 0;
   box-sizing: border-box;
-  box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.25);
-  background: var(--main-white);
   color: var(--foreground);
   resize: none;
   overflow-y: hidden;
@@ -27,7 +193,6 @@
 
 .input:focus {
   outline: none;
-  border-color: var(--flow-fill);
 }
 
 .input::placeholder {
@@ -38,26 +203,41 @@
   color: #94a3b8;
 }
 
-.scrollable .input {
-  overflow-y: auto;
+.multiline .input {
+  order: -1;
+  flex: 0 0 100%;
+}
+
+.leftControls {
+  display: flex;
+  align-items: center;
+}
+
+.rightControls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.measure {
+  position: absolute;
+  left: -9999px;
+  visibility: hidden;
+  white-space: pre;
+  pointer-events: none;
 }
 
 .iconWrapper,
 .iconWrapper1,
 .iconWrapper2 {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   outline: none;
   cursor: pointer;
   color: var(--flow-fill);
-  transition:
-    top 0.2s ease,
-    bottom 0.2s ease,
-    transform 0.2s ease;
   z-index: 1;
 }
 
@@ -65,24 +245,6 @@
 .sendIcon {
   display: block;
   color: var(--flow-fill);
-}
-
-.multiline .iconWrapper,
-.multiline .iconWrapper1,
-.multiline .iconWrapper2 {
-  top: auto;
-  bottom: 14px;
-  transform: translateY(0);
-}
-
-.iconWrapper {
-  left: 3%;
-}
-.iconWrapper1 {
-  right: 10%;
-}
-.iconWrapper2 {
-  right: 3%;
 }
 
 .iconWrapper::before,
@@ -146,12 +308,6 @@
   top: 58px;
 }
 
-.multiline .iconWrapper::after,
-.multiline .iconWrapper1::after,
-.multiline .iconWrapper2::after {
-  top: auto;
-  bottom: 45px;
-}
 .disabledHover:hover::after,
 .disabledHover:focus::before,
 .disabledHover:active::before {
@@ -159,80 +315,12 @@
   visibility: hidden !important;
 }
 
-.imagePreviewRow {
-  position: absolute;
-  top: 10px;
-  left: 60px;
-  right: 100px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  z-index: 2;
-  pointer-events: none;
-}
-
-.imageChip {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  width: 56px;
-  height: 56px;
-  border-radius: 12px;
-  overflow: hidden;
-  background: #f3f7fb;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
-  pointer-events: auto;
-}
-
-.imageChip img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.imageChip button {
-  position: absolute;
-  top: 2px;
-  right: 2px;
-  width: 18px;
-  height: 18px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  border-radius: 50%;
-  background: rgba(15, 23, 42, 0.85);
-  color: #fff;
-  font-size: 14px;
-  line-height: 1;
-  cursor: pointer;
-  padding: 0;
-  transition: background 0.15s ease;
-}
-
-.imageChip button:hover {
-  background: #0f172a;
-}
-
-.hasImages .input {
-  height: 140px;
-  padding-top: 80px;
-  padding-bottom: 24px;
-  align-content: flex-start;
-}
-
-.hasImages.multiline .input {
-  height: auto;
-  min-height: 140px;
-}
-
 .modalWrapper {
   max-width: 360px;
   width: 100%;
   position: absolute;
-  bottom: 80;
+  bottom: calc(100% + 12px);
+  left: 0;
   z-index: 10;
 }
 .modalWrapper.hidden {
@@ -241,46 +329,24 @@
 .modalWrapper.visible {
   display: block;
 }
+
 @media (max-width: 767px) and (min-width: 320px) {
   .inputContainer {
-    width: 100%;
     min-width: auto;
     max-width: 100%;
-    padding: 0 12px;
-    box-sizing: border-box;
+    width: auto;
+    margin: 0 12px;
   }
 
-  .iconWrapper,
-  .iconWrapper1,
-  .iconWrapper2 {
-    transform: translateY(-50%);
+  .composerBody {
+    column-gap: 8px;
+    padding: 12px;
   }
-}
-@media (max-width: 767px) and (min-width: 320px) {
+
   .input {
     font-size: 16px;
-    padding: 16px 88px 16px 40px;
-    height: auto;
   }
   .input::placeholder {
-    position: relative;
-    top: 5;
     font-size: 16px;
-  }
-  .iconWrapper,
-  .iconWrapper1,
-  .iconWrapper2 {
-    width: 30;
-    height: 30;
-  }
-
-  .iconWrapper {
-    left: 20;
-  }
-  .iconWrapper1 {
-    right: 25%;
-  }
-  .iconWrapper2 {
-    right: 10%;
   }
 }

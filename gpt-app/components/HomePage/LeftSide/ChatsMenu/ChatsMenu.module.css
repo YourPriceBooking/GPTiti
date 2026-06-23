@@ -1,46 +1,64 @@
 .container {
-    max-width: 200px;
-    width: 100%;
-    min-height: 98px;
-    background-color: #0f172a;
-    border-radius: 22px;
-
-    display: flex;
-    flex-direction: column;
-}
-
-.label1, .label2 {
-    font-family: var(--font-family);
-    font-style: italic;
-    font-weight: 700;
-    font-size: 14px;
-   
-}
-.label1{
-    color: #e5e7eb;
-}
-
-.label2 {
-   color: #f87171;
+  width: 260px;
+  background-color: #0f172a;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
 }
 
 .button {
-    min-height: 44px;
-    padding: 14px 94px 13px 13px;
-    margin: 4px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-
-    transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  width: 100%;
+  text-align: left;
+  transition: background-color 0.2s ease;
 }
 
 .button:hover {
-    background-color: #0B1220;
-    cursor: pointer;
-    border-radius: 12px;
+  background-color: #1e293b;
+  cursor: pointer;
+}
+
+.iconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+}
+
+.itemContent {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.label {
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 14px;
+  color: #e5e7eb;
+}
+
+.labelDelete {
+  color: #f87171;
+}
+
+.subtitle {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 11px;
+  color: #60a5fa;
 }
 
 .separator {
-    margin: 0 auto;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 4px 8px;
 }

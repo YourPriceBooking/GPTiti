@@ -3,23 +3,32 @@
 import { useRef, useEffect, useCallback, useState, useMemo } from "react";
 
 import LeftSide from "@/components/HomePage/LeftSide/LeftSide";
+import LeftSideDrawer from "@/components/HomePage/LeftSide/LeftSideDrawer/LeftSideDrawer";
 import MessageList from "@/components/HomePage/RightSide/MessageList/MessageList";
 import InputBar from "@/components/HomePage/RightSide/InputBar/InputBar";
 import HeaderRightSide from "@/components/HomePage/RightSide/HeaderRightSide/HeaderRightSide";
 import MainSectionRightSide from "@/components/HomePage/RightSide/MainSectionRightSide/MainSectionRightSide";
+import ChooseModelColumn from "@/components/HomePage/RightSide/ChooseModelColumn/ChooseModelColumn";
+import ProjectWorkspace from "@/components/HomePage/RightSide/ProjectWorkspace/ProjectWorkspace";
 import ModelModalOverlay from "@/components/ModelModalOverlay/ModelModalOverlay";
+import CreateProjectModalOverlay from "@/components/HomePage/LeftSide/CreateProjectModalWindow/CreateProjectModalOverlay";
 
 import { useModelMode } from "@/hooks/useModelMode";
 import { useScrollDirection } from "@/hooks/useScrollDirection";
-import { getFlowType } from "@/config/modelFlows.config";
-import { getEstimatedTokens } from "@/config/modelPricing.config";
+import { getFlowThemeId } from "@/config/modelFlows.config";
+import {
+  getEstimatedTokens,
+  modelSupportsEstimate,
+} from "@/config/modelPricing.config";
 import { getModelLimits } from "@/config/modelLimits.config";
+import { getModelGroupAndItem } from "@/functions/getModelGroupAndItem";
 
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
   selectActiveChat,
   selectActiveChatId,
   selectChatList,
+  selectSortedChatList,
   selectHasInput,
   selectInputSent,
   selectIsTyping,
@@ -48,7 +57,7 @@ import {
   removeConversation,
   renameConversation,
 } from "@/redux/chat/operations";
-import { selectIsLoggedIn } from "@/redux/auth/selectors";
+import { selectIsLoggedIn, selectAccessToken } from "@/redux/auth/selectors";
 import { useSocket } from "@/context/SocketContext";
 import {
   selectSelectedModel,
@@ -59,6 +68,8 @@ import {
   selectFocusMode,
   selectHasFirstRequest,
   selectIsModalOpen,
+  selectIsCreateProjectModalOpen,
+  selectActiveProjectId,
   selectIsOverlayOpen,
   selectIsSectionVisible,
   selectNewChatOpened,
@@ -67,12 +78,18 @@ import {
   setFocusMode,
   setHasFirstRequest,
   setIsModalOpen,
+  setIsCreateProjectModalOpen,
+  setActiveProjectId,
   setIsOverlayOpen,
   setIsSectionVisible,
   setNewChatOpened,
 } from "@/redux/ui/slice";
+import { selectProjectList } from "@/redux/projects/selectors";
+import { addProject } from "@/redux/projects/slice";
 import { refreshError } from "@/redux/auth/slice";
+import { setBalance } from "@/redux/tokens/slice";
 import { isAuthExpiredError } from "@/lib/authError";
+import { api } from "@/helpers/api";
 
 import styles from "./page.module.css";
 
@@ -80,6 +97,7 @@ export default function Home() {
   const dispatch = useAppDispatch();
 
   const chatList = useAppSelector(selectChatList);
+  const sortedChatList = useAppSelector(selectSortedChatList);
   const activeChat = useAppSelector(selectActiveChat);
   const activeChatId = useAppSelector(selectActiveChatId);
   const hasInput = useAppSelector(selectHasInput);
@@ -93,10 +111,17 @@ export default function Home() {
   const focusMode = useAppSelector(selectFocusMode);
   const isSectionVisible = useAppSelector(selectIsSectionVisible);
   const isModalOpen = useAppSelector(selectIsModalOpen);
+  const isCreateProjectModalOpen = useAppSelector(
+    selectIsCreateProjectModalOpen,
+  );
+  const activeProjectId = useAppSelector(selectActiveProjectId);
+  const projectList = useAppSelector(selectProjectList);
+  const activeProject = projectList.find((p) => p.id === activeProjectId);
   const isOverlayOpen = useAppSelector(selectIsOverlayOpen);
   const hasFirstRequest = useAppSelector(selectHasFirstRequest);
   const newChatOpened = useAppSelector(selectNewChatOpened);
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
+  const accessToken = useAppSelector(selectAccessToken);
 
   const { modelMode, setModelMode, modelRef } = useModelMode();
   const { socket } = useSocket();
@@ -106,15 +131,24 @@ export default function Home() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const pendingConvIdRef = useRef<string | null>(null);
+  const restoredActiveChatRef = useRef(false);
 
   const [inputCharCount, setInputCharCount] = useState(0);
   const [inputImageCount, setInputImageCount] = useState(0);
+
+  const [restoringActiveChat, setRestoringActiveChat] = useState(() => {
+    if (!isLoggedIn) return false;
+    if (!activeChatId || isDraftId(activeChatId)) return false;
+    const chat = chatList.find((c) => c.id === activeChatId);
+    return !chat?.messagesLoaded;
+  });
 
   const estimatedTokens = useMemo(
     () => getEstimatedTokens(selectedModel, inputCharCount, inputImageCount),
     [selectedModel, inputCharCount, inputImageCount],
   );
   const showEstimate = estimatedTokens !== null;
+  const estimateSupported = modelSupportsEstimate(selectedModel);
 
   useScrollDirection(scrollContainerRef);
 
@@ -132,7 +166,7 @@ export default function Home() {
 
   useEffect(() => {
     if (!activeChat || activeChat.messages.length === 0) return;
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({ behavior: "auto", block: "end" });
   }, [activeChat?.id, activeChat?.messages.length, activeChat]);
 
   useEffect(() => {
@@ -143,6 +177,17 @@ export default function Home() {
     }, 0);
     return () => clearTimeout(t);
   }, [activeChatId, activeChat?.messages.length, activeChat, dispatch]);
+
+  useEffect(() => {
+    if (!activeChat || isDraftId(activeChat.id)) return;
+    const model = activeChat.modelId;
+    if (!model || model === selectedModel) return;
+    const found = getModelGroupAndItem(model);
+    if (!found) return;
+    dispatch(setSelectedModel(model));
+    dispatch(setSelectedModelGroup(found.group));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeChat?.id, activeChat?.modelId, selectedModel, dispatch]);
 
   useEffect(() => {
     const maxChars = getModelLimits(selectedModel).maxTextChars;
@@ -203,7 +248,11 @@ export default function Home() {
   );
 
   const handleSendClick = useCallback(
-    async (_hasFirstRequest: boolean, imageUrls: string[] = []) => {
+    async (
+      _hasFirstRequest: boolean,
+      imageUrls: string[] = [],
+      imageFiles: File[] = [],
+    ) => {
       if (!inputRef.current || !activeChatId) return;
       const userText = inputRef.current.value.trim();
       if (!userText && imageUrls.length === 0) return;
@@ -222,6 +271,7 @@ export default function Home() {
               draftId: convId,
               realId: conv._id,
               title: conv.title ?? (userText || null),
+              modelId: conv.modelId ?? selectedModel,
             }),
           );
           convId = conv._id;
@@ -244,11 +294,16 @@ export default function Home() {
       setInputCharCount(0);
       setInputImageCount(0);
 
-      dispatch(startAssistantMessage({ chatId: convId, modelId: selectedModel }));
+      dispatch(
+        startAssistantMessage({ chatId: convId, modelId: selectedModel }),
+      );
       pendingConvIdRef.current = convId;
 
-      // 3. Send over the socket; the reply streams back via chat:stream / chat:end.
       try {
+        const uploadedFiles = await Promise.all(
+          imageFiles.map((file) => api.uploadImage(file).then((r) => r.file)),
+        );
+
         socket?.emit("chat:send", {
           event: "chat:send",
           type: "send-request",
@@ -256,6 +311,7 @@ export default function Home() {
             message: userText,
             conversationId: convId,
             modelId: selectedModel,
+            ...(uploadedFiles.length > 0 && { files: uploadedFiles }),
           },
         });
       } catch {
@@ -269,6 +325,7 @@ export default function Home() {
 
   const handleSelectChat = useCallback(
     (id: string) => {
+      dispatch(setActiveProjectId(null));
       dispatch(setActiveChatId(id));
       if (isDraftId(id)) return;
       const chat = chatList.find((c) => c.id === id);
@@ -298,8 +355,49 @@ export default function Home() {
   );
 
   useEffect(() => {
-    if (isLoggedIn) dispatch(fetchConversations());
-  }, [isLoggedIn, dispatch]);
+    if (isLoggedIn && accessToken) dispatch(fetchConversations());
+  }, [isLoggedIn, accessToken, dispatch]);
+
+  useEffect(() => {
+    if (restoredActiveChatRef.current) return;
+    if (chatList.length === 0) return;
+
+    if (!activeChatId || isDraftId(activeChatId)) {
+      if (!chatList.some((c) => c.id === activeChatId)) {
+        dispatch(setActiveChatId(chatList[0].id));
+      }
+      restoredActiveChatRef.current = true;
+      return;
+    }
+
+    const chat = chatList.find((c) => c.id === activeChatId);
+    if (!chat) return;
+    restoredActiveChatRef.current = true;
+    if (!chat.messagesLoaded) dispatch(fetchConversationMessages(activeChatId));
+  }, [activeChatId, chatList, dispatch]);
+
+  useEffect(() => {
+    if (!restoringActiveChat) return;
+    if (
+      !isLoggedIn ||
+      !activeChatId ||
+      isDraftId(activeChatId) ||
+      activeChat?.messagesLoaded
+    ) {
+      setRestoringActiveChat(false);
+    }
+  }, [
+    restoringActiveChat,
+    isLoggedIn,
+    activeChatId,
+    activeChat?.messagesLoaded,
+  ]);
+
+  useEffect(() => {
+    if (!restoringActiveChat) return;
+    const t = setTimeout(() => setRestoringActiveChat(false), 6000);
+    return () => clearTimeout(t);
+  }, [restoringActiveChat]);
 
   useEffect(() => {
     if (!socket) return;
@@ -309,9 +407,19 @@ export default function Home() {
       if (!chatId || !data?.chunk) return;
       dispatch(appendAssistantChunk({ chatId, chunk: data.chunk }));
     };
-    const onEnd = () => {
+    const onEnd = (data?: {
+      payload?: {
+        appTokensSpent?: number;
+        totalTokens?: number;
+        balance?: number;
+      };
+    }) => {
       const chatId = pendingConvIdRef.current;
-      if (chatId) dispatch(finishAssistantMessage({ chatId }));
+      const tokens = data?.payload?.appTokensSpent;
+      if (chatId) dispatch(finishAssistantMessage({ chatId, tokens }));
+      if (typeof data?.payload?.balance === "number") {
+        dispatch(setBalance(data.payload.balance));
+      }
       dispatch(setIsTyping(false));
       pendingConvIdRef.current = null;
     };
@@ -346,6 +454,7 @@ export default function Home() {
       handleChange({
         target: inputRef.current,
       } as React.ChangeEvent<HTMLTextAreaElement>);
+      dispatch(bumpTemplateTick());
     } else {
       pendingTemplateRef.current = clipped;
     }
@@ -358,9 +467,10 @@ export default function Home() {
       handleChange({
         target: inputRef.current,
       } as React.ChangeEvent<HTMLTextAreaElement>);
+      dispatch(bumpTemplateTick());
       pendingTemplateRef.current = null;
     }
-  }, [isOverlayOpen, handleChange]);
+  }, [isOverlayOpen, handleChange, dispatch]);
 
   return (
     <>
@@ -373,18 +483,33 @@ export default function Home() {
         setSelectedModelGroup={(g) => dispatch(setSelectedModelGroup(g))}
       />
 
+      <CreateProjectModalOverlay
+        isOpen={isCreateProjectModalOpen}
+        setIsOpen={(open) => dispatch(setIsCreateProjectModalOpen(open))}
+        onCreate={(name) => {
+          const id = crypto.randomUUID();
+          dispatch(addProject({ id, title: name }));
+          dispatch(setActiveProjectId(id));
+          dispatch(setIsCreateProjectModalOpen(false));
+        }}
+      />
+
       <div
         className={styles.appContainer}
-        data-flow={getFlowType(selectedModel)}
+        data-flow={getFlowThemeId(selectedModel)}
       >
         <div className={styles.leftSideContainer}>
           <LeftSide
-            onNewChat={() => dispatch(handleNewChat())}
+            onNewChat={() => {
+              dispatch(setActiveProjectId(null));
+              dispatch(handleNewChat());
+            }}
+            onNewProject={() => dispatch(setIsCreateProjectModalOpen(true))}
             isModalOpen={isModalOpen}
             setIsModalOpen={(open) => dispatch(setIsModalOpen(open))}
             modelMode={modelMode}
             setModelMode={setModelMode}
-            chatList={chatList}
+            chatList={sortedChatList}
             setActiveChatId={handleSelectChat}
             deleteChat={handleDeleteChat}
             renameChat={handleRenameChat}
@@ -396,109 +521,46 @@ export default function Home() {
           />
         </div>
         <div
-          className={`${styles.rightSection} ${
-            dockHidden ? styles.dockHidden : ""
-          }`}
+          className={styles.rightSection}
         >
-          <div className={styles.headerRightSectionContainer}>
-            <HeaderRightSide
-              chatTitle={activeChat?.title}
-              modelRef={modelRef}
-              selectedModel={selectedModel}
-              setSelectedModel={handleSelectModel}
-              selectedModelGroup={selectedModelGroup}
-              setSelectedModelGroup={(g) => dispatch(setSelectedModelGroup(g))}
-              isModalOpen={isModalOpen}
-              setIsModalOpen={(open) => dispatch(setIsModalOpen(open))}
-              quickActionsEnabled={hasFirstRequest || focusMode}
-              onOpenQuickActions={() => {
-                if (hasFirstRequest || focusMode)
-                  dispatch(setIsOverlayOpen(true));
-              }}
-            />
-          </div>
-
-          <div className={styles.scrollableContent} ref={scrollContainerRef}>
-            {!isOverlayOpen && (
-              <MainSectionRightSide
-                insertTemplate={insertTemplate}
-                setFocusMode={(updater) => {
-                  const next =
-                    typeof updater === "function"
-                      ? (updater as (prev: boolean) => boolean)(focusMode)
-                      : updater;
-                  dispatch(setFocusMode(next));
-                }}
-                focusMode={focusMode}
-                isSectionVisible={isSectionVisible}
-                hasInput={hasInput}
-                onChange={handleChange}
-                onSend={(_message, imageUrls) => {
-                  handleSendClick(hasFirstRequest, imageUrls);
-                }}
-                inputRef={inputRef}
-                onHideSection={() => dispatch(setIsSectionVisible(false))}
-                templateTick={templateTick}
-                setHasFirstRequest={(updater) => {
-                  const next =
-                    typeof updater === "function"
-                      ? (updater as (prev: boolean) => boolean)(hasFirstRequest)
-                      : updater;
-                  dispatch(setHasFirstRequest(next));
-                }}
-                hasFirstRequest={hasFirstRequest}
-                isOverlay={false}
-                selectedModel={selectedModel}
-                onImagesChange={setInputImageCount}
-              />
-            )}
-
-            {activeChat && activeChat.messages.length > 0 && (
-              <MessageList
-                messages={activeChat.messages}
-                isTyping={isTyping}
-                hasFirstRequest={hasFirstRequest}
-              />
-            )}
-
-            <div ref={messagesEndRef} />
-          </div>
-
-          {isOverlayOpen && (
+          {activeProject ? (
             <>
-              <div
-                className={styles.overlay}
-                onClick={() => dispatch(setIsOverlayOpen(false))}
+              <LeftSideDrawer
+                className={styles.projectMenuTrigger}
+                onNewChat={() => {
+                  dispatch(setActiveProjectId(null));
+                  dispatch(handleNewChat());
+                }}
+                onNewProject={() => dispatch(setIsCreateProjectModalOpen(true))}
+                isModalOpen={isModalOpen}
+                setIsModalOpen={(open) => dispatch(setIsModalOpen(open))}
+                modelMode={modelMode}
+                setModelMode={setModelMode}
+                chatList={sortedChatList}
+                setActiveChatId={handleSelectChat}
+                deleteChat={handleDeleteChat}
+                renameChat={handleRenameChat}
+                modelRef={modelRef}
+                selectedModel={selectedModel}
+                setSelectedModel={handleSelectModel}
+                selectedModelGroup={selectedModelGroup}
+                setSelectedModelGroup={(g) =>
+                  dispatch(setSelectedModelGroup(g))
+                }
               />
-              <div className={styles.overlayContent}>
-                <div
-                  className={styles.overlayContentInner}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <MainSectionRightSide
-                    insertTemplate={(template) => {
-                      insertTemplateToInput(template);
-                      dispatch(setIsOverlayOpen(false));
-                    }}
-                    setFocusMode={(updater) => {
-                      const next =
-                        typeof updater === "function"
-                          ? (updater as (prev: boolean) => boolean)(focusMode)
-                          : updater;
-                      dispatch(setFocusMode(next));
-                    }}
-                    isSectionVisible={true}
-                    focusMode={false}
-                    hasInput={hasInput}
-                    onChange={handleChange}
-                    onSend={(_message, imageUrls) => {
-                      handleSendClick(hasFirstRequest, imageUrls);
-                      dispatch(setIsOverlayOpen(false));
-                    }}
-                    inputRef={inputRef}
-                    onHideSection={() => dispatch(setIsOverlayOpen(false))}
-                    templateTick={templateTick}
-                    setHasFirstRequest={(updater) => {
+              <div className={styles.projectWorkspaceScroll}>
+                <ProjectWorkspace
+                  name={activeProject.title}
+                  onCreateFirstChat={() => inputRef.current?.focus()}
+                  inputProps={{
+                    hasInput,
+                    onChange: handleChange,
+                    onSend: (_message, imageUrls, imageFiles) =>
+                      handleSendClick(hasFirstRequest, imageUrls, imageFiles),
+                    inputRef,
+                    onHideSection: () => {},
+                    templateTick,
+                    setHasFirstRequest: (updater) => {
                       const next =
                         typeof updater === "function"
                           ? (updater as (prev: boolean) => boolean)(
@@ -506,41 +568,53 @@ export default function Home() {
                             )
                           : updater;
                       dispatch(setHasFirstRequest(next));
-                    }}
-                    hasFirstRequest={hasFirstRequest}
-                    isOverlay={true}
-                    selectedModel={selectedModel}
-                    onImagesChange={setInputImageCount}
-                  />
-                </div>
+                    },
+                    hasFirstRequest,
+                    selectedModel,
+                    onImagesChange: setInputImageCount,
+                  }}
+                  onChooseModel={() => dispatch(setIsModalOpen(true))}
+                  showEstimate={showEstimate}
+                />
               </div>
             </>
-          )}
+          ) : (
+            <>
+              <div className={styles.headerRightSectionContainer}>
+                <HeaderRightSide
+                  chatTitle={activeChat?.title}
+                  modelRef={modelRef}
+                  selectedModel={selectedModel}
+                  setSelectedModel={handleSelectModel}
+                  selectedModelGroup={selectedModelGroup}
+                  setSelectedModelGroup={(g) =>
+                    dispatch(setSelectedModelGroup(g))
+                  }
+                  isModalOpen={isModalOpen}
+                  setIsModalOpen={(open) => dispatch(setIsModalOpen(open))}
+                />
+              </div>
 
-          <div className={styles.inputDock}>
-            <div
-              className={
-                isExistingChat
-                  ? styles.inputBottom
-                  : newChatOpened && isNewChat
-                    ? styles.inputBottom
-                    : focusMode && inputSent
-                      ? styles.inputBottom
-                      : focusMode
-                        ? styles.inputBottom
-                        : inputSent
-                          ? styles.inputBottom
-                          : styles.inputWrapper
-              }
-            >
-              {!(isSectionVisible && focusMode) && !isOverlayOpen && (
-                <div className={styles.inputBottomInner}>
-                  <InputBar
+              <div
+                className={styles.scrollableContent}
+                ref={scrollContainerRef}
+              >
+                {!restoringActiveChat && !isOverlayOpen && (
+                  <MainSectionRightSide
+                    insertTemplate={insertTemplate}
+                    setFocusMode={(updater) => {
+                      const next =
+                        typeof updater === "function"
+                          ? (updater as (prev: boolean) => boolean)(focusMode)
+                          : updater;
+                      dispatch(setFocusMode(next));
+                    }}
+                    focusMode={focusMode}
+                    isSectionVisible={isSectionVisible}
                     hasInput={hasInput}
                     onChange={handleChange}
-                    onSend={(_message, imageUrls) => {
-                      handleSendClick(hasFirstRequest, imageUrls);
-                      if (!hasFirstRequest) dispatch(setHasFirstRequest(true));
+                    onSend={(_message, imageUrls, imageFiles) => {
+                      handleSendClick(hasFirstRequest, imageUrls, imageFiles);
                     }}
                     inputRef={inputRef}
                     onHideSection={() => dispatch(setIsSectionVisible(false))}
@@ -555,33 +629,181 @@ export default function Home() {
                       dispatch(setHasFirstRequest(next));
                     }}
                     hasFirstRequest={hasFirstRequest}
+                    isOverlay={false}
                     selectedModel={selectedModel}
                     onImagesChange={setInputImageCount}
+                    showEstimate={showEstimate}
+                    onChooseModel={() => dispatch(setIsModalOpen(true))}
                   />
+                )}
 
-                  <div className={styles.spanContainer}>
-                    {showEstimate ? (
-                      <div className={styles.spanContainerFirstRequest}>
-                        <span className={styles.inputSpan1}>
-                          ≈ Estimated cost: ~
-                          {estimatedTokens?.toLocaleString("en-US")} tokens
-                        </span>
-                        <span className={styles.inputSpan}>
-                          AI systems may make mistakes, so we recommend
-                          verifying important information.
-                        </span>
-                      </div>
-                    ) : (
-                      <span className={styles.inputSpan}>
-                        AI systems may make mistakes, so we recommend verifying
-                        important information.
-                      </span>
-                    )}
+                {!restoringActiveChat &&
+                  activeChat &&
+                  activeChat.messages.length > 0 && (
+                    <MessageList
+                      messages={activeChat.messages}
+                      isTyping={isTyping}
+                      hasFirstRequest={hasFirstRequest}
+                    />
+                  )}
+
+                <div ref={messagesEndRef} />
+              </div>
+
+              {isOverlayOpen && (
+                <>
+                  <div
+                    className={styles.overlay}
+                    onClick={() => dispatch(setIsOverlayOpen(false))}
+                  />
+                  <div className={styles.overlayContent}>
+                    <div
+                      className={styles.overlayContentInner}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <MainSectionRightSide
+                        insertTemplate={(template) => {
+                          insertTemplateToInput(template);
+                          dispatch(setIsOverlayOpen(false));
+                        }}
+                        setFocusMode={(updater) => {
+                          const next =
+                            typeof updater === "function"
+                              ? (updater as (prev: boolean) => boolean)(
+                                  focusMode,
+                                )
+                              : updater;
+                          dispatch(setFocusMode(next));
+                        }}
+                        isSectionVisible={true}
+                        focusMode={false}
+                        hasInput={hasInput}
+                        onChange={handleChange}
+                        onSend={(_message, imageUrls, imageFiles) => {
+                          handleSendClick(
+                            hasFirstRequest,
+                            imageUrls,
+                            imageFiles,
+                          );
+                          dispatch(setIsOverlayOpen(false));
+                        }}
+                        inputRef={inputRef}
+                        onHideSection={() => dispatch(setIsOverlayOpen(false))}
+                        templateTick={templateTick}
+                        setHasFirstRequest={(updater) => {
+                          const next =
+                            typeof updater === "function"
+                              ? (updater as (prev: boolean) => boolean)(
+                                  hasFirstRequest,
+                                )
+                              : updater;
+                          dispatch(setHasFirstRequest(next));
+                        }}
+                        hasFirstRequest={hasFirstRequest}
+                        isOverlay={true}
+                        selectedModel={selectedModel}
+                        onImagesChange={setInputImageCount}
+                        showEstimate={showEstimate}
+                        onChooseModel={() => dispatch(setIsModalOpen(true))}
+                      />
+                    </div>
                   </div>
-                </div>
+                </>
               )}
-            </div>
-          </div>
+
+              <div
+                className={styles.inputDock}
+                style={restoringActiveChat ? { display: "none" } : undefined}
+              >
+                <div
+                  className={
+                    isExistingChat
+                      ? styles.inputBottom
+                      : newChatOpened && isNewChat
+                        ? styles.inputBottom
+                        : focusMode && inputSent
+                          ? styles.inputBottom
+                          : focusMode
+                            ? styles.inputBottom
+                            : inputSent
+                              ? styles.inputBottom
+                              : styles.inputWrapper
+                  }
+                >
+                  {!dockHidden && (
+                    <div className={styles.inputBottomInner}>
+                      <InputBar
+                        hasInput={hasInput}
+                        onChange={handleChange}
+                        onSend={(_message, imageUrls, imageFiles) => {
+                          handleSendClick(
+                            hasFirstRequest,
+                            imageUrls,
+                            imageFiles,
+                          );
+                          if (!hasFirstRequest)
+                            dispatch(setHasFirstRequest(true));
+                        }}
+                        inputRef={inputRef}
+                        onHideSection={() =>
+                          dispatch(setIsSectionVisible(false))
+                        }
+                        templateTick={templateTick}
+                        setHasFirstRequest={(updater) => {
+                          const next =
+                            typeof updater === "function"
+                              ? (updater as (prev: boolean) => boolean)(
+                                  hasFirstRequest,
+                                )
+                              : updater;
+                          dispatch(setHasFirstRequest(next));
+                        }}
+                        hasFirstRequest={hasFirstRequest}
+                        selectedModel={selectedModel}
+                        onImagesChange={setInputImageCount}
+                      />
+
+                      <div className={styles.spanContainer}>
+                        {estimateSupported ? (
+                          <div className={styles.spanContainerFirstRequest}>
+                            <div
+                              className={styles.spanContainerFirstRequestTop}
+                            >
+                              <span
+                                className={`${styles.inputSpan1} ${
+                                  showEstimate ? "" : styles.estimateHidden
+                                }`}
+                              >
+                                ≈ Estimated cost: ~
+                                {(estimatedTokens ?? 0).toLocaleString("en-US")}{" "}
+                                tokens
+                              </span>
+                              <ChooseModelColumn
+                                selectedModel={selectedModel}
+                                showEstimate={showEstimate}
+                                onChoose={() =>
+                                  dispatch(setIsModalOpen(true))
+                                }
+                              />
+                            </div>
+                            <span className={styles.inputSpan}>
+                              AI systems may make mistakes, so we recommen
+                              verifying important information.
+                            </span>
+                          </div>
+                        ) : (
+                          <span className={styles.inputSpan}>
+                            AI systems may make mistakes, so we recommend
+                            verifying important information.
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </>

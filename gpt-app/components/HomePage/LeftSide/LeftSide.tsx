@@ -7,9 +7,15 @@ import SectionGptTokens from "./SectionGptTokens/SectionGptTokens";
 import { useState } from "react";
 import Image from "next/image";
 import WsDebugPanel from "@/components/common/WsDebugPanel/WsDebugPanel";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { selectProjectList } from "@/redux/projects/selectors";
+import { removeProject, renameProject } from "@/redux/projects/slice";
+import { selectActiveProjectId } from "@/redux/ui/selectors";
+import { setActiveProjectId } from "@/redux/ui/slice";
 
 export default function LeftSide({
   onNewChat,
+  onNewProject,
   chatList,
   setActiveChatId,
   deleteChat,
@@ -23,8 +29,26 @@ export default function LeftSide({
   setSelectedModelGroup,
   isModalOpen,
   setIsModalOpen,
+  onSelectProject,
 }: LeftSideProps) {
   const [isOpen, setIsOpen] = useState(true);
+
+  const dispatch = useAppDispatch();
+  const projectList = useAppSelector(selectProjectList);
+  const activeProjectId = useAppSelector(selectActiveProjectId);
+
+  const handleSelectProject = (id: string) => {
+    dispatch(setActiveProjectId(id));
+    onSelectProject?.();
+  };
+
+  const handleDeleteProject = (id: string) => {
+    dispatch(removeProject(id));
+    if (id === activeProjectId) dispatch(setActiveProjectId(null));
+  };
+
+  const handleRenameProject = (id: string, title: string) =>
+    dispatch(renameProject({ id, title }));
 
   return (
     <div
@@ -73,6 +97,11 @@ export default function LeftSide({
 
             <SectionGptChats
               onNewChat={onNewChat}
+              onNewProject={onNewProject}
+              projectList={projectList}
+              setActiveProject={handleSelectProject}
+              deleteProject={handleDeleteProject}
+              renameProject={handleRenameProject}
               chatList={chatList}
               setActiveChatId={setActiveChatId}
               deleteChat={deleteChat}

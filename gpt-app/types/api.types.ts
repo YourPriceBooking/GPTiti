@@ -28,6 +28,20 @@ export interface ChatStreamRequest {
   conversationId?: string;
 }
 
+export interface UploadedFile {
+  url: string;
+  publicId: string;
+  mimetype: string;
+  size: number;
+  originalName: string;
+  expiresAt: string;
+}
+
+export interface UploadFileResponse {
+  success: boolean;
+  file: UploadedFile;
+}
+
 export interface Conversation {
   _id: string;
   title: string | null;

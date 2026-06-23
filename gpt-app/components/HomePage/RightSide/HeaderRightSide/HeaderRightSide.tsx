@@ -1,16 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
+import { useState } from "react";
 
 import Image from "next/image";
 import ModelGptitiTitleWithIcon from "@/components/ModelGptitiTitleWithIcon/ModelGptitiTitleWithIcon";
 import LoginModal from "@/components/HomePage/common/LoginModal/LoginModal";
-import LeftSide from "../../LeftSide/LeftSide";
+import LeftSideDrawer from "../../LeftSide/LeftSideDrawer/LeftSideDrawer";
 
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { selectIsLoggedIn } from "@/redux/auth/selectors";
-import { selectActiveChatId, selectChatList } from "@/redux/chat/selectors";
+import { selectIsLoggedIn, selectUser } from "@/redux/auth/selectors";
+import { selectChatList } from "@/redux/chat/selectors";
 import {
   deleteDraftChat,
   handleNewChat,
@@ -23,6 +22,7 @@ import {
   removeConversation,
   renameConversation,
 } from "@/redux/chat/operations";
+import { setIsCreateProjectModalOpen } from "@/redux/ui/slice";
 
 import { useModelMode } from "@/hooks/useModelMode";
 
@@ -44,22 +44,14 @@ export default function HeaderRightSide({
   setSelectedModelGroup,
   isModalOpen,
   setIsModalOpen,
-  onOpenQuickActions,
-  quickActionsEnabled,
-}: HeaderRightSideProps & {
-  onOpenQuickActions: () => void;
-  quickActionsEnabled: boolean;
-}) {
+}: HeaderRightSideProps) {
   const dispatch = useAppDispatch();
 
   const isAuthed = useAppSelector(selectIsLoggedIn);
-  const activeChatId = useAppSelector(selectActiveChatId);
+  const user = useAppSelector(selectUser);
   const chatList = useAppSelector(selectChatList);
 
   const [isLoginOpen, setIsLoginOpen] = useState(false);
-  const [isModalMounted, setIsModalMounted] = useState(false);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isClosing, setIsClosing] = useState(false);
 
   const result = getModelGroupAndItem(selectedModel);
   const { modelMode, setModelMode } = useModelMode();
@@ -83,100 +75,26 @@ export default function HeaderRightSide({
     }
   };
 
-  const ANIM_MS = 220;
-
-  const openLeftPanel = () => {
-    setIsClosing(false);
-    setIsModalMounted(true);
-    requestAnimationFrame(() => setIsModalVisible(true));
-  };
-
-  const closeLeftPanel = () => {
-    setIsClosing(true);
-    setIsModalVisible(false);
-
-    window.setTimeout(() => {
-      setIsModalMounted(false);
-      setIsClosing(false);
-    }, ANIM_MS);
-  };
-
-  const setModelModalOpenSafe = (open: boolean) => {
-    if (!open) {
-      setIsModalOpen(false);
-      return;
-    }
-
-    if (isModalMounted) {
-      closeLeftPanel();
-      window.setTimeout(() => {
-        setIsModalOpen(true);
-      }, ANIM_MS);
-      return;
-    }
-
-    setIsModalOpen(true);
-  };
-
-  useEffect(() => {
-    if (isModalMounted) closeLeftPanel();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeChatId]);
-
   return (
     <div className={styles.container}>
-      <Image
-        className={styles.openModal}
-        src="/icons/open-icon.svg"
-        width={25}
-        height={25}
-        alt="open-modal"
-        onClick={openLeftPanel}
+      <LeftSideDrawer
+        className={styles.menuTrigger}
+        onNewChat={() => dispatch(handleNewChat())}
+        onNewProject={() => dispatch(setIsCreateProjectModalOpen(true))}
+        isModalOpen={isModalOpen}
+        setIsModalOpen={setIsModalOpen}
+        modelMode={modelMode}
+        setModelMode={setModelMode}
+        chatList={chatList}
+        setActiveChatId={handleSelectChat}
+        deleteChat={handleDeleteChat}
+        renameChat={handleRenameChat}
+        modelRef={modelRef}
+        selectedModel={selectedModel}
+        setSelectedModel={setSelectedModel}
+        selectedModelGroup={selectedModelGroup}
+        setSelectedModelGroup={setSelectedModelGroup}
       />
-
-      {isModalMounted &&
-        createPortal(
-          <div
-            className={`${styles.modalOverlay} ${
-              isModalVisible ? styles.modalOverlayOpen : ""
-            } ${isClosing ? styles.modalOverlayClosing : ""}`}
-            onClick={closeLeftPanel}
-          >
-            <div
-              className={`${styles.modalContent} ${
-                isModalVisible ? styles.modalContentOpen : ""
-              } ${isClosing ? styles.modalContentClosing : ""}`}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button
-                className={styles.closeButton}
-                onClick={closeLeftPanel}
-                aria-label="Close modal"
-                type="button"
-              >
-                <Image src="/icons/close.svg" width={20} height={20} alt="" />
-              </button>
-
-              <LeftSide
-                onNewChat={() => dispatch(handleNewChat())}
-                isModalOpen={isModalOpen}
-                setIsModalOpen={setModelModalOpenSafe}
-                modelMode={modelMode}
-                setModelMode={setModelMode}
-                chatList={chatList}
-                setActiveChatId={handleSelectChat}
-                deleteChat={handleDeleteChat}
-                renameChat={handleRenameChat}
-                modelRef={modelRef}
-                selectedModel={selectedModel}
-                setSelectedModel={setSelectedModel}
-                selectedModelGroup={selectedModelGroup}
-                setSelectedModelGroup={setSelectedModelGroup}
-              />
-            </div>
-          </div>,
-          document.body,
-        )}
 
       <div className={styles.containerGroupLogos}>
         <Image
@@ -198,20 +116,20 @@ export default function HeaderRightSide({
       <div className={styles.modelGptitiWrapper}>
         <div
           className={styles.modelGptitiContainer}
-          onClick={() => setModelModalOpenSafe(true)}
+          onClick={() => setIsModalOpen(true)}
           role="button"
           tabIndex={0}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") {
               e.preventDefault();
-              setModelModalOpenSafe(true);
+              setIsModalOpen(true);
             }
           }}
         >
           <ModelGptitiTitleWithIcon
             modelRef={modelRef}
             selectedModel={selectedModel}
-            setIsModalOpen={setModelModalOpenSafe}
+            setIsModalOpen={setIsModalOpen}
           />
           <p
             className={`${styles.paragraph} ${
@@ -255,20 +173,15 @@ export default function HeaderRightSide({
           />
         </>
       ) : (
-        <p
-          className={styles.quickActionsContainer}
-          onClick={onOpenQuickActions}
-          style={{ opacity: quickActionsEnabled ? 1 : 0.5 }}
-        >
+        <div className={styles.userAvatarContainer}>
           <Image
-            src="/icons/quick-actions.svg"
-            width={21}
-            height={21}
-            alt="quick-actions-icon"
-            className={styles.quickActionsIcon}
+            className={styles.userAvatar}
+            src={user?.avatar || "/icons/ghost-user.svg"}
+            width={36}
+            height={36}
+            alt={user?.email || "user-avatar"}
           />
-          <span className={styles.quickActionsSpan}>Quick actions</span>
-        </p>
+        </div>
       )}
     </div>
   );
