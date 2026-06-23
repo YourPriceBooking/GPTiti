@@ -521,9 +521,7 @@ export default function Home() {
           />
         </div>
         <div
-          className={`${styles.rightSection} ${
-            dockHidden ? styles.dockHidden : ""
-          }`}
+          className={styles.rightSection}
         >
           {activeProject ? (
             <>
@@ -575,6 +573,8 @@ export default function Home() {
                     selectedModel,
                     onImagesChange: setInputImageCount,
                   }}
+                  onChooseModel={() => dispatch(setIsModalOpen(true))}
+                  showEstimate={showEstimate}
                 />
               </div>
             </>
@@ -730,7 +730,7 @@ export default function Home() {
                               : styles.inputWrapper
                   }
                 >
-                  {!(isSectionVisible && focusMode) && !isOverlayOpen && (
+                  {!dockHidden && (
                     <div className={styles.inputBottomInner}>
                       <InputBar
                         hasInput={hasInput}

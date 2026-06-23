@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import clsx from "clsx";
 import styles from "./ModalWindow.module.css";
 import Image from "next/image";
@@ -32,6 +32,14 @@ export default function ModalWindow({
   const balance = useAppSelector(selectBalance);
 
   const [viewGroup, setViewGroup] = useState<ModelType>(appliedGroup);
+
+  const closeTimerRef = useRef<NodeJS.Timeout | null>(null);
+  useEffect(
+    () => () => {
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    },
+    [],
+  );
 
   useEffect(() => {
     setViewGroup(appliedGroup);
@@ -135,6 +143,12 @@ export default function ModalWindow({
                 }`}
                 onClick={() => {
                   setSelectedModel(item.title);
+                  if (closeTimerRef.current)
+                    clearTimeout(closeTimerRef.current);
+                  closeTimerRef.current = setTimeout(
+                    () => setIsModalOpen(false),
+                    1000,
+                  );
                 }}
               >
                 <div className={styles.mainContainerbtn2}>

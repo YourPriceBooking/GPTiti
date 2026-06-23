@@ -15,13 +15,8 @@
   flex-direction: column;
   align-items: center;
   overflow: hidden;
-
-  --composer-height: 100px;
 }
 
-.rightSection.dockHidden {
-  --composer-height: 0px;
-}
 .headerRightSectionContainer {
   position: sticky;
   top: 9px;
@@ -35,7 +30,8 @@
   width: 100%;
   overflow-y: auto;
   margin-top: 10px;
-  height: calc(100% - 75px - var(--composer-height));
+  flex: 1 1 auto;
+  min-height: 0;
 
   display: flex;
   flex-direction: column;
@@ -43,8 +39,7 @@
   gap: 24px;
 
   padding-top: 0;
-  flex: none;
-  padding-bottom: var(--composer-height);
+  padding-bottom: 16px;
 }
 
 .projectMenuTrigger {
@@ -74,14 +69,10 @@
 }
 
 .inputDock {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: var(--composer-height);
+  flex: none;
+  width: 100%;
   display: flex;
   justify-content: center;
-  align-items: flex-end;
   padding-bottom: 10px;
   z-index: 20;
 }

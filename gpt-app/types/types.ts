@@ -83,6 +83,9 @@ export type LeftSideProps = {
 
   isModalOpen: boolean;
   setIsModalOpen: (open: boolean) => void;
+
+  /** Optional: fires after a project is selected (used to close the mobile drawer). */
+  onSelectProject?: () => void;
 };
 
 export type SectionGptChatsProps = Pick<

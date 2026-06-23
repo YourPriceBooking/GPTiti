@@ -1,6 +1,7 @@
 import Image from "next/image";
 
 import InputBar from "@/components/HomePage/RightSide/InputBar/InputBar";
+import ChooseModelColumn from "@/components/HomePage/RightSide/ChooseModelColumn/ChooseModelColumn";
 
 import styles from "./ProjectWorkspace.module.css";
 
@@ -9,6 +10,8 @@ type ProjectWorkspaceProps = {
   chatCount?: number;
   onCreateFirstChat: () => void;
   inputProps: React.ComponentProps<typeof InputBar>;
+  onChooseModel: () => void;
+  showEstimate: boolean;
 };
 
 export default function ProjectWorkspace({
@@ -16,6 +19,8 @@ export default function ProjectWorkspace({
   chatCount = 0,
   onCreateFirstChat,
   inputProps,
+  onChooseModel,
+  showEstimate,
 }: ProjectWorkspaceProps) {
   return (
     <div className={styles.container}>
@@ -44,6 +49,13 @@ export default function ProjectWorkspace({
           placeholder="Start a new chat in this project"
           variant="project"
         />
+        <div className={styles.modelRow}>
+          <ChooseModelColumn
+            selectedModel={inputProps.selectedModel}
+            showEstimate={showEstimate}
+            onChoose={onChooseModel}
+          />
+        </div>
       </div>
 
       <div className={styles.tabsRow}>

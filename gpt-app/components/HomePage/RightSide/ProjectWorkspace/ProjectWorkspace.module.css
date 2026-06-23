@@ -61,8 +61,15 @@
   margin-top: 22px;
 }
 
+.modelRow {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
 .tabsRow {
   display: flex;
+  padding: 0 12px;
   align-items: center;
   justify-content: space-between;
   margin-top: 24px;

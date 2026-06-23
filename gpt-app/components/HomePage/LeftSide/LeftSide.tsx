@@ -29,6 +29,7 @@ export default function LeftSide({
   setSelectedModelGroup,
   isModalOpen,
   setIsModalOpen,
+  onSelectProject,
 }: LeftSideProps) {
   const [isOpen, setIsOpen] = useState(true);
 
@@ -36,7 +37,10 @@ export default function LeftSide({
   const projectList = useAppSelector(selectProjectList);
   const activeProjectId = useAppSelector(selectActiveProjectId);
 
-  const handleSelectProject = (id: string) => dispatch(setActiveProjectId(id));
+  const handleSelectProject = (id: string) => {
+    dispatch(setActiveProjectId(id));
+    onSelectProject?.();
+  };
 
   const handleDeleteProject = (id: string) => {
     dispatch(removeProject(id));
