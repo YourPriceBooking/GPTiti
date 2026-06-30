@@ -105,7 +105,7 @@
 }
 
 .badge {
-  background: var(--main-gray);
+  background: #2f2d31;
   color: var(--main-white);
   font-family: var(--font-family);
   font-size: 12px;
@@ -191,7 +191,7 @@
   max-width: 288px;
   margin-top: 6px;
   padding: 10px 16px;
-  background: var(--main-gray);
+  background: #2f2d31;
   border: none;
   border-radius: 11px;
   cursor: pointer;
@@ -241,13 +241,17 @@
 }
 
 .chatsListItem:hover {
-  background: var(--main-gray);
+  background: #2f2d31;
   cursor: pointer;
 }
 
 .chatsListItem:focus-visible {
-  background: var(--main-gray);
+  background: #2f2d31;
   cursor: pointer;
+}
+
+.chatsListItemActive {
+  background: #2f2d31;
 }
 
 .chatRight {

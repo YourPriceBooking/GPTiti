@@ -1,7 +1,6 @@
 .aiBlock {
   max-width: 760px;
   width: 100%;
-  padding: 10px 18px 16px;
   border-radius: 20px;
   background: linear-gradient(180deg, #fff 0%, #f7faff 100%);
   border: 1px solid rgba(37, 99, 235, 0.14);
@@ -12,6 +11,48 @@
   display: flex;
   align-items: center;
   gap: 5px;
+  padding: 10px 18px;
+  border-radius: 20px 20px 0 0;
+}
+
+/* Text-only responses: pin the logo/copy header while the answer scrolls. */
+.aiBlockText .aiTitle {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: #ffffff;
+  border-bottom: 1px solid rgba(37, 99, 235, 0.08);
+}
+
+.copyBtn {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 6px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.copyBtn:hover {
+  background: #eef2f7;
+}
+
+.copyBtnCopied,
+.copyBtnCopied:hover {
+  background: #dcfce7;
+  padding: 6px 10px;
+}
+
+.copyBtnLabel {
+  font-family: var(--font-family);
+  font-size: 12px;
+  font-weight: 600;
+  color: #16a34a;
 }
 
 .aiParagraph {
@@ -34,7 +75,7 @@
 
 .aiContent {
   margin-top: 8px;
-  padding-right: 8px;
+  padding: 0 18px 16px;
   font-family: var(--font-family);
   font-weight: 400;
   font-size: 14px;
@@ -147,17 +188,20 @@
 .aiContent :global(.code-block) {
   margin: 12px 0;
   border-radius: 12px;
-  overflow: hidden;
   background: #0d1117;
 }
 
 .aiContent :global(.code-header) {
+  position: sticky;
+  top: 0;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 7px 14px;
   background: #1c2128;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px 12px 0 0;
 }
 
 .aiContent :global(.code-lang) {
@@ -170,12 +214,13 @@
 .aiContent :global(.code-copy-btn) {
   border: none;
   background: none;
-  padding: 3px 8px;
+  padding: 5px;
   border-radius: 6px;
-  font-family: var(--font-family);
-  font-size: 12px;
-  color: #c9d1d9;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
   transition: background 0.15s ease;
 }
 
@@ -183,10 +228,44 @@
   background: rgba(255, 255, 255, 0.1);
 }
 
+.aiContent :global(.code-copy-btn.copied),
+.aiContent :global(.code-copy-btn.copied):hover {
+  padding: 5px 9px;
+  background: rgba(63, 185, 80, 0.15);
+}
+
+.aiContent :global(.code-copy-label) {
+  display: none;
+  font-family: var(--font-family);
+  font-size: 12px;
+  font-weight: 600;
+  color: #3fb950;
+}
+
+.aiContent :global(.code-copy-btn.copied .code-copy-label) {
+  display: inline;
+}
+
+/* Same copy/copied svg as the light card, recolored for the dark code header */
+.aiContent :global(.code-copy-icon) {
+  width: 16px;
+  height: 16px;
+  background-color: #c9d1d9;
+  -webkit-mask: url("/icons/copy.svg") no-repeat center / contain;
+  mask: url("/icons/copy.svg") no-repeat center / contain;
+}
+
+.aiContent :global(.code-copy-btn.copied .code-copy-icon) {
+  background-color: #3fb950;
+  -webkit-mask-image: url("/icons/copied.svg");
+  mask-image: url("/icons/copied.svg");
+}
+
 .aiContent pre {
   margin: 0;
   padding: 14px;
   overflow-x: auto;
+  border-radius: 0 0 12px 12px;
 }
 
 .aiContent pre code {

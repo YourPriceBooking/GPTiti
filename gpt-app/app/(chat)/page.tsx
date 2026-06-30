@@ -165,9 +165,10 @@ export default function Home() {
   }, [activeChat?.messages.length, activeChat, dispatch]);
 
   useEffect(() => {
+    if (restoringActiveChat) return;
     if (!activeChat || activeChat.messages.length === 0) return;
     messagesEndRef.current?.scrollIntoView({ behavior: "auto", block: "end" });
-  }, [activeChat?.id, activeChat?.messages.length, activeChat]);
+  }, [activeChat?.id, activeChat?.messages.length, restoringActiveChat]);
 
   useEffect(() => {
     const empty = !activeChat || activeChat.messages.length === 0;
@@ -520,9 +521,7 @@ export default function Home() {
             setSelectedModelGroup={(g) => dispatch(setSelectedModelGroup(g))}
           />
         </div>
-        <div
-          className={styles.rightSection}
-        >
+        <div className={styles.rightSection}>
           {activeProject ? (
             <>
               <LeftSideDrawer
@@ -781,9 +780,7 @@ export default function Home() {
                               <ChooseModelColumn
                                 selectedModel={selectedModel}
                                 showEstimate={showEstimate}
-                                onChoose={() =>
-                                  dispatch(setIsModalOpen(true))
-                                }
+                                onChoose={() => dispatch(setIsModalOpen(true))}
                               />
                             </div>
                             <span className={styles.inputSpan}>

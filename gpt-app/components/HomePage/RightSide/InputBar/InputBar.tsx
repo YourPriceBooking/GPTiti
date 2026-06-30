@@ -11,6 +11,7 @@ import { useAppSelector } from "@/redux/hooks";
 import { selectIsLoggedIn } from "@/redux/auth/selectors";
 
 import { getModelLimits } from "@/config/modelLimits.config";
+import { isModelComingSoon } from "@/config/models.config";
 import { compressImage } from "@/lib/compressImage";
 
 import styles from "./InputBar.module.css";
@@ -79,6 +80,10 @@ export default function InputBar({
   } | null>(null);
 
   const limits = useMemo(() => getModelLimits(selectedModel), [selectedModel]);
+  const isComingSoon = useMemo(
+    () => isModelComingSoon(selectedModel),
+    [selectedModel],
+  );
   const isImageBlocked = limits.maxImages === 0;
   const maxImageBytes = limits.maxImageSizeMb * MB;
   const isFileBlocked = limits.maxFiles === 0;
@@ -346,6 +351,7 @@ export default function InputBar({
   };
 
   const handleSend = () => {
+    if (isComingSoon) return;
     if (inputRef.current) {
       const message = inputRef.current.value;
       const hasContent =
@@ -386,6 +392,13 @@ export default function InputBar({
       inputRef.current.value = "";
       setIsMultiline(false);
       resizeTextarea();
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
+      e.preventDefault();
+      handleSend();
     }
   };
 
@@ -512,6 +525,7 @@ export default function InputBar({
           className={styles.input}
           placeholder={placeholder}
           onChange={handleChange}
+          onKeyDown={handleKeyDown}
           onPaste={handlePaste}
           rows={1}
           maxLength={limits.maxTextChars ?? undefined}
@@ -564,6 +578,20 @@ export default function InputBar({
 
         <span className={styles.measure} ref={measureRef} aria-hidden="true" />
       </div>
+
+      {isComingSoon && (
+        <div className={styles.comingSoonOverlay}>
+          <div className={styles.comingSoonBadge}>
+            <span className={styles.comingSoonDot} />
+            <span className={styles.comingSoonTitle}>
+              This model is coming soon.
+            </span>
+            <span className={styles.comingSoonHint}>
+              Choose another model to continue.
+            </span>
+          </div>
+        </div>
+      )}
 
       {editingImage && (
         <ImageEditorModal
