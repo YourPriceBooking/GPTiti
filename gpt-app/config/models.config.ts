@@ -231,3 +231,14 @@ export const modelConfig: Record<ModelType, ModelConfig> = {
     ],
   },
 };
+
+export const COMING_SOON_MODELS = new Set<string>([
+  ...modelConfig["AI tools"].list.map((item) => item.title),
+  "gpt-5.1-mini",
+  "gpt-5.1-realtime",
+  "o1-mini",
+  "gpt-4o-realtime",
+]);
+
+export const isModelComingSoon = (model: string): boolean =>
+  COMING_SOON_MODELS.has(model);

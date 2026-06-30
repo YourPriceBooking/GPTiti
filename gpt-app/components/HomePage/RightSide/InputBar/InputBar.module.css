@@ -197,7 +197,7 @@
 
 .input::placeholder {
   font-family: var(--font-family);
-  font-style: italic;
+  font-style: normal;
   font-weight: 600;
   font-size: 20px;
   color: #94a3b8;
@@ -315,6 +315,55 @@
   visibility: hidden !important;
 }
 
+/* "Coming soon" model — dims the composer and blocks input/sending */
+.comingSoonOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  border-radius: 33px;
+  background: rgba(148, 163, 184, 0.42);
+  z-index: 6;
+}
+
+.comingSoonBadge {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  text-align: center;
+  gap: 4px 9px;
+  max-width: 100%;
+  padding: 9px 18px;
+  border-radius: 22px;
+  background: #1d212a;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.25);
+}
+
+.comingSoonDot {
+  width: 9px;
+  height: 9px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #f5b301;
+}
+
+.comingSoonTitle {
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 15px;
+  color: #ffffff;
+}
+
+.comingSoonHint {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 13px;
+  color: #9aa6bd;
+}
+
 .modalWrapper {
   max-width: 360px;
   width: 100%;
@@ -348,5 +397,16 @@
   }
   .input::placeholder {
     font-size: 16px;
+  }
+
+  .comingSoonBadge {
+    gap: 4px 8px;
+    padding: 8px 14px;
+  }
+  .comingSoonTitle {
+    font-size: 13px;
+  }
+  .comingSoonHint {
+    font-size: 12px;
   }
 }
