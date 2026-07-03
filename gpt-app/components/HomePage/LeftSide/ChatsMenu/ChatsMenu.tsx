@@ -12,9 +12,6 @@ type ItemMenuProps = {
   onDeleteRequest: () => void;
 };
 
-
-
-
 export default function ChatsMenu({
   isPinned,
   onPinToggle,
@@ -46,8 +43,8 @@ export default function ChatsMenu({
                 ? "Return this project to the normal order"
                 : "Return this chat to the normal order"
               : isProject
-              ? "Keep this project first in Projects"
-              : "Keep this chat above the list"}
+                ? "Keep this project first in Projects"
+                : "Keep this chat above the list"}
           </span>
         </div>
       </button>
@@ -56,9 +53,17 @@ export default function ChatsMenu({
 
       {isProject ? (
         <>
-          <button className={styles.button} onClick={onAddChats}>
+          <button
+            className={styles.button}
+            // onClick={onAddChats}
+          >
             <span className={styles.iconWrap}>
-              <Image src="/icons/add-chats.svg" alt="Add chats" width={20} height={13} />
+              <Image
+                src="/icons/add-chats.svg"
+                alt="Add chats"
+                width={20}
+                height={13}
+              />
             </span>
             <div className={styles.itemContent}>
               <span className={styles.label}>Add chats</span>
@@ -73,7 +78,12 @@ export default function ChatsMenu({
         <>
           <button className={styles.button} onClick={onCreateProject}>
             <span className={styles.iconWrap}>
-              <Image src="/icons/create-project.svg" alt="Create project" width={16} height={16} />
+              <Image
+                src="/icons/create-project.svg"
+                alt="Create project"
+                width={16}
+                height={16}
+              />
             </span>
             <div className={styles.itemContent}>
               <span className={styles.label}>Create project</span>

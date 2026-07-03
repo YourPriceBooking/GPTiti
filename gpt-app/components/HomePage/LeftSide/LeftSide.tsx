@@ -9,9 +9,10 @@ import Image from "next/image";
 import WsDebugPanel from "@/components/common/WsDebugPanel/WsDebugPanel";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { selectProjectList } from "@/redux/projects/selectors";
-import { removeProject, renameProject } from "@/redux/projects/slice";
+import { renameProject } from "@/redux/projects/slice";
+import { removeProject, updateProject } from "@/redux/projects/operations";
 import { selectActiveProjectId } from "@/redux/ui/selectors";
-import { setActiveProjectId } from "@/redux/ui/slice";
+import { setActiveProjectId, setAddChatsProjectId } from "@/redux/ui/slice";
 
 export default function LeftSide({
   onNewChat,
@@ -47,8 +48,13 @@ export default function LeftSide({
     if (id === activeProjectId) dispatch(setActiveProjectId(null));
   };
 
-  const handleRenameProject = (id: string, title: string) =>
-    dispatch(renameProject({ id, title }));
+  const handleRenameProject = (id: string, title: string) => {
+    dispatch(renameProject({ id, title })); // optimistic local update
+    dispatch(updateProject({ id, changes: { title } }));
+  };
+
+  const handleAddChatsToProject = (id: string) =>
+    dispatch(setAddChatsProjectId(id));
 
   return (
     <div
@@ -102,6 +108,7 @@ export default function LeftSide({
               setActiveProject={handleSelectProject}
               deleteProject={handleDeleteProject}
               renameProject={handleRenameProject}
+              addChatsToProject={handleAddChatsToProject}
               chatList={chatList}
               setActiveChatId={setActiveChatId}
               deleteChat={deleteChat}

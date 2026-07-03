@@ -4,6 +4,7 @@ interface UiState {
   isModalOpen: boolean;
   isCreateProjectModalOpen: boolean;
   activeProjectId: string | null;
+  addChatsProjectId: string | null;
   focusMode: boolean;
   isSectionVisible: boolean;
   isOverlayOpen: boolean;
@@ -15,6 +16,7 @@ const initialState: UiState = {
   isModalOpen: false,
   isCreateProjectModalOpen: false,
   activeProjectId: null,
+  addChatsProjectId: null,
   focusMode: false,
   isSectionVisible: true,
   isOverlayOpen: false,
@@ -34,6 +36,9 @@ const uiSlice = createSlice({
     },
     setActiveProjectId(state, { payload }: PayloadAction<string | null>) {
       state.activeProjectId = payload;
+    },
+    setAddChatsProjectId(state, { payload }: PayloadAction<string | null>) {
+      state.addChatsProjectId = payload;
     },
     setFocusMode(state, { payload }: PayloadAction<boolean>) {
       state.focusMode = payload;
@@ -57,6 +62,7 @@ export const {
   setIsModalOpen,
   setIsCreateProjectModalOpen,
   setActiveProjectId,
+  setAddChatsProjectId,
   setFocusMode,
   setIsSectionVisible,
   setIsOverlayOpen,
