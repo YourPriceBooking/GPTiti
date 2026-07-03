@@ -52,35 +52,24 @@
   touch-action: none;
 }
 
-.gridLineV {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 1px;
-  background: rgba(255, 255, 255, 0.35);
-  pointer-events: none;
-}
-
-.gridLineH {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: rgba(255, 255, 255, 0.35);
-  pointer-events: none;
-}
-
 .handle {
   position: absolute;
   touch-action: none;
+}
+
+/* Invisible expanded hit area so the thin handles are easy to grab. */
+.handle::before {
+  content: "";
+  position: absolute;
+  inset: -12px;
 }
 
 .handle_nw,
 .handle_ne,
 .handle_sw,
 .handle_se {
-  width: 18px;
-  height: 18px;
+  width: 28px;
+  height: 28px;
 }
 
 .handle_nw {
@@ -123,7 +112,7 @@
 .handle_s {
   left: 50%;
   transform: translateX(-50%);
-  width: 26px;
+  width: 48px;
   height: 5px;
   background: #fff;
   border-radius: 3px;
@@ -143,7 +132,7 @@
   top: 50%;
   transform: translateY(-50%);
   width: 5px;
-  height: 26px;
+  height: 44px;
   background: #fff;
   border-radius: 3px;
   cursor: ew-resize;

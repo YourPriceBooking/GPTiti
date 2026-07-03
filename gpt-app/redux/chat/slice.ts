@@ -85,6 +85,30 @@ const chatSlice = createSlice({
       state.isTyping = false;
     },
 
+    addConversation(
+      state,
+      {
+        payload,
+      }: PayloadAction<{
+        id: string;
+        title: string | null;
+        modelId?: string;
+      }>,
+    ) {
+      const existing = state.chatList.find((c) => c.id === payload.id);
+      if (!existing) {
+        state.chatList.push({
+          id: payload.id,
+          title: payload.title,
+          messages: [],
+          messagesLoaded: true,
+          modelId: payload.modelId,
+          lastMessageAt: new Date().toISOString(),
+        });
+      }
+      state.activeChatId = payload.id;
+    },
+
     promoteDraft(
       state,
       {
@@ -274,6 +298,7 @@ const chatSlice = createSlice({
 export const {
   setActiveChatId,
   handleNewChat,
+  addConversation,
   promoteDraft,
   appendUserMessage,
   startAssistantMessage,

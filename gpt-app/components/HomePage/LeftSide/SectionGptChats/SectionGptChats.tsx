@@ -21,6 +21,7 @@ export default function SectionGptChats({
   setActiveProject,
   deleteProject,
   renameProject,
+  addChatsToProject,
   chatList,
   setActiveChatId,
   deleteChat,
@@ -571,7 +572,10 @@ export default function SectionGptChats({
               togglePinProject(openMenuProjectId);
               setOpenMenuProjectId(null);
             }}
-            onAddChats={() => setOpenMenuProjectId(null)}
+            onAddChats={() => {
+              addChatsToProject?.(openMenuProjectId);
+              setOpenMenuProjectId(null);
+            }}
             onRenameRequest={() => {
               setRenamingProjectId(openMenuProjectId);
               setOpenMenuProjectId(null);

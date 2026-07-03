@@ -28,6 +28,15 @@ export type Chat = {
 export type Project = {
   id: string;
   title: string;
+  description?: string;
+  icon?: string;
+  color?: string;
+  defaultModel?: string;
+  systemPrompt?: string;
+  archived?: boolean;
+  conversationCount?: number;
+  conversationIds?: string[];
+  lastActivityAt?: string;
 };
 
 export type ModelType =
@@ -90,11 +99,18 @@ export type LeftSideProps = {
 
 export type SectionGptChatsProps = Pick<
   LeftSideProps,
-  "onNewChat" | "onNewProject" | "projectList" | "chatList" | "setActiveChatId" | "deleteChat" | "renameChat"
+  | "onNewChat"
+  | "onNewProject"
+  | "projectList"
+  | "chatList"
+  | "setActiveChatId"
+  | "deleteChat"
+  | "renameChat"
 > & {
   setActiveProject?: (id: string) => void;
   deleteProject?: (id: string) => void;
   renameProject?: (id: string, title: string) => void;
+  addChatsToProject?: (id: string) => void;
 };
 
 export type MainSectionRightSideProps = {

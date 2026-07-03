@@ -2,6 +2,8 @@
 
 import { useRef, useEffect, useCallback, useState, useMemo } from "react";
 
+import type { Chat } from "@/types/types";
+
 import LeftSide from "@/components/HomePage/LeftSide/LeftSide";
 import LeftSideDrawer from "@/components/HomePage/LeftSide/LeftSideDrawer/LeftSideDrawer";
 import MessageList from "@/components/HomePage/RightSide/MessageList/MessageList";
@@ -35,6 +37,7 @@ import {
   selectTemplateTick,
 } from "@/redux/chat/selectors";
 import {
+  addConversation,
   appendAssistantChunk,
   appendUserMessage,
   bumpTemplateTick,
@@ -70,6 +73,7 @@ import {
   selectIsModalOpen,
   selectIsCreateProjectModalOpen,
   selectActiveProjectId,
+  selectAddChatsProjectId,
   selectIsOverlayOpen,
   selectIsSectionVisible,
   selectNewChatOpened,
@@ -80,12 +84,20 @@ import {
   setIsModalOpen,
   setIsCreateProjectModalOpen,
   setActiveProjectId,
+  setAddChatsProjectId,
   setIsOverlayOpen,
   setIsSectionVisible,
   setNewChatOpened,
 } from "@/redux/ui/slice";
 import { selectProjectList } from "@/redux/projects/selectors";
-import { addProject } from "@/redux/projects/slice";
+import {
+  createProject,
+  fetchProjects,
+  fetchProject,
+  addProjectConversations,
+  removeProjectConversation,
+} from "@/redux/projects/operations";
+import AddChatsModalOverlay from "@/components/HomePage/LeftSide/AddChatsModalWindow/AddChatsModalOverlay";
 import { refreshError } from "@/redux/auth/slice";
 import { setBalance } from "@/redux/tokens/slice";
 import { isAuthExpiredError } from "@/lib/authError";
@@ -115,8 +127,25 @@ export default function Home() {
     selectIsCreateProjectModalOpen,
   );
   const activeProjectId = useAppSelector(selectActiveProjectId);
+  const addChatsProjectId = useAppSelector(selectAddChatsProjectId);
   const projectList = useAppSelector(selectProjectList);
   const activeProject = projectList.find((p) => p.id === activeProjectId);
+  const addChatsProject = projectList.find((p) => p.id === addChatsProjectId);
+
+  const projectChats = useMemo(
+    () =>
+      (activeProject?.conversationIds ?? [])
+        .map((id) => chatList.find((c) => c.id === id))
+        .filter((c): c is Chat => c !== undefined),
+    [activeProject?.conversationIds, chatList],
+  );
+
+  const availableChatsForProject = useMemo(() => {
+    const inProject = new Set(addChatsProject?.conversationIds ?? []);
+    return chatList.filter(
+      (c) => !isDraftId(c.id) && c.title !== null && !inProject.has(c.id),
+    );
+  }, [chatList, addChatsProject?.conversationIds]);
   const isOverlayOpen = useAppSelector(selectIsOverlayOpen);
   const hasFirstRequest = useAppSelector(selectHasFirstRequest);
   const newChatOpened = useAppSelector(selectNewChatOpened);
@@ -248,6 +277,56 @@ export default function Home() {
     [dispatch, selectedModel, activeChat],
   );
 
+  const deliverMessage = useCallback(
+    async (
+      convId: string,
+      userText: string,
+      imageUrls: string[],
+      imageFiles: File[],
+    ) => {
+      dispatch(
+        appendUserMessage({
+          chatId: convId,
+          content: userText,
+          images: imageUrls,
+        }),
+      );
+      dispatch(setInputSent(true));
+      dispatch(setHasInput(false));
+      dispatch(setIsTyping(true));
+      if (inputRef.current) inputRef.current.value = "";
+      setInputCharCount(0);
+      setInputImageCount(0);
+
+      dispatch(
+        startAssistantMessage({ chatId: convId, modelId: selectedModel }),
+      );
+      pendingConvIdRef.current = convId;
+
+      try {
+        const uploadedFiles = await Promise.all(
+          imageFiles.map((file) => api.uploadImage(file).then((r) => r.file)),
+        );
+
+        socket?.emit("chat:send", {
+          event: "chat:send",
+          type: "send-request",
+          payload: {
+            message: userText,
+            conversationId: convId,
+            modelId: selectedModel,
+            ...(uploadedFiles.length > 0 && { files: uploadedFiles }),
+          },
+        });
+      } catch {
+        dispatch(finishAssistantMessage({ chatId: convId }));
+        dispatch(setIsTyping(false));
+        pendingConvIdRef.current = null;
+      }
+    },
+    [dispatch, selectedModel, socket],
+  );
+
   const handleSendClick = useCallback(
     async (
       _hasFirstRequest: boolean,
@@ -281,47 +360,48 @@ export default function Home() {
         }
       }
 
+      await deliverMessage(convId, userText, imageUrls, imageFiles);
+    },
+    [dispatch, activeChatId, selectedModel, deliverMessage],
+  );
+
+  const handleProjectSend = useCallback(
+    async (imageUrls: string[] = [], imageFiles: File[] = []) => {
+      if (!inputRef.current || !activeProjectId) return;
+      const userText = inputRef.current.value.trim();
+      if (!userText && imageUrls.length === 0) return;
+
+      const projectId = activeProjectId;
+      let conv;
+      try {
+        conv = await dispatch(
+          createConversation({
+            modelId: selectedModel,
+            title: userText.slice(0, 60) || undefined,
+          }),
+        ).unwrap();
+      } catch {
+        return;
+      }
+
       dispatch(
-        appendUserMessage({
-          chatId: convId,
-          content: userText,
-          images: imageUrls,
+        addConversation({
+          id: conv._id,
+          title: conv.title ?? (userText || null),
+          modelId: conv.modelId ?? selectedModel,
         }),
       );
-      dispatch(setInputSent(true));
-      dispatch(setHasInput(false));
-      dispatch(setIsTyping(true));
-      inputRef.current.value = "";
-      setInputCharCount(0);
-      setInputImageCount(0);
-
       dispatch(
-        startAssistantMessage({ chatId: convId, modelId: selectedModel }),
+        addProjectConversations({
+          projectId,
+          conversationIds: [conv._id],
+        }),
       );
-      pendingConvIdRef.current = convId;
+      dispatch(setActiveProjectId(null));
 
-      try {
-        const uploadedFiles = await Promise.all(
-          imageFiles.map((file) => api.uploadImage(file).then((r) => r.file)),
-        );
-
-        socket?.emit("chat:send", {
-          event: "chat:send",
-          type: "send-request",
-          payload: {
-            message: userText,
-            conversationId: convId,
-            modelId: selectedModel,
-            ...(uploadedFiles.length > 0 && { files: uploadedFiles }),
-          },
-        });
-      } catch {
-        dispatch(finishAssistantMessage({ chatId: convId }));
-        dispatch(setIsTyping(false));
-        pendingConvIdRef.current = null;
-      }
+      await deliverMessage(conv._id, userText, imageUrls, imageFiles);
     },
-    [dispatch, activeChatId, selectedModel, socket],
+    [dispatch, activeProjectId, selectedModel, deliverMessage],
   );
 
   const handleSelectChat = useCallback(
@@ -356,8 +436,34 @@ export default function Home() {
   );
 
   useEffect(() => {
-    if (isLoggedIn && accessToken) dispatch(fetchConversations());
+    if (isLoggedIn && accessToken) {
+      dispatch(fetchConversations());
+      dispatch(fetchProjects());
+    }
   }, [isLoggedIn, accessToken, dispatch]);
+
+  useEffect(() => {
+    if (isLoggedIn && activeProjectId) dispatch(fetchProject(activeProjectId));
+  }, [isLoggedIn, activeProjectId, dispatch]);
+
+  useEffect(() => {
+    if (isLoggedIn && addChatsProjectId) {
+      dispatch(fetchProject(addChatsProjectId));
+    }
+  }, [isLoggedIn, addChatsProjectId, dispatch]);
+
+  const handleRemoveChatFromProject = useCallback(
+    (conversationId: string) => {
+      if (!activeProjectId) return;
+      dispatch(
+        removeProjectConversation({
+          projectId: activeProjectId,
+          conversationId,
+        }),
+      );
+    },
+    [dispatch, activeProjectId],
+  );
 
   useEffect(() => {
     if (restoredActiveChatRef.current) return;
@@ -487,11 +593,36 @@ export default function Home() {
       <CreateProjectModalOverlay
         isOpen={isCreateProjectModalOpen}
         setIsOpen={(open) => dispatch(setIsCreateProjectModalOpen(open))}
-        onCreate={(name) => {
-          const id = crypto.randomUUID();
-          dispatch(addProject({ id, title: name }));
-          dispatch(setActiveProjectId(id));
+        onCreate={async (name) => {
           dispatch(setIsCreateProjectModalOpen(false));
+          try {
+            const created = await dispatch(
+              createProject({ title: name, defaultModel: selectedModel }),
+            ).unwrap();
+            dispatch(setActiveProjectId(created.id));
+          } catch {
+            // creation failed → the modal is already closed, error is in the store
+          }
+        }}
+      />
+
+      <AddChatsModalOverlay
+        isOpen={addChatsProjectId !== null}
+        setIsOpen={(open) => {
+          if (!open) dispatch(setAddChatsProjectId(null));
+        }}
+        projectName={addChatsProject?.title ?? "this project"}
+        chats={availableChatsForProject}
+        onConfirm={(ids) => {
+          if (addChatsProjectId && ids.length > 0) {
+            dispatch(
+              addProjectConversations({
+                projectId: addChatsProjectId,
+                conversationIds: ids,
+              }),
+            );
+          }
+          dispatch(setAddChatsProjectId(null));
         }}
       />
 
@@ -550,12 +681,15 @@ export default function Home() {
               <div className={styles.projectWorkspaceScroll}>
                 <ProjectWorkspace
                   name={activeProject.title}
+                  chats={projectChats}
+                  onOpenChat={handleSelectChat}
+                  onRemoveChat={handleRemoveChatFromProject}
                   onCreateFirstChat={() => inputRef.current?.focus()}
                   inputProps={{
                     hasInput,
                     onChange: handleChange,
                     onSend: (_message, imageUrls, imageFiles) =>
-                      handleSendClick(hasFirstRequest, imageUrls, imageFiles),
+                      handleProjectSend(imageUrls, imageFiles),
                     inputRef,
                     onHideSection: () => {},
                     templateTick,

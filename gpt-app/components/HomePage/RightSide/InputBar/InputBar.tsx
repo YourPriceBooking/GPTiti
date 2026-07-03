@@ -460,6 +460,7 @@ export default function InputBar({
                 </svg>
               </button>
               <button
+                className={styles.removeImageBtn}
                 type="button"
                 aria-label="Remove image"
                 onClick={() => removeImage(img.id)}

@@ -104,3 +104,45 @@ export interface PricePackage {
 export interface CheckoutResponse {
   checkoutUrl: string;
 }
+
+export interface ApiProject {
+  _id: string;
+  user: string;
+  title: string;
+  description?: string;
+  icon?: string;
+  color?: string;
+  defaultModel?: string;
+  systemPrompt?: string;
+  archived: boolean;
+  deleted: string | null;
+  lastActivityAt: string;
+  createdAt: string;
+  updatedAt: string;
+  conversationCount?: number;
+  conversations?: string[];
+}
+
+export interface CreateProjectPayload {
+  title: string;
+  description?: string;
+  icon?: string;
+  color?: string;
+  defaultModel?: string;
+  systemPrompt?: string;
+}
+
+export type UpdateProjectPayload = Partial<CreateProjectPayload> & {
+  archived?: boolean;
+};
+
+export interface AddProjectConversationsResponse {
+  success: boolean;
+  modified: number;
+}
+
+export interface RemoveProjectConversationResponse {
+  success: boolean;
+  message: string;
+  conversationId: string;
+}
