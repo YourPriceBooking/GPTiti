@@ -1,5 +1,5 @@
 import { createSlice, isAnyOf, type PayloadAction } from "@reduxjs/toolkit";
-import type { Project } from "@/types/types";
+import type { Project, ProjectConversation } from "@/types/types";
 import {
   fetchProjects,
   createProject,
@@ -79,9 +79,12 @@ const projectsSlice = createSlice({
       .addCase(addProjectConversations.fulfilled, (state, { payload }) => {
         const project = state.list.find((p) => p.id === payload.projectId);
         if (!project) return;
-        const ids = new Set(project.conversationIds ?? []);
-        payload.conversationIds.forEach((id) => ids.add(id));
-        project.conversationIds = [...ids];
+        const existing = project.conversationIds ?? [];
+        const existingIds = new Set(existing.map((c) => c._id));
+        const added: ProjectConversation[] = payload.conversationIds
+          .filter((id) => !existingIds.has(id))
+          .map((id) => ({ _id: id, title: null }));
+        project.conversationIds = [...existing, ...added];
         project.conversationCount = project.conversationIds.length;
       })
       .addCase(addProjectConversations.rejected, (state, { payload }) => {
@@ -91,7 +94,7 @@ const projectsSlice = createSlice({
         const project = state.list.find((p) => p.id === payload.projectId);
         if (!project) return;
         project.conversationIds = (project.conversationIds ?? []).filter(
-          (id) => id !== payload.conversationId,
+          (c) => c._id !== payload.conversationId,
         );
         project.conversationCount = project.conversationIds.length;
       })
