@@ -120,7 +120,7 @@ export interface ApiProject {
   createdAt: string;
   updatedAt: string;
   conversationCount?: number;
-  conversations?: string[];
+  conversations?: any[];
 }
 
 export interface CreateProjectPayload {

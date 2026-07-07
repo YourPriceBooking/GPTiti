@@ -132,16 +132,36 @@ export default function Home() {
   const activeProject = projectList.find((p) => p.id === activeProjectId);
   const addChatsProject = projectList.find((p) => p.id === addChatsProjectId);
 
-  const projectChats = useMemo(
+  console.log("projectList", projectList);
+  console.log("activeProject", activeProject);
+
+  console.log("chatList", chatList);
+  console.log("activeProject?.conversationIds", activeProject?.conversationIds);
+
+  const projectChats = useMemo<Chat[]>(
     () =>
-      (activeProject?.conversationIds ?? [])
-        .map((id) => chatList.find((c) => c.id === id))
-        .filter((c): c is Chat => c !== undefined),
+      (activeProject?.conversationIds ?? []).map((conv) => {
+        // Core data (title/model/updated) comes from the populated project
+        // conversation, which is always complete; messages (for the preview)
+        // are layered in from chatList once they have been loaded.
+        const loaded = chatList.find((c) => c.id === conv._id);
+        return {
+          id: conv._id,
+          title: conv.title ?? loaded?.title ?? null,
+          modelId: conv.modelId ?? loaded?.modelId,
+          lastMessageAt: conv.lastMessageAt ?? loaded?.lastMessageAt,
+          messages: loaded?.messages ?? [],
+          messagesLoaded: loaded?.messagesLoaded,
+        };
+      }),
     [activeProject?.conversationIds, chatList],
   );
 
+  console.log("projectChats", projectChats);
   const availableChatsForProject = useMemo(() => {
-    const inProject = new Set(addChatsProject?.conversationIds ?? []);
+    const inProject = new Set(
+      (addChatsProject?.conversationIds ?? []).map((c) => c._id),
+    );
     return chatList.filter(
       (c) => !isDraftId(c.id) && c.title !== null && !inProject.has(c.id),
     );
@@ -445,6 +465,24 @@ export default function Home() {
   useEffect(() => {
     if (isLoggedIn && activeProjectId) dispatch(fetchProject(activeProjectId));
   }, [isLoggedIn, activeProjectId, dispatch]);
+
+  // Preload messages for the open project's chats so each card can show its
+  // last reply preview without the user having to open the chat first.
+  const prefetchedMessagesRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    if (!isLoggedIn || !activeProjectId) return;
+    projectChats.forEach((chat) => {
+      if (
+        chat.messagesLoaded ||
+        isDraftId(chat.id) ||
+        prefetchedMessagesRef.current.has(chat.id)
+      ) {
+        return;
+      }
+      prefetchedMessagesRef.current.add(chat.id);
+      dispatch(fetchConversationMessages(chat.id));
+    });
+  }, [isLoggedIn, activeProjectId, projectChats, dispatch]);
 
   useEffect(() => {
     if (isLoggedIn && addChatsProjectId) {

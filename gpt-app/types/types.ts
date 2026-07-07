@@ -25,6 +25,19 @@ export type Chat = {
   lastMessageAt?: string;
 };
 
+export type ProjectConversation = {
+  _id: string;
+  user?: string;
+  title: string | null;
+  modelId?: string;
+  summary?: string;
+  archived?: boolean;
+  project?: string;
+  lastMessageAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
 export type Project = {
   id: string;
   title: string;
@@ -35,7 +48,7 @@ export type Project = {
   systemPrompt?: string;
   archived?: boolean;
   conversationCount?: number;
-  conversationIds?: string[];
+  conversationIds?: ProjectConversation[];
   lastActivityAt?: string;
 };
 

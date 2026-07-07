@@ -267,7 +267,11 @@ export default function SectionGptChats({
           }`}
         >
           <ul className={styles.chatsList}>
-            {visibleChats.map((chat) => (
+            {visibleChats.map((chat) => {
+              const project = projectList.find((p) =>
+                p.conversationIds?.some((c) => c._id === chat.id),
+              );
+              return (
               <li
                 key={chat.id}
                 className={`${styles.chatsListItem} ${
@@ -276,6 +280,7 @@ export default function SectionGptChats({
                 tabIndex={0}
                 onClick={() => setActiveChatId(chat.id)}
               >
+                <div className={styles.chatMain}>
                 <span
                   ref={(el) => {
                     if (el) titleRefs.current[chat.id] = el;
@@ -296,6 +301,37 @@ export default function SectionGptChats({
                     ? chat.title.slice(0, 18) + "..."
                     : chat.title}
                 </span>
+
+                {project && (
+                  <button
+                    type="button"
+                    className={styles.chatProjectRow}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveProject?.(project.id);
+                    }}
+                  >
+                    <svg
+                      className={styles.chatProjectIcon}
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M7 17 17 7" />
+                      <path d="M8 7h9v9" />
+                    </svg>
+                    <span className={styles.chatProjectName}>
+                      {project.title}
+                    </span>
+                  </button>
+                )}
+                </div>
 
                 <div className={styles.chatRight}>
                   {pinnedChatIds.includes(chat.id) && (
@@ -333,7 +369,8 @@ export default function SectionGptChats({
                   )}
                 </div>
               </li>
-            ))}
+              );
+            })}
           </ul>
         </div>
       )}
