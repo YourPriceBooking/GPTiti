@@ -419,7 +419,10 @@ export default function Home() {
           projectId,
           conversationIds: [conv._id],
         }),
-      );
+      )
+        .unwrap()
+        .then(() => dispatch(fetchConversations()))
+        .catch(() => {});
       dispatch(setActiveProjectId(null));
 
       await deliverMessage(conv._id, userText, imageUrls, imageFiles);
@@ -501,7 +504,10 @@ export default function Home() {
           projectId: activeProjectId,
           conversationId,
         }),
-      );
+      )
+        .unwrap()
+        .then(() => dispatch(fetchConversations()))
+        .catch(() => {});
     },
     [dispatch, activeProjectId],
   );
@@ -661,7 +667,10 @@ export default function Home() {
                 projectId: addChatsProjectId,
                 conversationIds: ids,
               }),
-            );
+            )
+              .unwrap()
+              .then(() => dispatch(fetchConversations()))
+              .catch(() => {});
           }
           dispatch(setAddChatsProjectId(null));
         }}

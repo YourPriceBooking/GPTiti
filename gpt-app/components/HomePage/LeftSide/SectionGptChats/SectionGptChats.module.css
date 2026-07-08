@@ -44,11 +44,7 @@
 .gptNewProject:focus,
 .yourChats:hover,
 .yourChats:focus-visible {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.14) 0%,
-    rgba(255, 255, 255, 0.08) 100%
-  );
+  background: #121525;
   cursor: pointer;
 }
 
@@ -109,11 +105,7 @@
 }
 
 .badge {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.14) 0%,
-    rgba(255, 255, 255, 0.08) 100%
-  );
+  background: #121525;
   color: var(--main-white);
   font-family: var(--font-family);
   font-size: 12px;
@@ -199,11 +191,7 @@
   max-width: 288px;
   margin-top: 6px;
   padding: 10px 16px;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.14) 0%,
-    rgba(255, 255, 255, 0.08) 100%
-  );
+  background: #121525;
   border: none;
   border-radius: 11px;
   cursor: pointer;
@@ -298,29 +286,17 @@
 }
 
 .chatsListItem:hover {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.14) 0%,
-    rgba(255, 255, 255, 0.08) 100%
-  );
+  background: #121525;
   cursor: pointer;
 }
 
 .chatsListItem:focus-visible {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.14) 0%,
-    rgba(255, 255, 255, 0.08) 100%
-  );
+  background: #121525;
   cursor: pointer;
 }
 
 .chatsListItemActive {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.14) 0%,
-    rgba(255, 255, 255, 0.08) 100%
-  );
+  background: #121525;
 }
 
 .chatRight {
@@ -378,8 +354,9 @@
 }
 
 .menuContainer {
+  /* Fixed to the viewport: the menu stays anchored where it was opened,
+     even while the chats/projects list scrolls underneath it. */
   position: fixed;
-  transform: translateY(-50%);
   z-index: 1000;
 }
 .chatTitle {

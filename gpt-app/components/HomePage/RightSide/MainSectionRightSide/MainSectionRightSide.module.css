@@ -1,7 +1,7 @@
 .mainSectionContainer {
   background: linear-gradient(180deg, #fff 0%, #fbfdff 100%);
   border-radius: 17px;
-  max-width: 75vw;
+  max-width: min(100% - 42px, 858px);
   width: 100%;
   min-height: 445px;
   overflow: hidden;
@@ -380,5 +380,11 @@
 @media (max-width: 766px) and (min-width: 320px) {
   .mainSectionContainer {
     position: relative;
+  }
+}
+
+@media (max-width: 767px) {
+  .mainSectionContainer {
+    max-width: min(100% - 66px, 858px);
   }
 }

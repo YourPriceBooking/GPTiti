@@ -16,6 +16,13 @@ export type Message = {
   streaming?: boolean;
 };
 
+export type ChatProject = {
+  id: string;
+  title: string;
+  icon?: string;
+  color?: string;
+};
+
 export type Chat = {
   id: string;
   title: string | null;
@@ -23,6 +30,7 @@ export type Chat = {
   messagesLoaded?: boolean;
   modelId?: string;
   lastMessageAt?: string;
+  project?: ChatProject;
 };
 
 export type ProjectConversation = {
