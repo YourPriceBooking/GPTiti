@@ -48,13 +48,19 @@ const projectsPersistConfig = {
   whitelist: ["list"],
 };
 
+const uiPersistConfig = {
+  key: "ui",
+  storage,
+  whitelist: ["activeProjectId"],
+};
+
 const rootReducer = combineReducers({
   auth: persistReducer(authPersistConfig, authReducer),
   chat: persistReducer(chatPersistConfig, chatReducer),
   model: persistReducer(modelPersistConfig, modelReducer),
   tokens: persistReducer(tokensPersistConfig, tokensReducer),
   projects: persistReducer(projectsPersistConfig, projectsReducer),
-  ui: uiReducer,
+  ui: persistReducer(uiPersistConfig, uiReducer),
 });
 
 export const store = configureStore({

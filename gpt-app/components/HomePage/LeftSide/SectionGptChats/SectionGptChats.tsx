@@ -275,7 +275,9 @@ export default function SectionGptChats({
               <li
                 key={chat.id}
                 className={`${styles.chatsListItem} ${
-                  chat.id === activeChatId ? styles.chatsListItemActive : ""
+                  chat.id === activeChatId && !activeProjectId
+                    ? styles.chatsListItemActive
+                    : ""
                 }`}
                 tabIndex={0}
                 onClick={() => setActiveChatId(chat.id)}
@@ -364,7 +366,7 @@ export default function SectionGptChats({
                       }}
                     />
                   </div>
-                  {chat.id === activeChatId && (
+                  {chat.id === activeChatId && !activeProjectId && (
                     <span className={styles.activeIndicator} />
                   )}
                 </div>

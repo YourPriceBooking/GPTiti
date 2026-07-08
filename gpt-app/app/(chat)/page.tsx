@@ -201,7 +201,10 @@ export default function Home() {
 
   useScrollDirection(scrollContainerRef);
 
-  const isNewChat = !activeChat || activeChat.messages.length === 0;
+  const activeChatLoading =
+    !!activeChat && !isDraftId(activeChat.id) && !activeChat.messagesLoaded;
+  const isNewChat =
+    !activeChatLoading && (!activeChat || activeChat.messages.length === 0);
   const isExistingChat = !!activeChat && !newChatOpened;
 
   const dockHidden = (isSectionVisible && focusMode) || isOverlayOpen;
@@ -720,6 +723,7 @@ export default function Home() {
                 <ProjectWorkspace
                   name={activeProject.title}
                   chats={projectChats}
+                  chatsLoaded={activeProject.conversationIds !== undefined}
                   onOpenChat={handleSelectChat}
                   onRemoveChat={handleRemoveChatFromProject}
                   onCreateFirstChat={() => inputRef.current?.focus()}
@@ -770,7 +774,7 @@ export default function Home() {
                 className={styles.scrollableContent}
                 ref={scrollContainerRef}
               >
-                {!restoringActiveChat && !isOverlayOpen && (
+                {!restoringActiveChat && !isOverlayOpen && isNewChat && (
                   <MainSectionRightSide
                     insertTemplate={insertTemplate}
                     setFocusMode={(updater) => {
@@ -818,7 +822,7 @@ export default function Home() {
                     />
                   )}
 
-                <div ref={messagesEndRef} />
+                <div ref={messagesEndRef} className={styles.scrollAnchor} />
               </div>
 
               {isOverlayOpen && (
