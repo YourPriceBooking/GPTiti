@@ -42,12 +42,20 @@ export interface UploadFileResponse {
   file: UploadedFile;
 }
 
+export interface ConversationProject {
+  _id: string;
+  title: string;
+  icon?: string;
+  color?: string;
+}
+
 export interface Conversation {
   _id: string;
   title: string | null;
   modelId?: string;
   summary?: string;
   archived?: boolean;
+  project?: ConversationProject | null;
   lastMessageAt?: string;
   createdAt: string;
   updatedAt?: string;

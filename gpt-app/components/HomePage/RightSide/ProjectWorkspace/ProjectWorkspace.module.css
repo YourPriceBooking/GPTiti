@@ -113,7 +113,7 @@
   background: rgba(14, 27, 52, 0.5);
 }
 
-.chatCard:active {
+.chatCard:active:not(:has(.cardMenuBtn:active)) {
   transform: translateY(-4px);
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
   z-index: 1;
@@ -121,14 +121,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .chatCard:active {
+  .chatCard:active:not(:has(.cardMenuBtn:active)) {
     transform: none;
   }
-}
-
-.chatCardActive {
-  border-color: rgba(125, 168, 255, 0.5);
-  background: rgba(23, 43, 82, 0.3);
 }
 
 .cardPin {
@@ -227,14 +222,8 @@
     background 0.18s ease;
 }
 
-.chatCard:hover .cardMenuBtn,
-.chatCardActive .cardMenuBtn {
+.chatCard:hover .cardMenuBtn {
   opacity: 1;
-}
-
-.cardMenuBtn:hover {
-  border-color: rgba(59, 130, 246, 0.4);
-  background: rgba(20, 37, 68, 0.9);
 }
 
 .cardMenu {
@@ -242,6 +231,12 @@
   top: 46px;
   right: 12px;
   z-index: 20;
+}
+
+
+.cardMenuUp {
+  top: auto;
+  bottom: calc(100% - 6px);
 }
 
 .divider {

@@ -1,5 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { Chat, Message } from "@/types/types";
+import type { Chat, ChatProject, Message } from "@/types/types";
+import type { ConversationProject } from "@/types/api.types";
 import { isAnyOf } from "@reduxjs/toolkit";
 import {
   fetchConversations,
@@ -19,6 +20,18 @@ interface ChatState {
   status: "idle" | "loading" | "error";
   error: string | null;
 }
+
+const toChatProject = (
+  project?: ConversationProject | null,
+): ChatProject | undefined =>
+  project
+    ? {
+        id: project._id,
+        title: project.title,
+        icon: project.icon,
+        color: project.color,
+      }
+    : undefined;
 
 const randomId = () =>
   typeof crypto !== "undefined" && "randomUUID" in crypto
@@ -234,6 +247,7 @@ const chatSlice = createSlice({
           const existing = existingById.get(c._id);
           if (existing) {
             if (c.lastMessageAt) existing.lastMessageAt = c.lastMessageAt;
+            existing.project = toChatProject(c.project);
             return existing;
           }
           return {
@@ -242,6 +256,7 @@ const chatSlice = createSlice({
             messages: [],
             messagesLoaded: false,
             modelId: c.modelId,
+            project: toChatProject(c.project),
             lastMessageAt: c.lastMessageAt,
           };
         });

@@ -5,13 +5,17 @@ import InputBar from "@/components/HomePage/RightSide/InputBar/InputBar";
 import ChooseModelColumn from "@/components/HomePage/RightSide/ChooseModelColumn/ChooseModelColumn";
 import ChatsMenu from "@/components/HomePage/LeftSide/ChatsMenu/ChatsMenu";
 import DeleteModalWindow from "@/components/HomePage/LeftSide/DeleteModalWindow/DeleteModalWindow";
-import { useAppSelector } from "@/redux/hooks";
-import { selectActiveChatId } from "@/redux/chat/selectors";
 import type { Chat } from "@/types/types";
 
 import styles from "./ProjectWorkspace.module.css";
 
 const PINNED_CHATS_KEY = "pinnedChatIds";
+const MENU_GAP = 6;
+const MENU_HEIGHT = 240;
+
+const shouldOpenUpwards = (trigger: HTMLElement) =>
+  trigger.getBoundingClientRect().bottom + MENU_GAP + MENU_HEIGHT >
+  window.innerHeight;
 
 type ProjectWorkspaceProps = {
   name: string;
@@ -67,9 +71,8 @@ export default function ProjectWorkspace({
   const chatCount = chats.length;
   const hasChats = chatCount > 0;
 
-  const activeChatId = useAppSelector(selectActiveChatId);
-
   const [openMenuChatId, setOpenMenuChatId] = useState<string | null>(null);
+  const [menuUp, setMenuUp] = useState(false);
   const [deletingChatId, setDeletingChatId] = useState<string | null>(null);
   const [pinnedChatIds, setPinnedChatIds] = useState<string[]>(() => {
     return JSON.parse(localStorage.getItem(PINNED_CHATS_KEY) || "[]");
@@ -98,7 +101,11 @@ export default function ProjectWorkspace({
   useEffect(() => {
     if (!openMenuChatId && !deletingChatId) return;
     const handleClickOutside = (e: MouseEvent) => {
-      if (!menuRef.current?.contains(e.target as Node)) {
+      const target = e.target as HTMLElement;
+
+      if (target.closest("[data-menu-trigger]")) return;
+
+      if (!menuRef.current?.contains(target)) {
         setOpenMenuChatId(null);
         setDeletingChatId(null);
       }
@@ -158,15 +165,12 @@ export default function ProjectWorkspace({
           {sortedChats.map((chat) => {
             const preview = getChatPreview(chat);
             const updated = formatRelativeTime(chat.lastMessageAt);
-            const isActive = chat.id === activeChatId;
             const isPinned = pinnedChatIds.includes(chat.id);
 
             return (
               <li
                 key={chat.id}
-                className={`${styles.chatCard} ${
-                  isActive ? styles.chatCardActive : ""
-                }`}
+                className={styles.chatCard}
                 tabIndex={0}
                 onClick={() => onOpenChat?.(chat.id)}
               >
@@ -208,8 +212,11 @@ export default function ProjectWorkspace({
                   aria-label="Chat options"
                   aria-haspopup="menu"
                   aria-expanded={openMenuChatId === chat.id}
+                  data-menu-trigger
                   onClick={(e) => {
                     e.stopPropagation();
+                    setDeletingChatId(null);
+                    setMenuUp(shouldOpenUpwards(e.currentTarget));
                     setOpenMenuChatId((prev) =>
                       prev === chat.id ? null : chat.id,
                     );
@@ -226,7 +233,9 @@ export default function ProjectWorkspace({
                 {openMenuChatId === chat.id && (
                   <div
                     ref={menuRef}
-                    className={styles.cardMenu}
+                    className={`${styles.cardMenu} ${
+                      menuUp ? styles.cardMenuUp : ""
+                    }`}
                     onClick={(e) => e.stopPropagation()}
                   >
                     <ChatsMenu
@@ -249,7 +258,9 @@ export default function ProjectWorkspace({
                 {deletingChatId === chat.id && (
                   <div
                     ref={menuRef}
-                    className={styles.cardMenu}
+                    className={`${styles.cardMenu} ${
+                      menuUp ? styles.cardMenuUp : ""
+                    }`}
                     onClick={(e) => e.stopPropagation()}
                   >
                     <DeleteModalWindow
