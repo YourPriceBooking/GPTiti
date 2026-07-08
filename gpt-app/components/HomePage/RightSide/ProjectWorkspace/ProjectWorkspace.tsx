@@ -20,6 +20,7 @@ type ProjectWorkspaceProps = {
   onChooseModel: () => void;
   showEstimate: boolean;
   chats?: Chat[];
+  chatsLoaded?: boolean;
   onOpenChat?: (id: string) => void;
   onRemoveChat?: (id: string) => void;
 };
@@ -59,6 +60,7 @@ export default function ProjectWorkspace({
   onChooseModel,
   showEstimate,
   chats = [],
+  chatsLoaded = true,
   onOpenChat,
   onRemoveChat,
 }: ProjectWorkspaceProps) {
@@ -263,7 +265,7 @@ export default function ProjectWorkspace({
             );
           })}
         </ul>
-      ) : (
+      ) : chatsLoaded ? (
         <div className={styles.emptyState}>
           <div className={styles.decorPattern} aria-hidden="true">
             <div className={styles.decorDots} />
@@ -291,7 +293,7 @@ export default function ProjectWorkspace({
             </button>
           </div>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

@@ -46,14 +46,26 @@ const projectsSlice = createSlice({
       })
       .addCase(fetchProjects.fulfilled, (state, { payload }) => {
         state.status = "idle";
-        state.list = payload;
+        const prevById = new Map(state.list.map((p) => [p.id, p]));
+        state.list = payload.map((p) => {
+          const prev = prevById.get(p.id);
+          return prev
+            ? {
+                ...p,
+                conversationIds: p.conversationIds ?? prev.conversationIds,
+              }
+            : p;
+        });
       })
       .addCase(fetchProjects.rejected, (state, { payload }) => {
         state.status = "error";
         state.error = payload ?? "Failed to load projects";
       })
       .addCase(createProject.fulfilled, (state, { payload }) => {
-        state.list.unshift(payload);
+        state.list.unshift({
+          ...payload,
+          conversationIds: payload.conversationIds ?? [],
+        });
       })
       .addCase(createProject.rejected, (state, { payload }) => {
         state.error = payload ?? "Failed to create project";

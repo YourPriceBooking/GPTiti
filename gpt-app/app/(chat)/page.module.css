@@ -40,6 +40,9 @@
 
   padding-top: 0;
   padding-bottom: 16px;
+  /* Reserve the scrollbar width on both sides so the content centers on
+     the same axis as the absolutely-positioned input dock. */
+  scrollbar-gutter: stable both-edges;
 }
 
 .projectMenuTrigger {
@@ -60,21 +63,25 @@
 }
 
 .inputWrapper {
-  margin-top: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
+  /* Same column geometry as .inputBottom so the input never changes
+     width or axis between the new-chat and existing-chat states. */
   max-width: 900px;
+  padding: 0 20px;
 }
 
 .inputDock {
-  flex: none;
-  width: 100%;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
   display: flex;
   justify-content: center;
-  padding-bottom: 10px;
   z-index: 20;
+  pointer-events: none;
 }
 
 .inputBottom {
@@ -85,10 +92,26 @@
 
 .inputBottomInner {
   width: 100%;
+  pointer-events: auto;
+  padding-top: 8px;
+}
+
+.inputBottomInner > :first-child {
+  position: relative;
+  z-index: 1;
+}
+
+.scrollAnchor {
+  flex: none;
+  height: 160px;
 }
 
 .spanContainer {
-  margin-top: 5px;
+  position: relative;
+  margin-top: -28px;
+  padding-top: 33px;
+  padding-bottom: 10px;
+  background: var(--chat-bg);
   text-align: center;
 }
 
@@ -184,6 +207,25 @@
   }
   .overlayContentInner {
     min-width: 400px;
+  }
+
+  .spanContainer {
+    margin-left: 12px;
+    margin-right: 12px;
+  }
+
+  .spanContainerFirstRequestTop {
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .inputSpan1 {
+    margin-left: 0;
+    justify-content: center;
+  }
+
+  .scrollAnchor {
+    height: 240px;
   }
 }
 
