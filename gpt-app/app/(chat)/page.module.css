@@ -119,7 +119,6 @@
   font-family: var(--font-family);
   font-weight: 300;
   font-size: 12px;
-  margin-top: 10px;
   color: var(--main-white);
 }
 
@@ -130,6 +129,7 @@
 
 .spanContainerFirstRequestTop {
   display: flex;
+  align-items: center;
   justify-content: space-between;
 }
 
@@ -140,10 +140,20 @@
   font-weight: 400;
   font-size: 13px;
   color: var(--muted);
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 0.25s ease,
+    visibility 0s;
 }
 
 .estimateHidden {
+  opacity: 0;
   visibility: hidden;
+  /* Fade out first, then flip to hidden once the fade has finished. */
+  transition:
+    opacity 0.25s ease,
+    visibility 0s 0.25s;
 }
 
 .overlay {
@@ -214,11 +224,6 @@
     margin-right: 12px;
   }
 
-  .spanContainerFirstRequestTop {
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-  }
   .inputSpan1 {
     margin-left: 0;
     justify-content: center;
@@ -232,5 +237,14 @@
 @media (max-width: 500px) {
   .overlayContentInner {
     min-width: 300px;
+  }
+}
+
+@media (max-width: 890px) {
+  .spanContainerFirstRequestTop {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
   }
 }
