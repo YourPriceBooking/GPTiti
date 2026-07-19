@@ -19,6 +19,7 @@ const shouldOpenUpwards = (trigger: HTMLElement) =>
 
 type ProjectWorkspaceProps = {
   name: string;
+  createdAt?: string;
   onCreateFirstChat: () => void;
   inputProps: React.ComponentProps<typeof InputBar>;
   onChooseModel: () => void;
@@ -50,6 +51,17 @@ function formatRelativeTime(iso?: string): string | null {
   return `${Math.floor(day / 365)}y ago`;
 }
 
+function formatCreatedDate(iso?: string): string | null {
+  if (!iso) return null;
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return null;
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
 function getChatPreview(chat: Chat): string | null {
   const lastAssistant = [...chat.messages]
     .reverse()
@@ -59,6 +71,7 @@ function getChatPreview(chat: Chat): string | null {
 
 export default function ProjectWorkspace({
   name,
+  createdAt,
   onCreateFirstChat,
   inputProps,
   onChooseModel,
@@ -126,7 +139,14 @@ export default function ProjectWorkspace({
           />
         </div>
         <div className={styles.headerText}>
-          <h1 className={styles.title}>{name}</h1>
+          <div className={styles.titleRow}>
+            <h1 className={styles.title}>{name}</h1>
+            {formatCreatedDate(createdAt) && (
+              <span className={styles.createdDate}>
+                Created · {formatCreatedDate(createdAt)}
+              </span>
+            )}
+          </div>
           <p className={styles.subtitle}>Project workspace</p>
           <p className={styles.description}>
             Organize chats, links, images, edited images and uploaded files in
@@ -165,6 +185,7 @@ export default function ProjectWorkspace({
           {sortedChats.map((chat) => {
             const preview = getChatPreview(chat);
             const updated = formatRelativeTime(chat.lastMessageAt);
+            const created = formatCreatedDate(chat.createdAt);
             const isPinned = pinnedChatIds.includes(chat.id);
 
             return (
@@ -197,8 +218,17 @@ export default function ProjectWorkspace({
                   <span className={styles.cardTitle}>
                     {chat.title || "Untitled chat"}
                   </span>
-                  {chat.modelId && (
-                    <span className={styles.cardBadge}>{chat.modelId}</span>
+                  {(chat.modelId || created) && (
+                    <span className={styles.cardMetaRow}>
+                      {chat.modelId && (
+                        <span className={styles.cardBadge}>{chat.modelId}</span>
+                      )}
+                      {created && (
+                        <span className={styles.cardCreated}>
+                          Created · {created}
+                        </span>
+                      )}
+                    </span>
                   )}
                   {preview && <p className={styles.cardPreview}>{preview}</p>}
                   {updated && (

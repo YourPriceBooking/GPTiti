@@ -30,6 +30,7 @@ export type Chat = {
   messagesLoaded?: boolean;
   modelId?: string;
   lastMessageAt?: string;
+  createdAt?: string;
   project?: ChatProject;
 };
 
@@ -58,6 +59,7 @@ export type Project = {
   conversationCount?: number;
   conversationIds?: ProjectConversation[];
   lastActivityAt?: string;
+  createdAt?: string;
 };
 
 export type ModelType =

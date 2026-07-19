@@ -62,6 +62,82 @@
   margin: 0;
 }
 
+/* Copy button under the user message bubble */
+.copyBtn {
+  align-self: flex-end;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #dce6f8;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease,
+    background 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease;
+}
+
+.copyBtnVisible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.copyBtn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.copyBtn:active {
+  color: #ffffff;
+  background: rgba(79, 124, 255, 0.18);
+  border-color: rgba(79, 124, 255, 0.32);
+}
+
+.copyBtnCopied,
+.copyBtnCopied:hover,
+.copyBtnCopied:active {
+  color: #8ef0b5;
+  background: rgba(46, 204, 113, 0.14);
+  border-color: rgba(46, 204, 113, 0.28);
+}
+
+.copyIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 13px;
+  height: 13px;
+}
+
+.copyLabel {
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 10px;
+  line-height: 1;
+  color: #8ef0b5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .copyBtn {
+    transform: none;
+    transition: opacity 0.18s ease;
+  }
+
+  .copyBtnVisible {
+    transform: none;
+  }
+}
+
 .aiMessage {
   display: flex;
   flex-direction: column;

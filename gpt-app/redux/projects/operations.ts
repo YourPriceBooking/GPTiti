@@ -24,6 +24,7 @@ const normalizeProject = (p: ApiProject): Project => ({
   conversationCount: p.conversationCount,
   conversationIds: p.conversations,
   lastActivityAt: p.lastActivityAt,
+  createdAt: p.createdAt,
 });
 
 /** Load the user's project list for the sidebar. */
