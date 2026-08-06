@@ -55,7 +55,7 @@ export default function ChatsMenu({
         <>
           <button
             className={styles.button}
-            // onClick={onAddChats}
+            onClick={onAddChats}
           >
             <span className={styles.iconWrap}>
               <Image

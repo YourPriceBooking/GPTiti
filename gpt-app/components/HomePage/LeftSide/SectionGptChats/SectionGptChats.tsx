@@ -1,6 +1,9 @@
+"use client";
+
 import { useState, useRef, useEffect, type CSSProperties } from "react";
 import styles from "./SectionGptChats.module.css";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { SectionGptChatsProps, Chat, Project } from "@/types/types";
 import ChatsMenu from "../ChatsMenu/ChatsMenu";
 import DeleteModalWindow from "../DeleteModalWindow/DeleteModalWindow";
@@ -54,6 +57,7 @@ export default function SectionGptChats({
   deleteChat,
   renameChat,
 }: SectionGptChatsProps) {
+  const router = useRouter();
   const [showAllProjects, setShowAllProjects] = useState(false);
   const projectsCount = projectList.length;
   const hasProjects = projectsCount > 0;
@@ -298,10 +302,9 @@ export default function SectionGptChats({
             {hasChats && <span className={styles.badge}>{chatsCount}</span>}
           </div>
           {isHeaderInteractive && (
-            <div
-              className={`${styles.chatsChevron} ${headerExpanded ? styles.chatsChevronOpen : ""}`}
-            >
+            <div className={styles.chatsChevron}>
               <Image
+                className={`${styles.chevronIcon} ${headerExpanded ? styles.chevronIconOpen : ""}`}
                 width={15}
                 height={15}
                 src="/icons/chevron-down.svg"
@@ -456,13 +459,16 @@ export default function SectionGptChats({
 
       <article
         className={styles.yourChats}
-        onClick={
-          isProjectsInteractive
-            ? () => setShowAllProjects((prev) => !prev)
-            : undefined
-        }
-        role={isProjectsInteractive ? "button" : undefined}
-        tabIndex={isProjectsInteractive ? 0 : undefined}
+        role="button"
+        tabIndex={0}
+        onClick={() => router.push("/projects")}
+        onKeyDown={(event) => {
+          if ((event.target as HTMLElement).closest("button")) return;
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            router.push("/projects");
+          }
+        }}
       >
         <Image
           width={36}
@@ -481,17 +487,45 @@ export default function SectionGptChats({
               <span className={styles.badge}>{projectsCount}</span>
             )}
           </div>
-          {isProjectsInteractive && (
-            <div
-              className={`${styles.projectsChevron} ${showAllProjects ? styles.projectsChevronOpen : ""}`}
+          <button
+            type="button"
+            className={styles.addProjectBtn}
+            aria-label="Start new project"
+            onClick={(e) => {
+              e.stopPropagation();
+              onNewProject?.();
+              e.currentTarget.blur();
+            }}
+          >
+            <svg
+              width={12}
+              height={12}
+              viewBox="0 0 10 10"
+              fill="none"
+              aria-hidden="true"
             >
-              <Image
-                width={15}
-                height={15}
-                src="/icons/chevron-down.svg"
-                alt="chevron-down"
-              />
-            </div>
+              <use href="/icons/input-sprite.svg#ib-plus-thin" />
+            </svg>
+          </button>
+          {isProjectsInteractive && (
+              <button
+                type="button"
+                className={styles.projectsChevron}
+                aria-label={showAllProjects ? "Collapse projects" : "Expand projects"}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowAllProjects((prev) => !prev);
+                  e.currentTarget.blur();
+                }}
+              >
+                <Image
+                  className={`${styles.chevronIcon} ${showAllProjects ? styles.chevronIconOpen : ""}`}
+                  width={15}
+                  height={15}
+                  src="/icons/chevron-down.svg"
+                  alt="chevron-down"
+                />
+              </button>
           )}
         </div>
       </article>

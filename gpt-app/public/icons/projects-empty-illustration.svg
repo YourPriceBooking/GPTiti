@@ -1,0 +1,19 @@
+<svg width="319" height="290" viewBox="0 0 319 290" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0.8" y="0.8" width="316.8" height="288" rx="38.4" fill="url(#panel)" stroke="#16365E" stroke-width="1.6"/>
+  <rect x="93.6" y="64.8" width="131.2" height="131.2" rx="38.4" fill="url(#folder-panel)" stroke="#2D66B9" stroke-width="1.6"/>
+  <path d="M122.4 112.8H148L160.8 125.6H196V154.4H122.4V112.8Z" stroke="#8CB5FF" stroke-width="5.12" stroke-linejoin="round"/>
+  <path opacity=".95" d="M263.2 58.4L269.6 71.2L282.4 77.6L269.6 84L263.2 96.8L256.8 84L244 77.6L256.8 71.2L263.2 58.4Z" fill="#2F6BFF"/>
+  <path opacity=".85" d="M39.2 228L44 237.6L53.6 242.4L44 247.2L39.2 256.8L34.4 247.2L24.8 242.4L34.4 237.6L39.2 228Z" fill="#6FA2FF"/>
+  <circle cx="272.8" cy="218.4" r="25.6" fill="#0D2346" stroke="#2F6BFF" stroke-width="1.6"/>
+  <path d="M272.8 205.6V231.2M260 218.4H285.6" stroke="#6FA2FF" stroke-width="3.52" stroke-linecap="round"/>
+  <defs>
+    <linearGradient id="panel" x1=".8" y1=".8" x2="287.5" y2="316.2" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0C1C34"/>
+      <stop offset="1" stop-color="#081426"/>
+    </linearGradient>
+    <linearGradient id="folder-panel" x1="93.6" y1="64.8" x2="224.8" y2="196" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#12386F"/>
+      <stop offset="1" stop-color="#0A1F43"/>
+    </linearGradient>
+  </defs>
+</svg>

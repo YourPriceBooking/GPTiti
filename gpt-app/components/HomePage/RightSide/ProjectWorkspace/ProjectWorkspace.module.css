@@ -51,7 +51,6 @@
 
 .createdDate {
   font-family: var(--font-family);
-  font-weight: 700;
   font-size: 14px;
   color: #f7faff;
   white-space: nowrap;
@@ -208,7 +207,6 @@
 
 .cardCreated {
   font-family: var(--font-family);
-  font-weight: 700;
   font-size: 12px;
   color: #94bcff;
   white-space: nowrap;
@@ -228,7 +226,6 @@
 
 .cardMeta {
   font-family: var(--font-family);
-  font-weight: 700;
   font-size: 12px;
   color: #8fa2c5;
 }
