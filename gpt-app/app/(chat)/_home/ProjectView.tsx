@@ -69,6 +69,7 @@ export default function ProjectView({ ctrl }: { ctrl: HomeController }) {
             hasFirstRequest: ctrl.hasFirstRequest,
             selectedModel: ctrl.selectedModel,
             onImagesChange: ctrl.setInputImageCount,
+            isAiResponding: ctrl.isTyping,
           }}
           onChooseModel={() => dispatch(setIsModalOpen(true))}
           showEstimate={ctrl.showEstimate}

@@ -115,27 +115,84 @@
   min-width: 24px;
   text-align: center;
   line-height: 1.4;
+  transition: background 0.2s ease;
+}
+
+.badge:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.addProjectBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  margin: -10px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--main-white);
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.2s ease, background 0.2s ease;
+}
+
+.addProjectBtn:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.addProjectBtn:focus-visible {
+  opacity: 1;
 }
 
 .projectsChevron {
   display: flex;
   align-items: center;
-  transition: transform 0.2s ease;
+  justify-content: center;
+  padding: 10px;
+  margin: -10px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.2s ease, background 0.2s ease;
 }
 
-.projectsChevronOpen {
-  transform: rotate(180deg);
+.projectsChevron:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.projectsChevron:focus-visible {
+  opacity: 1;
 }
 
 .chatsChevron {
   display: flex;
   align-items: center;
+  justify-content: center;
+  padding: 10px;
+  margin: -10px;
+  border-radius: 8px;
+  opacity: 0.5;
+  transition: opacity 0.2s ease, background 0.2s ease;
+}
+
+.chatsChevron:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.chevronIcon {
   transition: transform 0.2s ease;
 }
 
-.chatsChevronOpen {
+.chevronIconOpen {
   transform: rotate(180deg);
 }
+
 .chatsList {
   display: flex;
   flex-direction: column;
@@ -208,8 +265,8 @@
   gap: 6px;
 }
 .showMoreDot {
-  width: 6px;
-  height: 6px;
+  width: 4px;
+  height: 4px;
   border-radius: 50%;
   background: var(--main-gray2);
 }

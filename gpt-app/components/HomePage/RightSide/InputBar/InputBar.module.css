@@ -31,6 +31,8 @@
 
 .inputContainer.project .input::placeholder {
   color: #8a9ac0;
+  font-size: 18px;
+  font-weight: 400;
 }
 
 .imagePreviewRow {
@@ -308,11 +310,12 @@
   top: 58px;
 }
 
-.disabledHover:hover::after,
-.disabledHover:focus::before,
-.disabledHover:active::before {
-  opacity: 0 !important;
-  visibility: hidden !important;
+.iconWrapper2.sendTooltip::after {
+  content: "Send message";
+}
+
+.iconWrapper2.stopTooltip::after {
+  content: "Stop answering";
 }
 
 /* "Coming soon" model — dims the composer and blocks input/sending */

@@ -19,7 +19,15 @@ import {
 
 import type { HomeController } from "./useHomeController";
 
-export default function HomeModals({ ctrl }: { ctrl: HomeController }) {
+type HomeModalsProps = {
+  ctrl: HomeController;
+  onProjectCreated?: (projectId: string) => void;
+};
+
+export default function HomeModals({
+  ctrl,
+  onProjectCreated,
+}: HomeModalsProps) {
   const { dispatch } = ctrl;
 
   return (
@@ -43,6 +51,7 @@ export default function HomeModals({ ctrl }: { ctrl: HomeController }) {
               createProject({ title: name, defaultModel: ctrl.selectedModel }),
             ).unwrap();
             dispatch(setActiveProjectId(created.id));
+            onProjectCreated?.(created.id);
           } catch {
             // creation failed → the modal is already closed, error is in the store
           }

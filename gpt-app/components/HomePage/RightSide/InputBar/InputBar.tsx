@@ -42,6 +42,7 @@ export default function InputBar({
   onImagesChange,
   placeholder = "Ask anything...",
   variant = "default",
+  isAiResponding = false,
 }: {
   hasInput: boolean;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
@@ -55,6 +56,7 @@ export default function InputBar({
   onImagesChange?: (count: number) => void;
   placeholder?: string;
   variant?: "default" | "project";
+  isAiResponding?: boolean;
 }) {
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
 
@@ -556,9 +558,26 @@ export default function InputBar({
             </svg>
           </div>
 
-          {hasInput || images.length > 0 || files.length > 0 ? (
+          {isAiResponding ? (
             <div
-              className={`${styles.iconWrapper2} ${styles.disabledHover}`}
+              className={`${styles.iconWrapper2} ${styles.stopTooltip}`}
+              tabIndex={0}
+            >
+              <svg
+                className={styles.sendIcon}
+                width={35}
+                height={35}
+                viewBox="0 0 44 44"
+                role="img"
+                aria-label="generating"
+              >
+                <use href="/icons/input-sprite.svg#ib-stop" />
+              </svg>
+            </div>
+          ) : hasInput || images.length > 0 || files.length > 0 ? (
+            <div
+              className={`${styles.iconWrapper2} ${styles.sendTooltip}`}
+              tabIndex={0}
               onClick={handleSend}
             >
               <svg

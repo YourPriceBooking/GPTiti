@@ -96,7 +96,10 @@ export default function LeftSideDrawer({
                   leftSideProps.setActiveChatId(id);
                   closePanel();
                 }}
-                onSelectProject={closePanel}
+                onSelectProject={() => {
+                  leftSideProps.onSelectProject?.();
+                  closePanel();
+                }}
                 setIsModalOpen={(open) => {
                   if (open) closeThen(() => leftSideProps.setIsModalOpen(true));
                   else leftSideProps.setIsModalOpen(false);

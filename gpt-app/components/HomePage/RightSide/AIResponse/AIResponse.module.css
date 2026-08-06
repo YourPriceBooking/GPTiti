@@ -194,52 +194,94 @@
 /* --- Code blocks (ChatGPT-like) --- */
 
 .aiContent :global(.code-block) {
+  --code-bg: #171c26;
+  --code-header-bg: #202734;
+  --code-border: #303b4d;
+  --code-text: #e8edf5;
+  --code-muted: #98a3b4;
+
+  position: relative;
   margin: 12px 0;
+  width: 100%;
+  overflow: hidden;
+
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
   border-radius: 12px;
-  background: #0d1117;
+
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12);
 }
 
 .aiContent :global(.code-header) {
-  position: sticky;
-  top: 0;
-  z-index: 2;
+  min-height: 40px;
+  padding: 0 12px 0 14px;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 7px 14px;
-  background: #1c2128;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 12px 12px 0 0;
+  gap: 12px;
+
+  background: var(--code-header-bg);
+  border-bottom: 1px solid var(--code-border);
 }
 
 .aiContent :global(.code-lang) {
+  color: var(--code-muted);
+
   font-family: var(--font-family);
   font-size: 12px;
-  color: #8b949e;
+  font-weight: 500;
+  line-height: 1;
+
   text-transform: lowercase;
 }
 
 .aiContent :global(.code-copy-btn) {
-  border: none;
-  background: none;
-  padding: 5px;
-  border-radius: 6px;
-  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
   gap: 5px;
-  transition: background 0.15s ease;
+
+  color: #aab4c3;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+
+  cursor: pointer;
+
+  transition:
+    color 140ms ease,
+    background-color 140ms ease,
+    border-color 140ms ease,
+    transform 100ms ease;
 }
 
 .aiContent :global(.code-copy-btn):hover {
-  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.09);
+}
+
+.aiContent :global(.code-copy-btn):active {
+  color: #7db3ff;
+  background: rgba(37, 99, 235, 0.16);
+  border-color: rgba(79, 124, 255, 0.28);
+
+  transform: scale(0.96);
 }
 
 .aiContent :global(.code-copy-btn.copied),
 .aiContent :global(.code-copy-btn.copied):hover {
-  padding: 5px 9px;
-  background: rgba(63, 185, 80, 0.15);
+  width: auto;
+  padding: 0 9px;
+  color: #8ef0b5;
+  background: rgba(46, 204, 113, 0.12);
+  border-color: rgba(46, 204, 113, 0.24);
 }
 
 .aiContent :global(.code-copy-label) {
@@ -247,7 +289,7 @@
   font-family: var(--font-family);
   font-size: 12px;
   font-weight: 600;
-  color: #3fb950;
+  color: #8ef0b5;
 }
 
 .aiContent :global(.code-copy-btn.copied .code-copy-label) {
@@ -258,32 +300,72 @@
 .aiContent :global(.code-copy-icon) {
   width: 16px;
   height: 16px;
-  background-color: #c9d1d9;
+  background-color: currentColor;
   -webkit-mask: url("/icons/copy.svg") no-repeat center / contain;
   mask: url("/icons/copy.svg") no-repeat center / contain;
 }
 
 .aiContent :global(.code-copy-btn.copied .code-copy-icon) {
-  background-color: #3fb950;
   -webkit-mask-image: url("/icons/copied.svg");
   mask-image: url("/icons/copied.svg");
 }
 
 .aiContent pre {
+  min-width: max-content;
+  width: 100%;
   margin: 0;
-  padding: 14px;
+  padding: 16px 14px 18px;
   overflow-x: auto;
-  border-radius: 0 0 12px 12px;
+  box-sizing: border-box;
+
+  background: transparent;
+  border-radius: 0;
+
+  scrollbar-width: thin;
+  scrollbar-color: #4a5870 var(--code-header-bg, #202734);
 }
 
 .aiContent pre code {
   background: none;
   padding: 0;
   border-radius: 0;
-  color: #e6edf3;
+  border: 0;
+  color: #e8edf5;
+
+  font-family:
+    "JetBrains Mono",
+    "Fira Code",
+    Consolas,
+    "Courier New",
+    monospace;
   font-size: 13px;
-  line-height: 1.6;
+  font-weight: 400;
+  line-height: 1.65;
   white-space: pre;
+  tab-size: 2;
+}
+
+.aiContent pre::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+.aiContent pre::-webkit-scrollbar-track {
+  background: var(--code-header-bg, #202734);
+}
+
+.aiContent pre::-webkit-scrollbar-thumb {
+  background: #4a5870;
+  border: 2px solid var(--code-header-bg, #202734);
+  border-radius: 999px;
+}
+
+.aiContent pre::-webkit-scrollbar-thumb:hover {
+  background: #5e6f8d;
+}
+
+.aiContent pre::-webkit-scrollbar-corner {
+  background: var(--code-header-bg, #202734);
 }
 
 .aiList {

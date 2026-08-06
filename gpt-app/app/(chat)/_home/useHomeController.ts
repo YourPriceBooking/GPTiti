@@ -603,6 +603,7 @@ export function useHomeController() {
     // data / selectors
     activeChat,
     activeProject,
+    projectList,
     addChatsProject,
     addChatsProjectId,
     availableChatsForProject,
