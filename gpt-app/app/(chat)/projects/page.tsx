@@ -75,19 +75,17 @@ export default function ProjectsPage() {
             {...leftSideProps}
             className={pageStyles.projectMenuTrigger}
           />
-          <div className={pageStyles.projectWorkspaceScroll}>
-            <ProjectsOverview
-              projects={ctrl.projectList}
-              onCreateProject={() => dispatch(setIsCreateProjectModalOpen(true))}
-              onOpenProject={openProject}
-              onRenameProject={(projectId, title) => {
-                dispatch(renameProject({ id: projectId, title }));
-                dispatch(updateProject({ id: projectId, changes: { title } }));
-              }}
-              onDeleteProject={(projectId) => dispatch(removeProject(projectId))}
-              onAddChats={(projectId) => dispatch(setAddChatsProjectId(projectId))}
-            />
-          </div>
+          <ProjectsOverview
+            projects={ctrl.projectList}
+            onCreateProject={() => dispatch(setIsCreateProjectModalOpen(true))}
+            onOpenProject={openProject}
+            onRenameProject={(projectId, title) => {
+              dispatch(renameProject({ id: projectId, title }));
+              dispatch(updateProject({ id: projectId, changes: { title } }));
+            }}
+            onDeleteProject={(projectId) => dispatch(removeProject(projectId))}
+            onAddChats={(projectId) => dispatch(setAddChatsProjectId(projectId))}
+          />
         </div>
       </div>
     </>

@@ -88,22 +88,20 @@ export default function AIResponse({ content, modelId }: AIResponseProps) {
         <p className={styles.aiParagraph}>GPTiti</p>
         {modelId && <span className={styles.aiModel}>{modelId}</span>}
 
-        {!hasCodeBlock && (
-          <button
-            type="button"
-            className={`${styles.copyBtn} ${copied ? styles.copyBtnCopied : ""}`}
-            onClick={handleCopyResponse}
+        <button
+          type="button"
+          className={`${styles.copyBtn} ${copied ? styles.copyBtnCopied : ""}`}
+          onClick={handleCopyResponse}
             aria-label={copied ? "Скопійовано" : "Копіювати відповідь"}
-          >
-            <Image
-              src={copied ? "/icons/copied.svg" : "/icons/copy.svg"}
-              alt=""
-              width={16}
-              height={16}
-            />
-            {copied && <span className={styles.copyBtnLabel}>Copied</span>}
-          </button>
-        )}
+        >
+          <Image
+            src={copied ? "/icons/copied.svg" : "/icons/copy.svg"}
+            alt=""
+            width={16}
+            height={16}
+          />
+          {copied && <span className={styles.copyBtnLabel}>Copied</span>}
+        </button>
       </h2>
 
       <div

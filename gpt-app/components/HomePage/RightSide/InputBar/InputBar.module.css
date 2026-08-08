@@ -237,6 +237,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+  width: 35px;
+  height: 35px;
   outline: none;
   cursor: pointer;
   color: var(--flow-fill);
@@ -272,50 +275,40 @@
   opacity: 1;
 }
 
-.iconWrapper::after,
-.iconWrapper1::after,
-.iconWrapper2::after {
+.inputTooltip {
+  --tooltip-shift: 0px;
   position: absolute;
-  top: 50px;
-  left: 0;
+  z-index: 20;
+  top: 52px;
+  left: 50%;
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  max-width: calc(100vw - 16px);
+  transform: translateX(calc(-50% + var(--tooltip-shift)));
   background-color: #1d212a;
   color: var(--main-white);
-  padding: 5px 19px 6px 18px;
+  padding: 0 14px;
   border-radius: 7px;
-  font-size: 14px;
+  font-size: 12px;
+  line-height: 1.2;
   white-space: nowrap;
   opacity: 0;
   visibility: hidden;
+  pointer-events: none;
   transition:
-    opacity 1s ease,
-    visibility 1s ease;
+    opacity 180ms ease,
+    visibility 180ms ease;
 }
 
-.iconWrapper:hover::after,
-.iconWrapper1:hover::after,
-.iconWrapper2:hover::after {
+.iconWrapper:hover .inputTooltip,
+.iconWrapper:focus-visible .inputTooltip,
+.iconWrapper1:hover .inputTooltip,
+.iconWrapper1:focus-visible .inputTooltip,
+.iconWrapper2:hover .inputTooltip,
+.iconWrapper2:focus-visible .inputTooltip {
   opacity: 1;
   visibility: visible;
-}
-
-.iconWrapper::after {
-  content: "Add files and more";
-}
-.iconWrapper1::after {
-  content: "Dictate";
-  top: 58px;
-}
-.iconWrapper2::after {
-  content: "Use voice model";
-  top: 58px;
-}
-
-.iconWrapper2.sendTooltip::after {
-  content: "Send message";
-}
-
-.iconWrapper2.stopTooltip::after {
-  content: "Stop answering";
 }
 
 /* "Coming soon" model — dims the composer and blocks input/sending */
@@ -400,6 +393,42 @@
   }
   .input::placeholder {
     font-size: 16px;
+  }
+
+  .inputContainer.project {
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+    border-radius: 26px;
+  }
+
+  .inputContainer.project .composerBody {
+    min-height: 58px;
+    flex-wrap: nowrap;
+    gap: 8px;
+    padding: 9px 12px;
+  }
+
+  .inputContainer.project.multiline .composerBody {
+    flex-wrap: wrap;
+  }
+
+  .inputContainer.project .input {
+    min-height: 24px;
+    font-size: 15px;
+    line-height: 1.4;
+  }
+
+  .inputContainer.project .input:placeholder-shown {
+    white-space: nowrap;
+  }
+
+  .inputContainer.project .input::placeholder {
+    font-size: 14px;
+  }
+
+  .inputContainer.project .rightControls {
+    gap: 4px;
   }
 
   .comingSoonBadge {

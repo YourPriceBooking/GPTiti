@@ -553,8 +553,8 @@ export default function SectionGptChats({
                 <div className={styles.projectItemContent}>
                   <Image
                     width={28}
-                    height={28}
-                    src="/icons/project-item.svg"
+                    height={23}
+                    src="/icons/create-modal-project.svg"
                     alt="project"
                   />
                   <span

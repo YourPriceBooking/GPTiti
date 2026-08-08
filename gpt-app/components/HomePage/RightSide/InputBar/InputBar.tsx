@@ -18,6 +18,38 @@ import styles from "./InputBar.module.css";
 import Image from "next/image";
 
 const MB = 1024 * 1024;
+const TOOLTIP_VIEWPORT_GAP = 8;
+
+const fitInputTooltipToViewport = (trigger: HTMLElement) => {
+  const tooltip = trigger.querySelector<HTMLElement>("[data-input-tooltip]");
+  if (!tooltip) return;
+
+  tooltip.style.setProperty("--tooltip-shift", "0px");
+  requestAnimationFrame(() => {
+    if (!tooltip.isConnected) return;
+
+    const inputBar = trigger.closest<HTMLElement>("[data-input-bar]");
+    const inputBarRect = inputBar?.getBoundingClientRect();
+    const rect = tooltip.getBoundingClientRect();
+    const allowedLeft = Math.max(
+      TOOLTIP_VIEWPORT_GAP,
+      (inputBarRect?.left ?? 0) + TOOLTIP_VIEWPORT_GAP,
+    );
+    const allowedRight = Math.min(
+      window.innerWidth - TOOLTIP_VIEWPORT_GAP,
+      (inputBarRect?.right ?? window.innerWidth) - TOOLTIP_VIEWPORT_GAP,
+    );
+    let shift = 0;
+
+    if (rect.left < allowedLeft) {
+      shift = allowedLeft - rect.left;
+    } else if (rect.right > allowedRight) {
+      shift = allowedRight - rect.right;
+    }
+
+    tooltip.style.setProperty("--tooltip-shift", `${shift}px`);
+  });
+};
 
 const formatFileSize = (bytes: number) => {
   if (bytes >= MB) return `${(bytes / MB).toFixed(1)} MB`;
@@ -410,6 +442,7 @@ export default function InputBar({
       className={`${styles.inputContainer} ${
         isMultiline ? styles.multiline : ""
       } ${variant === "project" ? styles.project : ""}`}
+      data-input-bar
     >
       {showAddInput && (
         <div
@@ -518,6 +551,10 @@ export default function InputBar({
           <div
             className={styles.iconWrapper}
             tabIndex={0}
+            onPointerEnter={(event) =>
+              fitInputTooltipToViewport(event.currentTarget)
+            }
+            onFocus={(event) => fitInputTooltipToViewport(event.currentTarget)}
             onClick={() => {
               setShowAddInput((prev) => !prev);
             }}
@@ -531,6 +568,13 @@ export default function InputBar({
             >
               <use href="/icons/input-sprite.svg#ib-plus" />
             </svg>
+            <span
+              className={styles.inputTooltip}
+              data-input-tooltip
+              role="tooltip"
+            >
+              Add files and more
+            </span>
           </div>
         </div>
 
@@ -546,7 +590,14 @@ export default function InputBar({
         />
 
         <div className={styles.rightControls} ref={rightControlsRef}>
-          <div className={styles.iconWrapper1} tabIndex={0}>
+          <div
+            className={styles.iconWrapper1}
+            tabIndex={0}
+            onPointerEnter={(event) =>
+              fitInputTooltipToViewport(event.currentTarget)
+            }
+            onFocus={(event) => fitInputTooltipToViewport(event.currentTarget)}
+          >
             <svg
               className={styles.inputIcon}
               width={35}
@@ -556,12 +607,25 @@ export default function InputBar({
             >
               <use href="/icons/input-sprite.svg#ib-microphone" />
             </svg>
+            <span
+              className={styles.inputTooltip}
+              data-input-tooltip
+              role="tooltip"
+            >
+              Dictate
+            </span>
           </div>
 
           {isAiResponding ? (
             <div
-              className={`${styles.iconWrapper2} ${styles.stopTooltip}`}
+              className={styles.iconWrapper2}
               tabIndex={0}
+              onPointerEnter={(event) =>
+                fitInputTooltipToViewport(event.currentTarget)
+              }
+              onFocus={(event) =>
+                fitInputTooltipToViewport(event.currentTarget)
+              }
             >
               <svg
                 className={styles.sendIcon}
@@ -573,11 +637,24 @@ export default function InputBar({
               >
                 <use href="/icons/input-sprite.svg#ib-stop" />
               </svg>
+              <span
+                className={styles.inputTooltip}
+                data-input-tooltip
+                role="tooltip"
+              >
+                Stop answering
+              </span>
             </div>
           ) : hasInput || images.length > 0 || files.length > 0 ? (
             <div
-              className={`${styles.iconWrapper2} ${styles.sendTooltip}`}
+              className={styles.iconWrapper2}
               tabIndex={0}
+              onPointerEnter={(event) =>
+                fitInputTooltipToViewport(event.currentTarget)
+              }
+              onFocus={(event) =>
+                fitInputTooltipToViewport(event.currentTarget)
+              }
               onClick={handleSend}
             >
               <svg
@@ -590,9 +667,25 @@ export default function InputBar({
               >
                 <use href="/icons/input-sprite.svg#ib-send" />
               </svg>
+              <span
+                className={styles.inputTooltip}
+                data-input-tooltip
+                role="tooltip"
+              >
+                Send message
+              </span>
             </div>
           ) : (
-            <div className={styles.iconWrapper2} tabIndex={0}>
+            <div
+              className={styles.iconWrapper2}
+              tabIndex={0}
+              onPointerEnter={(event) =>
+                fitInputTooltipToViewport(event.currentTarget)
+              }
+              onFocus={(event) =>
+                fitInputTooltipToViewport(event.currentTarget)
+              }
+            >
               <svg
                 className={styles.inputIcon}
                 width={35}
@@ -603,6 +696,13 @@ export default function InputBar({
               >
                 <use href="/icons/input-sprite.svg#ib-voice" />
               </svg>
+              <span
+                className={styles.inputTooltip}
+                data-input-tooltip
+                role="tooltip"
+              >
+                Use voice model
+              </span>
             </div>
           )}
         </div>

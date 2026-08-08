@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 import MessageList from "@/components/HomePage/RightSide/MessageList/MessageList";
 import InputBar from "@/components/HomePage/RightSide/InputBar/InputBar";
 import HeaderRightSide from "@/components/HomePage/RightSide/HeaderRightSide/HeaderRightSide";
@@ -21,6 +23,34 @@ import styles from "../page.module.css";
 export default function ChatView({ ctrl }: { ctrl: HomeController }) {
   const { dispatch, activeChat, inputRef, scrollContainerRef, messagesEndRef } =
     ctrl;
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const updateDisclaimer = () => {
+      const distanceFromBottom =
+        container.scrollHeight - container.scrollTop - container.clientHeight;
+      setShowDisclaimer(distanceFromBottom <= 32);
+    };
+
+    const frame = requestAnimationFrame(updateDisclaimer);
+    const resizeObserver = new ResizeObserver(updateDisclaimer);
+    resizeObserver.observe(container);
+    Array.from(container.children).forEach((child) =>
+      resizeObserver.observe(child),
+    );
+    container.addEventListener("scroll", updateDisclaimer, { passive: true });
+    window.addEventListener("resize", updateDisclaimer);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      resizeObserver.disconnect();
+      container.removeEventListener("scroll", updateDisclaimer);
+      window.removeEventListener("resize", updateDisclaimer);
+    };
+  }, [activeChat?.id, activeChat?.messages.length, ctrl.isTyping, scrollContainerRef]);
 
   return (
     <>
@@ -150,6 +180,12 @@ export default function ChatView({ ctrl }: { ctrl: HomeController }) {
         className={styles.inputDock}
         style={ctrl.restoringActiveChat ? { display: "none" } : undefined}
       >
+        {showDisclaimer && !ctrl.dockHidden && (
+          <span className={styles.inputDockDisclaimer}>
+            AI systems may make mistakes, so we recommend verifying important
+            information.
+          </span>
+        )}
         <div
           className={
             ctrl.isExistingChat
@@ -215,17 +251,8 @@ export default function ChatView({ ctrl }: { ctrl: HomeController }) {
                         onChoose={() => dispatch(setIsModalOpen(true))}
                       />
                     </div>
-                    <span className={styles.inputSpan}>
-                      AI systems may make mistakes, so we recommen verifying
-                      important information.
-                    </span>
                   </div>
-                ) : (
-                  <span className={styles.inputSpan}>
-                    AI systems may make mistakes, so we recommend verifying
-                    important information.
-                  </span>
-                )}
+                ) : null}
               </div>
             </div>
           )}

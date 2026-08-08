@@ -158,7 +158,7 @@ export default function ProjectWorkspace({
       <div className={styles.inputRow}>
         <InputBar
           {...inputProps}
-          placeholder="Start a new chat in this project"
+          placeholder="Start a new chat"
           variant="project"
         />
         <div className={styles.modelRow}>

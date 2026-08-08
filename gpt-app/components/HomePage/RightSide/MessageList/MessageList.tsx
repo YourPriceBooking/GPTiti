@@ -17,8 +17,8 @@ const COPIED_RESET_MS = 2000;
 function CopyGlyph() {
   return (
     <svg
-      width="15"
-      height="15"
+      width="16"
+      height="16"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
