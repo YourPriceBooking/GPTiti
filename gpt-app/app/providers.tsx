@@ -7,7 +7,6 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import { store, persistor } from "@/redux/store";
 
 import { SocketProvider } from "@/context/SocketContext";
-import { WsProvider } from "@/context/WsContext";
 import SessionExpiredModal from "./SessionExpiredModal";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
@@ -17,9 +16,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         <GoogleOAuthProvider
           clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ""}
         >
-          <SocketProvider>
-            <WsProvider>{children}</WsProvider>
-          </SocketProvider>
+          <SocketProvider>{children}</SocketProvider>
           <SessionExpiredModal />
         </GoogleOAuthProvider>
       </PersistGate>

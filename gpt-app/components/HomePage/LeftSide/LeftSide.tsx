@@ -6,7 +6,6 @@ import SectionGptChats from "./SectionGptChats/SectionGptChats";
 import SectionGptTokens from "./SectionGptTokens/SectionGptTokens";
 import { useState } from "react";
 import Image from "next/image";
-import WsDebugPanel from "@/components/common/WsDebugPanel/WsDebugPanel";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { selectProjectList } from "@/redux/projects/selectors";
 import { renameProject } from "@/redux/projects/slice";
@@ -116,12 +115,6 @@ export default function LeftSide({
             />
 
             <SectionGptUser />
-
-            {/* {process.env.NODE_ENV !== "production" && (
-              <div style={{ marginTop: 12 }}>
-                <WsDebugPanel />
-              </div>
-            )} */}
 
             <FooterLeftSide />
           </div>

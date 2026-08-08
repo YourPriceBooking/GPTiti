@@ -10,6 +10,8 @@ import {
 import { logoutUser, refreshUser } from "../auth/operations";
 import { refreshError } from "../auth/slice";
 
+type ChatListStatus = "idle" | "loading" | "loaded" | "error";
+
 interface ChatState {
   chatList: Chat[];
   activeChatId: string | null;
@@ -17,7 +19,7 @@ interface ChatState {
   inputSent: boolean;
   hasInput: boolean;
   templateTick: number;
-  status: "idle" | "loading" | "error";
+  status: ChatListStatus;
   error: string | null;
 }
 
@@ -40,6 +42,13 @@ const randomId = () =>
 
 const makeDraftId = () => `draft-${randomId()}`;
 
+const makeDraftChat = (): Chat => ({
+  id: makeDraftId(),
+  title: null,
+  messages: [],
+  messagesStatus: "loaded",
+});
+
 export const isDraftId = (id: string | null | undefined): boolean =>
   typeof id === "string" && id.startsWith("draft-");
 
@@ -51,20 +60,20 @@ const removeChatById = (state: ChatState, id: string) => {
   if (state.chatList.length > 0) {
     state.activeChatId = state.chatList[state.chatList.length - 1].id;
   } else {
-    const draftId = makeDraftId();
-    state.chatList.push({ id: draftId, title: null, messages: [] });
-    state.activeChatId = draftId;
+    const draft = makeDraftChat();
+    state.chatList.push(draft);
+    state.activeChatId = draft.id;
   }
   state.hasInput = false;
   state.inputSent = false;
   state.isTyping = false;
 };
 
-const initialDraftId = makeDraftId();
+const initialDraft = makeDraftChat();
 
 const initialState: ChatState = {
-  chatList: [{ id: initialDraftId, title: null, messages: [] }],
-  activeChatId: initialDraftId,
+  chatList: [initialDraft],
+  activeChatId: initialDraft.id,
   isTyping: false,
   inputSent: false,
   hasInput: false,
@@ -89,9 +98,9 @@ const chatSlice = createSlice({
       if (emptyDraft) {
         state.activeChatId = emptyDraft.id;
       } else {
-        const draftId = makeDraftId();
-        state.chatList.push({ id: draftId, title: null, messages: [] });
-        state.activeChatId = draftId;
+        const draft = makeDraftChat();
+        state.chatList.push(draft);
+        state.activeChatId = draft.id;
       }
       state.hasInput = false;
       state.inputSent = false;
@@ -114,7 +123,7 @@ const chatSlice = createSlice({
           id: payload.id,
           title: payload.title,
           messages: [],
-          messagesLoaded: true,
+          messagesStatus: "loaded",
           modelId: payload.modelId,
           lastMessageAt: new Date().toISOString(),
         });
@@ -138,7 +147,7 @@ const chatSlice = createSlice({
       chat.id = payload.realId;
       if (payload.title) chat.title = payload.title;
       if (payload.modelId) chat.modelId = payload.modelId;
-      chat.messagesLoaded = true; // brand-new conversation, nothing to fetch
+      chat.messagesStatus = "loaded"; // brand-new conversation, nothing to fetch
       if (state.activeChatId === payload.draftId) {
         state.activeChatId = payload.realId;
       }
@@ -239,7 +248,7 @@ const chatSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchConversations.fulfilled, (state, { payload }) => {
-        state.status = "idle";
+        state.status = "loaded";
         // Preserve local drafts and any already-loaded chats; merge in server chats.
         const drafts = state.chatList.filter((c) => isDraftId(c.id));
         const existingById = new Map(state.chatList.map((c) => [c.id, c]));
@@ -254,7 +263,7 @@ const chatSlice = createSlice({
             id: c._id,
             title: c.title,
             messages: [],
-            messagesLoaded: false,
+            messagesStatus: "idle" as const,
             modelId: c.modelId,
             project: toChatProject(c.project),
             lastMessageAt: c.lastMessageAt,
@@ -269,6 +278,10 @@ const chatSlice = createSlice({
         state.status = "error";
         state.error = payload ?? "Failed to load conversations";
       })
+      .addCase(fetchConversationMessages.pending, (state, { meta }) => {
+        const chat = state.chatList.find((c) => c.id === meta.arg);
+        if (chat) chat.messagesStatus = "loading";
+      })
       .addCase(fetchConversationMessages.fulfilled, (state, { payload }) => {
         const chat = state.chatList.find((c) => c.id === payload.id);
         if (!chat) return;
@@ -279,15 +292,20 @@ const chatSlice = createSlice({
           tokens: m.tokens,
           modelId: m.modelId,
         }));
-        chat.messagesLoaded = true;
+        chat.messagesStatus = "loaded";
         const lastModel = [...chat.messages]
           .reverse()
           .find((m) => m.modelId)?.modelId;
         if (lastModel) chat.modelId = lastModel;
       })
-      .addCase(fetchConversationMessages.rejected, (state, { payload }) => {
-        state.error = payload ?? "Failed to load messages";
-      })
+      .addCase(
+        fetchConversationMessages.rejected,
+        (state, { payload, meta }) => {
+          const chat = state.chatList.find((c) => c.id === meta.arg);
+          if (chat) chat.messagesStatus = "error";
+          state.error = payload ?? "Failed to load messages";
+        },
+      )
       .addCase(removeConversation.fulfilled, (state, { payload }) => {
         removeChatById(state, payload);
       })
@@ -298,9 +316,9 @@ const chatSlice = createSlice({
       .addMatcher(
         isAnyOf(logoutUser.fulfilled, refreshError, refreshUser.rejected),
         (state) => {
-          const draftId = makeDraftId();
-          state.chatList = [{ id: draftId, title: null, messages: [] }];
-          state.activeChatId = draftId;
+          const draft = makeDraftChat();
+          state.chatList = [draft];
+          state.activeChatId = draft.id;
           state.isTyping = false;
           state.inputSent = false;
           state.hasInput = false;

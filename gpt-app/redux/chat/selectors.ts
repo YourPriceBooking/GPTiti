@@ -12,6 +12,15 @@ export const selectSortedChatList = createSelector(
 export const selectActiveChatId = (state: RootState) => state.chat.activeChatId;
 export const selectActiveChat = (state: RootState) =>
   state.chat.chatList.find((c) => c.id === state.chat.activeChatId);
+
+export const selectActiveChatMessagesStatus = (state: RootState) =>
+  state.chat.chatList.find((c) => c.id === state.chat.activeChatId)
+    ?.messagesStatus;
+export const selectActiveChatModelId = (state: RootState) =>
+  state.chat.chatList.find((c) => c.id === state.chat.activeChatId)?.modelId;
+export const selectActiveChatMessageCount = (state: RootState) =>
+  state.chat.chatList.find((c) => c.id === state.chat.activeChatId)?.messages
+    .length ?? 0;
 export const selectIsTyping = (state: RootState) => state.chat.isTyping;
 export const selectInputSent = (state: RootState) => state.chat.inputSent;
 export const selectHasInput = (state: RootState) => state.chat.hasInput;
