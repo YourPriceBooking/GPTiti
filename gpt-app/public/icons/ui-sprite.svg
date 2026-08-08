@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <symbol id="ui-close" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+  </symbol>
+  <symbol id="ui-check-circle" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+  </symbol>
+  <symbol id="ui-check-circle-outline" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M16.59 7.58 10 14.17l-3.59-3.58L5 12l5 5 8-8zM12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16z"/>
+  </symbol>
+</svg>

@@ -63,6 +63,9 @@ function formatCreatedDate(iso?: string): string | null {
 }
 
 function getChatPreview(chat: Chat): string | null {
+  const preview = chat.preview?.trim().replace(/\s+/g, " ");
+  if (preview) return preview;
+
   const lastAssistant = [...chat.messages]
     .reverse()
     .find((m) => m.role === "assistant")?.content;

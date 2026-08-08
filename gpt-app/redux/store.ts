@@ -9,6 +9,7 @@ import {
   PURGE,
   REGISTER,
 } from "redux-persist";
+import type { PersistedState } from "redux-persist/es/types";
 import storage from "redux-persist/lib/storage";
 
 import { authReducer } from "./auth/slice";
@@ -19,10 +20,24 @@ import { uiReducer } from "./ui/slice";
 import { projectsReducer } from "./projects/slice";
 import { setupInterceptors } from "@/lib/axiosInstance"; // ← додано
 
+const removeLegacyPersistedToken = async (
+  state: PersistedState,
+): Promise<PersistedState> => {
+  if (!state) return state;
+
+  // redux-persist's whitelist only filters future writes. Existing installs
+  // must explicitly remove the credential during rehydration.
+  const migrated = state as PersistedState & { accessToken?: unknown };
+  delete migrated.accessToken;
+  return migrated;
+};
+
 const authPersistConfig = {
   key: "auth",
+  version: 1,
   storage,
   whitelist: ["user", "isLoggedIn"],
+  migrate: removeLegacyPersistedToken,
 };
 
 const modelPersistConfig = {

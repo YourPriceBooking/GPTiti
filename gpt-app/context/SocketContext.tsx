@@ -3,10 +3,14 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import type { Socket } from "socket.io-client";
 
+import { readAccessToken } from "@/lib/authTokenVault";
 import { env } from "@/lib/env";
 import { getOrCreateSocket } from "@/lib/socketClient";
 import { useAppSelector } from "@/redux/hooks";
-import { selectAccessToken } from "@/redux/auth/selectors";
+import {
+  selectAccessTokenReady,
+  selectIsLoggedIn,
+} from "@/redux/auth/selectors";
 
 type SocketStatus = "disabled" | "disconnected" | "connecting" | "connected" | "error";
 
@@ -24,7 +28,8 @@ function resolveSocketConfig() {
 }
 
 export function SocketProvider({ children }: { children: React.ReactNode }) {
-  const accessToken = useAppSelector(selectAccessToken);
+  const isLoggedIn = useAppSelector(selectIsLoggedIn);
+  const accessTokenReady = useAppSelector(selectAccessTokenReady);
   const socketConfig = useMemo(() => resolveSocketConfig(), []);
   const allowGuest = env.socketAllowGuest;
 
@@ -82,13 +87,17 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
 
     const liveSocket = getOrCreateSocket(socketConfig);
 
-    if (!accessToken && !allowGuest) {
+    if ((!isLoggedIn || !accessTokenReady) && !allowGuest) {
       liveSocket.disconnect();
       return;
     }
 
-    // update auth token and (re)connect
-    liveSocket.auth = accessToken ? { token: accessToken } : {};
+    // Socket.IO invokes this callback for every handshake/reconnect, so a
+    // refreshed token is never captured in a stale React closure.
+    liveSocket.auth = (authorize) => {
+      const token = readAccessToken();
+      authorize(token ? { token } : {});
+    };
 
     liveSocket.connect();
 
@@ -96,7 +105,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
       // keep singleton instance, but stop network activity if provider unmounts
       liveSocket.disconnect();
     };
-  }, [socketConfig, accessToken, allowGuest]);
+  }, [socketConfig, isLoggedIn, accessTokenReady, allowGuest]);
 
   const value = useMemo<SocketContextValue>(
     () => ({ socket, status, lastError }),

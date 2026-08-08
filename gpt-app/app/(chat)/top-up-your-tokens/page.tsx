@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -18,7 +19,10 @@ import { claimTokens } from "@/redux/tokens/operations";
 import { selectIsLoggedIn } from "@/redux/auth/selectors";
 
 import LoginModal from "@/components/HomePage/common/LoginModal/LoginModal";
-import PaymentModal from "@/components/PaymentModal/PaymentModal";
+const PaymentModal = dynamic(
+  () => import("@/components/PaymentModal/PaymentModal"),
+  { ssr: false },
+);
 
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -373,7 +377,9 @@ export default function TokensPage() {
                 {claimError}
               </p>
             ) : (
-              <p className={styles.claimParagraph}>Next claim in: {countdown}</p>
+              <p className={styles.claimParagraph}>
+                Next claim in: {countdown}
+              </p>
             )}
           </div>
         </article>

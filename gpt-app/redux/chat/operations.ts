@@ -1,10 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { api } from "@/helpers/api";
-import type {
-  Conversation,
-  ConversationMessage,
-  ChatHistoryResponse,
-} from "@/types/api.types";
+import type { Conversation, ConversationMessage } from "@/types/api.types";
 
 const errMessage = (e: unknown, fallback: string) => {
   const err = e as { response?: { data?: { message?: string } } };
@@ -48,7 +44,7 @@ export const fetchConversationMessages = createAsyncThunk<
   { rejectValue: string }
 >("chat/fetchConversationMessages", async (id, thunkApi) => {
   try {
-    const messages = await api.getConversationMessages(id);
+    const messages = await api.getConversationMessages(id, thunkApi.signal);
     return { id, messages };
   } catch (e) {
     return thunkApi.rejectWithValue(errMessage(e, "Failed to load messages"));
@@ -82,21 +78,6 @@ export const renameConversation = createAsyncThunk<
   } catch (e) {
     return thunkApi.rejectWithValue(
       errMessage(e, "Failed to rename conversation"),
-    );
-  }
-});
-
-/** Last 20 messages across all conversations (chatPreview.md). Available for a recent feed. */
-export const fetchChatHistory = createAsyncThunk<
-  ChatHistoryResponse,
-  void,
-  { rejectValue: string }
->("chat/fetchChatHistory", async (_, thunkApi) => {
-  try {
-    return await api.getChatHistory();
-  } catch (e) {
-    return thunkApi.rejectWithValue(
-      errMessage(e, "Failed to load chat history"),
     );
   }
 });

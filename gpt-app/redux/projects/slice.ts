@@ -1,5 +1,6 @@
 import { createSlice, isAnyOf, type PayloadAction } from "@reduxjs/toolkit";
-import type { Project, ProjectConversation } from "@/types/types";
+import type { ProjectConversation } from "@/types/api.types";
+import type { Project } from "@/types/types";
 import {
   fetchProjects,
   createProject,
