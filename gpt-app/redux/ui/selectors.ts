@@ -13,3 +13,4 @@ export const selectIsSectionVisible = (state: RootState) =>
 export const selectIsOverlayOpen = (state: RootState) => state.ui.isOverlayOpen;
 export const selectHasFirstRequest = (state: RootState) =>
   state.ui.hasFirstRequest;
+export const selectErrorToast = (state: RootState) => state.ui.errorToast;

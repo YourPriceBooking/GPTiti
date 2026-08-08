@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { Socket } from "socket.io-client";
 
 import { useSocket } from "@/context/SocketContext";
 import { api } from "@/helpers/api";
@@ -20,14 +21,38 @@ import { refreshError } from "@/redux/auth/slice";
 import {
   appendAssistantChunk,
   appendUserMessage,
+  failAssistantMessage,
   finishAssistantMessage,
+  retryAssistantMessage,
   setIsTyping,
   startAssistantMessage,
 } from "@/redux/chat/slice";
 import { useAppDispatch } from "@/redux/hooks";
 import { setBalance } from "@/redux/tokens/slice";
+import type { UploadedFile } from "@/types/api.types";
 
 const TURN_ALREADY_RUNNING = "Wait for the current response to finish.";
+const SOCKET_RECONNECT_TIMEOUT_MS = 8000;
+
+const reconnectSocket = (socket: Socket): Promise<boolean> => {
+  if (socket.connected) return Promise.resolve(true);
+
+  return new Promise((resolve) => {
+    const finish = (connected: boolean) => {
+      window.clearTimeout(timer);
+      socket.off("connect", onConnect);
+      resolve(connected);
+    };
+    const onConnect = () => finish(true);
+    const timer = window.setTimeout(
+      () => finish(socket.connected),
+      SOCKET_RECONNECT_TIMEOUT_MS,
+    );
+
+    socket.once("connect", onConnect);
+    socket.connect();
+  });
+};
 
 export type SendChatMessageArgs = {
   conversationId: string;
@@ -39,6 +64,7 @@ export type SendChatMessageArgs = {
 
 export type ChatStream = {
   sendMessage: (args: SendChatMessageArgs) => Promise<boolean>;
+  retryLastMessage: (chatId: string) => Promise<boolean>;
   streamError: string | null;
   clearStreamError: () => void;
 };
@@ -48,6 +74,14 @@ export function useChatStream(): ChatStream {
   const { socket } = useSocket();
 
   const streamingConversationIdRef = useRef<string | null>(null);
+  const retryInFlightRef = useRef(false);
+  const assistantStartedRef = useRef(false);
+  const lastAcceptedTurnRef = useRef<{
+    conversationId: string;
+    modelId: string;
+    text: string;
+    files: UploadedFile[];
+  } | null>(null);
   const chunkBufferRef = useRef("");
   const chunkBufferChatIdRef = useRef<string | null>(null);
   const chunkFrameRef = useRef<number | null>(null);
@@ -94,19 +128,21 @@ export function useChatStream(): ChatStream {
     (outcome: ChatTurnEnd) => {
       flushAssistantChunks();
       const chatId = streamingConversationIdRef.current;
+      const assistantStarted = assistantStartedRef.current;
       streamingConversationIdRef.current = null;
-
-      if (chatId) {
-        const tokens =
-          outcome.reason === "completed"
-            ? (outcome.tokensSpent ?? undefined)
-            : undefined;
-        dispatch(finishAssistantMessage({ chatId, tokens }));
-      }
+      assistantStartedRef.current = false;
       dispatch(setIsTyping(false));
 
       switch (outcome.reason) {
         case "completed":
+          if (chatId && assistantStarted) {
+            dispatch(
+              finishAssistantMessage({
+                chatId,
+                tokens: outcome.tokensSpent ?? undefined,
+              }),
+            );
+          }
           if (outcome.balance !== null) dispatch(setBalance(outcome.balance));
           return;
         case "auth-expired":
@@ -114,10 +150,23 @@ export function useChatStream(): ChatStream {
           dispatch(refreshError());
           return;
         case "failed":
-          setStreamError(outcome.message);
+          if (chatId && assistantStarted) {
+            dispatch(failAssistantMessage({ chatId, error: outcome.message }));
+          } else {
+            setStreamError(outcome.message);
+          }
           return;
         case "disconnected":
-          setStreamError(CHAT_CONNECTION_LOST);
+          if (chatId && assistantStarted) {
+            dispatch(
+              failAssistantMessage({
+                chatId,
+                error: CHAT_CONNECTION_LOST,
+              }),
+            );
+          } else {
+            setStreamError(CHAT_CONNECTION_LOST);
+          }
           return;
         default:
           assertNever(outcome);
@@ -169,7 +218,7 @@ export function useChatStream(): ChatStream {
       imageUrls,
       imageFiles,
     }: SendChatMessageArgs) => {
-      if (streamingConversationIdRef.current) {
+      if (streamingConversationIdRef.current || retryInFlightRef.current) {
         setStreamError(TURN_ALREADY_RUNNING);
         return false;
       }
@@ -196,6 +245,13 @@ export function useChatStream(): ChatStream {
         );
         dispatch(startAssistantMessage({ chatId: conversationId, modelId }));
         dispatch(setIsTyping(true));
+        assistantStartedRef.current = true;
+        lastAcceptedTurnRef.current = {
+          conversationId,
+          modelId,
+          text,
+          files,
+        };
 
         socket.emit(
           CHAT_SEND_EVENT,
@@ -215,5 +271,73 @@ export function useChatStream(): ChatStream {
     [dispatch, endTurn, socket],
   );
 
-  return { sendMessage, streamError, clearStreamError };
+  const retryLastMessage = useCallback(
+    async (chatId: string) => {
+      const turn = lastAcceptedTurnRef.current;
+      if (
+        !turn ||
+        turn.conversationId !== chatId ||
+        streamingConversationIdRef.current ||
+        retryInFlightRef.current
+      ) {
+        return false;
+      }
+
+      if (!socket) {
+        setStreamError(CHAT_CONNECTION_LOST);
+        return false;
+      }
+
+      setStreamError(null);
+      retryInFlightRef.current = true;
+      dispatch(setIsTyping(true));
+
+      try {
+        const connected = await reconnectSocket(socket);
+        if (!connected) {
+          dispatch(setIsTyping(false));
+          dispatch(
+            failAssistantMessage({
+              chatId: turn.conversationId,
+              error: CHAT_CONNECTION_LOST,
+            }),
+          );
+          return false;
+        }
+
+        streamingConversationIdRef.current = turn.conversationId;
+        assistantStartedRef.current = true;
+        dispatch(
+          retryAssistantMessage({
+            chatId: turn.conversationId,
+            modelId: turn.modelId,
+          }),
+        );
+
+        socket.emit(
+          CHAT_SEND_EVENT,
+          makeChatSendEnvelope({
+            message: turn.text,
+            conversationId: turn.conversationId,
+            modelId: turn.modelId,
+            ...(turn.files.length > 0 && { files: turn.files }),
+          }),
+        );
+        return true;
+      } catch (err) {
+        endTurn(classifyChatError(err));
+        return false;
+      } finally {
+        retryInFlightRef.current = false;
+      }
+    },
+    [dispatch, endTurn, socket],
+  );
+
+  return {
+    sendMessage,
+    retryLastMessage,
+    streamError,
+    clearStreamError,
+  };
 }

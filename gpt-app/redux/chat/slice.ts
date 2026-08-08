@@ -179,6 +179,9 @@ const chatSlice = createSlice({
     ) {
       const chat = state.chatList.find((c) => c.id === payload.chatId);
       if (!chat) return;
+      for (const message of chat.messages) {
+        if (message.role === "assistant") message.retryable = false;
+      }
       chat.messages.push({
         role: "assistant",
         content: "",
@@ -199,6 +202,36 @@ const chatSlice = createSlice({
         last = chat.messages[chat.messages.length - 1];
       }
       last.content += payload.chunk;
+    },
+
+    failAssistantMessage(
+      state,
+      { payload }: PayloadAction<{ chatId: string; error: string }>,
+    ) {
+      const chat = state.chatList.find((c) => c.id === payload.chatId);
+      if (!chat) return;
+      const last = chat.messages[chat.messages.length - 1];
+      if (!last || last.role !== "assistant") return;
+      last.streaming = false;
+      last.error = payload.error;
+      last.retryable = true;
+    },
+
+    retryAssistantMessage(
+      state,
+      { payload }: PayloadAction<{ chatId: string; modelId?: string }>,
+    ) {
+      const chat = state.chatList.find((c) => c.id === payload.chatId);
+      if (!chat) return;
+      const failed = [...chat.messages]
+        .reverse()
+        .find((message) => message.role === "assistant" && message.retryable);
+      if (!failed) return;
+      failed.content = "";
+      failed.streaming = true;
+      failed.error = undefined;
+      failed.retryable = false;
+      if (payload.modelId) failed.modelId = payload.modelId;
     },
 
     finishAssistantMessage(
@@ -337,6 +370,8 @@ export const {
   appendUserMessage,
   startAssistantMessage,
   appendAssistantChunk,
+  failAssistantMessage,
+  retryAssistantMessage,
   finishAssistantMessage,
   deleteDraftChat,
   renameChat,

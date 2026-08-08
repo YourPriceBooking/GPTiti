@@ -9,6 +9,7 @@ import { env } from "@/lib/env";
 
 import AuthBootstrap from "./AuthBootstrap";
 import SessionExpiredModal from "./SessionExpiredModal";
+import ErrorToast from "@/components/common/ErrorToast/ErrorToast";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -18,6 +19,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
           <AuthBootstrap />
           {children}
           <SessionExpiredModal />
+          <ErrorToast />
         </GoogleOAuthProvider>
       </PersistGate>
     </Provider>

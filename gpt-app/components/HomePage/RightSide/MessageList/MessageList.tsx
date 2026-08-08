@@ -9,6 +9,7 @@ type MessageListProps = {
   messages: Message[];
   isTyping?: boolean;
   hasFirstRequest: boolean;
+  onRetry: () => void;
 };
 
 const HIDE_DELAY_MS = 1000;
@@ -130,7 +131,9 @@ function UserMessage({ message }: { message: Message }) {
 
 export default function MessageList({
   messages,
+  isTyping = false,
   hasFirstRequest,
+  onRetry,
 }: MessageListProps) {
   return (
     <div className={styles.messageList}>
@@ -150,17 +153,46 @@ export default function MessageList({
               <TypingPlaceholder />
             ) : (
               <>
-                <AIResponse
-                  content={message.content}
-                  modelId={message.modelId}
-                />
-                {hasFirstRequest && message.tokens !== undefined && (
-                  <div className={styles.costInfo}>
-                    <span className={styles.costSpan}>
-                      Used: {message.tokens} tokens
+                {message.content && (
+                  <AIResponse
+                    content={message.content}
+                    modelId={message.modelId}
+                  />
+                )}
+                {message.error && (
+                  <div className={styles.streamError} role="alert">
+                    <span className={styles.streamErrorIcon} aria-hidden="true">
+                      !
                     </span>
+                    <div className={styles.streamErrorBody}>
+                      <p className={styles.streamErrorTitle}>
+                        Response interrupted
+                      </p>
+                      <p className={styles.streamErrorMessage}>
+                        {message.error}
+                      </p>
+                    </div>
+                    {message.retryable && (
+                      <button
+                        type="button"
+                        className={styles.retryButton}
+                        onClick={onRetry}
+                        disabled={isTyping}
+                      >
+                        {isTyping ? "Retrying..." : "Retry"}
+                      </button>
+                    )}
                   </div>
                 )}
+                {!message.error &&
+                  hasFirstRequest &&
+                  message.tokens !== undefined && (
+                    <div className={styles.costInfo}>
+                      <span className={styles.costSpan}>
+                        Used: {message.tokens} tokens
+                      </span>
+                    </div>
+                  )}
               </>
             )}
           </div>

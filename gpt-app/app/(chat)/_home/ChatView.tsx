@@ -68,6 +68,15 @@ export default function ChatView({ ctrl }: { ctrl: HomeController }) {
       </div>
 
       <div className={styles.scrollableContent} ref={scrollContainerRef}>
+        {ctrl.streamError && (
+          <div className={styles.streamNotice} role="alert">
+            <span>{ctrl.streamError}</span>
+            <button type="button" onClick={ctrl.clearStreamError}>
+              Dismiss
+            </button>
+          </div>
+        )}
+
         {!ctrl.restoringActiveChat && !ctrl.isOverlayOpen && ctrl.isNewChat && (
           <MainSectionRightSide
             insertTemplate={ctrl.insertTemplate}
@@ -111,6 +120,7 @@ export default function ChatView({ ctrl }: { ctrl: HomeController }) {
               messages={activeChat.messages}
               isTyping={ctrl.isTyping}
               hasFirstRequest={ctrl.hasFirstRequest}
+              onRetry={() => void ctrl.handleRetryStream()}
             />
           )}
 

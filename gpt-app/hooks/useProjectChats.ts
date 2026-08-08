@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo } from "react";
 
-import { readErrorMessage } from "@/lib/errorMessage";
 import { selectIsLoggedIn } from "@/redux/auth/selectors";
 import { selectChatList } from "@/redux/chat/selectors";
 import { fetchConversations } from "@/redux/chat/operations";
@@ -20,14 +19,7 @@ import {
 } from "@/redux/ui/selectors";
 import type { Chat } from "@/types/types";
 
-const ADD_TO_PROJECT_FAILED = "Couldn't add the chat to the project.";
-const REMOVE_FROM_PROJECT_FAILED = "Couldn't remove the chat from the project.";
-
-type UseProjectChatsParams = {
-  onError: (message: string) => void;
-};
-
-export function useProjectChats({ onError }: UseProjectChatsParams) {
+export function useProjectChats() {
   const dispatch = useAppDispatch();
 
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
@@ -79,32 +71,32 @@ export function useProjectChats({ onError }: UseProjectChatsParams) {
   const linkConversations = useCallback(
     (projectId: string, conversationIds: string[]) => {
       if (conversationIds.length === 0) return;
-      dispatch(addProjectConversations({ projectId, conversationIds }))
-        .unwrap()
-        .then(() => dispatch(fetchConversations()))
-        .catch((err: unknown) =>
-          onError(readErrorMessage(err, ADD_TO_PROJECT_FAILED)),
-        );
+      void dispatch(
+        addProjectConversations({ projectId, conversationIds }),
+      ).then((action) => {
+        if (addProjectConversations.fulfilled.match(action)) {
+          dispatch(fetchConversations());
+        }
+      });
     },
-    [dispatch, onError],
+    [dispatch],
   );
 
   const unlinkConversation = useCallback(
     (conversationId: string) => {
       if (!activeProjectId) return;
-      dispatch(
+      void dispatch(
         removeProjectConversation({
           projectId: activeProjectId,
           conversationId,
         }),
-      )
-        .unwrap()
-        .then(() => dispatch(fetchConversations()))
-        .catch((err: unknown) =>
-          onError(readErrorMessage(err, REMOVE_FROM_PROJECT_FAILED)),
-        );
+      ).then((action) => {
+        if (removeProjectConversation.fulfilled.match(action)) {
+          dispatch(fetchConversations());
+        }
+      });
     },
-    [dispatch, activeProjectId, onError],
+    [dispatch, activeProjectId],
   );
 
   return {
