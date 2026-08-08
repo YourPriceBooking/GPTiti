@@ -46,6 +46,7 @@ const contentSecurityPolicy = [
   scriptSrc,
   // emotion/MUI і Tailwind вставляють стилі інлайном.
   "style-src 'self' 'unsafe-inline'",
+  "style-src-elem 'self' 'unsafe-inline' https://accounts.google.com",
   "img-src 'self' data: blob: https://lh3.googleusercontent.com https://res.cloudinary.com",
   "font-src 'self' data:",
   `connect-src ${connectSources}`,
