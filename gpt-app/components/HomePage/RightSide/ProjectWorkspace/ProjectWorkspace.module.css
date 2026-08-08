@@ -438,17 +438,133 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 767px) {
   .container {
-    padding: 18px;
-  }
-
-  .title {
-    font-size: 19px;
+    padding: 56px 4px 24px;
   }
 
   .header {
-    gap: 12px;
+    display: grid;
+    grid-template-columns: 52px minmax(0, 1fr);
+    column-gap: 12px;
+    row-gap: 0;
+  }
+
+  .headerIcon {
+    grid-column: 1;
+    grid-row: 1;
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+  }
+
+  .headerText {
+    display: contents;
+  }
+
+  .titleRow {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: center;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .title {
+    width: 100%;
+    overflow: hidden;
+    font-size: 20px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .createdDate {
+    font-size: 12px;
+  }
+
+  .subtitle {
+    grid-column: 1 / -1;
+    margin: 14px 0 3px;
+    font-size: 13px;
+  }
+
+  .description {
+    grid-column: 1 / -1;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .inputRow {
+    margin-top: 18px;
+  }
+
+  .modelRow {
+    margin-top: 8px;
+  }
+
+  .tabsRow {
+    gap: 10px;
+    margin-top: 22px;
+    padding: 0;
+  }
+
+  .tab {
+    padding: 8px 16px;
+  }
+
+  .counter {
+    flex: 1;
+    min-width: 0;
+    max-width: 170px;
+    padding: 8px 14px;
+  }
+
+  .divider {
+    margin-top: 14px;
+  }
+
+  .emptyState {
+    flex: none;
+    align-items: center;
+    min-height: 250px;
+    margin-top: 0;
+    padding: 28px 0 8px;
+  }
+
+  .emptyContent {
+    width: 100%;
+    max-width: 360px;
+  }
+
+  .emptyIcon {
+    width: 52px;
+    height: 52px;
+    margin-bottom: 14px;
+  }
+
+  .emptyDescription {
+    margin-bottom: 18px;
+    font-size: 13px;
+  }
+
+  .chatGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 54px 2px 20px;
+  }
+
+  .title {
+    font-size: 18px;
+  }
+
+  .header {
+    grid-template-columns: 48px minmax(0, 1fr);
+    column-gap: 10px;
   }
 
   .headerIcon {
@@ -459,5 +575,9 @@
 
   .decorPattern {
     display: none;
+  }
+
+  .createButton {
+    padding: 12px 28px;
   }
 }

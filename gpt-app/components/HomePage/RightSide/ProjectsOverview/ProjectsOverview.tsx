@@ -10,6 +10,12 @@ import DeleteModalWindow from "@/components/HomePage/LeftSide/DeleteModalWindow/
 import styles from "./ProjectsOverview.module.css";
 
 const PINNED_PROJECTS_KEY = "pinnedProjectIds";
+const MENU_GAP = 6;
+const MENU_HEIGHT = 240;
+
+const shouldOpenUpwards = (trigger: HTMLElement) =>
+  trigger.getBoundingClientRect().bottom + MENU_GAP + MENU_HEIGHT >
+  window.innerHeight;
 
 type ProjectsOverviewProps = {
   projects: Project[];
@@ -54,14 +60,12 @@ const formatActivity = (value?: string) => {
 function FolderIcon() {
   return (
     <span className={styles.projectIcon} aria-hidden="true">
-      <svg viewBox="0 0 28 24" fill="none">
-        <path
-          d="M2.5 6.5h8l2.7 3H25.5v11.7H2.5V6.5Z"
-          stroke="currentColor"
-          strokeWidth="1.8"
-          strokeLinejoin="round"
-        />
-      </svg>
+      <Image
+        src="/icons/create-modal-project.svg"
+        alt=""
+        width={38}
+        height={31}
+      />
     </span>
   );
 }
@@ -70,6 +74,7 @@ function ProjectRow({
   project,
   isPinned,
   menuOpen,
+  menuUp,
   renaming,
   onOpen,
   onMenuToggle,
@@ -82,9 +87,10 @@ function ProjectRow({
   project: Project;
   isPinned: boolean;
   menuOpen: boolean;
+  menuUp: boolean;
   renaming: boolean;
   onOpen: () => void;
-  onMenuToggle: () => void;
+  onMenuToggle: (trigger: HTMLButtonElement) => void;
   onPinToggle: () => void;
   onRenameRequest: () => void;
   onRename: (title: string) => void;
@@ -109,7 +115,7 @@ function ProjectRow({
 
   return (
     <li
-      className={styles.projectRow}
+      className={`${styles.projectRow} ${menuOpen ? styles.projectRowMenuOpen : ""}`}
       tabIndex={renaming ? -1 : 0}
       onClick={renaming ? undefined : onOpen}
       onKeyDown={(event) => {
@@ -160,13 +166,16 @@ function ProjectRow({
           aria-expanded={menuOpen}
           onClick={(event) => {
             event.stopPropagation();
-            onMenuToggle();
+            onMenuToggle(event.currentTarget);
           }}
         >
           <Image src="/icons/three-points.svg" alt="" width={18} height={12} />
         </button>
         {menuOpen && (
-          <div className={styles.menu} onClick={(event) => event.stopPropagation()}>
+          <div
+            className={`${styles.menu} ${menuUp ? styles.menuUp : ""}`}
+            onClick={(event) => event.stopPropagation()}
+          >
             <ChatsMenu
               isProject
               isPinned={isPinned}
@@ -200,6 +209,7 @@ export default function ProjectsOverview({
     }
   });
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [menuUp, setMenuUp] = useState(false);
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -243,11 +253,13 @@ export default function ProjectsOverview({
       project={project}
       isPinned={validPinnedIds.includes(project.id)}
       menuOpen={openMenuId === project.id}
+      menuUp={openMenuId === project.id && menuUp}
       renaming={renamingId === project.id}
       onOpen={() => onOpenProject(project.id)}
-      onMenuToggle={() =>
-        setOpenMenuId((current) => (current === project.id ? null : project.id))
-      }
+      onMenuToggle={(trigger) => {
+        setMenuUp(shouldOpenUpwards(trigger));
+        setOpenMenuId((current) => (current === project.id ? null : project.id));
+      }}
       onPinToggle={() => togglePin(project.id)}
       onAddChats={() => {
         setOpenMenuId(null);
@@ -270,7 +282,6 @@ export default function ProjectsOverview({
 
   return (
     <main className={styles.page}>
-      <div className={styles.ambientGlow} aria-hidden="true" />
       <header className={styles.header}>
         <div>
           <h1 className={styles.title}>Projects</h1>
