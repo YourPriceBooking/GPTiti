@@ -1,14 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 
 import { readErrorMessage } from "@/lib/errorMessage";
 import { selectIsLoggedIn } from "@/redux/auth/selectors";
 import { selectChatList } from "@/redux/chat/selectors";
-import {
-  fetchConversationMessages,
-  fetchConversations,
-} from "@/redux/chat/operations";
+import { fetchConversations } from "@/redux/chat/operations";
 import { isDraftId } from "@/redux/chat/slice";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
@@ -49,6 +46,7 @@ export function useProjectChats({ onError }: UseProjectChatsParams) {
         return {
           id: conv._id,
           title: conv.title ?? loaded?.title ?? null,
+          preview: conv.summary,
           modelId: conv.modelId ?? loaded?.modelId,
           lastMessageAt: conv.lastMessageAt ?? loaded?.lastMessageAt,
           createdAt: conv.createdAt ?? loaded?.createdAt,
@@ -77,20 +75,6 @@ export function useProjectChats({ onError }: UseProjectChatsParams) {
     if (!isLoggedIn || !addChatsProjectId) return;
     dispatch(fetchProject(addChatsProjectId));
   }, [isLoggedIn, addChatsProjectId, dispatch]);
-
-  // TODO(§5): це N+1 — потрібен пакетний ендпоінт замість запиту на кожен чат.
-  const prefetchedMessagesRef = useRef<Set<string>>(new Set());
-  useEffect(() => {
-    if (!isLoggedIn || !activeProjectId) return;
-    projectChats.forEach((chat) => {
-      if (chat.messagesStatus !== "idle") return;
-      if (isDraftId(chat.id) || prefetchedMessagesRef.current.has(chat.id)) {
-        return;
-      }
-      prefetchedMessagesRef.current.add(chat.id);
-      dispatch(fetchConversationMessages(chat.id));
-    });
-  }, [isLoggedIn, activeProjectId, projectChats, dispatch]);
 
   const linkConversations = useCallback(
     (projectId: string, conversationIds: string[]) => {

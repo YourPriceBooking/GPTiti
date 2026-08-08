@@ -37,7 +37,10 @@ import {
   removeConversation,
   renameConversation,
 } from "@/redux/chat/operations";
-import { selectIsLoggedIn, selectAccessToken } from "@/redux/auth/selectors";
+import {
+  selectAccessTokenReady,
+  selectIsLoggedIn,
+} from "@/redux/auth/selectors";
 import {
   selectFocusMode,
   selectHasFirstRequest,
@@ -82,7 +85,7 @@ export function useHomeController() {
   const hasFirstRequest = useAppSelector(selectHasFirstRequest);
   const activeProjectId = useAppSelector(selectActiveProjectId);
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
-  const accessToken = useAppSelector(selectAccessToken);
+  const accessTokenReady = useAppSelector(selectAccessTokenReady);
 
   const [operationError, setOperationError] = useState<string | null>(null);
   const reportError = useCallback(
@@ -102,6 +105,7 @@ export function useHomeController() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const sendCycleInFlightRef = useRef(false);
   useScrollDirection(scrollContainerRef);
 
   const chatError = streamError ?? operationError;
@@ -113,15 +117,15 @@ export function useHomeController() {
   const activeChatLoading =
     activeChatMessagesStatus === "idle" ||
     activeChatMessagesStatus === "loading";
-  const isNewChat = !activeChatLoading && activeChatMessageCount === 0;
+  const isNewChat = !activeChatLoading && isDraftId(activeChatId);
   const isExistingChat = !!activeChat;
   const dockHidden = (isSectionVisible && focusMode) || isOverlayOpen;
 
   useEffect(() => {
-    if (!isLoggedIn || !accessToken) return;
+    if (!isLoggedIn || !accessTokenReady) return;
     dispatch(fetchConversations());
     dispatch(fetchProjects());
-  }, [isLoggedIn, accessToken, dispatch]);
+  }, [isLoggedIn, accessTokenReady, dispatch]);
 
   useEffect(() => {
     dispatch(setIsSectionVisible(activeChatMessageCount === 0));
@@ -168,62 +172,78 @@ export function useHomeController() {
       imageUrls: string[] = [],
       imageFiles: File[] = [],
     ) => {
-      const text = draft.readDraftText();
-      if (!text && imageUrls.length === 0) return;
+      if (sendCycleInFlightRef.current) return;
+      sendCycleInFlightRef.current = true;
 
-      const conversationId = await ensureConversationId(text);
-      if (!conversationId) return;
+      try {
+        const text = draft.readDraftText();
+        if (!text && imageUrls.length === 0) return;
 
-      draft.consumeDraft();
-      await sendMessage({
-        conversationId,
-        modelId: selectedModel,
-        text,
-        imageUrls,
-        imageFiles,
-      });
+        const conversationId = await ensureConversationId(text);
+        if (!conversationId) return;
+
+        const accepted = await sendMessage({
+          conversationId,
+          modelId: selectedModel,
+          text,
+          imageUrls,
+          imageFiles,
+        });
+        if (accepted) draft.consumeDraft();
+      } finally {
+        sendCycleInFlightRef.current = false;
+      }
     },
     [draft, ensureConversationId, selectedModel, sendMessage],
   );
 
   const handleProjectSend = useCallback(
     async (imageUrls: string[] = [], imageFiles: File[] = []) => {
-      if (!activeProjectId) return;
-      const text = draft.readDraftText();
-      if (!text && imageUrls.length === 0) return;
+      if (sendCycleInFlightRef.current) return;
+      sendCycleInFlightRef.current = true;
 
-      let conv;
       try {
-        conv = await dispatch(
-          createConversation({
-            modelId: selectedModel,
-            title: text.slice(0, 60) || undefined,
+        if (!activeProjectId) return;
+        const text = draft.readDraftText();
+        if (!text && imageUrls.length === 0) return;
+
+        let conv;
+        try {
+          conv = await dispatch(
+            createConversation({
+              modelId: selectedModel,
+              title: text.slice(0, 60) || undefined,
+            }),
+          ).unwrap();
+        } catch (err) {
+          setOperationError(
+            readErrorMessage(err, CREATE_CONVERSATION_FAILED),
+          );
+          return;
+        }
+
+        dispatch(
+          addConversation({
+            id: conv._id,
+            title: conv.title ?? (text || null),
+            modelId: conv.modelId ?? selectedModel,
           }),
-        ).unwrap();
-      } catch (err) {
-        setOperationError(readErrorMessage(err, CREATE_CONVERSATION_FAILED));
-        return;
+        );
+
+        projects.linkConversations(activeProjectId, [conv._id]);
+        dispatch(setActiveProjectId(null));
+
+        const accepted = await sendMessage({
+          conversationId: conv._id,
+          modelId: selectedModel,
+          text,
+          imageUrls,
+          imageFiles,
+        });
+        if (accepted) draft.consumeDraft();
+      } finally {
+        sendCycleInFlightRef.current = false;
       }
-
-      dispatch(
-        addConversation({
-          id: conv._id,
-          title: conv.title ?? (text || null),
-          modelId: conv.modelId ?? selectedModel,
-        }),
-      );
-
-      projects.linkConversations(activeProjectId, [conv._id]);
-      dispatch(setActiveProjectId(null));
-
-      draft.consumeDraft();
-      await sendMessage({
-        conversationId: conv._id,
-        modelId: selectedModel,
-        text,
-        imageUrls,
-        imageFiles,
-      });
     },
     [dispatch, activeProjectId, selectedModel, draft, projects, sendMessage],
   );

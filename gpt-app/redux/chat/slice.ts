@@ -302,7 +302,8 @@ const chatSlice = createSlice({
         fetchConversationMessages.rejected,
         (state, { payload, meta }) => {
           const chat = state.chatList.find((c) => c.id === meta.arg);
-          if (chat) chat.messagesStatus = "error";
+          if (chat) chat.messagesStatus = meta.aborted ? "idle" : "error";
+          if (meta.aborted) return;
           state.error = payload ?? "Failed to load messages";
         },
       )

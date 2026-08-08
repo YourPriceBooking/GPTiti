@@ -2,10 +2,6 @@
 
 import Link from "next/link";
 
-import Checkbox from "@mui/material/Checkbox";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-
 import { useAppSelector } from "@/redux/hooks";
 import { selectIsLoggedIn } from "@/redux/auth/selectors";
 
@@ -52,17 +48,29 @@ export default function TermsCheckbox({
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: 0.2 }}
     >
-      <Checkbox
-        checked={checked}
-        onChange={(e) => setChecked(e.target.checked)}
-        icon={<CheckCircleOutlineIcon sx={{ color: "#00e676" }} />}
-        checkedIcon={<CheckCircleIcon sx={{ color: "#00e676" }} />}
-        sx={{
-          padding: 0,
-          transition: "opacity 0.3s ease-in-out",
-          alignSelf: "flex-start",
-        }}
-      />
+      <label className="relative flex shrink-0 self-start cursor-pointer">
+        <input
+          type="checkbox"
+          checked={checked}
+          onChange={(e) => setChecked(e.target.checked)}
+          className="peer absolute inset-0 h-full w-full cursor-pointer opacity-0"
+          aria-label="I have read and agree to the Terms & Conditions and Privacy Policy"
+        />
+        <svg
+          viewBox="0 0 24 24"
+          width="24"
+          height="24"
+          aria-hidden="true"
+          focusable="false"
+          className="rounded-full text-[#00e676] peer-focus-visible:ring-2 peer-focus-visible:ring-[#00e676]"
+        >
+          <use
+            href={`/icons/ui-sprite.svg#${
+              checked ? "ui-check-circle" : "ui-check-circle-outline"
+            }`}
+          />
+        </svg>
+      </label>
       <span className="text-gray-500 hover:text-gray-700 text-sm leading-snug">
         I have read and agree to the{" "}
         <Link

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useSocket } from "@/context/SocketContext";
 import { api } from "@/helpers/api";
+import { clearAccessToken } from "@/lib/authTokenVault";
 import {
   assertNever,
   CHAT_CONNECTION_LOST,
@@ -37,7 +38,7 @@ export type SendChatMessageArgs = {
 };
 
 export type ChatStream = {
-  sendMessage: (args: SendChatMessageArgs) => Promise<void>;
+  sendMessage: (args: SendChatMessageArgs) => Promise<boolean>;
   streamError: string | null;
   clearStreamError: () => void;
 };
@@ -47,13 +48,51 @@ export function useChatStream(): ChatStream {
   const { socket } = useSocket();
 
   const streamingConversationIdRef = useRef<string | null>(null);
+  const chunkBufferRef = useRef("");
+  const chunkBufferChatIdRef = useRef<string | null>(null);
+  const chunkFrameRef = useRef<number | null>(null);
 
   const [streamError, setStreamError] = useState<string | null>(null);
 
   const clearStreamError = useCallback(() => setStreamError(null), []);
 
+  const flushAssistantChunks = useCallback(() => {
+    if (chunkFrameRef.current !== null) {
+      cancelAnimationFrame(chunkFrameRef.current);
+      chunkFrameRef.current = null;
+    }
+
+    const chatId = chunkBufferChatIdRef.current;
+    const chunk = chunkBufferRef.current;
+    chunkBufferChatIdRef.current = null;
+    chunkBufferRef.current = "";
+
+    if (chatId && chunk) {
+      dispatch(appendAssistantChunk({ chatId, chunk }));
+    }
+  }, [dispatch]);
+
+  const queueAssistantChunk = useCallback(
+    (chatId: string, chunk: string) => {
+      if (
+        chunkBufferChatIdRef.current &&
+        chunkBufferChatIdRef.current !== chatId
+      ) {
+        flushAssistantChunks();
+      }
+
+      chunkBufferChatIdRef.current = chatId;
+      chunkBufferRef.current += chunk;
+      if (chunkFrameRef.current === null) {
+        chunkFrameRef.current = requestAnimationFrame(flushAssistantChunks);
+      }
+    },
+    [flushAssistantChunks],
+  );
+
   const endTurn = useCallback(
     (outcome: ChatTurnEnd) => {
+      flushAssistantChunks();
       const chatId = streamingConversationIdRef.current;
       streamingConversationIdRef.current = null;
 
@@ -71,6 +110,7 @@ export function useChatStream(): ChatStream {
           if (outcome.balance !== null) dispatch(setBalance(outcome.balance));
           return;
         case "auth-expired":
+          clearAccessToken();
           dispatch(refreshError());
           return;
         case "failed":
@@ -83,7 +123,7 @@ export function useChatStream(): ChatStream {
           assertNever(outcome);
       }
     },
-    [dispatch],
+    [dispatch, flushAssistantChunks],
   );
 
   useEffect(() => {
@@ -94,7 +134,7 @@ export function useChatStream(): ChatStream {
       if (!chatId) return;
       const chunk = readStreamChunk(raw);
       if (chunk === null) return;
-      dispatch(appendAssistantChunk({ chatId, chunk }));
+      queueAssistantChunk(chatId, chunk);
     };
 
     const onEnd = (raw: unknown) =>
@@ -113,12 +153,13 @@ export function useChatStream(): ChatStream {
     socket.on("disconnect", onDisconnect);
 
     return () => {
+      flushAssistantChunks();
       socket.off(ChatServerEvent.Stream, onStream);
       socket.off(ChatServerEvent.End, onEnd);
       socket.off(ChatServerEvent.Error, onError);
       socket.off("disconnect", onDisconnect);
     };
-  }, [socket, dispatch, endTurn]);
+  }, [socket, endTurn, flushAssistantChunks, queueAssistantChunk]);
 
   const sendMessage = useCallback(
     async ({
@@ -130,19 +171,10 @@ export function useChatStream(): ChatStream {
     }: SendChatMessageArgs) => {
       if (streamingConversationIdRef.current) {
         setStreamError(TURN_ALREADY_RUNNING);
-        return;
+        return false;
       }
 
       setStreamError(null);
-      dispatch(
-        appendUserMessage({
-          chatId: conversationId,
-          content: text,
-          images: imageUrls,
-        }),
-      );
-      dispatch(startAssistantMessage({ chatId: conversationId, modelId }));
-      dispatch(setIsTyping(true));
       streamingConversationIdRef.current = conversationId;
 
       try {
@@ -152,8 +184,18 @@ export function useChatStream(): ChatStream {
 
         if (!socket?.connected) {
           endTurn({ reason: "disconnected" });
-          return;
+          return false;
         }
+
+        dispatch(
+          appendUserMessage({
+            chatId: conversationId,
+            content: text,
+            images: imageUrls,
+          }),
+        );
+        dispatch(startAssistantMessage({ chatId: conversationId, modelId }));
+        dispatch(setIsTyping(true));
 
         socket.emit(
           CHAT_SEND_EVENT,
@@ -164,8 +206,10 @@ export function useChatStream(): ChatStream {
             ...(files.length > 0 && { files }),
           }),
         );
+        return true;
       } catch (err) {
         endTurn(classifyChatError(err));
+        return false;
       }
     },
     [dispatch, endTurn, socket],

@@ -1,4 +1,5 @@
 import React from "react";
+import type { ProjectConversation } from "@/types/api.types";
 
 export interface CustomScrollBarProps {
   scrollTargetClass: string;
@@ -30,23 +31,11 @@ export type Chat = {
   title: string | null;
   messages: Message[];
   messagesStatus: MessagesStatus;
+  preview?: string;
   modelId?: string;
   lastMessageAt?: string;
   createdAt?: string;
   project?: ChatProject;
-};
-
-export type ProjectConversation = {
-  _id: string;
-  user?: string;
-  title: string | null;
-  modelId?: string;
-  summary?: string;
-  archived?: boolean;
-  project?: string;
-  lastMessageAt?: string;
-  createdAt?: string;
-  updatedAt?: string;
 };
 
 export type Project = {

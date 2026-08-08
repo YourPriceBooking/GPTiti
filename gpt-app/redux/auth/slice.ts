@@ -1,16 +1,10 @@
-import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import { loginUser, logoutUser, refreshUser } from "./operations";
-
-export interface AuthUser {
-  id: number;
-  email: string;
-  name: string;
-  avatar?: string;
-}
+import type { AuthUser } from "@/types/google.types";
 
 interface AuthState {
   user: AuthUser | null;
-  accessToken: string | null;
+  accessTokenReady: boolean;
   isLoggedIn: boolean;
   error: string | null;
   sessionExpired: boolean;
@@ -18,7 +12,7 @@ interface AuthState {
 
 const initialState: AuthState = {
   user: null,
-  accessToken: null,
+  accessTokenReady: false,
   isLoggedIn: false,
   error: null,
   sessionExpired: false,
@@ -28,13 +22,9 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    resetToken(state, { payload }: PayloadAction<string | null>) {
-      state.accessToken = payload;
-      state.isLoggedIn = Boolean(payload);
-    },
     refreshError(state) {
       state.user = null;
-      state.accessToken = null;
+      state.accessTokenReady = false;
       state.isLoggedIn = false;
       state.sessionExpired = true;
     },
@@ -46,7 +36,7 @@ const authSlice = createSlice({
     builder
       .addCase(loginUser.fulfilled, (state, { payload }) => {
         state.user = payload.user;
-        state.accessToken = payload.accessToken;
+        state.accessTokenReady = true;
         state.isLoggedIn = true;
         state.error = null;
         state.sessionExpired = false;
@@ -54,25 +44,24 @@ const authSlice = createSlice({
       .addCase(loginUser.rejected, (state, { payload }) => {
         state.error = payload ?? "Login failed";
       })
-      .addCase(refreshUser.fulfilled, (state, { payload }) => {
-        state.accessToken = payload;
+      .addCase(refreshUser.fulfilled, (state) => {
+        state.accessTokenReady = true;
         state.isLoggedIn = true;
       })
       .addCase(refreshUser.rejected, (state) => {
         state.user = null;
-        state.accessToken = null;
+        state.accessTokenReady = false;
         state.isLoggedIn = false;
         state.sessionExpired = true;
       })
       .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
-        state.accessToken = null;
+        state.accessTokenReady = false;
         state.isLoggedIn = false;
         state.error = null;
         state.sessionExpired = false;
       }),
 });
 
-export const { resetToken, refreshError, clearSessionExpired } =
-  authSlice.actions;
+export const { refreshError, clearSessionExpired } = authSlice.actions;
 export const authReducer = authSlice.reducer;

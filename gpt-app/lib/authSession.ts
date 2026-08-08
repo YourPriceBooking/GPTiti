@@ -1,8 +1,8 @@
-let inFlight: Promise<string> | null = null;
+let inFlight: Promise<void> | null = null;
 
 export const runSingleFlightRefresh = (
-  start: () => Promise<string>,
-): Promise<string> => {
+  start: () => Promise<void>,
+): Promise<void> => {
   if (inFlight) return inFlight;
 
   const request = start();

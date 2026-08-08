@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 import { selectIsLoggedIn } from "@/redux/auth/selectors";
 import {
@@ -19,13 +19,35 @@ export function useChatRestore(): { restoringActiveChat: boolean } {
   const activeChatId = useAppSelector(selectActiveChatId);
   const messagesStatus = useAppSelector(selectActiveChatMessagesStatus);
   const chatListStatus = useAppSelector(selectChatStatus);
+  const restoreRequestRef = useRef<{
+    chatId: string;
+    abort: () => void;
+  } | null>(null);
 
   useEffect(() => {
     if (!isLoggedIn || !activeChatId || isDraftId(activeChatId)) return;
 
     if (messagesStatus !== "idle") return;
-    dispatch(fetchConversationMessages(activeChatId));
+    const request = dispatch(fetchConversationMessages(activeChatId));
+    const trackedRequest = { chatId: activeChatId, abort: request.abort };
+    restoreRequestRef.current = trackedRequest;
+
+    void request.finally(() => {
+      if (restoreRequestRef.current === trackedRequest) {
+        restoreRequestRef.current = null;
+      }
+    });
   }, [isLoggedIn, activeChatId, messagesStatus, dispatch]);
+
+  useEffect(
+    () => () => {
+      const request = restoreRequestRef.current;
+      if (request?.chatId !== activeChatId) return;
+      request.abort();
+      restoreRequestRef.current = null;
+    },
+    [activeChatId, isLoggedIn],
+  );
 
   const restoringActiveChat = useMemo(() => {
     if (!isLoggedIn || !activeChatId || isDraftId(activeChatId)) return false;
