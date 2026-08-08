@@ -57,7 +57,6 @@ export default function PaymentModal({ isOpen, onClose, plan }: Props) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Pay for plan:", plan, "cardNumber:", cardNumber);
   };
 
   return (

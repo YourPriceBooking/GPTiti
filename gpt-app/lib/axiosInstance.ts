@@ -1,9 +1,11 @@
 import axios from "axios";
 import type { AppStore } from "@/redux/store";
 import { isAuthExpiredError } from "@/lib/authError";
+import { runSingleFlightRefresh } from "@/lib/authSession";
+import { env } from "@/lib/env";
 
 export const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_BACKEND_API_URL,
+  baseURL: env.backendApiUrl,
   withCredentials: true,
   headers: { "Content-Type": "application/json" },
 });
@@ -41,7 +43,9 @@ export const setupInterceptors = (store: AppStore) => {
           const { refreshUser } = await import("@/redux/auth/operations");
           const { resetToken } = await import("@/redux/auth/slice");
 
-          const accessToken = await store.dispatch(refreshUser()).unwrap();
+          const accessToken = await runSingleFlightRefresh(() =>
+            store.dispatch(refreshUser()).unwrap(),
+          );
           store.dispatch(resetToken(accessToken));
           config.headers = {
             ...(config.headers ?? {}),
