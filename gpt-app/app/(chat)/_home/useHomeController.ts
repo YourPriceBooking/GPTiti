@@ -9,7 +9,7 @@ import { useChatRestore } from "@/hooks/useChatRestore";
 import { useInputDraft } from "@/hooks/useInputDraft";
 import { useModelSync } from "@/hooks/useModelSync";
 import { useProjectChats } from "@/hooks/useProjectChats";
-import { readErrorMessage } from "@/lib/chat/chatProtocol";
+import { readErrorMessage } from "@/lib/errorMessage";
 
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {

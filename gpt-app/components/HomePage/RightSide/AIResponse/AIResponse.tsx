@@ -2,34 +2,8 @@
 
 import Image from "next/image";
 import { useCallback, useMemo, useState } from "react";
-import { marked } from "marked";
-import DOMPurify from "dompurify";
+import { renderAssistantMarkdown } from "@/lib/markdown";
 import styles from "./AIResponse.module.css";
-
-const escapeHtml = (value: string) =>
-  value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-
-marked.use({
-  gfm: true,
-  breaks: true,
-  renderer: {
-    code({ text, lang }) {
-      const language = (lang ?? "").trim().split(/\s+/)[0] || "text";
-      return (
-        `<div class="code-block">` +
-        `<div class="code-header">` +
-        `<span class="code-lang">${escapeHtml(language)}</span>` +
-        `<button type="button" class="code-copy-btn" aria-label="Копіювати код">` +
-        `<span class="code-copy-icon"></span>` +
-        `<span class="code-copy-label">Copied</span>` +
-        `</button>` +
-        `</div>` +
-        `<pre><code class="language-${escapeHtml(language)}">${escapeHtml(text)}</code></pre>` +
-        `</div>`
-      );
-    },
-  },
-});
 
 type AIResponseProps = {
   content: string;
@@ -37,10 +11,7 @@ type AIResponseProps = {
 };
 
 export default function AIResponse({ content, modelId }: AIResponseProps) {
-  const html = useMemo(() => {
-    const raw = marked.parse(content, { async: false });
-    return DOMPurify.sanitize(raw);
-  }, [content]);
+  const html = useMemo(() => renderAssistantMarkdown(content), [content]);
 
   const hasCodeBlock = useMemo(
     () => html.includes('class="code-block"'),

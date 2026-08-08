@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import type { Socket } from "socket.io-client";
 
+import { env } from "@/lib/env";
 import { getOrCreateSocket } from "@/lib/socketClient";
 import { useAppSelector } from "@/redux/hooks";
 import { selectAccessToken } from "@/redux/auth/selectors";
@@ -18,18 +19,14 @@ type SocketContextValue = {
 const SocketContext = createContext<SocketContextValue | undefined>(undefined);
 
 function resolveSocketConfig() {
-  const url = process.env.NEXT_PUBLIC_SOCKET_URL;
-  const path = process.env.NEXT_PUBLIC_SOCKET_PATH;
-
-  if (!url) return null;
-
-  return { url, path };
+  if (!env.socketUrl) return null;
+  return { url: env.socketUrl, path: env.socketPath ?? undefined };
 }
 
 export function SocketProvider({ children }: { children: React.ReactNode }) {
   const accessToken = useAppSelector(selectAccessToken);
   const socketConfig = useMemo(() => resolveSocketConfig(), []);
-  const allowGuest = process.env.NEXT_PUBLIC_SOCKET_ALLOW_GUEST === "true";
+  const allowGuest = env.socketAllowGuest;
 
   const [status, setStatus] = useState<SocketStatus>(() =>
     socketConfig ? "disconnected" : "disabled"

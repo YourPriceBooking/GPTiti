@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
-import { readErrorMessage } from "@/lib/chat/chatProtocol";
+import { readErrorMessage } from "@/lib/errorMessage";
 import { selectIsLoggedIn } from "@/redux/auth/selectors";
 import { selectChatList } from "@/redux/chat/selectors";
 import {
