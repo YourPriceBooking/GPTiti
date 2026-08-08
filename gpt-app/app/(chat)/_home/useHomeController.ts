@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useCallback, useState } from "react";
+import { useRef, useEffect, useCallback } from "react";
 
 import { useModelMode } from "@/hooks/useModelMode";
 import { useScrollDirection } from "@/hooks/useScrollDirection";
@@ -9,7 +9,6 @@ import { useChatRestore } from "@/hooks/useChatRestore";
 import { useInputDraft } from "@/hooks/useInputDraft";
 import { useModelSync } from "@/hooks/useModelSync";
 import { useProjectChats } from "@/hooks/useProjectChats";
-import { readErrorMessage } from "@/lib/errorMessage";
 
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
@@ -57,9 +56,6 @@ import {
 } from "@/redux/ui/slice";
 import { fetchProjects } from "@/redux/projects/operations";
 
-const CREATE_CONVERSATION_FAILED =
-  "Couldn't start a new chat. Please try again.";
-
 export function useHomeController() {
   const dispatch = useAppDispatch();
 
@@ -87,19 +83,14 @@ export function useHomeController() {
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
   const accessTokenReady = useAppSelector(selectAccessTokenReady);
 
-  const [operationError, setOperationError] = useState<string | null>(null);
-  const reportError = useCallback(
-    (message: string) => setOperationError(message),
-    [],
-  );
-
   const draft = useInputDraft();
   const { selectedModel, selectedModelGroup, selectModel } = useModelSync({
     onModelSwitched: draft.clearDraft,
   });
-  const { sendMessage, streamError, clearStreamError } = useChatStream();
+  const { sendMessage, retryLastMessage, streamError, clearStreamError } =
+    useChatStream();
   const { restoringActiveChat } = useChatRestore();
-  const projects = useProjectChats({ onError: reportError });
+  const projects = useProjectChats();
 
   const { modelMode, setModelMode, modelRef } = useModelMode();
 
@@ -107,12 +98,6 @@ export function useHomeController() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const sendCycleInFlightRef = useRef(false);
   useScrollDirection(scrollContainerRef);
-
-  const chatError = streamError ?? operationError;
-  const clearChatError = useCallback(() => {
-    clearStreamError();
-    setOperationError(null);
-  }, [clearStreamError]);
 
   const activeChatLoading =
     activeChatMessagesStatus === "idle" ||
@@ -158,8 +143,7 @@ export function useHomeController() {
           }),
         );
         return conv._id;
-      } catch (err) {
-        setOperationError(readErrorMessage(err, CREATE_CONVERSATION_FAILED));
+      } catch {
         return null;
       }
     },
@@ -215,10 +199,7 @@ export function useHomeController() {
               title: text.slice(0, 60) || undefined,
             }),
           ).unwrap();
-        } catch (err) {
-          setOperationError(
-            readErrorMessage(err, CREATE_CONVERSATION_FAILED),
-          );
+        } catch {
           return;
         }
 
@@ -255,6 +236,11 @@ export function useHomeController() {
     },
     [dispatch],
   );
+
+  const handleRetryStream = useCallback(async () => {
+    if (!activeChatId) return false;
+    return retryLastMessage(activeChatId);
+  }, [activeChatId, retryLastMessage]);
 
   const handleDeleteChat = useCallback(
     (id: string) => {
@@ -303,8 +289,8 @@ export function useHomeController() {
     isExistingChat,
     dockHidden,
     // errors
-    chatError,
-    clearChatError,
+    streamError,
+    clearStreamError,
     // estimate
     showEstimate: draft.showEstimate,
     estimateSupported: draft.estimateSupported,
@@ -327,6 +313,7 @@ export function useHomeController() {
     handleDeleteChat,
     handleRenameChat,
     handleSendClick,
+    handleRetryStream,
     handleProjectSend,
     handleRemoveChatFromProject: projects.unlinkConversation,
     linkConversations: projects.linkConversations,

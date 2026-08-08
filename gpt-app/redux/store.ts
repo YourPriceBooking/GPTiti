@@ -18,6 +18,7 @@ import { modelReducer } from "./model/slice";
 import { tokensReducer } from "./tokens/slice";
 import { uiReducer } from "./ui/slice";
 import { projectsReducer } from "./projects/slice";
+import { errorToastMiddleware } from "./errorToastMiddleware";
 import { setupInterceptors } from "@/lib/axiosInstance"; // ← додано
 
 const removeLegacyPersistedToken = async (
@@ -85,7 +86,7 @@ export const store = configureStore({
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
-    }),
+    }).concat(errorToastMiddleware),
 });
 
 setupInterceptors(store); // ← викликаємо після створення store

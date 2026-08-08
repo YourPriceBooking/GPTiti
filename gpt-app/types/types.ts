@@ -15,6 +15,8 @@ export type Message = {
   images?: string[];
   modelId?: string;
   streaming?: boolean;
+  error?: string;
+  retryable?: boolean;
 };
 
 export type ChatProject = {

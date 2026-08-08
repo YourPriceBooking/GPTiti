@@ -9,6 +9,8 @@ interface UiState {
   isSectionVisible: boolean;
   isOverlayOpen: boolean;
   hasFirstRequest: boolean;
+  errorToast: { id: number; message: string } | null;
+  nextToastId: number;
 }
 
 const initialState: UiState = {
@@ -20,6 +22,8 @@ const initialState: UiState = {
   isSectionVisible: true,
   isOverlayOpen: false,
   hasFirstRequest: false,
+  errorToast: null,
+  nextToastId: 0,
 };
 
 const uiSlice = createSlice({
@@ -50,6 +54,14 @@ const uiSlice = createSlice({
     setHasFirstRequest(state, { payload }: PayloadAction<boolean>) {
       state.hasFirstRequest = payload;
     },
+    showErrorToast(state, { payload }: PayloadAction<string>) {
+      state.nextToastId += 1;
+      state.errorToast = { id: state.nextToastId, message: payload };
+    },
+    hideErrorToast(state, { payload }: PayloadAction<number | undefined>) {
+      if (payload !== undefined && state.errorToast?.id !== payload) return;
+      state.errorToast = null;
+    },
   },
 });
 
@@ -62,6 +74,8 @@ export const {
   setIsSectionVisible,
   setIsOverlayOpen,
   setHasFirstRequest,
+  showErrorToast,
+  hideErrorToast,
 } = uiSlice.actions;
 
 export const uiReducer = uiSlice.reducer;
