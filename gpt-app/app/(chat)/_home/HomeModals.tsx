@@ -4,7 +4,6 @@ import ModelModalOverlay from "@/components/ModelModalOverlay/ModelModalOverlay"
 import CreateProjectModalOverlay from "@/components/HomePage/LeftSide/CreateProjectModalWindow/CreateProjectModalOverlay";
 import AddChatsModalOverlay from "@/components/HomePage/LeftSide/AddChatsModalWindow/AddChatsModalOverlay";
 
-import { fetchConversations } from "@/redux/chat/operations";
 import { setSelectedModelGroup } from "@/redux/model/slice";
 import {
   setIsModalOpen,
@@ -12,10 +11,7 @@ import {
   setActiveProjectId,
   setAddChatsProjectId,
 } from "@/redux/ui/slice";
-import {
-  createProject,
-  addProjectConversations,
-} from "@/redux/projects/operations";
+import { createProject } from "@/redux/projects/operations";
 
 import type { HomeController } from "./useHomeController";
 
@@ -66,16 +62,8 @@ export default function HomeModals({
         projectName={ctrl.addChatsProject?.title ?? "this project"}
         chats={ctrl.availableChatsForProject}
         onConfirm={(ids) => {
-          if (ctrl.addChatsProjectId && ids.length > 0) {
-            dispatch(
-              addProjectConversations({
-                projectId: ctrl.addChatsProjectId,
-                conversationIds: ids,
-              }),
-            )
-              .unwrap()
-              .then(() => dispatch(fetchConversations()))
-              .catch(() => {});
+          if (ctrl.addChatsProjectId) {
+            ctrl.linkConversations(ctrl.addChatsProjectId, ids);
           }
           dispatch(setAddChatsProjectId(null));
         }}

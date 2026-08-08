@@ -130,7 +130,7 @@ export default function ChatView({ ctrl }: { ctrl: HomeController }) {
             >
               <MainSectionRightSide
                 insertTemplate={(template) => {
-                  ctrl.insertTemplateToInput(template);
+                  ctrl.insertTemplate(template);
                   dispatch(setIsOverlayOpen(false));
                 }}
                 setFocusMode={(updater) => {
@@ -188,17 +188,9 @@ export default function ChatView({ ctrl }: { ctrl: HomeController }) {
         )}
         <div
           className={
-            ctrl.isExistingChat
+            ctrl.isExistingChat || ctrl.focusMode || ctrl.inputSent
               ? styles.inputBottom
-              : ctrl.newChatOpened && ctrl.isNewChat
-                ? styles.inputBottom
-                : ctrl.focusMode && ctrl.inputSent
-                  ? styles.inputBottom
-                  : ctrl.focusMode
-                    ? styles.inputBottom
-                    : ctrl.inputSent
-                      ? styles.inputBottom
-                      : styles.inputWrapper
+              : styles.inputWrapper
           }
         >
           {!ctrl.dockHidden && (

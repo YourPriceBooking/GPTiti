@@ -9,7 +9,6 @@ interface UiState {
   isSectionVisible: boolean;
   isOverlayOpen: boolean;
   hasFirstRequest: boolean;
-  newChatOpened: boolean;
 }
 
 const initialState: UiState = {
@@ -21,7 +20,6 @@ const initialState: UiState = {
   isSectionVisible: true,
   isOverlayOpen: false,
   hasFirstRequest: false,
-  newChatOpened: false,
 };
 
 const uiSlice = createSlice({
@@ -52,9 +50,6 @@ const uiSlice = createSlice({
     setHasFirstRequest(state, { payload }: PayloadAction<boolean>) {
       state.hasFirstRequest = payload;
     },
-    setNewChatOpened(state, { payload }: PayloadAction<boolean>) {
-      state.newChatOpened = payload;
-    },
   },
 });
 
@@ -67,7 +62,6 @@ export const {
   setIsSectionVisible,
   setIsOverlayOpen,
   setHasFirstRequest,
-  setNewChatOpened,
 } = uiSlice.actions;
 
 export const uiReducer = uiSlice.reducer;

@@ -23,11 +23,13 @@ export type ChatProject = {
   color?: string;
 };
 
+export type MessagesStatus = "idle" | "loading" | "loaded" | "error";
+
 export type Chat = {
   id: string;
   title: string | null;
   messages: Message[];
-  messagesLoaded?: boolean;
+  messagesStatus: MessagesStatus;
   modelId?: string;
   lastMessageAt?: string;
   createdAt?: string;

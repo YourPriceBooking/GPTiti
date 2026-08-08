@@ -18,7 +18,6 @@ import {
   setActiveChatId,
 } from "@/redux/chat/slice";
 import {
-  fetchConversationMessages,
   removeConversation,
   renameConversation,
 } from "@/redux/chat/operations";
@@ -58,9 +57,6 @@ export default function HeaderRightSide({
 
   const handleSelectChat = (id: string) => {
     dispatch(setActiveChatId(id));
-    if (isDraftId(id)) return;
-    const chat = chatList.find((c) => c.id === id);
-    if (chat && !chat.messagesLoaded) dispatch(fetchConversationMessages(id));
   };
 
   const handleDeleteChat = (id: string) => {
