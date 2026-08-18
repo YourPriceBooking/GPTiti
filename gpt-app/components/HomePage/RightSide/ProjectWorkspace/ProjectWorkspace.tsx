@@ -198,16 +198,6 @@ export default function ProjectWorkspace({
                 tabIndex={0}
                 onClick={() => onOpenChat?.(chat.id)}
               >
-                {isPinned && (
-                  <span className={styles.cardPin}>
-                    <Image
-                      src="/icons/pin.svg"
-                      alt="pinned"
-                      width={14}
-                      height={15}
-                    />
-                  </span>
-                )}
                 <div className={styles.cardIcon}>
                   <Image
                     src="/icons/new-chat.svg"
@@ -239,29 +229,63 @@ export default function ProjectWorkspace({
                   )}
                 </div>
 
-                <button
-                  type="button"
-                  className={styles.cardMenuBtn}
-                  aria-label="Chat options"
-                  aria-haspopup="menu"
-                  aria-expanded={openMenuChatId === chat.id}
-                  data-menu-trigger
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setDeletingChatId(null);
-                    setMenuUp(shouldOpenUpwards(e.currentTarget));
-                    setOpenMenuChatId((prev) =>
-                      prev === chat.id ? null : chat.id,
-                    );
-                  }}
-                >
-                  <Image
-                    src="/icons/three-points.svg"
-                    alt=""
-                    width={20}
-                    height={20}
-                  />
-                </button>
+                <div className={styles.cardActions}>
+                  <button
+                    type="button"
+                    className={`${styles.cardQuickPinBtn} ${
+                      isPinned ? styles.cardQuickPinBtnPinned : ""
+                    }`}
+                    aria-label={isPinned ? "Unpin chat" : "Pin chat to top"}
+                    title={isPinned ? "Unpin chat" : "Pin chat to top"}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setOpenMenuChatId(null);
+                      setDeletingChatId(null);
+                      togglePinChat(chat.id);
+                    }}
+                  >
+                    <Image
+                      className={isPinned ? styles.pinnedIcon : undefined}
+                      src="/icons/pin.svg"
+                      alt=""
+                      width={14}
+                      height={15}
+                    />
+                    {isPinned && (
+                      <Image
+                        className={styles.unpinIcon}
+                        src="/icons/unpin.svg"
+                        alt=""
+                        width={14}
+                        height={15}
+                      />
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    className={styles.cardMenuBtn}
+                    aria-label="Chat options"
+                    aria-haspopup="menu"
+                    aria-expanded={openMenuChatId === chat.id}
+                    data-menu-trigger
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDeletingChatId(null);
+                      setMenuUp(shouldOpenUpwards(e.currentTarget));
+                      setOpenMenuChatId((prev) =>
+                        prev === chat.id ? null : chat.id,
+                      );
+                    }}
+                  >
+                    <Image
+                      src="/icons/three-points.svg"
+                      alt=""
+                      width={20}
+                      height={20}
+                    />
+                  </button>
+                </div>
 
                 {openMenuChatId === chat.id && (
                   <div

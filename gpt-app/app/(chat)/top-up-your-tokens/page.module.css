@@ -230,7 +230,7 @@
 .priceTitle {
   display: flex;
   align-items: center;
-  color: #fff;
+  color: #e4e6e9;
   margin-top: 19px;
   margin-bottom: 17px;
 }
@@ -294,7 +294,7 @@
   font-family: var(--font-family);
   font-weight: 700;
   font-size: 14px;
-  color: #fff;
+  color: #e4e6e9;
   text-align: center;
 }
 
@@ -706,7 +706,7 @@
     font-family: var(--font-family);
     font-weight: 700;
     font-size: 26px;
-    color: #fff;
+    color: #e4e6e9;
   }
   .mobileBalanceIcon {
     display: block;

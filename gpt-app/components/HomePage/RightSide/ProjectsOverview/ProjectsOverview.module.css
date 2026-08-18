@@ -1,5 +1,6 @@
 .page {
-  --projects-border: #17477b;
+  --projects-border: #0a1522;
+  --projects-divider: #061b32;
   --projects-surface: #07172b;
   position: relative;
   isolation: isolate;
@@ -11,7 +12,7 @@
   min-height: 100%;
   padding: 30px 4% 50px;
   overflow: hidden auto;
-  color: #f3f6fb;
+  color: #e4e6e9;
   background: transparent;
 }
 
@@ -47,7 +48,7 @@
   padding: 0 20px;
   border: 1px solid rgba(124, 173, 255, 0.5);
   border-radius: 14px;
-  color: #fff;
+  color: #e4e6e9;
   background: linear-gradient(135deg, #327bff 0%, #1761ee 100%);
   box-shadow: 0 10px 32px rgba(16, 88, 230, 0.12);
   font-size: 16px;
@@ -186,6 +187,10 @@
   background: rgba(7, 23, 43, 0.78);
 }
 
+.pinnedList {
+  --projects-divider: #153151;
+}
+
 .tableHeader + .list {
   margin-top: 0;
 }
@@ -197,7 +202,7 @@
   align-items: center;
   min-height: 57px;
   padding: 7px 17px;
-  border-bottom: 1px solid rgba(23, 71, 123, 0.58);
+  border-bottom: 1px solid var(--projects-divider);
   cursor: pointer;
   outline: none;
   transition: background-color 140ms ease, box-shadow 140ms ease;
@@ -253,7 +258,7 @@
 .projectName {
   display: block;
   overflow: hidden;
-  color: #f3f6fb;
+  color: #e4e6e9;
   font-size: 15px;
   font-weight: 700;
   text-overflow: ellipsis;
@@ -283,7 +288,7 @@
   border: 1px solid #2f75e8;
   border-radius: 7px;
   outline: 0;
-  color: #f3f6fb;
+  color: #e4e6e9;
   background: #061326;
   font-size: 15px;
   font-weight: 700;
@@ -353,7 +358,7 @@
 
 .emptyDivider {
   height: 1px;
-  background: rgba(23, 71, 123, 0.72);
+  background: var(--projects-divider);
 }
 
 .emptyState {

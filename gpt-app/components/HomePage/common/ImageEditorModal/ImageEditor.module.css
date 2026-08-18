@@ -240,13 +240,13 @@
 .toolBtnActive {
   border-color: #3b82f6;
   background: #16263e;
-  color: #fff;
+  color: #e4e6e9;
 }
 
 .doneBtn {
   background: #2563eb;
   border-color: #2563eb;
-  color: #fff;
+  color: #e4e6e9;
 }
 
 .doneBtn:hover:not(:disabled) {

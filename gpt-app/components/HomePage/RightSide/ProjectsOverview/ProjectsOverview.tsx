@@ -302,7 +302,9 @@ export default function ProjectsOverview({
           <span className={styles.count}>{pinnedProjects.length}</span>
         </div>
         {pinnedProjects.length > 0 ? (
-          <ul className={styles.list}>{pinnedProjects.map(renderRow)}</ul>
+          <ul className={`${styles.list} ${styles.pinnedList}`}>
+            {pinnedProjects.map(renderRow)}
+          </ul>
         ) : (
           <p className={styles.noPinned}>
             No pinned projects yet. Pin important projects from the three-dot menu.
