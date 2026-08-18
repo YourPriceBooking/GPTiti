@@ -52,7 +52,11 @@ export default function Home() {
             setSelectedModelGroup={(g) => dispatch(setSelectedModelGroup(g))}
           />
         </div>
-        <div className={styles.rightSection}>
+        <div
+          className={`${styles.rightSection} ${
+            ctrl.activeProject ? "" : styles.rightSectionChat
+          }`}
+        >
           {ctrl.activeProject ? (
             <ProjectView ctrl={ctrl} />
           ) : (

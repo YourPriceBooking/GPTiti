@@ -127,7 +127,7 @@
   background: rgba(14, 27, 52, 0.5);
 }
 
-.chatCard:active:not(:has(.cardMenuBtn:active)) {
+.chatCard:active:not(:has(.cardActions button:active)) {
   transform: translateY(-4px);
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
   z-index: 1;
@@ -135,18 +135,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .chatCard:active:not(:has(.cardMenuBtn:active)) {
+  .chatCard:active:not(:has(.cardActions button:active)) {
     transform: none;
   }
-}
-
-.cardPin {
-  position: absolute;
-  top: 8px;
-  left: 5px;
-  display: flex;
-  z-index: 2;
-  pointer-events: none;
 }
 
 .cardIcon {
@@ -172,7 +163,7 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 6px;
-  padding-right: 28px;
+  padding-right: 64px;
 }
 
 .cardTitle {
@@ -230,10 +221,17 @@
   color: #8fa2c5;
 }
 
-.cardMenuBtn {
+.cardActions {
   position: absolute;
   top: 12px;
   right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.cardQuickPinBtn,
+.cardMenuBtn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -248,6 +246,43 @@
     opacity 0.18s ease,
     border-color 0.18s ease,
     background 0.18s ease;
+}
+
+.cardQuickPinBtn {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.chatCard:hover .cardQuickPinBtn,
+.chatCard:focus-within .cardQuickPinBtn {
+  opacity: 0.5;
+  pointer-events: auto;
+}
+
+.chatCard .cardQuickPinBtn:hover,
+.chatCard .cardQuickPinBtn:focus-visible {
+  opacity: 1;
+}
+
+.cardQuickPinBtnPinned,
+.chatCard:hover .cardQuickPinBtnPinned,
+.chatCard:focus-within .cardQuickPinBtnPinned {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.unpinIcon {
+  display: none;
+}
+
+.cardQuickPinBtnPinned:hover .pinnedIcon,
+.cardQuickPinBtnPinned:focus-visible .pinnedIcon {
+  display: none;
+}
+
+.cardQuickPinBtnPinned:hover .unpinIcon,
+.cardQuickPinBtnPinned:focus-visible .unpinIcon {
+  display: block;
 }
 
 .chatCard:hover .cardMenuBtn {
@@ -390,7 +425,7 @@
   font-family: var(--font-family);
   font-weight: 700;
   font-size: 15px;
-  color: #fff;
+  color: #e4e6e9;
   padding: 14px 38px;
   border-radius: 12px;
   border: 1px solid rgba(125, 168, 255, 0.42);

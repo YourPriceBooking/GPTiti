@@ -18,6 +18,11 @@
   overflow: hidden;
 }
 
+/* окремий фон лише для екрана з відповідями — решта сторінок правої частини як були */
+.rightSectionChat {
+  background: var(--right-bg);
+}
+
 .headerRightSectionContainer {
   position: sticky;
   top: 9px;
@@ -129,7 +134,7 @@
   margin-top: -28px;
   padding-top: 30px;
   padding-bottom: 5px;
-  background: var(--chat-bg);
+  background: var(--right-bg);
   text-align: center;
 }
 

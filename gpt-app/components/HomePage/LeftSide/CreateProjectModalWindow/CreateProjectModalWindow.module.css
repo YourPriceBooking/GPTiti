@@ -186,7 +186,7 @@
   font-family: var(--font-family);
   font-weight: 700;
   font-size: 15px;
-  color: #fff;
+  color: #e4e6e9;
   background: linear-gradient(135deg, #0b1730 0%, #081221 100%);
   border: 1px solid rgba(70, 98, 133, 0.25);
   border-radius: 10px;
@@ -228,7 +228,7 @@
   font-family: var(--font-family);
   font-weight: 700;
   font-size: 15px;
-  color: #fff;
+  color: #e4e6e9;
   padding: 14px 65px;
   border-radius: 12px;
   border: 1px solid rgba(125, 168, 255, 0.42);

@@ -324,6 +324,7 @@ export default function SectionGptChats({
           <ul className={styles.chatsList}>
             {visibleChats.map((chat) => {
               const chatProject = chat.project;
+              const isPinned = pinnedChatIds.includes(chat.id);
               const project = chatProject
                 ? (projectList.find((p) => p.id === chatProject.id) ??
                   chatProject)
@@ -393,16 +394,36 @@ export default function SectionGptChats({
                   </div>
 
                   <div className={styles.chatRight}>
-                    {pinnedChatIds.includes(chat.id) && (
-                      <span className={styles.pinSmall}>
+                    <button
+                      type="button"
+                      className={`${styles.quickPinButton} ${
+                        isPinned ? styles.quickPinButtonPinned : ""
+                      }`}
+                      aria-label={isPinned ? "Unpin chat" : "Pin chat to top"}
+                      title={isPinned ? "Unpin chat" : "Pin chat to top"}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        closeMenus();
+                        togglePinChat(chat.id);
+                      }}
+                    >
+                      <Image
+                        className={isPinned ? styles.pinnedIcon : undefined}
+                        src="/icons/pin.svg"
+                        alt=""
+                        width={14}
+                        height={15}
+                      />
+                      {isPinned && (
                         <Image
-                          src="/icons/pin.svg"
-                          alt="pinned"
+                          className={styles.unpinIcon}
+                          src="/icons/unpin.svg"
+                          alt=""
                           width={14}
                           height={15}
                         />
-                      </span>
-                    )}
+                      )}
+                    </button>
                     <div className={styles.chatAction}>
                       <span
                         className={styles.dotsIcon}
@@ -539,84 +560,112 @@ export default function SectionGptChats({
           }`}
         >
           <ul className={styles.chatsList}>
-            {sortedProjects.map((project) => (
-              <li
-                key={project.id}
-                className={`${styles.chatsListItem} ${
-                  project.id === activeProjectId
-                    ? styles.chatsListItemActive
-                    : ""
-                }`}
-                tabIndex={0}
-                onClick={() => setActiveProject?.(project.id)}
-              >
-                <div className={styles.projectItemContent}>
-                  <Image
-                    width={28}
-                    height={23}
-                    src="/icons/create-modal-project.svg"
-                    alt="project"
-                  />
-                  <span
-                    ref={(el) => {
-                      if (el) projectTitleRefs.current[project.id] = el;
-                    }}
-                    contentEditable={renamingProjectId === project.id}
-                    suppressContentEditableWarning
-                    className={styles.chatTitle}
-                    onClick={
-                      renamingProjectId === project.id
-                        ? (e) => e.stopPropagation()
-                        : undefined
-                    }
-                    onBlur={(e) => {
-                      const newTitle = e.currentTarget.textContent?.trim();
-                      if (newTitle && newTitle !== project.title) {
-                        renameProject?.(project.id, newTitle);
+            {sortedProjects.map((project) => {
+              const isPinned = pinnedProjectIds.includes(project.id);
+
+              return (
+                <li
+                  key={project.id}
+                  className={`${styles.chatsListItem} ${
+                    project.id === activeProjectId
+                      ? styles.chatsListItemActive
+                      : ""
+                  }`}
+                  tabIndex={0}
+                  onClick={() => setActiveProject?.(project.id)}
+                >
+                  <div className={styles.projectItemContent}>
+                    <Image
+                      width={28}
+                      height={23}
+                      src="/icons/create-modal-project.svg"
+                      alt="project"
+                    />
+                    <span
+                      ref={(el) => {
+                        if (el) projectTitleRefs.current[project.id] = el;
+                      }}
+                      contentEditable={renamingProjectId === project.id}
+                      suppressContentEditableWarning
+                      className={styles.chatTitle}
+                      onClick={
+                        renamingProjectId === project.id
+                          ? (e) => e.stopPropagation()
+                          : undefined
                       }
-                      setRenamingProjectId(null);
-                      setOpenMenuProjectId(null);
-                    }}
-                  >
-                    {renamingProjectId === project.id
-                      ? project.title
-                      : project.title.length > 12
-                        ? project.title.slice(0, 12) + "..."
-                        : project.title}
-                  </span>
-                </div>
-                <div className={styles.chatRight}>
-                  {pinnedProjectIds.includes(project.id) && (
-                    <span className={styles.pinSmall}>
+                      onBlur={(e) => {
+                        const newTitle = e.currentTarget.textContent?.trim();
+                        if (newTitle && newTitle !== project.title) {
+                          renameProject?.(project.id, newTitle);
+                        }
+                        setRenamingProjectId(null);
+                        setOpenMenuProjectId(null);
+                      }}
+                    >
+                      {renamingProjectId === project.id
+                        ? project.title
+                        : project.title.length > 12
+                          ? project.title.slice(0, 12) + "..."
+                          : project.title}
+                    </span>
+                  </div>
+                  <div className={styles.chatRight}>
+                    <button
+                      type="button"
+                      className={`${styles.quickPinButton} ${
+                        isPinned ? styles.quickPinButtonPinned : ""
+                      }`}
+                      aria-label={
+                        isPinned ? "Unpin project" : "Pin project to top"
+                      }
+                      title={
+                        isPinned ? "Unpin project" : "Pin project to top"
+                      }
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        closeMenus();
+                        togglePinProject(project.id);
+                      }}
+                    >
                       <Image
+                        className={isPinned ? styles.pinnedIcon : undefined}
                         src="/icons/pin.svg"
-                        alt="pinned"
+                        alt=""
                         width={14}
                         height={15}
                       />
-                    </span>
-                  )}
-                  <span
-                    className={styles.dotsIcon}
-                    data-menu-trigger
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      const wasOpen = openMenuProjectId === project.id;
-                      closeMenus();
-                      if (wasOpen) return;
+                      {isPinned && (
+                        <Image
+                          className={styles.unpinIcon}
+                          src="/icons/unpin.svg"
+                          alt=""
+                          width={14}
+                          height={15}
+                        />
+                      )}
+                    </button>
+                    <span
+                      className={styles.dotsIcon}
+                      data-menu-trigger
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const wasOpen = openMenuProjectId === project.id;
+                        closeMenus();
+                        if (wasOpen) return;
 
-                      const trigger = e.currentTarget as HTMLElement;
-                      projectTriggerRef.current = trigger;
-                      setProjectMenuPosition(menuPositionBelow(trigger));
-                      setOpenMenuProjectId(project.id);
-                    }}
-                  />
-                  {project.id === activeProjectId && (
-                    <span className={styles.activeIndicator} />
-                  )}
-                </div>
-              </li>
-            ))}
+                        const trigger = e.currentTarget as HTMLElement;
+                        projectTriggerRef.current = trigger;
+                        setProjectMenuPosition(menuPositionBelow(trigger));
+                        setOpenMenuProjectId(project.id);
+                      }}
+                    />
+                    {project.id === activeProjectId && (
+                      <span className={styles.activeIndicator} />
+                    )}
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         </div>
       )}

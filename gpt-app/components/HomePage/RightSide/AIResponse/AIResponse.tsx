@@ -1,8 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { renderAssistantMarkdown } from "@/lib/markdown";
+import { highlightCodeHtml } from "@/lib/shiki";
 import styles from "./AIResponse.module.css";
 
 type AIResponseProps = {
@@ -13,12 +14,32 @@ type AIResponseProps = {
 export default function AIResponse({ content, modelId }: AIResponseProps) {
   const html = useMemo(() => renderAssistantMarkdown(content), [content]);
 
-  const hasCodeBlock = useMemo(
-    () => html.includes('class="code-block"'),
-    [html],
-  );
-
   const [copied, setCopied] = useState(false);
+
+  const [highlighted, setHighlighted] = useState({ source: "", html: "" });
+
+  useEffect(() => {
+    if (!html.includes('class="code-block"')) return;
+
+    let cancelled = false;
+
+    const timer = setTimeout(() => {
+      void highlightCodeHtml(html)
+        .then((result) => {
+          if (!cancelled) setHighlighted({ source: html, html: result });
+        })
+        .catch((error) => {
+          console.error("Syntax highlighting failed", error);
+        });
+    }, 150);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [html]);
+
+  const renderedHtml = highlighted.source === html ? highlighted.html : html;
 
   const handleCopyResponse = useCallback(() => {
     navigator.clipboard.writeText(content).then(() => {
@@ -46,9 +67,7 @@ export default function AIResponse({ content, modelId }: AIResponseProps) {
   );
 
   return (
-    <div
-      className={`${styles.aiBlock} ${hasCodeBlock ? "" : styles.aiBlockText}`}
-    >
+    <div className={styles.aiBlock}>
       <h2 className={styles.aiTitle}>
         <Image
           src="/icons/rabbit.svg"
@@ -63,7 +82,7 @@ export default function AIResponse({ content, modelId }: AIResponseProps) {
           type="button"
           className={`${styles.copyBtn} ${copied ? styles.copyBtnCopied : ""}`}
           onClick={handleCopyResponse}
-            aria-label={copied ? "Скопійовано" : "Копіювати відповідь"}
+          aria-label={copied ? "Скопійовано" : "Копіювати відповідь"}
         >
           <Image
             src={copied ? "/icons/copied.svg" : "/icons/copy.svg"}
@@ -78,7 +97,7 @@ export default function AIResponse({ content, modelId }: AIResponseProps) {
       <div
         className={styles.aiContent}
         onClick={handleContentClick}
-        dangerouslySetInnerHTML={{ __html: html }}
+        dangerouslySetInnerHTML={{ __html: renderedHtml }}
       />
     </div>
   );

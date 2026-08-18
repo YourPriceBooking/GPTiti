@@ -271,7 +271,7 @@
   font-style: normal;
   font-weight: 700;
   font-size: 18px;
-  color: #fcfdff;
+  color: #e4e6e9;
   text-align: center;
 }
 .focusSubtitle {
@@ -340,7 +340,7 @@
   font-family: var(--font-family);
   font-weight: 300;
   font-size: 12px;
-  color: #fcfdff;
+  color: #e4e6e9;
   text-align: center;
   margin-top: 8px;
 }

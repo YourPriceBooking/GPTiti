@@ -7,11 +7,12 @@
   --background: #ffffff;
   --foreground: #1d212a;
   --chat-bg: #0a101c;
+  --right-bg: #1f1f24;
   --card-bg: #243052;
   --border: #243052;
 
   /* text / accents */
-  --main-white: #fcfdff;
+  --main-white: #e4e6e9;
   --main-gray: #3e3d40;
   --main-gray2: #b8bbc0;
   --muted: #94a3b8;

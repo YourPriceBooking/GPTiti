@@ -7,7 +7,7 @@
   width: 100%;
   border: 0.2px solid #3e3d40;
   border-radius: 33px;
-  background: var(--main-white);
+  background: #fcfdff;
   box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.25);
 }
 
@@ -73,7 +73,7 @@
   border: none;
   border-radius: 50%;
   background: rgba(15, 23, 42, 0.85);
-  color: #fff;
+  color: #e4e6e9;
   font-size: 15px;
   line-height: 1;
   cursor: pointer;
@@ -156,7 +156,7 @@
   border: none;
   border-radius: 50%;
   background: rgba(15, 23, 42, 0.85);
-  color: #fff;
+  color: #e4e6e9;
   font-size: 13px;
   line-height: 1;
   cursor: pointer;
@@ -350,7 +350,7 @@
   font-family: var(--font-family);
   font-weight: 700;
   font-size: 15px;
-  color: #ffffff;
+  color: #e4e6e9;
 }
 
 .comingSoonHint {
