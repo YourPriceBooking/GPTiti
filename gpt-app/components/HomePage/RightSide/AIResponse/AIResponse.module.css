@@ -1,6 +1,8 @@
 .aiBlock {
   max-width: 760px;
   width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   border-radius: 24px;
   background: #ffffff;
   color: #1d1d1f;
@@ -74,6 +76,9 @@
 }
 
 .aiContent {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
   margin-top: 8px;
   padding: 0 18px 16px;
   font-family: var(--font-family);
@@ -202,7 +207,10 @@
   z-index: 5;
   margin: 12px 0;
   width: 100%;
-  overflow: visible;
+  min-width: 0;
+  max-width: 100%;
+  overflow: clip;
+  box-sizing: border-box;
 
   background: var(--code-bg);
   border: 1px solid var(--code-border);
@@ -316,18 +324,17 @@
 }
 
 .aiContent pre {
-  min-width: max-content;
+  display: block;
+  min-width: 0;
+  max-width: 100%;
   width: 100%;
   margin: 0;
   padding: 16px 14px 18px;
-  overflow-x: auto;
+  overflow-x: hidden;
   box-sizing: border-box;
 
   background: transparent;
   border-radius: 0 0 11px 11px;
-
-  scrollbar-width: thin;
-  scrollbar-color: #c7c7cc var(--code-header-bg, #f5f5f7);
 }
 
 .aiContent :global(.shiki),
@@ -347,35 +354,14 @@
   font-size: 13px;
   font-weight: 400;
   line-height: 1.65;
-  white-space: pre;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
   tab-size: 2;
 }
 
 .aiContent :global(.shiki .line) {
   min-height: 1.65em;
-}
-
-.aiContent pre::-webkit-scrollbar {
-  width: 9px;
-  height: 9px;
-}
-
-.aiContent pre::-webkit-scrollbar-track {
-  background: var(--code-header-bg, #f5f5f7);
-}
-
-.aiContent pre::-webkit-scrollbar-thumb {
-  background: #c7c7cc;
-  border: 2px solid var(--code-header-bg, #f5f5f7);
-  border-radius: 999px;
-}
-
-.aiContent pre::-webkit-scrollbar-thumb:hover {
-  background: #aeaeb2;
-}
-
-.aiContent pre::-webkit-scrollbar-corner {
-  background: var(--code-header-bg, #f5f5f7);
 }
 
 .aiList {

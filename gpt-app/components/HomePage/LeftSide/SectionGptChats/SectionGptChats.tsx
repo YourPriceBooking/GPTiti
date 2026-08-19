@@ -396,9 +396,7 @@ export default function SectionGptChats({
                   <div className={styles.chatRight}>
                     <button
                       type="button"
-                      className={`${styles.quickPinButton} ${
-                        isPinned ? styles.quickPinButtonPinned : ""
-                      }`}
+                      className={styles.quickPinButton}
                       aria-label={isPinned ? "Unpin chat" : "Pin chat to top"}
                       title={isPinned ? "Unpin chat" : "Pin chat to top"}
                       onClick={(e) => {
@@ -408,21 +406,11 @@ export default function SectionGptChats({
                       }}
                     >
                       <Image
-                        className={isPinned ? styles.pinnedIcon : undefined}
-                        src="/icons/pin.svg"
+                        src={isPinned ? "/icons/unpin.svg" : "/icons/pin.svg"}
                         alt=""
                         width={14}
                         height={15}
                       />
-                      {isPinned && (
-                        <Image
-                          className={styles.unpinIcon}
-                          src="/icons/unpin.svg"
-                          alt=""
-                          width={14}
-                          height={15}
-                        />
-                      )}
                     </button>
                     <div className={styles.chatAction}>
                       <span
@@ -612,9 +600,7 @@ export default function SectionGptChats({
                   <div className={styles.chatRight}>
                     <button
                       type="button"
-                      className={`${styles.quickPinButton} ${
-                        isPinned ? styles.quickPinButtonPinned : ""
-                      }`}
+                      className={styles.quickPinButton}
                       aria-label={
                         isPinned ? "Unpin project" : "Pin project to top"
                       }
@@ -628,21 +614,11 @@ export default function SectionGptChats({
                       }}
                     >
                       <Image
-                        className={isPinned ? styles.pinnedIcon : undefined}
-                        src="/icons/pin.svg"
+                        src={isPinned ? "/icons/unpin.svg" : "/icons/pin.svg"}
                         alt=""
                         width={14}
                         height={15}
                       />
-                      {isPinned && (
-                        <Image
-                          className={styles.unpinIcon}
-                          src="/icons/unpin.svg"
-                          alt=""
-                          width={14}
-                          height={15}
-                        />
-                      )}
                     </button>
                     <span
                       className={styles.dotsIcon}
