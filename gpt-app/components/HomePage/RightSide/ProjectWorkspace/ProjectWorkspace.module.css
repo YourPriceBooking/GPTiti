@@ -253,8 +253,7 @@
   pointer-events: none;
 }
 
-.chatCard:hover .cardQuickPinBtn,
-.chatCard:focus-within .cardQuickPinBtn {
+.chatCard:hover .cardQuickPinBtn {
   opacity: 0.5;
   pointer-events: auto;
 }
@@ -262,27 +261,7 @@
 .chatCard .cardQuickPinBtn:hover,
 .chatCard .cardQuickPinBtn:focus-visible {
   opacity: 1;
-}
-
-.cardQuickPinBtnPinned,
-.chatCard:hover .cardQuickPinBtnPinned,
-.chatCard:focus-within .cardQuickPinBtnPinned {
-  opacity: 1;
   pointer-events: auto;
-}
-
-.unpinIcon {
-  display: none;
-}
-
-.cardQuickPinBtnPinned:hover .pinnedIcon,
-.cardQuickPinBtnPinned:focus-visible .pinnedIcon {
-  display: none;
-}
-
-.cardQuickPinBtnPinned:hover .unpinIcon,
-.cardQuickPinBtnPinned:focus-visible .unpinIcon {
-  display: block;
 }
 
 .chatCard:hover .cardMenuBtn {

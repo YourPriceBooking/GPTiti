@@ -232,9 +232,7 @@ export default function ProjectWorkspace({
                 <div className={styles.cardActions}>
                   <button
                     type="button"
-                    className={`${styles.cardQuickPinBtn} ${
-                      isPinned ? styles.cardQuickPinBtnPinned : ""
-                    }`}
+                    className={styles.cardQuickPinBtn}
                     aria-label={isPinned ? "Unpin chat" : "Pin chat to top"}
                     title={isPinned ? "Unpin chat" : "Pin chat to top"}
                     onClick={(e) => {
@@ -245,21 +243,11 @@ export default function ProjectWorkspace({
                     }}
                   >
                     <Image
-                      className={isPinned ? styles.pinnedIcon : undefined}
-                      src="/icons/pin.svg"
+                      src={isPinned ? "/icons/unpin.svg" : "/icons/pin.svg"}
                       alt=""
                       width={14}
                       height={15}
                     />
-                    {isPinned && (
-                      <Image
-                        className={styles.unpinIcon}
-                        src="/icons/unpin.svg"
-                        alt=""
-                        width={14}
-                        height={15}
-                      />
-                    )}
                   </button>
 
                   <button

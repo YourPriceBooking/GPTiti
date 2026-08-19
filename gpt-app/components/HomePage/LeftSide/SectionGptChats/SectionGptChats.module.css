@@ -396,8 +396,7 @@
   transition: opacity 0.2s ease;
 }
 
-.chatsListItem:hover .quickPinButton,
-.chatsListItem:focus-within .quickPinButton {
+.chatsListItem:hover .quickPinButton {
   opacity: 0.5;
   pointer-events: auto;
 }
@@ -405,27 +404,7 @@
 .chatsListItem .quickPinButton:hover,
 .chatsListItem .quickPinButton:focus-visible {
   opacity: 1;
-}
-
-.quickPinButtonPinned,
-.chatsListItem:hover .quickPinButtonPinned,
-.chatsListItem:focus-within .quickPinButtonPinned {
-  opacity: 1;
   pointer-events: auto;
-}
-
-.unpinIcon {
-  display: none;
-}
-
-.quickPinButtonPinned:hover .pinnedIcon,
-.quickPinButtonPinned:focus-visible .pinnedIcon {
-  display: none;
-}
-
-.quickPinButtonPinned:hover .unpinIcon,
-.quickPinButtonPinned:focus-visible .unpinIcon {
-  display: block;
 }
 
 .dotsIcon {
