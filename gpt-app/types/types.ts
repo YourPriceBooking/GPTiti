@@ -147,6 +147,8 @@ export type MainSectionRightSideProps = {
   onImagesChange?: (count: number) => void;
   showEstimate: boolean;
   onChooseModel: () => void;
+  estimateSupported?: boolean;
+  estimatedTokens?: number | null;
 };
 
 export type ModelModalOverlayProps = {

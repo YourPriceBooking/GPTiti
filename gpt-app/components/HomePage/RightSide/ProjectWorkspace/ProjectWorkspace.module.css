@@ -76,12 +76,6 @@
   margin-top: 22px;
 }
 
-.modelRow {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 10px;
-}
-
 .tabsRow {
   display: flex;
   padding: 0 12px;
@@ -264,7 +258,16 @@
   pointer-events: auto;
 }
 
+.cardMenuBtn {
+  opacity: 0.5;
+}
+
 .chatCard:hover .cardMenuBtn {
+  opacity: 0.5;
+}
+
+.chatCard .cardMenuBtn:hover,
+.chatCard .cardMenuBtn:focus-visible {
   opacity: 1;
 }
 
@@ -511,10 +514,6 @@
 
   .inputRow {
     margin-top: 18px;
-  }
-
-  .modelRow {
-    margin-top: 8px;
   }
 
   .tabsRow {

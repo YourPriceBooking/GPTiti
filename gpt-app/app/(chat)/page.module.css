@@ -23,13 +23,11 @@
   background: var(--right-bg);
 }
 
-.headerRightSectionContainer {
-  position: sticky;
-  top: 9px;
-  z-index: 30;
-  width: 100%;
-  max-width: 70vw;
-  min-height: 56px;
+.chatMenuTrigger {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 40;
 }
 
 .scrollableContent {
@@ -103,80 +101,11 @@
   padding-top: 8px;
 }
 
-.inputBottomInner > :first-child {
-  position: relative;
-  z-index: 1;
-}
-
 .scrollAnchor {
   flex: none;
   width: 100%;
   min-width: 0;
   height: 120px;
-}
-
-.inputDockDisclaimer {
-  position: absolute;
-  bottom: calc(100% + 10px);
-  left: 50%;
-  width: max-content;
-  max-width: calc(100% - 32px);
-  transform: translateX(-50%);
-  font-family: var(--font-family);
-  font-weight: 300;
-  font-size: 12px;
-  color: var(--muted);
-  text-align: center;
-}
-
-.spanContainer {
-  position: relative;
-  margin-top: -28px;
-  padding-top: 30px;
-  padding-bottom: 5px;
-  background: var(--right-bg);
-  text-align: center;
-}
-
-.inputSpan {
-  font-family: var(--font-family);
-  font-weight: 300;
-  font-size: 12px;
-  color: var(--main-white);
-}
-
-.spanContainerFirstRequest {
-  display: flex;
-  flex-direction: column;
-}
-
-.spanContainerFirstRequestTop {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.inputSpan1 {
-  display: flex;
-  margin-left: 50px;
-  font-family: var(--font-family);
-  font-weight: 400;
-  font-size: 11px;
-  color: var(--muted);
-  opacity: 1;
-  visibility: visible;
-  transition:
-    opacity 0.25s ease,
-    visibility 0s;
-}
-
-.estimateHidden {
-  opacity: 0;
-  visibility: hidden;
-  /* Fade out first, then flip to hidden once the fade has finished. */
-  transition:
-    opacity 0.25s ease,
-    visibility 0s 0.25s;
 }
 
 .overlay {
@@ -264,9 +193,8 @@
   .projectWorkspaceScroll {
     padding: 0 12px 24px;
   }
-  .headerRightSectionContainer {
-    max-width: 100vw;
-    width: 100%;
+  .scrollableContent > :first-child {
+    margin-top: 44px;
   }
   .overlayContent {
     left: 0;
@@ -275,37 +203,13 @@
     min-width: 400px;
   }
 
-  .spanContainer {
-    margin-left: 12px;
-    margin-right: 12px;
-  }
-
-  .inputSpan1 {
-    margin-left: 0;
-    justify-content: center;
-  }
-
   .scrollAnchor {
     height: 160px;
-  }
-
-  .inputDockDisclaimer {
-    width: calc(100% - 24px);
-    font-size: 11px;
   }
 }
 
 @media (max-width: 500px) {
   .overlayContentInner {
     min-width: 300px;
-  }
-}
-
-@media (max-width: 890px) {
-  .spanContainerFirstRequestTop {
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 4px;
   }
 }

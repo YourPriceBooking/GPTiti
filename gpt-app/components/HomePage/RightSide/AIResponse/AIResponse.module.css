@@ -4,6 +4,7 @@
   min-width: 0;
   box-sizing: border-box;
   border-radius: 24px;
+  overflow: clip;
   background: #ffffff;
   color: #1d1d1f;
   border: 1px solid #e5e5ea;

@@ -217,6 +217,15 @@ export default function InputBar({
     onImagesChange?.(images.length);
   }, [images.length, onImagesChange]);
 
+  useLayoutEffect(() => {
+    const textarea = inputRef.current;
+    if (!textarea) return;
+    onChange({
+      target: textarea,
+    } as React.ChangeEvent<HTMLTextAreaElement>);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     onChange(e);
     syncComposer();

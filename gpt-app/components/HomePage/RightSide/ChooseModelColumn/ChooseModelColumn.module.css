@@ -47,6 +47,26 @@
   border-color: #82a3ff;
 }
 
+.chooseModelColumn.project .inputSpan2 {
+  color: #a5b5d9;
+}
+
+.chooseModelColumn.project .chooseModelBtn {
+  color: #f7faff;
+  background: rgba(14, 27, 52, 0.55);
+  border-color: rgba(59, 130, 246, 0.4);
+  border-radius: 999px;
+}
+
+.chooseModelColumn.project .chooseModelBtn:hover {
+  background: rgba(14, 27, 52, 0.8);
+  border-color: rgba(111, 160, 255, 0.7);
+}
+
+.chooseModelColumn.project .chooseModelBtn:active {
+  border-color: #3e7cff;
+}
+
 .estimateHidden,
 .estimateNone {
   opacity: 0;

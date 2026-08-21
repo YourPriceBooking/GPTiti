@@ -4,7 +4,6 @@
   padding: 28px;
   padding-bottom: 16px;
   border-radius: 20px;
-  border: 1px solid rgba(59, 130, 246, 0.4);
   /* background: linear-gradient(135deg, #0c1b3a 0%, #07152e 45%, #050d1e 100%); */
   background: #061127;
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
@@ -58,7 +57,6 @@
   justify-content: center;
   border-radius: 14px;
   background: transparent;
-  border: 1px solid rgba(59, 130, 246, 0.32);
   cursor: pointer;
   padding: 8px;
   transition: opacity 0.2s ease;
@@ -106,7 +104,6 @@
   margin-top: 22px;
   padding: 20px;
   border-radius: 14px;
-  border: 1px solid rgba(59, 130, 246, 0.22);
   background: rgba(14, 27, 52, 0.55);
 }
 
@@ -188,11 +185,9 @@
   font-size: 15px;
   color: #e4e6e9;
   background: linear-gradient(135deg, #0b1730 0%, #081221 100%);
-  border: 1px solid rgba(70, 98, 133, 0.25);
   border-radius: 10px;
   padding: 14px 55px;
   cursor: pointer;
-  transition: border-color 0.2s ease;
 }
 
 .cancelButton::before {
@@ -206,16 +201,8 @@
   transition: opacity 0.2s ease;
 }
 
-.cancelButton:hover {
-  border-color: rgba(111, 160, 255, 0.88);
-}
-
 .cancelButton:hover::before {
   opacity: 1;
-}
-
-.cancelButton:active {
-  border-color: rgba(70, 98, 133, 0.25);
 }
 
 .cancelButton:active::before {
@@ -231,7 +218,6 @@
   color: #e4e6e9;
   padding: 14px 65px;
   border-radius: 12px;
-  border: 1px solid rgba(125, 168, 255, 0.42);
   background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
   cursor: pointer;
 }

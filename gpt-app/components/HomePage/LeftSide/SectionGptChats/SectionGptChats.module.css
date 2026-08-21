@@ -426,6 +426,11 @@
 }
 
 .chatsListItem:hover .dotsIcon {
+  opacity: 0.5;
+}
+
+.chatsListItem .dotsIcon:hover,
+.chatsListItem .dotsIcon:focus-visible {
   opacity: 1;
 }
 

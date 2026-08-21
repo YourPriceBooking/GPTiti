@@ -73,6 +73,8 @@ export default function ProjectView({ ctrl }: { ctrl: HomeController }) {
           }}
           onChooseModel={() => dispatch(setIsModalOpen(true))}
           showEstimate={ctrl.showEstimate}
+          estimateSupported={ctrl.estimateSupported}
+          estimatedTokens={ctrl.estimatedTokens}
         />
       </div>
     </>

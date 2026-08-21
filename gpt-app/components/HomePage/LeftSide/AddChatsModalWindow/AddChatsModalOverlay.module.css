@@ -43,7 +43,6 @@
   padding: 28px;
   padding-bottom: 16px;
   border-radius: 20px;
-  border: 1px solid rgba(59, 130, 246, 0.4);
   background: #061127;
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
   display: flex;
@@ -97,7 +96,6 @@
   justify-content: center;
   border-radius: 14px;
   background: transparent;
-  border: 1px solid rgba(59, 130, 246, 0.32);
   cursor: pointer;
   padding: 8px;
   transition: opacity 0.2s ease;
@@ -110,12 +108,33 @@
 .list {
   list-style: none;
   margin: 22px 0 0;
-  padding: 0;
+  padding: 0 6px 0 0;
   max-height: 320px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 8px;
+
+  scrollbar-width: thin;
+  scrollbar-color: rgba(125, 168, 255, 0.35) transparent;
+}
+
+.list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.list::-webkit-scrollbar-thumb {
+  background: rgba(125, 168, 255, 0.35);
+  border-radius: 3px;
+}
+
+.list::-webkit-scrollbar-thumb:hover {
+  background: rgba(125, 168, 255, 0.55);
+  cursor: pointer;
 }
 
 .item {
@@ -201,15 +220,14 @@
   font-size: 15px;
   color: #e4e6e9;
   background: linear-gradient(135deg, #0b1730 0%, #081221 100%);
-  border: 1px solid rgba(70, 98, 133, 0.25);
   border-radius: 10px;
   padding: 14px 40px;
   cursor: pointer;
-  transition: border-color 0.2s ease;
+  transition: background 0.2s ease;
 }
 
 .cancelButton:hover {
-  border-color: rgba(111, 160, 255, 0.88);
+  background: linear-gradient(100deg, #102245 0%, #0e1727 100%);
 }
 
 .addButton {
@@ -221,7 +239,6 @@
   color: #e4e6e9;
   padding: 14px 40px;
   border-radius: 12px;
-  border: 1px solid rgba(125, 168, 255, 0.42);
   background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
   cursor: pointer;
 }

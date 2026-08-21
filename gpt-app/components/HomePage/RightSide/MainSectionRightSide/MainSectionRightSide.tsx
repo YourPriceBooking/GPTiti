@@ -1,9 +1,8 @@
 import styles from "./MainSectionRightSide.module.css";
 import Image from "next/image";
 import { MainSectionRightSideProps } from "@/types/types";
-import InputBar from "@/components/HomePage/RightSide/InputBar/InputBar";
+import InputComposer from "@/components/HomePage/RightSide/InputComposer/InputComposer";
 import { getModelFlow } from "@/config/modelFlows.config";
-import ChooseModelColumn from "../ChooseModelColumn/ChooseModelColumn";
 
 export default function MainSectionRightSide(props: MainSectionRightSideProps) {
   const {
@@ -24,6 +23,8 @@ export default function MainSectionRightSide(props: MainSectionRightSideProps) {
     onImagesChange,
     showEstimate,
     onChooseModel,
+    estimateSupported = false,
+    estimatedTokens,
   } = props;
 
   const flow = getModelFlow(selectedModel);
@@ -120,7 +121,8 @@ export default function MainSectionRightSide(props: MainSectionRightSideProps) {
               <h2 className={styles.focusTitle}>{flow.header}</h2>
               <p className={styles.focusSubtitle}>{flow.subtitle}</p>
             </div>
-            <InputBar
+            <InputComposer
+              showDisclaimer
               hasInput={hasInput}
               onChange={onChange}
               onSend={onSend}
@@ -131,18 +133,11 @@ export default function MainSectionRightSide(props: MainSectionRightSideProps) {
               hasFirstRequest={hasFirstRequest}
               selectedModel={selectedModel}
               onImagesChange={onImagesChange}
+              showEstimate={showEstimate}
+              estimateSupported={estimateSupported}
+              estimatedTokens={estimatedTokens}
+              onChooseModel={onChooseModel}
             />
-            <div className={styles.spanContainer}>
-              <ChooseModelColumn
-                selectedModel={selectedModel}
-                showEstimate={showEstimate}
-                onChoose={onChooseModel}
-              />
-              <span className={styles.inputSpan}>
-                AI systems may make mistakes, so we recommend verifying
-                important information.
-              </span>
-            </div>
           </div>
         </>
       )}
