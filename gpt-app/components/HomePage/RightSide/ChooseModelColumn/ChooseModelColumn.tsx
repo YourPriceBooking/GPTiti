@@ -6,15 +6,21 @@ interface ChooseModelColumnProps {
   selectedModel: string;
   showEstimate: boolean;
   onChoose: () => void;
+  variant?: "default" | "project";
 }
 
 export default function ChooseModelColumn({
   selectedModel,
   showEstimate,
   onChoose,
+  variant = "default",
 }: ChooseModelColumnProps) {
   return (
-    <div className={styles.chooseModelColumn}>
+    <div
+      className={`${styles.chooseModelColumn} ${
+        variant === "project" ? styles.project : ""
+      }`}
+    >
       <span
         className={`${styles.inputSpan2} ${
           showEstimate ? "" : styles.estimateHidden

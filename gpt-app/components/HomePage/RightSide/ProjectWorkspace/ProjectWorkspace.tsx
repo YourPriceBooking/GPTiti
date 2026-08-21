@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
 import InputBar from "@/components/HomePage/RightSide/InputBar/InputBar";
-import ChooseModelColumn from "@/components/HomePage/RightSide/ChooseModelColumn/ChooseModelColumn";
+import InputComposer from "@/components/HomePage/RightSide/InputComposer/InputComposer";
 import ChatsMenu from "@/components/HomePage/LeftSide/ChatsMenu/ChatsMenu";
 import DeleteModalWindow from "@/components/HomePage/LeftSide/DeleteModalWindow/DeleteModalWindow";
 import type { Chat } from "@/types/types";
@@ -24,6 +24,8 @@ type ProjectWorkspaceProps = {
   inputProps: React.ComponentProps<typeof InputBar>;
   onChooseModel: () => void;
   showEstimate: boolean;
+  estimateSupported?: boolean;
+  estimatedTokens?: number | null;
   chats?: Chat[];
   chatsLoaded?: boolean;
   onOpenChat?: (id: string) => void;
@@ -79,6 +81,8 @@ export default function ProjectWorkspace({
   inputProps,
   onChooseModel,
   showEstimate,
+  estimateSupported,
+  estimatedTokens,
   chats = [],
   chatsLoaded = true,
   onOpenChat,
@@ -159,18 +163,15 @@ export default function ProjectWorkspace({
       </header>
 
       <div className={styles.inputRow}>
-        <InputBar
+        <InputComposer
           {...inputProps}
           placeholder="Start a new chat"
           variant="project"
+          showEstimate={showEstimate}
+          estimateSupported={estimateSupported}
+          estimatedTokens={estimatedTokens}
+          onChooseModel={onChooseModel}
         />
-        <div className={styles.modelRow}>
-          <ChooseModelColumn
-            selectedModel={inputProps.selectedModel}
-            showEstimate={showEstimate}
-            onChoose={onChooseModel}
-          />
-        </div>
       </div>
 
       <div className={styles.tabsRow}>

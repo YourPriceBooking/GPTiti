@@ -3,11 +3,11 @@
 import { useEffect, useState } from "react";
 
 import MessageList from "@/components/HomePage/RightSide/MessageList/MessageList";
-import InputBar from "@/components/HomePage/RightSide/InputBar/InputBar";
-import HeaderRightSide from "@/components/HomePage/RightSide/HeaderRightSide/HeaderRightSide";
+import InputComposer from "@/components/HomePage/RightSide/InputComposer/InputComposer";
 import MainSectionRightSide from "@/components/HomePage/RightSide/MainSectionRightSide/MainSectionRightSide";
-import ChooseModelColumn from "@/components/HomePage/RightSide/ChooseModelColumn/ChooseModelColumn";
+import LeftSideDrawer from "@/components/HomePage/LeftSide/LeftSideDrawer/LeftSideDrawer";
 
+import { handleNewChat } from "@/redux/chat/slice";
 import { setSelectedModelGroup } from "@/redux/model/slice";
 import {
   setFocusMode,
@@ -15,7 +15,10 @@ import {
   setIsModalOpen,
   setIsOverlayOpen,
   setIsSectionVisible,
+  setIsCreateProjectModalOpen,
 } from "@/redux/ui/slice";
+
+import { useQuickTasksAccess } from "@/hooks/useFeatureAccess";
 
 import type { HomeController } from "./useHomeController";
 import styles from "../page.module.css";
@@ -24,6 +27,16 @@ export default function ChatView({ ctrl }: { ctrl: HomeController }) {
   const { dispatch, activeChat, inputRef, scrollContainerRef, messagesEndRef } =
     ctrl;
   const [showDisclaimer, setShowDisclaimer] = useState(false);
+
+  const showQuickTasks = useQuickTasksAccess();
+  const focusOnly = !showQuickTasks;
+
+  const showMainSection =
+    !ctrl.restoringActiveChat && !ctrl.isOverlayOpen && ctrl.isNewChat;
+  const focusMode = focusOnly ? true : ctrl.focusMode;
+  const isSectionVisible = focusOnly ? true : ctrl.isSectionVisible;
+
+  const dockHidden = focusOnly ? showMainSection : ctrl.dockHidden;
 
   useEffect(() => {
     const container = scrollContainerRef.current;
@@ -50,22 +63,33 @@ export default function ChatView({ ctrl }: { ctrl: HomeController }) {
       container.removeEventListener("scroll", updateDisclaimer);
       window.removeEventListener("resize", updateDisclaimer);
     };
-  }, [activeChat?.id, activeChat?.messages.length, ctrl.isTyping, scrollContainerRef]);
+  }, [
+    activeChat?.id,
+    activeChat?.messages.length,
+    ctrl.isTyping,
+    scrollContainerRef,
+  ]);
 
   return (
     <>
-      <div className={styles.headerRightSectionContainer}>
-        <HeaderRightSide
-          chatTitle={activeChat?.title}
-          modelRef={ctrl.modelRef}
-          selectedModel={ctrl.selectedModel}
-          setSelectedModel={ctrl.handleSelectModel}
-          selectedModelGroup={ctrl.selectedModelGroup}
-          setSelectedModelGroup={(g) => dispatch(setSelectedModelGroup(g))}
-          isModalOpen={ctrl.isModalOpen}
-          setIsModalOpen={(open) => dispatch(setIsModalOpen(open))}
-        />
-      </div>
+      <LeftSideDrawer
+        className={styles.chatMenuTrigger}
+        onNewChat={() => dispatch(handleNewChat())}
+        onNewProject={() => dispatch(setIsCreateProjectModalOpen(true))}
+        isModalOpen={ctrl.isModalOpen}
+        setIsModalOpen={(open) => dispatch(setIsModalOpen(open))}
+        modelMode={ctrl.modelMode}
+        setModelMode={ctrl.setModelMode}
+        chatList={ctrl.sortedChatList}
+        setActiveChatId={ctrl.handleSelectChat}
+        deleteChat={ctrl.handleDeleteChat}
+        renameChat={ctrl.handleRenameChat}
+        modelRef={ctrl.modelRef}
+        selectedModel={ctrl.selectedModel}
+        setSelectedModel={ctrl.handleSelectModel}
+        selectedModelGroup={ctrl.selectedModelGroup}
+        setSelectedModelGroup={(g) => dispatch(setSelectedModelGroup(g))}
+      />
 
       <div className={styles.scrollableContent} ref={scrollContainerRef}>
         {ctrl.streamError && (
@@ -77,18 +101,19 @@ export default function ChatView({ ctrl }: { ctrl: HomeController }) {
           </div>
         )}
 
-        {!ctrl.restoringActiveChat && !ctrl.isOverlayOpen && ctrl.isNewChat && (
+        {showMainSection && (
           <MainSectionRightSide
             insertTemplate={ctrl.insertTemplate}
             setFocusMode={(updater) => {
+              if (focusOnly) return;
               const next =
                 typeof updater === "function"
                   ? (updater as (prev: boolean) => boolean)(ctrl.focusMode)
                   : updater;
               dispatch(setFocusMode(next));
             }}
-            focusMode={ctrl.focusMode}
-            isSectionVisible={ctrl.isSectionVisible}
+            focusMode={focusMode}
+            isSectionVisible={isSectionVisible}
             hasInput={ctrl.hasInput}
             onChange={ctrl.handleChange}
             onSend={(_message, imageUrls, imageFiles) => {
@@ -100,7 +125,9 @@ export default function ChatView({ ctrl }: { ctrl: HomeController }) {
             setHasFirstRequest={(updater) => {
               const next =
                 typeof updater === "function"
-                  ? (updater as (prev: boolean) => boolean)(ctrl.hasFirstRequest)
+                  ? (updater as (prev: boolean) => boolean)(
+                      ctrl.hasFirstRequest,
+                    )
                   : updater;
               dispatch(setHasFirstRequest(next));
             }}
@@ -109,6 +136,8 @@ export default function ChatView({ ctrl }: { ctrl: HomeController }) {
             selectedModel={ctrl.selectedModel}
             onImagesChange={ctrl.setInputImageCount}
             showEstimate={ctrl.showEstimate}
+            estimateSupported={ctrl.estimateSupported}
+            estimatedTokens={ctrl.estimatedTokens}
             onChooseModel={() => dispatch(setIsModalOpen(true))}
           />
         )}
@@ -127,7 +156,7 @@ export default function ChatView({ ctrl }: { ctrl: HomeController }) {
         <div ref={messagesEndRef} className={styles.scrollAnchor} />
       </div>
 
-      {ctrl.isOverlayOpen && (
+      {showQuickTasks && ctrl.isOverlayOpen && (
         <>
           <div
             className={styles.overlay}
@@ -190,22 +219,16 @@ export default function ChatView({ ctrl }: { ctrl: HomeController }) {
         className={styles.inputDock}
         style={ctrl.restoringActiveChat ? { display: "none" } : undefined}
       >
-        {showDisclaimer && !ctrl.dockHidden && (
-          <span className={styles.inputDockDisclaimer}>
-            AI systems may make mistakes, so we recommend verifying important
-            information.
-          </span>
-        )}
         <div
           className={
-            ctrl.isExistingChat || ctrl.focusMode || ctrl.inputSent
+            ctrl.isExistingChat || focusMode || ctrl.inputSent
               ? styles.inputBottom
               : styles.inputWrapper
           }
         >
-          {!ctrl.dockHidden && (
+          {!dockHidden && (
             <div className={styles.inputBottomInner}>
-              <InputBar
+              <InputComposer
                 hasInput={ctrl.hasInput}
                 onChange={ctrl.handleChange}
                 onSend={(_message, imageUrls, imageFiles) => {
@@ -232,30 +255,12 @@ export default function ChatView({ ctrl }: { ctrl: HomeController }) {
                 selectedModel={ctrl.selectedModel}
                 onImagesChange={ctrl.setInputImageCount}
                 isAiResponding={ctrl.isTyping}
+                showDisclaimer={showDisclaimer}
+                showEstimate={ctrl.showEstimate}
+                estimateSupported={ctrl.estimateSupported}
+                estimatedTokens={ctrl.estimatedTokens}
+                onChooseModel={() => dispatch(setIsModalOpen(true))}
               />
-
-              <div className={styles.spanContainer}>
-                {ctrl.estimateSupported ? (
-                  <div className={styles.spanContainerFirstRequest}>
-                    <div className={styles.spanContainerFirstRequestTop}>
-                      <span
-                        className={`${styles.inputSpan1} ${
-                          ctrl.showEstimate ? "" : styles.estimateHidden
-                        }`}
-                      >
-                        ≈ Estimated cost: ~
-                        {(ctrl.estimatedTokens ?? 0).toLocaleString("en-US")}{" "}
-                        tokens
-                      </span>
-                      <ChooseModelColumn
-                        selectedModel={ctrl.selectedModel}
-                        showEstimate={ctrl.showEstimate}
-                        onChoose={() => dispatch(setIsModalOpen(true))}
-                      />
-                    </div>
-                  </div>
-                ) : null}
-              </div>
             </div>
           )}
         </div>
