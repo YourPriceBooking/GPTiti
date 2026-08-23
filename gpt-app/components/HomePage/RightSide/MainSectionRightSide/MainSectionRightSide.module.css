@@ -182,7 +182,7 @@
 }
 .hiddenSectionContainer {
   position: relative;
-  background: linear-gradient(180deg, #f7faff 0%, #eef5ff 100%);
+  background: linear-gradient(180deg, var(--main-white) 0%, #eef5ff 100%);
   max-width: 100%;
   width: 100%;
   min-height: 520px;
@@ -250,7 +250,8 @@
   margin: 0px auto;
   width: 100%;
   max-width: 816px;
-  flex: 1;
+  min-width: 0;
+  flex: 1 0 auto;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -328,12 +329,14 @@
 
 .mainSectionContainer.noneContainer {
   background: transparent;
+  width: 100%;
   max-width: none;
-  flex: 1;
+  flex: 1 0 auto;
   display: flex;
   flex-direction: column;
-  min-height: 0;
+  min-height: min-content;
   margin-top: 0;
+  overflow: visible;
 }
 @media (max-width: 1024px) and (min-width: 320px) {
   .mainSectionContainer {
@@ -373,5 +376,9 @@
 @media (max-width: 767px) {
   .mainSectionContainer {
     max-width: min(100% - 66px, 858px);
+  }
+
+  .mainSectionContainer.noneContainer {
+    max-width: 100%;
   }
 }

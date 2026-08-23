@@ -26,7 +26,7 @@
 }
 
 .inputContainer.project .input {
-  color: #f7faff;
+  color: var(--main-white);
 }
 
 .inputContainer.project .input::placeholder {

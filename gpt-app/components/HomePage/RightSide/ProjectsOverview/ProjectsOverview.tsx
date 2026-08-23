@@ -76,12 +76,15 @@ function ProjectRow({
   menuOpen,
   menuUp,
   renaming,
+  deleting,
   onOpen,
   onMenuToggle,
   onPinToggle,
   onRenameRequest,
   onRename,
   onDeleteRequest,
+  onDeleteCancel,
+  onDeleteConfirm,
   onAddChats,
 }: {
   project: Project;
@@ -89,12 +92,15 @@ function ProjectRow({
   menuOpen: boolean;
   menuUp: boolean;
   renaming: boolean;
+  deleting: boolean;
   onOpen: () => void;
   onMenuToggle: (trigger: HTMLButtonElement) => void;
   onPinToggle: () => void;
   onRenameRequest: () => void;
   onRename: (title: string) => void;
   onDeleteRequest: () => void;
+  onDeleteCancel: () => void;
+  onDeleteConfirm: () => void;
   onAddChats: () => void;
 }) {
   const [draftTitle, setDraftTitle] = useState(project.title);
@@ -186,6 +192,18 @@ function ProjectRow({
             />
           </div>
         )}
+        {deleting && (
+          <div
+            className={`${styles.menu} ${styles.deleteMenu} ${menuUp ? styles.menuUp : ""}`}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <DeleteModalWindow
+              type="project"
+              onCancel={onDeleteCancel}
+              onConfirm={onDeleteConfirm}
+            />
+          </div>
+        )}
       </div>
     </li>
   );
@@ -218,15 +236,18 @@ export default function ProjectsOverview({
   }, [pinnedProjectIds]);
 
   useEffect(() => {
-    if (!openMenuId) return;
-    const close = () => setOpenMenuId(null);
+    if (!openMenuId && !deletingId) return;
+    const close = () => {
+      setOpenMenuId(null);
+      setDeletingId(null);
+    };
     window.addEventListener("resize", close);
     document.addEventListener("click", close);
     return () => {
       window.removeEventListener("resize", close);
       document.removeEventListener("click", close);
     };
-  }, [openMenuId]);
+  }, [openMenuId, deletingId]);
 
   const validPinnedIds = pinnedProjectIds.filter((id) =>
     projects.some((project) => project.id === id),
@@ -255,6 +276,7 @@ export default function ProjectsOverview({
       menuOpen={openMenuId === project.id}
       menuUp={openMenuId === project.id && menuUp}
       renaming={renamingId === project.id}
+      deleting={deletingId === project.id}
       onOpen={() => onOpenProject(project.id)}
       onMenuToggle={(trigger) => {
         setMenuUp(shouldOpenUpwards(trigger));
@@ -276,6 +298,14 @@ export default function ProjectsOverview({
       onDeleteRequest={() => {
         setOpenMenuId(null);
         setDeletingId(project.id);
+      }}
+      onDeleteCancel={() => setDeletingId(null)}
+      onDeleteConfirm={() => {
+        onDeleteProject(project.id);
+        setPinnedProjectIds((current) =>
+          current.filter((id) => id !== project.id),
+        );
+        setDeletingId(null);
       }}
     />
   );
@@ -365,24 +395,6 @@ export default function ProjectsOverview({
           </div>
         )}
       </section>
-
-      {deletingId && (
-        <div className={styles.deleteOverlay} onClick={() => setDeletingId(null)}>
-          <div onClick={(event) => event.stopPropagation()}>
-            <DeleteModalWindow
-              type="project"
-              onCancel={() => setDeletingId(null)}
-              onConfirm={() => {
-                onDeleteProject(deletingId);
-                setPinnedProjectIds((current) =>
-                  current.filter((id) => id !== deletingId),
-                );
-                setDeletingId(null);
-              }}
-            />
-          </div>
-        </div>
-      )}
     </main>
   );
 }

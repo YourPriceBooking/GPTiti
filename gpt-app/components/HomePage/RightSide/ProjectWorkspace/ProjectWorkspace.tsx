@@ -18,6 +18,7 @@ const shouldOpenUpwards = (trigger: HTMLElement) =>
   window.innerHeight;
 
 type ProjectWorkspaceProps = {
+  projectId: string;
   name: string;
   createdAt?: string;
   onCreateFirstChat: () => void;
@@ -30,6 +31,10 @@ type ProjectWorkspaceProps = {
   chatsLoaded?: boolean;
   onOpenChat?: (id: string) => void;
   onRemoveChat?: (id: string) => void;
+  onRenameChat?: (id: string, title: string) => void;
+  onAddChatsToProject: (id: string) => void;
+  onRenameProject: (id: string, title: string) => void;
+  onDeleteProject: (id: string) => void;
 };
 
 /**style label from an ISO timestamp. */
@@ -75,6 +80,7 @@ function getChatPreview(chat: Chat): string | null {
 }
 
 export default function ProjectWorkspace({
+  projectId,
   name,
   createdAt,
   onCreateFirstChat,
@@ -87,6 +93,10 @@ export default function ProjectWorkspace({
   chatsLoaded = true,
   onOpenChat,
   onRemoveChat,
+  onRenameChat,
+  onAddChatsToProject,
+  onRenameProject,
+  onDeleteProject,
 }: ProjectWorkspaceProps) {
   const chatCount = chats.length;
   const hasChats = chatCount > 0;
@@ -94,14 +104,160 @@ export default function ProjectWorkspace({
   const [openMenuChatId, setOpenMenuChatId] = useState<string | null>(null);
   const [menuUp, setMenuUp] = useState(false);
   const [deletingChatId, setDeletingChatId] = useState<string | null>(null);
+  const [renamingChatId, setRenamingChatId] = useState<string | null>(null);
+  const [projectMenuOpen, setProjectMenuOpen] = useState(false);
+  const [renamingProject, setRenamingProject] = useState(false);
+  const [deletingProject, setDeletingProject] = useState(false);
+  const [draftProjectName, setDraftProjectName] = useState(name);
   const [pinnedChatIds, setPinnedChatIds] = useState<string[]>(() => {
     return JSON.parse(localStorage.getItem(PINNED_CHATS_KEY) || "[]");
   });
   const menuRef = useRef<HTMLDivElement | null>(null);
+  const projectMenuRef = useRef<HTMLDivElement | null>(null);
+  const projectNameInputRef = useRef<HTMLInputElement | null>(null);
+  const titleRefs = useRef<Record<string, HTMLSpanElement | null>>({});
 
   useEffect(() => {
     localStorage.setItem(PINNED_CHATS_KEY, JSON.stringify(pinnedChatIds));
   }, [pinnedChatIds]);
+
+  useEffect(() => {
+    if (!renamingProject) return;
+    projectNameInputRef.current?.focus();
+    projectNameInputRef.current?.select();
+  }, [renamingProject]);
+
+  useEffect(() => {
+    if (!projectMenuOpen && !deletingProject) return;
+
+    const closeProjectMenu = (event: MouseEvent) => {
+      if (!projectMenuRef.current?.contains(event.target as Node)) {
+        setProjectMenuOpen(false);
+        setDeletingProject(false);
+      }
+    };
+
+    document.addEventListener("mousedown", closeProjectMenu);
+    return () => document.removeEventListener("mousedown", closeProjectMenu);
+  }, [projectMenuOpen, deletingProject]);
+
+  useEffect(() => {
+    if (!renamingChatId) return;
+
+    const title = titleRefs.current[renamingChatId];
+    if (!title) return;
+
+    title.focus();
+    const range = document.createRange();
+    range.selectNodeContents(title);
+    range.collapse(false);
+
+    const selection = window.getSelection();
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+  }, [renamingChatId]);
+
+  const registerTitleRef = (element: HTMLSpanElement | null) => {
+    const chatId = element?.dataset.chatId;
+    if (element && chatId) titleRefs.current[chatId] = element;
+  };
+
+  const getChatTitle = (chatId: string) =>
+    chats.find((chat) => chat.id === chatId)?.title || "Untitled chat";
+
+  const handleTitleClick = (event: React.MouseEvent<HTMLSpanElement>) => {
+    if (event.currentTarget.isContentEditable) event.stopPropagation();
+  };
+
+  const handleTitleBlur = (event: React.FocusEvent<HTMLSpanElement>) => {
+    const chatId = event.currentTarget.dataset.chatId;
+    if (!chatId || renamingChatId !== chatId) return;
+
+    const currentTitle = getChatTitle(chatId);
+    const newTitle = event.currentTarget.textContent?.trim();
+
+    if (newTitle && newTitle !== currentTitle) {
+      onRenameChat?.(chatId, newTitle);
+    } else if (!newTitle) {
+      event.currentTarget.textContent = currentTitle;
+    }
+
+    setRenamingChatId(null);
+  };
+
+  const handleTitleKeyDown = (
+    event: React.KeyboardEvent<HTMLSpanElement>,
+  ) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      event.currentTarget.blur();
+      return;
+    }
+
+    if (event.key === "Escape") {
+      event.preventDefault();
+      const chatId = event.currentTarget.dataset.chatId;
+      if (chatId) event.currentTarget.textContent = getChatTitle(chatId);
+      setRenamingChatId(null);
+      event.currentTarget.blur();
+    }
+  };
+
+  const startRenamingChat = (chatId: string) => {
+    setRenamingChatId(chatId);
+    setOpenMenuChatId(null);
+  };
+
+  const toggleProjectMenu = () => {
+    setProjectMenuOpen((open) => !open);
+  };
+
+  const addChatsToProject = () => {
+    setProjectMenuOpen(false);
+    onAddChatsToProject(projectId);
+  };
+
+  const startRenamingProject = () => {
+    setProjectMenuOpen(false);
+    setDraftProjectName(name);
+    setRenamingProject(true);
+  };
+
+  const commitProjectRename = () => {
+    const nextName = draftProjectName.trim();
+    if (nextName && nextName !== name) {
+      onRenameProject(projectId, nextName);
+    } else {
+      setDraftProjectName(name);
+    }
+    setRenamingProject(false);
+  };
+
+  const handleProjectNameKeyDown = (
+    event: React.KeyboardEvent<HTMLInputElement>,
+  ) => {
+    if (event.key === "Enter") {
+      event.currentTarget.blur();
+      return;
+    }
+
+    if (event.key === "Escape") {
+      setDraftProjectName(name);
+      setRenamingProject(false);
+    }
+  };
+
+  const requestProjectDelete = () => {
+    setProjectMenuOpen(false);
+    setDeletingProject(true);
+  };
+
+  const cancelProjectDelete = () => setDeletingProject(false);
+
+  const confirmProjectDelete = () => {
+    onDeleteProject(projectId);
+    setDeletingProject(false);
+  };
 
   const togglePinChat = (id: string) => {
     setPinnedChatIds((prev) =>
@@ -147,7 +303,19 @@ export default function ProjectWorkspace({
         </div>
         <div className={styles.headerText}>
           <div className={styles.titleRow}>
-            <h1 className={styles.title}>{name}</h1>
+            {renamingProject ? (
+              <input
+                ref={projectNameInputRef}
+                className={styles.projectRenameInput}
+                value={draftProjectName}
+                maxLength={60}
+                onChange={(event) => setDraftProjectName(event.target.value)}
+                onBlur={commitProjectRename}
+                onKeyDown={handleProjectNameKeyDown}
+              />
+            ) : (
+              <h1 className={styles.title}>{name}</h1>
+            )}
             {formatCreatedDate(createdAt) && (
               <span className={styles.createdDate}>
                 Created · {formatCreatedDate(createdAt)}
@@ -159,6 +327,45 @@ export default function ProjectWorkspace({
             Organize chats, links, images, edited images and uploaded files in
             one place.
           </p>
+        </div>
+        <div className={styles.projectActions} ref={projectMenuRef}>
+          <button
+            type="button"
+            className={`${styles.projectMenuButton} ${
+              projectMenuOpen ? styles.projectMenuButtonOpen : ""
+            }`}
+            aria-label={`Actions for ${name}`}
+            aria-haspopup="menu"
+            aria-expanded={projectMenuOpen}
+            onClick={toggleProjectMenu}
+          >
+            <Image
+              src="/icons/three-points.svg"
+              alt=""
+              width={20}
+              height={20}
+            />
+          </button>
+          {projectMenuOpen && (
+            <div className={styles.projectMenu}>
+              <ChatsMenu
+                isProject
+                showPinToggle={false}
+                onAddChats={addChatsToProject}
+                onRenameRequest={startRenamingProject}
+                onDeleteRequest={requestProjectDelete}
+              />
+            </div>
+          )}
+          {deletingProject && (
+            <div className={styles.projectDeleteModal}>
+              <DeleteModalWindow
+                type="project"
+                onCancel={cancelProjectDelete}
+                onConfirm={confirmProjectDelete}
+              />
+            </div>
+          )}
         </div>
       </header>
 
@@ -209,7 +416,16 @@ export default function ProjectWorkspace({
                 </div>
 
                 <div className={styles.cardBody}>
-                  <span className={styles.cardTitle}>
+                  <span
+                    ref={registerTitleRef}
+                    data-chat-id={chat.id}
+                    className={styles.cardTitle}
+                    contentEditable={renamingChatId === chat.id}
+                    suppressContentEditableWarning
+                    onClick={handleTitleClick}
+                    onBlur={handleTitleBlur}
+                    onKeyDown={handleTitleKeyDown}
+                  >
                     {chat.title || "Untitled chat"}
                   </span>
                   {(chat.modelId || created) && (
@@ -292,7 +508,7 @@ export default function ProjectWorkspace({
                       }}
                       showCreateProject
                       onCreateProject={() => setOpenMenuChatId(null)}
-                      onRenameRequest={() => setOpenMenuChatId(null)}
+                      onRenameRequest={() => startRenamingChat(chat.id)}
                       onDeleteRequest={() => {
                         setDeletingChatId(chat.id);
                         setOpenMenuChatId(null);

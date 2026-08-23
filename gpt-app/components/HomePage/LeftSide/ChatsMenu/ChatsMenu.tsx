@@ -2,8 +2,9 @@ import styles from "./ChatsMenu.module.css";
 import Image from "next/image";
 
 type ItemMenuProps = {
-  isPinned: boolean;
-  onPinToggle: () => void;
+  isPinned?: boolean;
+  onPinToggle?: () => void;
+  showPinToggle?: boolean;
   isProject?: boolean;
   showCreateProject?: boolean;
   onCreateProject?: () => void;
@@ -15,6 +16,7 @@ type ItemMenuProps = {
 export default function ChatsMenu({
   isPinned,
   onPinToggle,
+  showPinToggle = true,
   isProject = false,
   showCreateProject = false,
   onCreateProject,
@@ -24,32 +26,36 @@ export default function ChatsMenu({
 }: ItemMenuProps) {
   return (
     <div className={styles.container}>
-      <button className={styles.button} onClick={onPinToggle}>
-        <span className={styles.iconWrap}>
-          <Image
-            src={isPinned ? "/icons/unpin.svg" : "/icons/pin.svg"}
-            alt={isPinned ? "Unpin" : "Pin"}
-            width={16}
-            height={17}
-          />
-        </span>
-        <div className={styles.itemContent}>
-          <span className={styles.label}>
-            {isPinned ? "Unpin" : "Pin to top"}
-          </span>
-          <span className={styles.subtitle}>
-            {isPinned
-              ? isProject
-                ? "Return this project to the normal order"
-                : "Return this chat to the normal order"
-              : isProject
-                ? "Keep this project first in Projects"
-                : "Keep this chat above the list"}
-          </span>
-        </div>
-      </button>
+      {showPinToggle && (
+        <>
+          <button className={styles.button} onClick={onPinToggle}>
+            <span className={styles.iconWrap}>
+              <Image
+                src={isPinned ? "/icons/unpin.svg" : "/icons/pin.svg"}
+                alt={isPinned ? "Unpin" : "Pin"}
+                width={16}
+                height={17}
+              />
+            </span>
+            <div className={styles.itemContent}>
+              <span className={styles.label}>
+                {isPinned ? "Unpin" : "Pin to top"}
+              </span>
+              <span className={styles.subtitle}>
+                {isPinned
+                  ? isProject
+                    ? "Return this project to the normal order"
+                    : "Return this chat to the normal order"
+                  : isProject
+                    ? "Keep this project first in Projects"
+                    : "Keep this chat above the list"}
+              </span>
+            </div>
+          </button>
 
-      <div className={styles.separator} />
+          <div className={styles.separator} />
+        </>
+      )}
 
       {isProject ? (
         <>

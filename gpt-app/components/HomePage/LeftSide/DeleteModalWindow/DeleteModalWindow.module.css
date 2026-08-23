@@ -9,6 +9,17 @@
   display: flex;
   gap: 12px;
 }
+
+.iconContainer {
+  flex-shrink: 0;
+  width: 30px;
+}
+
+.infoContainer {
+  flex: 1;
+  min-width: 0;
+}
+
 .title {
   font-family: var(--font-family);
   font-weight: 700;

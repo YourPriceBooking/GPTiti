@@ -7,7 +7,6 @@ import InputComposer from "@/components/HomePage/RightSide/InputComposer/InputCo
 import MainSectionRightSide from "@/components/HomePage/RightSide/MainSectionRightSide/MainSectionRightSide";
 import LeftSideDrawer from "@/components/HomePage/LeftSide/LeftSideDrawer/LeftSideDrawer";
 
-import { handleNewChat } from "@/redux/chat/slice";
 import { setSelectedModelGroup } from "@/redux/model/slice";
 import {
   setFocusMode,
@@ -74,7 +73,7 @@ export default function ChatView({ ctrl }: { ctrl: HomeController }) {
     <>
       <LeftSideDrawer
         className={styles.chatMenuTrigger}
-        onNewChat={() => dispatch(handleNewChat())}
+        onNewChat={ctrl.handleStartNewChat}
         onNewProject={() => dispatch(setIsCreateProjectModalOpen(true))}
         isModalOpen={ctrl.isModalOpen}
         setIsModalOpen={(open) => dispatch(setIsModalOpen(open))}

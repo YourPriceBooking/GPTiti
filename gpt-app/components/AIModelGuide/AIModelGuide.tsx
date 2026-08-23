@@ -376,7 +376,7 @@ const AIModelGuide = () => {
         </ul>
         <Link
           href="/ai-models-guide/best-ai-model-for-chat"
-          className="text-sm font-bold text-[#2F6BFF] px-2.5 py-1.5 rounded-lg bg-[#F2F6FF] inline-block"
+          className="text-sm font-bold text-[#2F6BFF] px-2.5 py-1.5 rounded-lg bg-[var(--main-white)] inline-block"
         >
           🔥 Compare best AI models for chat →
         </Link>

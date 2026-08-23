@@ -12,7 +12,7 @@
   min-height: 100%;
   padding: 30px 4% 50px;
   overflow: hidden auto;
-  color: #e4e6e9;
+  color: #c8d2e2;
   background: transparent;
 }
 
@@ -163,10 +163,9 @@
 
 .tableHeader {
   display: grid;
-  grid-template-columns: 40px minmax(220px, 1.55fr) minmax(180px, 1fr) minmax(
-      190px,
-      1fr
-    ) 52px;
+  grid-template-columns:
+    40px minmax(220px, 1.55fr) minmax(180px, 1fr) minmax(190px, 1fr)
+    52px;
   align-items: center;
   min-height: 40px;
   padding: 0 17px;
@@ -202,10 +201,9 @@
 .projectRow {
   position: relative;
   display: grid;
-  grid-template-columns: 40px minmax(220px, 1.55fr) minmax(180px, 1fr) minmax(
-      190px,
-      1fr
-    ) 52px;
+  grid-template-columns:
+    40px minmax(220px, 1.55fr) minmax(180px, 1fr) minmax(190px, 1fr)
+    52px;
   align-items: center;
   min-height: 57px;
   padding: 7px 17px;
@@ -265,7 +263,7 @@
 .projectName {
   display: block;
   overflow: hidden;
-  color: #e4e6e9;
+  color: #c8d2e2;
   font-size: 15px;
   font-weight: 700;
   text-overflow: ellipsis;
@@ -433,16 +431,8 @@
   font-weight: 700;
 }
 
-.deleteOverlay {
-  position: fixed;
-  z-index: 2100;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  background: rgba(0, 0, 0, 0.58);
-  backdrop-filter: blur(3px);
+.deleteMenu {
+  width: 300px;
 }
 
 @media (max-width: 1050px) {
@@ -601,7 +591,7 @@
 
 @media (max-width: 700px) {
   .page {
-    padding: 68px 22px 38px;
+    padding: 20px 22px 38px;
   }
 
   .header {
