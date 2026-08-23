@@ -3,13 +3,11 @@
 import LeftSideDrawer from "@/components/HomePage/LeftSide/LeftSideDrawer/LeftSideDrawer";
 import ProjectWorkspace from "@/components/HomePage/RightSide/ProjectWorkspace/ProjectWorkspace";
 
-import { handleNewChat } from "@/redux/chat/slice";
 import { setSelectedModelGroup } from "@/redux/model/slice";
 import {
   setHasFirstRequest,
   setIsModalOpen,
   setIsCreateProjectModalOpen,
-  setActiveProjectId,
 } from "@/redux/ui/slice";
 
 import type { HomeController } from "./useHomeController";
@@ -23,10 +21,7 @@ export default function ProjectView({ ctrl }: { ctrl: HomeController }) {
     <>
       <LeftSideDrawer
         className={styles.projectMenuTrigger}
-        onNewChat={() => {
-          dispatch(setActiveProjectId(null));
-          dispatch(handleNewChat());
-        }}
+        onNewChat={ctrl.handleStartNewChat}
         onNewProject={() => dispatch(setIsCreateProjectModalOpen(true))}
         isModalOpen={ctrl.isModalOpen}
         setIsModalOpen={(open) => dispatch(setIsModalOpen(open))}
@@ -44,12 +39,17 @@ export default function ProjectView({ ctrl }: { ctrl: HomeController }) {
       />
       <div className={styles.projectWorkspaceScroll}>
         <ProjectWorkspace
+          projectId={activeProject.id}
           name={activeProject.title}
           createdAt={activeProject.createdAt}
           chats={ctrl.projectChats}
           chatsLoaded={activeProject.conversationIds !== undefined}
           onOpenChat={ctrl.handleSelectChat}
           onRemoveChat={ctrl.handleRemoveChatFromProject}
+          onRenameChat={ctrl.handleRenameChat}
+          onAddChatsToProject={ctrl.handleAddChatsToProject}
+          onRenameProject={ctrl.handleRenameProject}
+          onDeleteProject={ctrl.handleDeleteProject}
           onCreateFirstChat={() => inputRef.current?.focus()}
           inputProps={{
             hasInput: ctrl.hasInput,

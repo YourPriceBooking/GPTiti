@@ -3,12 +3,10 @@
 import LeftSide from "@/components/HomePage/LeftSide/LeftSide";
 
 import { getFlowThemeId } from "@/config/modelFlows.config";
-import { handleNewChat } from "@/redux/chat/slice";
 import { setSelectedModelGroup } from "@/redux/model/slice";
 import {
   setIsModalOpen,
   setIsCreateProjectModalOpen,
-  setActiveProjectId,
 } from "@/redux/ui/slice";
 
 import { useHomeController } from "./_home/useHomeController";
@@ -32,10 +30,7 @@ export default function Home() {
       >
         <div className={styles.leftSideContainer}>
           <LeftSide
-            onNewChat={() => {
-              dispatch(setActiveProjectId(null));
-              dispatch(handleNewChat());
-            }}
+            onNewChat={ctrl.handleStartNewChat}
             onNewProject={() => dispatch(setIsCreateProjectModalOpen(true))}
             isModalOpen={ctrl.isModalOpen}
             setIsModalOpen={(open) => dispatch(setIsModalOpen(open))}

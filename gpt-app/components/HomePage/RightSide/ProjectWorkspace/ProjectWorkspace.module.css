@@ -25,7 +25,6 @@
   align-items: center;
   justify-content: center;
   background: linear-gradient(100deg, #102e69 0%, #0d1d46 100%);
-  border: 1px solid rgba(59, 130, 246, 0.45);
 }
 
 .headerText {
@@ -44,15 +43,29 @@
   font-family: var(--font-family);
   font-weight: 700;
   font-size: 26px;
-  color: #f7faff;
+  color: var(--main-white);
   margin: 0;
   word-break: break-word;
+}
+
+.projectRenameInput {
+  width: min(100%, 360px);
+  height: 38px;
+  padding: 4px 9px;
+  border: 1px solid #2f75e8;
+  border-radius: 7px;
+  outline: 0;
+  color: var(--main-white);
+  background: #061326;
+  font-family: var(--font-family);
+  font-size: 20px;
+  font-weight: 700;
 }
 
 .createdDate {
   font-family: var(--font-family);
   font-size: 14px;
-  color: #f7faff;
+  color: var(--main-white);
   white-space: nowrap;
 }
 
@@ -70,6 +83,53 @@
   font-size: 14px;
   color: #a5b5d9;
   margin: 0;
+}
+
+.projectActions {
+  position: relative;
+  flex-shrink: 0;
+  align-self: flex-start;
+  margin: 3px 0 0 auto;
+}
+
+.projectMenuButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 28px;
+  border-radius: 8px;
+  background: transparent;
+  opacity: 0.5;
+  cursor: pointer;
+  transition:
+    opacity 140ms ease,
+    background-color 140ms ease;
+}
+
+.projectMenuButton:hover,
+.projectMenuButton:focus-visible,
+.projectMenuButtonOpen {
+  background: rgba(30, 76, 137, 0.48);
+  opacity: 1;
+}
+
+.projectMenu {
+  position: absolute;
+  z-index: 40;
+  top: calc(100% + 6px);
+  right: 0;
+  width: 260px;
+  filter: drop-shadow(0 18px 34px rgba(0, 0, 0, 0.42));
+}
+
+.projectDeleteModal {
+  position: absolute;
+  z-index: 40;
+  top: calc(100% + 6px);
+  right: 0;
+  width: 300px;
+  filter: drop-shadow(0 18px 34px rgba(0, 0, 0, 0.42));
 }
 
 .inputRow {
@@ -165,10 +225,21 @@
   font-family: var(--font-family);
   font-weight: 700;
   font-size: 16px;
-  color: #f4f8ff;
+  color: var(--main-white);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.cardTitle[contenteditable="true"] {
+  min-width: 120px;
+  padding: 2px 5px;
+  border-radius: 6px;
+  outline: 1px solid rgba(111, 160, 255, 0.7);
+  background: rgba(37, 99, 235, 0.18);
+  overflow: visible;
+  text-overflow: clip;
+  cursor: text;
 }
 
 .cardMetaRow {
@@ -242,33 +313,25 @@
     background 0.18s ease;
 }
 
-.cardQuickPinBtn {
+.cardQuickPinBtn,
+.cardMenuBtn {
   opacity: 0;
   pointer-events: none;
 }
 
-.chatCard:hover .cardQuickPinBtn {
+.chatCard:hover .cardQuickPinBtn,
+.chatCard:hover .cardMenuBtn {
   opacity: 0.5;
   pointer-events: auto;
 }
 
 .chatCard .cardQuickPinBtn:hover,
-.chatCard .cardQuickPinBtn:focus-visible {
+.chatCard .cardQuickPinBtn:focus-visible,
+.chatCard .cardMenuBtn:hover,
+.chatCard .cardMenuBtn:focus-visible,
+.chatCard .cardMenuBtn[aria-expanded="true"] {
   opacity: 1;
   pointer-events: auto;
-}
-
-.cardMenuBtn {
-  opacity: 0.5;
-}
-
-.chatCard:hover .cardMenuBtn {
-  opacity: 0.5;
-}
-
-.chatCard .cardMenuBtn:hover,
-.chatCard .cardMenuBtn:focus-visible {
-  opacity: 1;
 }
 
 .cardMenu {
@@ -295,7 +358,7 @@
   font-family: var(--font-family);
   font-weight: 700;
   font-size: 14px;
-  color: #f7faff;
+  color: var(--main-white);
   padding: 8px 18px;
   border-radius: 999px;
   border: 1px solid rgba(59, 130, 246, 0.4);
@@ -388,7 +451,7 @@
   font-family: var(--font-family);
   font-weight: 700;
   font-size: 18px;
-  color: #f7faff;
+  color: var(--main-white);
   margin: 0 0 10px;
 }
 
@@ -457,12 +520,12 @@
 
 @media (max-width: 767px) {
   .container {
-    padding: 56px 4px 24px;
+    padding: 12px 4px 24px;
   }
 
   .header {
     display: grid;
-    grid-template-columns: 52px minmax(0, 1fr);
+    grid-template-columns: 52px minmax(0, 1fr) 36px;
     column-gap: 12px;
     row-gap: 0;
   }
@@ -488,6 +551,13 @@
     gap: 2px;
   }
 
+  .projectActions {
+    grid-column: 3;
+    grid-row: 1;
+    align-self: center;
+    margin: 0;
+  }
+
   .title {
     width: 100%;
     overflow: hidden;
@@ -510,6 +580,12 @@
     grid-column: 1 / -1;
     font-size: 13px;
     line-height: 1.5;
+  }
+
+  .projectRenameInput {
+    width: 100%;
+    height: 34px;
+    font-size: 18px;
   }
 
   .inputRow {
@@ -568,7 +644,7 @@
 
 @media (max-width: 480px) {
   .container {
-    padding: 54px 2px 20px;
+    padding: 10px 2px 20px;
   }
 
   .title {
@@ -576,7 +652,7 @@
   }
 
   .header {
-    grid-template-columns: 48px minmax(0, 1fr);
+    grid-template-columns: 48px minmax(0, 1fr) 36px;
     column-gap: 10px;
   }
 

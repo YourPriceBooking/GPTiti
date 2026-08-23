@@ -22,7 +22,7 @@
   --button-background: #265ed9;
   --button-background-hover: #1f4fbc;
   --accent: #2f6bff;
-  --accent-soft: #f2f6ff;
+  --accent-soft: var(--main-white);
 
   /* feedback */
   --error: #ef5050;

@@ -67,6 +67,13 @@
   padding: 24px 20px 40px;
 }
 
+.projectsOverviewViewport {
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  min-height: 0;
+}
+
 .inputWrapper {
   display: flex;
   align-items: center;
@@ -191,10 +198,16 @@
     width: 100vw;
   }
   .projectWorkspaceScroll {
+    height: calc(100% - 56px);
+    margin-top: 56px;
     padding: 0 12px 24px;
   }
-  .scrollableContent > :first-child {
-    margin-top: 44px;
+  .projectsOverviewViewport {
+    height: calc(100% - 56px);
+    margin-top: 56px;
+  }
+  .scrollableContent {
+    margin-top: 56px;
   }
   .overlayContent {
     left: 0;

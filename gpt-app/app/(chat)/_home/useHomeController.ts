@@ -25,6 +25,7 @@ import {
 import {
   addConversation,
   deleteDraftChat,
+  handleNewChat,
   isDraftId,
   promoteDraft,
   renameChat,
@@ -53,8 +54,14 @@ import {
   setFocusMode,
   setIsSectionVisible,
   setActiveProjectId,
+  setAddChatsProjectId,
 } from "@/redux/ui/slice";
-import { fetchProjects } from "@/redux/projects/operations";
+import {
+  fetchProjects,
+  removeProject,
+  updateProject,
+} from "@/redux/projects/operations";
+import { renameProject } from "@/redux/projects/slice";
 
 export function useHomeController() {
   const dispatch = useAppDispatch();
@@ -84,8 +91,9 @@ export function useHomeController() {
   const accessTokenReady = useAppSelector(selectAccessTokenReady);
 
   const draft = useInputDraft();
+  const { clearDraft } = draft;
   const { selectedModel, selectedModelGroup, selectModel } = useModelSync({
-    onModelSwitched: draft.clearDraft,
+    onModelSwitched: clearDraft,
   });
   const { sendMessage, retryLastMessage, streamError, clearStreamError } =
     useChatStream();
@@ -93,6 +101,39 @@ export function useHomeController() {
   const projects = useProjectChats();
 
   const { modelMode, setModelMode, modelRef } = useModelMode();
+
+  const handleStartNewChat = useCallback(() => {
+    clearDraft();
+    dispatch(setActiveProjectId(null));
+    dispatch(handleNewChat());
+  }, [clearDraft, dispatch]);
+
+  const handleAddChatsToProject = useCallback(
+    (projectId: string) => dispatch(setAddChatsProjectId(projectId)),
+    [dispatch],
+  );
+
+  const handleRenameProject = useCallback(
+    (projectId: string, title: string) => {
+      dispatch(renameProject({ id: projectId, title }));
+      dispatch(updateProject({ id: projectId, changes: { title } }));
+    },
+    [dispatch],
+  );
+
+  const handleDeleteProject = useCallback(
+    (projectId: string) => {
+      void dispatch(removeProject(projectId)).then((action) => {
+        if (
+          removeProject.fulfilled.match(action) &&
+          activeProjectId === projectId
+        ) {
+          dispatch(setActiveProjectId(null));
+        }
+      });
+    },
+    [activeProjectId, dispatch],
+  );
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -307,6 +348,10 @@ export function useHomeController() {
     setInputImageCount: draft.setInputImageCount,
     // handlers
     handleChange: draft.handleChange,
+    handleStartNewChat,
+    handleAddChatsToProject,
+    handleRenameProject,
+    handleDeleteProject,
     insertTemplate: draft.insertTemplate,
     handleSelectModel: selectModel,
     handleSelectChat,

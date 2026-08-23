@@ -6,13 +6,9 @@ import LeftSide from "@/components/HomePage/LeftSide/LeftSide";
 import LeftSideDrawer from "@/components/HomePage/LeftSide/LeftSideDrawer/LeftSideDrawer";
 import ProjectsOverview from "@/components/HomePage/RightSide/ProjectsOverview/ProjectsOverview";
 import { getFlowThemeId } from "@/config/modelFlows.config";
-import { handleNewChat } from "@/redux/chat/slice";
 import { setSelectedModelGroup } from "@/redux/model/slice";
-import { removeProject, updateProject } from "@/redux/projects/operations";
-import { renameProject } from "@/redux/projects/slice";
 import {
   setActiveProjectId,
-  setAddChatsProjectId,
   setIsCreateProjectModalOpen,
   setIsModalOpen,
 } from "@/redux/ui/slice";
@@ -28,8 +24,7 @@ export default function ProjectsPage() {
 
   const openHome = () => router.push("/");
   const startNewChat = () => {
-    dispatch(setActiveProjectId(null));
-    dispatch(handleNewChat());
+    ctrl.handleStartNewChat();
     openHome();
   };
   const openProject = (projectId: string) => {
@@ -75,17 +70,18 @@ export default function ProjectsPage() {
             {...leftSideProps}
             className={pageStyles.projectMenuTrigger}
           />
-          <ProjectsOverview
-            projects={ctrl.projectList}
-            onCreateProject={() => dispatch(setIsCreateProjectModalOpen(true))}
-            onOpenProject={openProject}
-            onRenameProject={(projectId, title) => {
-              dispatch(renameProject({ id: projectId, title }));
-              dispatch(updateProject({ id: projectId, changes: { title } }));
-            }}
-            onDeleteProject={(projectId) => dispatch(removeProject(projectId))}
-            onAddChats={(projectId) => dispatch(setAddChatsProjectId(projectId))}
-          />
+          <div className={pageStyles.projectsOverviewViewport}>
+            <ProjectsOverview
+              projects={ctrl.projectList}
+              onCreateProject={() =>
+                dispatch(setIsCreateProjectModalOpen(true))
+              }
+              onOpenProject={openProject}
+              onRenameProject={ctrl.handleRenameProject}
+              onDeleteProject={ctrl.handleDeleteProject}
+              onAddChats={ctrl.handleAddChatsToProject}
+            />
+          </div>
         </div>
       </div>
     </>
