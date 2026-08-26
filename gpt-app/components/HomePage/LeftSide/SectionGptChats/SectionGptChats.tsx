@@ -282,6 +282,22 @@ export default function SectionGptChats({
         </div>
       </article>
 
+      <button
+        type="button"
+        className={styles.myProjectsShortcut}
+        onClick={() => router.push("/projects")}
+      >
+        <Image
+          className={styles.myProjectsShortcutIcon}
+          width={36}
+          height={36}
+          src="/icons/my-projects-closed.svg"
+          alt=""
+        />
+        <span className={styles.span}>My Projects</span>
+        {hasProjects && <span className={styles.badge}>{projectsCount}</span>}
+      </button>
+
       <article
         className={styles.yourChats}
         onClick={isHeaderInteractive ? handleYourChatsClick : undefined}
