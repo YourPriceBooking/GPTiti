@@ -20,7 +20,7 @@
 
 /* окремий фон лише для екрана з відповідями — решта сторінок правої частини як були */
 .rightSectionChat {
-  background: var(--right-bg);
+  background: #f8fafc;
 }
 
 .chatMenuTrigger {
