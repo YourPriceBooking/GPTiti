@@ -1,16 +1,52 @@
+.triggerBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+}
+
 .openModal {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 36px;
+  height: 36px;
   cursor: pointer;
   background: transparent;
   border: none;
   padding: 0;
+  color: inherit;
+  border-radius: 9px;
+  transition: background-color 140ms ease;
+}
+
+.openModal:hover {
+  background: color-mix(in srgb, currentColor 8%, transparent);
+}
+
+.openModal:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: -2px;
+}
+
+.menuIcon {
+  display: block;
+  width: 25px;
+  height: 25px;
+  background-color: currentColor;
+  -webkit-mask: url("/icons/open-icon.svg") no-repeat center / contain;
+  mask: url("/icons/open-icon.svg") no-repeat center / contain;
 }
 
 /* The static left panel is visible from 768px, so the trigger is only needed below it */
 @media (min-width: 768px) {
-  .openModal {
+  .triggerBar {
     display: none;
   }
 }

@@ -12,7 +12,7 @@ import styles from "./LeftSideDrawer.module.css";
 const ANIM_MS = 220;
 
 type LeftSideDrawerProps = LeftSideProps & {
-  /** Extra classes for the trigger button (positioning / margins per consumer). */
+  /** Extra classes for the mobile trigger bar theme per consumer. */
   className?: string;
 };
 
@@ -48,19 +48,16 @@ export default function LeftSideDrawer({
 
   return (
     <>
-      <button
-        type="button"
-        className={`${styles.openModal} ${className ?? ""}`}
-        onClick={openPanel}
-        aria-label="Open menu"
-      >
-        <Image
-          src="/icons/open-icon.svg"
-          width={25}
-          height={25}
-          alt="open-modal"
-        />
-      </button>
+      <div className={`${styles.triggerBar} ${className ?? ""}`}>
+        <button
+          type="button"
+          className={styles.openModal}
+          onClick={openPanel}
+          aria-label="Open menu"
+        >
+          <span className={styles.menuIcon} aria-hidden="true" />
+        </button>
+      </div>
 
       {mounted &&
         createPortal(

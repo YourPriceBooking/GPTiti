@@ -258,6 +258,7 @@ export default function ChatView({ ctrl }: { ctrl: HomeController }) {
                 showEstimate={ctrl.showEstimate}
                 estimateSupported={ctrl.estimateSupported}
                 estimatedTokens={ctrl.estimatedTokens}
+                showModelSelection={ctrl.isNewChat}
                 onChooseModel={() => dispatch(setIsModalOpen(true))}
               />
             </div>
