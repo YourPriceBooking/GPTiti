@@ -24,10 +24,8 @@
 }
 
 .chatMenuTrigger {
-  position: absolute;
-  top: 16px;
-  left: 16px;
-  z-index: 40;
+  color: #64748b;
+  background: #f8fafc;
 }
 
 .scrollableContent {
@@ -50,10 +48,8 @@
 }
 
 .projectMenuTrigger {
-  position: absolute;
-  top: 16px;
-  left: 16px;
-  z-index: 40;
+  color: #c8d2e2;
+  background: var(--chat-bg);
 }
 
 .projectWorkspaceScroll {
@@ -93,6 +89,19 @@
   display: flex;
   justify-content: center;
   z-index: 20;
+  pointer-events: none;
+}
+
+.inputDock :global([data-input-bar])::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: -1;
+  height: calc(100% + 24px);
+  background: rgba(248, 250, 252, 0.7);
+  backdrop-filter: blur(1.5px);
   pointer-events: none;
 }
 
@@ -198,16 +207,16 @@
     width: 100vw;
   }
   .projectWorkspaceScroll {
-    height: calc(100% - 56px);
-    margin-top: 56px;
+    height: calc(100% - 46px);
+    margin-top: 40px;
     padding: 0 12px 24px;
   }
   .projectsOverviewViewport {
-    height: calc(100% - 56px);
-    margin-top: 56px;
+    height: calc(100% - 40px);
+    margin-top: 40px;
   }
   .scrollableContent {
-    margin-top: 56px;
+    margin-top: 40px;
   }
   .overlayContent {
     left: 0;
@@ -224,5 +233,13 @@
 @media (max-width: 500px) {
   .overlayContentInner {
     min-width: 300px;
+  }
+}
+
+@media (max-width: 546px) {
+  .inputWrapper,
+  .inputBottom {
+    padding-left: 14px;
+    padding-right: 14px;
   }
 }

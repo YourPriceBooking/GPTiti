@@ -442,3 +442,11 @@
     font-size: 12px;
   }
 }
+
+@media (max-width: 546px) {
+  .inputContainer {
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+}

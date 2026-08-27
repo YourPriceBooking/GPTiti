@@ -12,14 +12,16 @@ marked.use({
       const language = (lang ?? "").trim().split(/\s+/)[0] || "text";
       return (
         `<div class="code-block">` +
+        `<div class="code-surface">` +
         `<div class="code-header">` +
         `<span class="code-lang">${escapeHtml(language)}</span>` +
+        `</div>` +
+        `<pre><code class="language-${escapeHtml(language)}">${escapeHtml(text)}</code></pre>` +
+        `</div>` +
         `<button type="button" class="code-copy-btn" aria-label="Copy code">` +
         `<span class="code-copy-icon"></span>` +
         `<span class="code-copy-label">Copied</span>` +
         `</button>` +
-        `</div>` +
-        `<pre><code class="language-${escapeHtml(language)}">${escapeHtml(text)}</code></pre>` +
         `</div>`
       );
     },

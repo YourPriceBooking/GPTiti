@@ -30,6 +30,7 @@
 
 .metaWrap {
   position: relative;
+  z-index: 2;
   margin-top: -28px;
   padding-top: 30px;
   padding-bottom: 5px;
@@ -53,7 +54,7 @@
   font-family: var(--font-family);
   font-weight: 400;
   font-size: 11px;
-  color: #475569;
+  color: #334155;
   opacity: 1;
   visibility: visible;
   transition:

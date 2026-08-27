@@ -17,6 +17,13 @@
   }
 }
 
+@media (max-width: 546px) {
+  .messageList {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+}
+
 .userMessage {
   display: flex;
   justify-content: flex-end;
@@ -47,12 +54,7 @@
 }
 
 .userText {
-  background: linear-gradient(
-    135deg,
-    #394567 0%,
-    #39476a 50%,
-    #384466 100%
-  );
+  background: linear-gradient(135deg, #394567 0%, #39476a 50%, #384466 100%);
   color: #f4f7ff;
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: none;

@@ -13,6 +13,7 @@ type InputComposerProps = React.ComponentProps<typeof InputBar> & {
   estimatedTokens?: number | null;
   onChooseModel: () => void;
   showDisclaimer?: boolean;
+  showModelSelection?: boolean;
 };
 
 export default function InputComposer({
@@ -21,6 +22,7 @@ export default function InputComposer({
   estimatedTokens,
   onChooseModel,
   showDisclaimer = false,
+  showModelSelection = true,
   ...inputBarProps
 }: InputComposerProps) {
   const isProject = inputBarProps.variant === "project";
@@ -59,12 +61,14 @@ export default function InputComposer({
               ≈ Estimated cost: ~
               {(estimatedTokens ?? 0).toLocaleString("en-US")} tokens
             </span>
-            <ChooseModelColumn
-              selectedModel={inputBarProps.selectedModel}
-              showEstimate={showEstimate}
-              onChoose={onChooseModel}
-              variant={isProject ? "project" : "default"}
-            />
+            {showModelSelection && (
+              <ChooseModelColumn
+                selectedModel={inputBarProps.selectedModel}
+                showEstimate={showEstimate}
+                onChoose={onChooseModel}
+                variant={isProject ? "project" : "default"}
+              />
+            )}
           </div>
         ) : null}
       </div>
