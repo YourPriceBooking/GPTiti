@@ -10,7 +10,7 @@
 
 .yourChats,
 .gptNewChat,
-.myProjectsShortcut {
+.myProjectsButton {
   flex-shrink: 0;
   display: flex;
   gap: 13px;
@@ -24,7 +24,7 @@
   transition: background 0.3s ease-in;
 }
 
-.myProjectsShortcut {
+.myProjectsButton {
   border: none;
   background: transparent;
   text-align: left;
@@ -33,6 +33,11 @@
 
 .myProjectsShortcutIcon {
   transform: translateX(-3px);
+}
+
+.myProjectsButtonShortcut .projectsLabelWrapper::after {
+  content: "";
+  flex: 0 0 15px;
 }
 
 .gptNewProject {
@@ -54,8 +59,8 @@
 .gptNewChat:focus,
 .gptNewProject:hover,
 .gptNewProject:focus,
-.myProjectsShortcut:hover,
-.myProjectsShortcut:focus-visible,
+.myProjectsButton:hover,
+.myProjectsButton:focus-visible,
 .yourChats:hover,
 .yourChats:focus-visible {
   background: #121525;
@@ -151,17 +156,17 @@
   transition: opacity 0.2s ease, background 0.2s ease;
 }
 
-.yourChats:hover .addProjectBtn,
-.yourChats:focus-within .addProjectBtn {
+.myProjectsButton:hover .addProjectBtn,
+.myProjectsButton:focus-within .addProjectBtn {
   opacity: 0.5;
 }
 
-.yourChats .addProjectBtn:hover {
+.myProjectsButton .addProjectBtn:hover {
   opacity: 1;
   background: rgba(255, 255, 255, 0.08);
 }
 
-.yourChats .addProjectBtn:focus-visible {
+.myProjectsButton .addProjectBtn:focus-visible {
   opacity: 1;
 }
 

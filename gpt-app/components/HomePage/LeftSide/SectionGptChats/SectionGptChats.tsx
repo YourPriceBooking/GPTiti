@@ -10,6 +10,7 @@ import DeleteModalWindow from "../DeleteModalWindow/DeleteModalWindow";
 import { useAppSelector } from "@/redux/hooks";
 import { selectActiveChatId } from "@/redux/chat/selectors";
 import { selectActiveProjectId } from "@/redux/ui/selectors";
+import MyProjectsButton from "./MyProjectsButton";
 
 const PINNED_CHATS_KEY = "pinnedChatIds";
 const PINNED_PROJECTS_KEY = "pinnedProjectIds";
@@ -65,7 +66,6 @@ export default function SectionGptChats({
   const hasMoreProjects = projectsCount > MAX_VISIBLE_PROJECTS;
   const hiddenProjectsCount = projectsCount - MAX_VISIBLE_PROJECTS;
   const isProjectsInteractive = hasMoreProjects;
-  const showProjectsOpen = hasMoreProjects && showAllProjects;
 
   const [pinnedChatIds, setPinnedChatIds] = useState<string[]>(() => {
     if (typeof window === "undefined") return [];
@@ -132,6 +132,11 @@ export default function SectionGptChats({
   const headerExpanded = showAllChats;
   const handleYourChatsClick = () => {
     if (hasMoreChats) setShowAllChats((prev) => !prev);
+  };
+  const handleOpenProjects = () => router.push("/projects");
+  const handleCreateProject = () => onNewProject?.();
+  const handleToggleProjects = () => {
+    setShowAllProjects((prev) => !prev);
   };
   const menuRef = useRef<HTMLDivElement | null>(null);
   const projectMenuRef = useRef<HTMLDivElement | null>(null);
@@ -282,21 +287,12 @@ export default function SectionGptChats({
         </div>
       </article>
 
-      <button
-        type="button"
-        className={styles.myProjectsShortcut}
-        onClick={() => router.push("/projects")}
-      >
-        <Image
-          className={styles.myProjectsShortcutIcon}
-          width={36}
-          height={36}
-          src="/icons/my-projects-closed.svg"
-          alt=""
-        />
-        <span className={styles.span}>My Projects</span>
-        {hasProjects && <span className={styles.badge}>{projectsCount}</span>}
-      </button>
+      <MyProjectsButton
+        variant="shortcut"
+        projectsCount={projectsCount}
+        onOpen={handleOpenProjects}
+        onCreate={handleCreateProject}
+      />
 
       <article
         className={styles.yourChats}
@@ -482,78 +478,15 @@ export default function SectionGptChats({
         </button>
       )}
 
-      <article
-        className={styles.yourChats}
-        role="button"
-        tabIndex={0}
-        onClick={() => router.push("/projects")}
-        onKeyDown={(event) => {
-          if ((event.target as HTMLElement).closest("button")) return;
-          if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            router.push("/projects");
-          }
-        }}
-      >
-        <Image
-          width={36}
-          height={36}
-          src={
-            showProjectsOpen
-              ? "/icons/my-projects-open.svg"
-              : "/icons/my-projects-closed.svg"
-          }
-          alt="my-projects"
-        />
-        <div className={styles.projectsLabelWrapper}>
-          <div className={styles.labelLeft}>
-            <span className={styles.span}>My Projects</span>
-            {hasProjects && (
-              <span className={styles.badge}>{projectsCount}</span>
-            )}
-          </div>
-          <button
-            type="button"
-            className={styles.addProjectBtn}
-            aria-label="Start new project"
-            onClick={(e) => {
-              e.stopPropagation();
-              onNewProject?.();
-              e.currentTarget.blur();
-            }}
-          >
-            <svg
-              width={12}
-              height={12}
-              viewBox="0 0 10 10"
-              fill="none"
-              aria-hidden="true"
-            >
-              <use href="/icons/input-sprite.svg#ib-plus-thin" />
-            </svg>
-          </button>
-          {isProjectsInteractive && (
-              <button
-                type="button"
-                className={styles.projectsChevron}
-                aria-label={showAllProjects ? "Collapse projects" : "Expand projects"}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowAllProjects((prev) => !prev);
-                  e.currentTarget.blur();
-                }}
-              >
-                <Image
-                  className={`${styles.chevronIcon} ${showAllProjects ? styles.chevronIconOpen : ""}`}
-                  width={15}
-                  height={15}
-                  src="/icons/chevron-down.svg"
-                  alt="chevron-down"
-                />
-              </button>
-          )}
-        </div>
-      </article>
+      <MyProjectsButton
+        variant="expandable"
+        projectsCount={projectsCount}
+        expanded={showAllProjects}
+        canExpand={isProjectsInteractive}
+        onOpen={handleOpenProjects}
+        onCreate={handleCreateProject}
+        onToggle={handleToggleProjects}
+      />
 
       {hasProjects && (
         <div
