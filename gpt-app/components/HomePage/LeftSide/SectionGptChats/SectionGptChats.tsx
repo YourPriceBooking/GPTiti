@@ -1,18 +1,49 @@
+"use client";
+
 import { useState, useRef, useEffect, type CSSProperties } from "react";
 import styles from "./SectionGptChats.module.css";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { SectionGptChatsProps, Chat, Project } from "@/types/types";
 import ChatsMenu from "../ChatsMenu/ChatsMenu";
 import DeleteModalWindow from "../DeleteModalWindow/DeleteModalWindow";
 import { useAppSelector } from "@/redux/hooks";
 import { selectActiveChatId } from "@/redux/chat/selectors";
 import { selectActiveProjectId } from "@/redux/ui/selectors";
+import MyProjectsButton from "./MyProjectsButton";
 
 const PINNED_CHATS_KEY = "pinnedChatIds";
 const PINNED_PROJECTS_KEY = "pinnedProjectIds";
 const NARROW_VIEWPORT = 640;
 const VIEWPORT_EDGE_GAP = 8;
 const DELETE_MODAL_SHIFT = 28;
+const MENU_GAP = 6;
+
+const MENU_HEIGHT = 240;
+
+type MenuPosition = {
+  top?: number;
+  bottom?: number;
+  left?: number;
+  right?: number;
+};
+
+const menuPositionBelow = (trigger: HTMLElement): MenuPosition => {
+  const rect = trigger.getBoundingClientRect();
+  const isNarrow = window.innerWidth <= NARROW_VIEWPORT;
+  const below = rect.bottom + MENU_GAP;
+  const fitsBelow = below + MENU_HEIGHT <= window.innerHeight;
+  const horizontal = isNarrow
+    ? { right: VIEWPORT_EDGE_GAP }
+    : { left: rect.left };
+
+  if (fitsBelow) return { top: below, ...horizontal };
+
+  return {
+    bottom: window.innerHeight - rect.top + MENU_GAP,
+    ...horizontal,
+  };
+};
 
 export default function SectionGptChats({
   onNewChat,
@@ -21,11 +52,13 @@ export default function SectionGptChats({
   setActiveProject,
   deleteProject,
   renameProject,
+  addChatsToProject,
   chatList,
   setActiveChatId,
   deleteChat,
   renameChat,
 }: SectionGptChatsProps) {
+  const router = useRouter();
   const [showAllProjects, setShowAllProjects] = useState(false);
   const projectsCount = projectList.length;
   const hasProjects = projectsCount > 0;
@@ -33,7 +66,6 @@ export default function SectionGptChats({
   const hasMoreProjects = projectsCount > MAX_VISIBLE_PROJECTS;
   const hiddenProjectsCount = projectsCount - MAX_VISIBLE_PROJECTS;
   const isProjectsInteractive = hasMoreProjects;
-  const showProjectsOpen = hasMoreProjects && showAllProjects;
 
   const [pinnedChatIds, setPinnedChatIds] = useState<string[]>(() => {
     if (typeof window === "undefined") return [];
@@ -53,19 +85,12 @@ export default function SectionGptChats({
   }, [pinnedProjectIds]);
 
   const [openMenuChatId, setOpenMenuChatId] = useState<string | null>(null);
-  const [menuPosition, setMenuPosition] = useState<{
-    top: number;
-    left?: number;
-    right?: number;
-  } | null>(null);
+  const [menuPosition, setMenuPosition] = useState<MenuPosition | null>(null);
   const [openMenuProjectId, setOpenMenuProjectId] = useState<string | null>(
     null,
   );
-  const [projectMenuPosition, setProjectMenuPosition] = useState<{
-    top: number;
-    left?: number;
-    right?: number;
-  } | null>(null);
+  const [projectMenuPosition, setProjectMenuPosition] =
+    useState<MenuPosition | null>(null);
   const [renamingChatId, setRenamingChatId] = useState<string | null>(null);
   const [renamingProjectId, setRenamingProjectId] = useState<string | null>(
     null,
@@ -108,10 +133,19 @@ export default function SectionGptChats({
   const handleYourChatsClick = () => {
     if (hasMoreChats) setShowAllChats((prev) => !prev);
   };
+  const handleOpenProjects = () => router.push("/projects");
+  const handleCreateProject = () => onNewProject?.();
+  const handleToggleProjects = () => {
+    setShowAllProjects((prev) => !prev);
+  };
   const menuRef = useRef<HTMLDivElement | null>(null);
   const projectMenuRef = useRef<HTMLDivElement | null>(null);
   const titleRefs = useRef<Record<string, HTMLSpanElement | null>>({});
   const projectTitleRefs = useRef<Record<string, HTMLSpanElement | null>>({});
+  // The dots buttons the open menus were launched from, so the menus can
+  // follow them while the chats/projects list scrolls.
+  const chatTriggerRef = useRef<HTMLElement | null>(null);
+  const projectTriggerRef = useRef<HTMLElement | null>(null);
 
   const togglePinChat = (id: string) => {
     setPinnedChatIds((prev) =>
@@ -124,12 +158,9 @@ export default function SectionGptChats({
     );
   };
 
-  const deleteModalStyle = (pos: {
-    top: number;
-    left?: number;
-    right?: number;
-  }): CSSProperties => ({
+  const deleteModalStyle = (pos: MenuPosition): CSSProperties => ({
     top: pos.top,
+    bottom: pos.bottom,
     left: pos.left != null ? pos.left + DELETE_MODAL_SHIFT : undefined,
     right:
       pos.right != null
@@ -137,25 +168,56 @@ export default function SectionGptChats({
         : undefined,
   });
 
+  const closeMenus = () => {
+    setOpenMenuChatId(null);
+    setOpenMenuProjectId(null);
+    setDeletingChatId(null);
+    setDeletingProjectId(null);
+  };
+
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
+      // The dots button toggles its own menu on click; closing it here on
+      // mousedown would make that click reopen it instead of closing.
+      if (target.closest("[data-menu-trigger]")) return;
+
       const insideAnyMenu =
         menuRef.current?.contains(target) ||
         projectMenuRef.current?.contains(target);
 
-      if (!insideAnyMenu) {
-        setOpenMenuChatId(null);
-        setDeletingChatId(null);
-        setOpenMenuProjectId(null);
-        setDeletingProjectId(null);
-      }
+      if (!insideAnyMenu) closeMenus();
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  const chatMenuOpen = openMenuChatId !== null || deletingChatId !== null;
+  const projectMenuOpen =
+    openMenuProjectId !== null || deletingProjectId !== null;
+
+  useEffect(() => {
+    if (!chatMenuOpen && !projectMenuOpen) return;
+
+    const reanchor = () => {
+      if (chatMenuOpen && chatTriggerRef.current) {
+        setMenuPosition(menuPositionBelow(chatTriggerRef.current));
+      }
+      if (projectMenuOpen && projectTriggerRef.current) {
+        setProjectMenuPosition(menuPositionBelow(projectTriggerRef.current));
+      }
+    };
+
+    window.addEventListener("scroll", reanchor, true);
+    window.addEventListener("resize", reanchor);
+    return () => {
+      window.removeEventListener("scroll", reanchor, true);
+      window.removeEventListener("resize", reanchor);
+    };
+  }, [chatMenuOpen, projectMenuOpen]);
+
   useEffect(() => {
     if (!renamingChatId) return;
 
@@ -225,6 +287,13 @@ export default function SectionGptChats({
         </div>
       </article>
 
+      <MyProjectsButton
+        variant="shortcut"
+        projectsCount={projectsCount}
+        onOpen={handleOpenProjects}
+        onCreate={handleCreateProject}
+      />
+
       <article
         className={styles.yourChats}
         onClick={isHeaderInteractive ? handleYourChatsClick : undefined}
@@ -245,10 +314,9 @@ export default function SectionGptChats({
             {hasChats && <span className={styles.badge}>{chatsCount}</span>}
           </div>
           {isHeaderInteractive && (
-            <div
-              className={`${styles.chatsChevron} ${headerExpanded ? styles.chatsChevronOpen : ""}`}
-            >
+            <div className={styles.chatsChevron}>
               <Image
+                className={`${styles.chevronIcon} ${headerExpanded ? styles.chevronIconOpen : ""}`}
                 width={15}
                 height={15}
                 src="/icons/chevron-down.svg"
@@ -266,73 +334,120 @@ export default function SectionGptChats({
           }`}
         >
           <ul className={styles.chatsList}>
-            {visibleChats.map((chat) => (
-              <li
-                key={chat.id}
-                className={`${styles.chatsListItem} ${
-                  chat.id === activeChatId ? styles.chatsListItemActive : ""
-                }`}
-                tabIndex={0}
-                onClick={() => setActiveChatId(chat.id)}
-              >
-                <span
-                  ref={(el) => {
-                    if (el) titleRefs.current[chat.id] = el;
-                  }}
-                  contentEditable={renamingChatId === chat.id}
-                  suppressContentEditableWarning
-                  className={styles.chatTitle}
-                  onBlur={(e) => {
-                    const newTitle = e.currentTarget.textContent?.trim();
-                    if (newTitle && newTitle !== chat.title) {
-                      renameChat(chat.id, newTitle);
-                    }
-                    setRenamingChatId(null);
-                    setOpenMenuChatId(null);
-                  }}
+            {visibleChats.map((chat) => {
+              const chatProject = chat.project;
+              const isPinned = pinnedChatIds.includes(chat.id);
+              const project = chatProject
+                ? (projectList.find((p) => p.id === chatProject.id) ??
+                  chatProject)
+                : undefined;
+              return (
+                <li
+                  key={chat.id}
+                  className={`${styles.chatsListItem} ${
+                    chat.id === activeChatId && !activeProjectId
+                      ? styles.chatsListItemActive
+                      : ""
+                  }`}
+                  tabIndex={0}
+                  onClick={() => setActiveChatId(chat.id)}
                 >
-                  {chat.title && chat.title.length > 18
-                    ? chat.title.slice(0, 18) + "..."
-                    : chat.title}
-                </span>
+                  <div className={styles.chatMain}>
+                    <span
+                      ref={(el) => {
+                        if (el) titleRefs.current[chat.id] = el;
+                      }}
+                      contentEditable={renamingChatId === chat.id}
+                      suppressContentEditableWarning
+                      className={styles.chatTitle}
+                      onBlur={(e) => {
+                        const newTitle = e.currentTarget.textContent?.trim();
+                        if (newTitle && newTitle !== chat.title) {
+                          renameChat(chat.id, newTitle);
+                        }
+                        setRenamingChatId(null);
+                        setOpenMenuChatId(null);
+                      }}
+                    >
+                      {chat.title && chat.title.length > 18
+                        ? chat.title.slice(0, 18) + "..."
+                        : chat.title}
+                    </span>
 
-                <div className={styles.chatRight}>
-                  {pinnedChatIds.includes(chat.id) && (
-                    <span className={styles.pinSmall}>
+                    {project && (
+                      <button
+                        type="button"
+                        className={styles.chatProjectRow}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveProject?.(project.id);
+                        }}
+                      >
+                        <svg
+                          className={styles.chatProjectIcon}
+                          width="12"
+                          height="12"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          aria-hidden="true"
+                        >
+                          <path d="M7 17 17 7" />
+                          <path d="M8 7h9v9" />
+                        </svg>
+                        <span className={styles.chatProjectName}>
+                          {project.title}
+                        </span>
+                      </button>
+                    )}
+                  </div>
+
+                  <div className={styles.chatRight}>
+                    <button
+                      type="button"
+                      className={styles.quickPinButton}
+                      aria-label={isPinned ? "Unpin chat" : "Pin chat to top"}
+                      title={isPinned ? "Unpin chat" : "Pin chat to top"}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        closeMenus();
+                        togglePinChat(chat.id);
+                      }}
+                    >
                       <Image
-                        src="/icons/pin.svg"
-                        alt="pinned"
+                        src={isPinned ? "/icons/unpin.svg" : "/icons/pin.svg"}
+                        alt=""
                         width={14}
                         height={15}
                       />
-                    </span>
-                  )}
-                  <div className={styles.chatAction}>
-                    <span
-                      className={styles.dotsIcon}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        const rect = (
-                          e.currentTarget as HTMLElement
-                        ).getBoundingClientRect();
-                        const centerY = rect.top + rect.height / 2;
-                        const isNarrow = window.innerWidth <= NARROW_VIEWPORT;
-                        setMenuPosition({
-                          top: centerY,
-                          ...(isNarrow
-                            ? { right: VIEWPORT_EDGE_GAP }
-                            : { left: rect.right + 8 }),
-                        });
-                        setOpenMenuChatId(chat.id);
-                      }}
-                    />
+                    </button>
+                    <div className={styles.chatAction}>
+                      <span
+                        className={styles.dotsIcon}
+                        data-menu-trigger
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const wasOpen = openMenuChatId === chat.id;
+                          closeMenus();
+                          if (wasOpen) return;
+
+                          const trigger = e.currentTarget as HTMLElement;
+                          chatTriggerRef.current = trigger;
+                          setMenuPosition(menuPositionBelow(trigger));
+                          setOpenMenuChatId(chat.id);
+                        }}
+                      />
+                    </div>
+                    {chat.id === activeChatId && !activeProjectId && (
+                      <span className={styles.activeIndicator} />
+                    )}
                   </div>
-                  {chat.id === activeChatId && (
-                    <span className={styles.activeIndicator} />
-                  )}
-                </div>
-              </li>
-            ))}
+                </li>
+              );
+            })}
           </ul>
         </div>
       )}
@@ -363,47 +478,15 @@ export default function SectionGptChats({
         </button>
       )}
 
-      <article
-        className={styles.yourChats}
-        onClick={
-          isProjectsInteractive
-            ? () => setShowAllProjects((prev) => !prev)
-            : undefined
-        }
-        role={isProjectsInteractive ? "button" : undefined}
-        tabIndex={isProjectsInteractive ? 0 : undefined}
-      >
-        <Image
-          width={36}
-          height={36}
-          src={
-            showProjectsOpen
-              ? "/icons/my-projects-open.svg"
-              : "/icons/my-projects-closed.svg"
-          }
-          alt="my-projects"
-        />
-        <div className={styles.projectsLabelWrapper}>
-          <div className={styles.labelLeft}>
-            <span className={styles.span}>My Projects</span>
-            {hasProjects && (
-              <span className={styles.badge}>{projectsCount}</span>
-            )}
-          </div>
-          {isProjectsInteractive && (
-            <div
-              className={`${styles.projectsChevron} ${showAllProjects ? styles.projectsChevronOpen : ""}`}
-            >
-              <Image
-                width={15}
-                height={15}
-                src="/icons/chevron-down.svg"
-                alt="chevron-down"
-              />
-            </div>
-          )}
-        </div>
-      </article>
+      <MyProjectsButton
+        variant="expandable"
+        projectsCount={projectsCount}
+        expanded={showAllProjects}
+        canExpand={isProjectsInteractive}
+        onOpen={handleOpenProjects}
+        onCreate={handleCreateProject}
+        onToggle={handleToggleProjects}
+      />
 
       {hasProjects && (
         <div
@@ -414,86 +497,100 @@ export default function SectionGptChats({
           }`}
         >
           <ul className={styles.chatsList}>
-            {sortedProjects.map((project) => (
-              <li
-                key={project.id}
-                className={`${styles.chatsListItem} ${
-                  project.id === activeProjectId
-                    ? styles.chatsListItemActive
-                    : ""
-                }`}
-                tabIndex={0}
-                onClick={() => setActiveProject?.(project.id)}
-              >
-                <div className={styles.projectItemContent}>
-                  <Image
-                    width={28}
-                    height={28}
-                    src="/icons/project-item.svg"
-                    alt="project"
-                  />
-                  <span
-                    ref={(el) => {
-                      if (el) projectTitleRefs.current[project.id] = el;
-                    }}
-                    contentEditable={renamingProjectId === project.id}
-                    suppressContentEditableWarning
-                    className={styles.chatTitle}
-                    onClick={
-                      renamingProjectId === project.id
-                        ? (e) => e.stopPropagation()
-                        : undefined
-                    }
-                    onBlur={(e) => {
-                      const newTitle = e.currentTarget.textContent?.trim();
-                      if (newTitle && newTitle !== project.title) {
-                        renameProject?.(project.id, newTitle);
+            {sortedProjects.map((project) => {
+              const isPinned = pinnedProjectIds.includes(project.id);
+
+              return (
+                <li
+                  key={project.id}
+                  className={`${styles.chatsListItem} ${
+                    project.id === activeProjectId
+                      ? styles.chatsListItemActive
+                      : ""
+                  }`}
+                  tabIndex={0}
+                  onClick={() => setActiveProject?.(project.id)}
+                >
+                  <div className={styles.projectItemContent}>
+                    <Image
+                      width={28}
+                      height={23}
+                      src="/icons/create-modal-project.svg"
+                      alt="project"
+                    />
+                    <span
+                      ref={(el) => {
+                        if (el) projectTitleRefs.current[project.id] = el;
+                      }}
+                      contentEditable={renamingProjectId === project.id}
+                      suppressContentEditableWarning
+                      className={styles.chatTitle}
+                      onClick={
+                        renamingProjectId === project.id
+                          ? (e) => e.stopPropagation()
+                          : undefined
                       }
-                      setRenamingProjectId(null);
-                      setOpenMenuProjectId(null);
-                    }}
-                  >
-                    {renamingProjectId === project.id
-                      ? project.title
-                      : project.title.length > 12
-                        ? project.title.slice(0, 12) + "..."
-                        : project.title}
-                  </span>
-                </div>
-                <div className={styles.chatRight}>
-                  {pinnedProjectIds.includes(project.id) && (
-                    <span className={styles.pinSmall}>
+                      onBlur={(e) => {
+                        const newTitle = e.currentTarget.textContent?.trim();
+                        if (newTitle && newTitle !== project.title) {
+                          renameProject?.(project.id, newTitle);
+                        }
+                        setRenamingProjectId(null);
+                        setOpenMenuProjectId(null);
+                      }}
+                    >
+                      {renamingProjectId === project.id
+                        ? project.title
+                        : project.title.length > 12
+                          ? project.title.slice(0, 12) + "..."
+                          : project.title}
+                    </span>
+                  </div>
+                  <div className={styles.chatRight}>
+                    <button
+                      type="button"
+                      className={styles.quickPinButton}
+                      aria-label={
+                        isPinned ? "Unpin project" : "Pin project to top"
+                      }
+                      title={
+                        isPinned ? "Unpin project" : "Pin project to top"
+                      }
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        closeMenus();
+                        togglePinProject(project.id);
+                      }}
+                    >
                       <Image
-                        src="/icons/pin.svg"
-                        alt="pinned"
+                        src={isPinned ? "/icons/unpin.svg" : "/icons/pin.svg"}
+                        alt=""
                         width={14}
                         height={15}
                       />
-                    </span>
-                  )}
-                  <span
-                    className={styles.dotsIcon}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      const rect = (
-                        e.currentTarget as HTMLElement
-                      ).getBoundingClientRect();
-                      const isNarrow = window.innerWidth <= NARROW_VIEWPORT;
-                      setProjectMenuPosition({
-                        top: rect.top + rect.height / 2,
-                        ...(isNarrow
-                          ? { right: VIEWPORT_EDGE_GAP }
-                          : { left: rect.right + 8 }),
-                      });
-                      setOpenMenuProjectId(project.id);
-                    }}
-                  />
-                  {project.id === activeProjectId && (
-                    <span className={styles.activeIndicator} />
-                  )}
-                </div>
-              </li>
-            ))}
+                    </button>
+                    <span
+                      className={styles.dotsIcon}
+                      data-menu-trigger
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const wasOpen = openMenuProjectId === project.id;
+                        closeMenus();
+                        if (wasOpen) return;
+
+                        const trigger = e.currentTarget as HTMLElement;
+                        projectTriggerRef.current = trigger;
+                        setProjectMenuPosition(menuPositionBelow(trigger));
+                        setOpenMenuProjectId(project.id);
+                      }}
+                    />
+                    {project.id === activeProjectId && (
+                      <span className={styles.activeIndicator} />
+                    )}
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         </div>
       )}
@@ -530,6 +627,7 @@ export default function SectionGptChats({
           className={styles.menuContainer}
           style={{
             top: menuPosition.top,
+            bottom: menuPosition.bottom,
             left: menuPosition.left,
             right: menuPosition.right,
           }}
@@ -560,6 +658,7 @@ export default function SectionGptChats({
           className={styles.menuContainer}
           style={{
             top: projectMenuPosition.top,
+            bottom: projectMenuPosition.bottom,
             left: projectMenuPosition.left,
             right: projectMenuPosition.right,
           }}
@@ -571,7 +670,10 @@ export default function SectionGptChats({
               togglePinProject(openMenuProjectId);
               setOpenMenuProjectId(null);
             }}
-            onAddChats={() => setOpenMenuProjectId(null)}
+            onAddChats={() => {
+              addChatsToProject?.(openMenuProjectId);
+              setOpenMenuProjectId(null);
+            }}
             onRenameRequest={() => {
               setRenamingProjectId(openMenuProjectId);
               setOpenMenuProjectId(null);

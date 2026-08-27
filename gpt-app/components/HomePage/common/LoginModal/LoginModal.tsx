@@ -1,13 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import Image from "next/image";
 import Link from "next/link";
 
-import { GoogleLogin } from "@react-oauth/google";
-
 import AppModal from "@/components/HomePage/common/AppModal/AppModal";
+import GoogleCredentialButton from "@/components/common/GoogleCredentialButton/GoogleCredentialButton";
 import { useGoogleLogin } from "@/hooks/useGoogleLogin";
 import styles from "./LoginModal.module.css";
 
@@ -17,15 +16,16 @@ type LoginModalProps = {
 };
 
 export default function LoginModal({ open, onClose }: LoginModalProps) {
+  if (!open) return null;
+  return <OpenLoginModal onClose={onClose} />;
+}
+
+function OpenLoginModal({ onClose }: Pick<LoginModalProps, "onClose">) {
   const { handleCredential, handleError, errorText } = useGoogleLogin(onClose);
   const [agreed, setAgreed] = useState(false);
 
-  useEffect(() => {
-    if (!open) setAgreed(false);
-  }, [open]);
-
   return (
-    <AppModal open={open} onClose={onClose} title="Welcome to GPTiti ">
+    <AppModal open onClose={onClose} title="Welcome to GPTiti ">
       <div className={styles.root}>
         <p className={styles.lead}>
           Premium AI models. No subscriptions. Just access.
@@ -83,7 +83,7 @@ export default function LoginModal({ open, onClose }: LoginModalProps) {
             }`}
             aria-disabled={!agreed}
           >
-            <GoogleLogin
+            <GoogleCredentialButton
               onSuccess={handleCredential}
               onError={handleError}
               theme="filled_black"

@@ -666,10 +666,6 @@ export default function ImageEditor({
                 onPointerMove={moveCropDrag}
                 onPointerUp={endCropDrag}
               >
-                <div className={css.gridLineV} style={{ left: "33.333%" }} />
-                <div className={css.gridLineV} style={{ left: "66.666%" }} />
-                <div className={css.gridLineH} style={{ top: "33.333%" }} />
-                <div className={css.gridLineH} style={{ top: "66.666%" }} />
                 {HANDLES.map((h) => (
                   <span
                     key={h}

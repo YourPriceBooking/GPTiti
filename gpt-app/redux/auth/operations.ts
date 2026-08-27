@@ -1,9 +1,16 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { axiosInstance } from "@/lib/axiosInstance";
-import type { BackendAuthResponse } from "@/types/google.types";
+import {
+  clearAccessToken,
+  storeAccessToken,
+} from "@/lib/authTokenVault";
+import type {
+  AuthSession,
+  BackendAuthResponse,
+} from "@/types/google.types";
 
 export const loginUser = createAsyncThunk<
-  BackendAuthResponse,
+  AuthSession,
   string,
   { rejectValue: string }
 >("auth/loginWithGoogle", async (idToken, thunkApi) => {
@@ -12,7 +19,8 @@ export const loginUser = createAsyncThunk<
       "/users/user",
       { idToken },
     );
-    return data;
+    storeAccessToken(data.accessToken);
+    return { user: data.user };
   } catch (e) {
     const err = e as { response?: { status?: number; data?: { message?: string } } };
     if (err.response?.status === 401) {
@@ -26,7 +34,7 @@ export const loginUser = createAsyncThunk<
 });
 
 export const refreshUser = createAsyncThunk<
-  string,
+  void,
   void,
   { rejectValue: string }
 >("auth/refresh", async (_, thunkApi) => {
@@ -34,8 +42,9 @@ export const refreshUser = createAsyncThunk<
     const { data } = await axiosInstance.post<{ accessToken: string }>(
       "/users/refresh",
     );
-    return data.accessToken;
+    storeAccessToken(data.accessToken);
   } catch (e) {
+    clearAccessToken();
     const err = e as { response?: { status?: number } };
     if (err.response?.status === 403) {
       return thunkApi.rejectWithValue("Session expired, please login again");
@@ -51,6 +60,8 @@ export const logoutUser = createAsyncThunk<void, void>(
       await axiosInstance.get("/users/logout");
     } catch {
       // ignore — logout still proceeds locally
+    } finally {
+      clearAccessToken();
     }
   },
 );

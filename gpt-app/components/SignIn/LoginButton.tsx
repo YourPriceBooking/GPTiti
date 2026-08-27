@@ -1,12 +1,11 @@
 "use client";
 
-import { GoogleLogin } from "@react-oauth/google";
-
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { selectIsLoggedIn } from "@/redux/auth/selectors";
 import { logoutUser } from "@/redux/auth/operations";
 
 import { useGoogleLogin } from "@/hooks/useGoogleLogin";
+import GoogleCredentialButton from "@/components/common/GoogleCredentialButton/GoogleCredentialButton";
 
 import { motion } from "framer-motion";
 
@@ -54,7 +53,7 @@ export default function LoginButton({ checked }: { checked: boolean }) {
 
         {checked && (
           <div className="absolute inset-0 opacity-0">
-            <GoogleLogin
+            <GoogleCredentialButton
               onSuccess={handleCredential}
               onError={handleError}
               theme="filled_black"

@@ -9,6 +9,7 @@ import {
   PURGE,
   REGISTER,
 } from "redux-persist";
+import type { PersistedState } from "redux-persist/es/types";
 import storage from "redux-persist/lib/storage";
 
 import { authReducer } from "./auth/slice";
@@ -17,12 +18,27 @@ import { modelReducer } from "./model/slice";
 import { tokensReducer } from "./tokens/slice";
 import { uiReducer } from "./ui/slice";
 import { projectsReducer } from "./projects/slice";
+import { errorToastMiddleware } from "./errorToastMiddleware";
 import { setupInterceptors } from "@/lib/axiosInstance"; // ← додано
+
+const removeLegacyPersistedToken = async (
+  state: PersistedState,
+): Promise<PersistedState> => {
+  if (!state) return state;
+
+  // redux-persist's whitelist only filters future writes. Existing installs
+  // must explicitly remove the credential during rehydration.
+  const migrated = state as PersistedState & { accessToken?: unknown };
+  delete migrated.accessToken;
+  return migrated;
+};
 
 const authPersistConfig = {
   key: "auth",
+  version: 1,
   storage,
-  whitelist: ["accessToken", "user", "isLoggedIn"],
+  whitelist: ["user", "isLoggedIn"],
+  migrate: removeLegacyPersistedToken,
 };
 
 const modelPersistConfig = {
@@ -48,13 +64,19 @@ const projectsPersistConfig = {
   whitelist: ["list"],
 };
 
+const uiPersistConfig = {
+  key: "ui",
+  storage,
+  whitelist: ["activeProjectId"],
+};
+
 const rootReducer = combineReducers({
   auth: persistReducer(authPersistConfig, authReducer),
   chat: persistReducer(chatPersistConfig, chatReducer),
   model: persistReducer(modelPersistConfig, modelReducer),
   tokens: persistReducer(tokensPersistConfig, tokensReducer),
   projects: persistReducer(projectsPersistConfig, projectsReducer),
-  ui: uiReducer,
+  ui: persistReducer(uiPersistConfig, uiReducer),
 });
 
 export const store = configureStore({
@@ -64,7 +86,7 @@ export const store = configureStore({
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
-    }),
+    }).concat(errorToastMiddleware),
 });
 
 setupInterceptors(store); // ← викликаємо після створення store

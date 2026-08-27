@@ -2,10 +2,19 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
-  padding: 20px;
+
+  padding: 20px 21px;
   width: 100%;
+  min-width: 0;
   max-width: 900px;
   margin: 0 auto;
+}
+
+@media (max-width: 767px) {
+  .messageList {
+    padding-left: 33px;
+    padding-right: 33px;
+  }
 }
 
 .userMessage {
@@ -38,8 +47,15 @@
 }
 
 .userText {
-  background: #3b82f6;
-  color: white;
+  background: linear-gradient(
+    135deg,
+    #394567 0%,
+    #39476a 50%,
+    #384466 100%
+  );
+  color: #f4f7ff;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: none;
   padding: 12px 20px;
   border-radius: 20px;
   max-width: 650px;
@@ -47,12 +63,190 @@
   margin: 0;
 }
 
+/* Copy button under the user message bubble */
+.copyBtn {
+  align-self: flex-end;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: 28px;
+  height: 28px;
+  padding: 5px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease,
+    background 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease;
+}
+
+.copyBtnVisible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.copyBtn:hover {
+  color: #64748b;
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.copyBtn:active {
+  color: #64748b;
+  background: rgba(79, 124, 255, 0.18);
+  border-color: rgba(79, 124, 255, 0.32);
+}
+
+.copyBtnCopied,
+.copyBtnCopied:hover,
+.copyBtnCopied:active {
+  width: auto;
+  color: #8ef0b5;
+  background: rgba(46, 204, 113, 0.14);
+  border-color: rgba(46, 204, 113, 0.28);
+}
+
+.copyIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+}
+
+.copyLabel {
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 10px;
+  line-height: 1;
+  color: #8ef0b5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .copyBtn {
+    transform: none;
+    transition: opacity 0.18s ease;
+  }
+
+  .copyBtnVisible {
+    transform: none;
+  }
+}
+
 .aiMessage {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   width: 100%;
+  min-width: 0;
   max-width: 100%;
+}
+
+.streamError {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 760px;
+  margin-top: 8px;
+  padding: 11px 12px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 14px;
+  background: linear-gradient(180deg, #182236 0%, #131c2e 100%);
+  box-shadow: 0 10px 26px rgba(2, 6, 23, 0.2);
+  color: var(--main-white);
+}
+
+.streamErrorIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(239, 80, 80, 0.14);
+  color: var(--error-soft);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.streamErrorBody {
+  min-width: 0;
+}
+
+.streamErrorTitle,
+.streamErrorMessage {
+  margin: 0;
+}
+
+.streamErrorTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: #f1f5f9;
+}
+
+.streamErrorMessage {
+  margin-top: 3px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+.retryButton {
+  --retry-accent: #3e7cff;
+
+  flex: 0 0 auto;
+  min-width: 74px;
+  min-height: 34px;
+  padding: 7px 14px;
+  border: 1px solid rgba(62, 124, 255, 0.55);
+  border-radius: 10px;
+  background: rgba(62, 124, 255, 0.14);
+  color: #e5edff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background 0.16s ease,
+    border-color 0.16s ease,
+    transform 0.16s ease;
+}
+
+.retryButton:hover:not(:disabled) {
+  border-color: var(--retry-accent);
+  background: rgba(62, 124, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+.retryButton:focus-visible {
+  outline: 2px solid var(--retry-accent);
+  outline-offset: 2px;
+}
+
+.retryButton:disabled {
+  cursor: wait;
+  opacity: 0.62;
+}
+
+@media (max-width: 520px) {
+  .streamError {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .retryButton {
+    grid-column: 2;
+    justify-self: start;
+  }
 }
 
 .costInfo {

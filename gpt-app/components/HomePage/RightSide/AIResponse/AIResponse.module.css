@@ -1,31 +1,75 @@
 .aiBlock {
   max-width: 760px;
   width: 100%;
-  padding: 10px 18px 16px;
-  border-radius: 20px;
-  background: linear-gradient(180deg, #fff 0%, #f7faff 100%);
-  border: 1px solid rgba(37, 99, 235, 0.14);
+  min-width: 0;
+  box-sizing: border-box;
+  border-radius: 24px;
+  overflow: clip;
+  background: #ffffff;
+  color: #1d1d1f;
+  border: 1px solid #e5e5ea;
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 10px 30px rgba(15, 23, 42, 0.06);
   /* margin-bottom: 24px; */
 }
 
 .aiTitle {
+  position: sticky;
+  top: 0;
+  z-index: 3;
   display: flex;
   align-items: center;
   gap: 5px;
+  padding: 10px 18px;
+  border-radius: 24px 24px 0 0;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e5ea;
+}
+
+.copyBtn {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 6px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.copyBtn:hover {
+  background: #f5f5f7;
+}
+
+.copyBtnCopied,
+.copyBtnCopied:hover {
+  background: #dcfce7;
+  padding: 6px 10px;
+}
+
+.copyBtnLabel {
+  font-family: var(--font-family);
+  font-size: 12px;
+  font-weight: 600;
+  color: #16a34a;
 }
 
 .aiParagraph {
   font-family: var(--font-family);
   font-weight: 700;
   font-size: 14px;
-  color: #0b1220;
+  color: #1d1d1f;
 }
 
 .aiModel {
   font-family: var(--font-family);
   font-weight: 500;
   font-size: 11px;
-  color: #64748b;
+  color: #5b6472;
   background: #f1f5f9;
   border-radius: 6px;
   padding: 2px 7px;
@@ -33,14 +77,23 @@
 }
 
 .aiContent {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
   margin-top: 8px;
-  padding-right: 8px;
+  padding: 0 18px 16px;
   font-family: var(--font-family);
   font-weight: 400;
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.55;
-  color: #0b1220;
+  color: #1d1d1f;
   word-break: break-word;
+}
+
+.aiContent p,
+.aiContent li,
+.aiContent div {
+  color: #1d1d1f;
 }
 
 /* --- Markdown typography --- */
@@ -59,24 +112,24 @@
 .aiContent h4 {
   margin: 18px 0 8px;
   font-weight: 700;
-  color: #0b1220;
+  color: #1d1d1f;
   line-height: 1.3;
 }
 
 .aiContent h1 {
-  font-size: 19px;
+  font-size: 21px;
 }
 
 .aiContent h2 {
-  font-size: 17px;
+  font-size: 19px;
 }
 
 .aiContent h3 {
-  font-size: 15px;
+  font-size: 18px;
 }
 
 .aiContent h4 {
-  font-size: 14px;
+  font-size: 16px;
 }
 
 .aiContent ul,
@@ -102,7 +155,7 @@
   margin: 10px 0;
   padding: 4px 0 4px 14px;
   border-left: 3px solid #cbd5e1;
-  color: #475569;
+  color: #5b6472;
 }
 
 .aiContent hr {
@@ -115,7 +168,7 @@
   margin: 12px 0;
   border-collapse: collapse;
   width: 100%;
-  font-size: 13px;
+  font-size: 16px;
 }
 
 .aiContent th,
@@ -133,11 +186,11 @@
 /* --- Inline code --- */
 
 .aiContent code {
-  font-family: ui-monospace, SFMono-Regular, "Cascadia Code", Menlo, Consolas,
-    monospace;
-  font-size: 13px;
-  background: #eef2f7;
-  color: #0b1220;
+  font-family:
+    ui-monospace, SFMono-Regular, "Cascadia Code", Menlo, Consolas, monospace;
+  font-size: 16px;
+  background: #f5f5f7;
+  color: #1d1d1f;
   border-radius: 5px;
   padding: 2px 5px;
 }
@@ -145,58 +198,171 @@
 /* --- Code blocks (ChatGPT-like) --- */
 
 .aiContent :global(.code-block) {
+  --code-bg: #fafafa;
+  --code-header-bg: #f5f5f7;
+  --code-border: #e5e5ea;
+  --code-text: #1d1d1f;
+  --code-muted: #6e7781;
+
+  position: relative;
+  z-index: 5;
   margin: 12px 0;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  overflow: clip;
+  box-sizing: border-box;
+
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
   border-radius: 12px;
-  overflow: hidden;
-  background: #0d1117;
+
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 8px 20px rgba(15, 23, 42, 0.05);
 }
 
 .aiContent :global(.code-header) {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  min-height: 40px;
+  padding: 0 12px 0 14px;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 7px 14px;
-  background: #1c2128;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  gap: 12px;
+
+  background: var(--code-header-bg);
+  border-bottom: 1px solid var(--code-border);
+  border-radius: 11px 11px 0 0;
 }
 
 .aiContent :global(.code-lang) {
+  color: var(--code-muted);
+
   font-family: var(--font-family);
   font-size: 12px;
-  color: #8b949e;
+  font-weight: 500;
+  line-height: 1;
+
   text-transform: lowercase;
 }
 
 .aiContent :global(.code-copy-btn) {
-  border: none;
-  background: none;
-  padding: 3px 8px;
-  border-radius: 6px;
-  font-family: var(--font-family);
-  font-size: 12px;
-  color: #c9d1d9;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  gap: 5px;
+
+  color: var(--code-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+
   cursor: pointer;
-  transition: background 0.15s ease;
+
+  transition:
+    color 140ms ease,
+    background-color 140ms ease,
+    border-color 140ms ease,
+    transform 100ms ease;
 }
 
 .aiContent :global(.code-copy-btn):hover {
-  background: rgba(255, 255, 255, 0.1);
+  color: var(--code-text);
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+.aiContent :global(.code-copy-btn):active {
+  color: #0550ae;
+  background: rgba(5, 80, 174, 0.08);
+  border-color: rgba(5, 80, 174, 0.16);
+
+  transform: scale(0.96);
+}
+
+.aiContent :global(.code-copy-btn.copied),
+.aiContent :global(.code-copy-btn.copied):hover {
+  width: auto;
+  padding: 0 9px;
+  color: #1a7f37;
+  background: rgba(26, 127, 55, 0.1);
+  border-color: rgba(26, 127, 55, 0.2);
+}
+
+.aiContent :global(.code-copy-label) {
+  display: none;
+  font-family: var(--font-family);
+  font-size: 12px;
+  font-weight: 600;
+  color: #1a7f37;
+}
+
+.aiContent :global(.code-copy-btn.copied .code-copy-label) {
+  display: inline;
+}
+
+/* Той самий copy/copied svg, що й у картці відповіді, перефарбований під шапку коду */
+.aiContent :global(.code-copy-icon) {
+  width: 16px;
+  height: 16px;
+  background-color: currentColor;
+  -webkit-mask: url("/icons/copy.svg") no-repeat center / contain;
+  mask: url("/icons/copy.svg") no-repeat center / contain;
+}
+
+.aiContent :global(.code-copy-btn.copied .code-copy-icon) {
+  -webkit-mask-image: url("/icons/copied.svg");
+  mask-image: url("/icons/copied.svg");
 }
 
 .aiContent pre {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
   margin: 0;
-  padding: 14px;
-  overflow-x: auto;
+  padding: 16px 14px 18px;
+  overflow-x: hidden;
+  box-sizing: border-box;
+
+  background: transparent;
+  border-radius: 0 0 11px 11px;
+}
+
+.aiContent :global(.shiki),
+.aiContent :global(.shiki) span {
+  background-color: transparent !important;
 }
 
 .aiContent pre code {
   background: none;
   padding: 0;
   border-radius: 0;
-  color: #e6edf3;
-  font-size: 13px;
-  line-height: 1.6;
-  white-space: pre;
+  border: 0;
+  color: var(--code-text, #1d1d1f);
+
+  font-family:
+    "JetBrains Mono", "Fira Code", Consolas, "Courier New", monospace;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.65;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  tab-size: 2;
+}
+
+.aiContent :global(.shiki .line) {
+  min-height: 1.65em;
 }
 
 .aiList {
@@ -211,11 +377,11 @@
   font-family: var(--font-family);
   font-weight: 700;
   font-size: 13px;
-  color: #0b1220;
+  color: #1d1d1f;
 }
 .aiListSpan {
   font-family: var(--font-family);
   font-weight: 700;
   font-size: 12px;
-  color: #475569;
+  color: #5b6472;
 }

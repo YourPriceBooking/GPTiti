@@ -45,9 +45,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 import { api } from "@/helpers/api";
 ......
-const summary = await api.getUsageSummary();
-const data = await api.loginWithGoogle(googleToken);
-const history = await api.getUsageHistory(7);
+const conversations = await api.getConversations();
 
 далі-обробляти дані так, як зі звичайними данними, що прийшли з того чи іншого роуту бек енду
   далі-обробляти дані так, як зі звичайними данними, що прийшли з того чи іншого роуту бек енду

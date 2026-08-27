@@ -1,32 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useMemo } from "react";
-import { marked } from "marked";
-import DOMPurify from "dompurify";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { renderAssistantMarkdown } from "@/lib/markdown";
+import { highlightCodeHtml } from "@/lib/shiki";
 import styles from "./AIResponse.module.css";
-
-const escapeHtml = (value: string) =>
-  value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-
-marked.use({
-  gfm: true,
-  breaks: true,
-  renderer: {
-    code({ text, lang }) {
-      const language = (lang ?? "").trim().split(/\s+/)[0] || "text";
-      return (
-        `<div class="code-block">` +
-        `<div class="code-header">` +
-        `<span class="code-lang">${escapeHtml(language)}</span>` +
-        `<button type="button" class="code-copy-btn">Копіювати код</button>` +
-        `</div>` +
-        `<pre><code class="language-${escapeHtml(language)}">${escapeHtml(text)}</code></pre>` +
-        `</div>`
-      );
-    },
-  },
-});
 
 type AIResponseProps = {
   content: string;
@@ -34,9 +12,40 @@ type AIResponseProps = {
 };
 
 export default function AIResponse({ content, modelId }: AIResponseProps) {
-  const html = useMemo(() => {
-    const raw = marked.parse(content, { async: false });
-    return DOMPurify.sanitize(raw);
+  const html = useMemo(() => renderAssistantMarkdown(content), [content]);
+
+  const [copied, setCopied] = useState(false);
+
+  const [highlighted, setHighlighted] = useState({ source: "", html: "" });
+
+  useEffect(() => {
+    if (!html.includes('class="code-block"')) return;
+
+    let cancelled = false;
+
+    const timer = setTimeout(() => {
+      void highlightCodeHtml(html)
+        .then((result) => {
+          if (!cancelled) setHighlighted({ source: html, html: result });
+        })
+        .catch((error) => {
+          console.error("Syntax highlighting failed", error);
+        });
+    }, 150);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [html]);
+
+  const renderedHtml = highlighted.source === html ? highlighted.html : html;
+
+  const handleCopyResponse = useCallback(() => {
+    navigator.clipboard.writeText(content).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
   }, [content]);
 
   const handleContentClick = useCallback(
@@ -48,13 +57,13 @@ export default function AIResponse({ content, modelId }: AIResponseProps) {
       if (!code) return;
 
       navigator.clipboard.writeText(code.textContent ?? "").then(() => {
-        button.textContent = "Скопійовано!";
+        button.classList.add("copied");
         setTimeout(() => {
-          button.textContent = "Копіювати код";
+          button.classList.remove("copied");
         }, 2000);
       });
     },
-    []
+    [],
   );
 
   return (
@@ -68,12 +77,27 @@ export default function AIResponse({ content, modelId }: AIResponseProps) {
         />
         <p className={styles.aiParagraph}>GPTiti</p>
         {modelId && <span className={styles.aiModel}>{modelId}</span>}
+
+        <button
+          type="button"
+          className={`${styles.copyBtn} ${copied ? styles.copyBtnCopied : ""}`}
+          onClick={handleCopyResponse}
+          aria-label={copied ? "Скопійовано" : "Копіювати відповідь"}
+        >
+          <Image
+            src={copied ? "/icons/copied.svg" : "/icons/copy.svg"}
+            alt=""
+            width={16}
+            height={16}
+          />
+          {copied && <span className={styles.copyBtnLabel}>Copied</span>}
+        </button>
       </h2>
 
       <div
         className={styles.aiContent}
         onClick={handleContentClick}
-        dangerouslySetInnerHTML={{ __html: html }}
+        dangerouslySetInnerHTML={{ __html: renderedHtml }}
       />
     </div>
   );

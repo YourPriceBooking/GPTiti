@@ -1,4 +1,5 @@
 import React from "react";
+import type { ProjectConversation } from "@/types/api.types";
 
 export interface CustomScrollBarProps {
   scrollTargetClass: string;
@@ -14,20 +15,44 @@ export type Message = {
   images?: string[];
   modelId?: string;
   streaming?: boolean;
+  error?: string;
+  retryable?: boolean;
 };
+
+export type ChatProject = {
+  id: string;
+  title: string;
+  icon?: string;
+  color?: string;
+};
+
+export type MessagesStatus = "idle" | "loading" | "loaded" | "error";
 
 export type Chat = {
   id: string;
   title: string | null;
   messages: Message[];
-  messagesLoaded?: boolean;
+  messagesStatus: MessagesStatus;
+  preview?: string;
   modelId?: string;
   lastMessageAt?: string;
+  createdAt?: string;
+  project?: ChatProject;
 };
 
 export type Project = {
   id: string;
   title: string;
+  description?: string;
+  icon?: string;
+  color?: string;
+  defaultModel?: string;
+  systemPrompt?: string;
+  archived?: boolean;
+  conversationCount?: number;
+  conversationIds?: ProjectConversation[];
+  lastActivityAt?: string;
+  createdAt?: string;
 };
 
 export type ModelType =
@@ -90,11 +115,18 @@ export type LeftSideProps = {
 
 export type SectionGptChatsProps = Pick<
   LeftSideProps,
-  "onNewChat" | "onNewProject" | "projectList" | "chatList" | "setActiveChatId" | "deleteChat" | "renameChat"
+  | "onNewChat"
+  | "onNewProject"
+  | "projectList"
+  | "chatList"
+  | "setActiveChatId"
+  | "deleteChat"
+  | "renameChat"
 > & {
   setActiveProject?: (id: string) => void;
   deleteProject?: (id: string) => void;
   renameProject?: (id: string, title: string) => void;
+  addChatsToProject?: (id: string) => void;
 };
 
 export type MainSectionRightSideProps = {
@@ -115,6 +147,8 @@ export type MainSectionRightSideProps = {
   onImagesChange?: (count: number) => void;
   showEstimate: boolean;
   onChooseModel: () => void;
+  estimateSupported?: boolean;
+  estimatedTokens?: number | null;
 };
 
 export type ModelModalOverlayProps = {

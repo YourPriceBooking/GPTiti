@@ -11,11 +11,45 @@ import { useAppSelector } from "@/redux/hooks";
 import { selectIsLoggedIn } from "@/redux/auth/selectors";
 
 import { getModelLimits } from "@/config/modelLimits.config";
+import { isModelComingSoon } from "@/config/models.config";
 import { compressImage } from "@/lib/compressImage";
 
 import styles from "./InputBar.module.css";
+import Image from "next/image";
 
 const MB = 1024 * 1024;
+const TOOLTIP_VIEWPORT_GAP = 8;
+
+const fitInputTooltipToViewport = (trigger: HTMLElement) => {
+  const tooltip = trigger.querySelector<HTMLElement>("[data-input-tooltip]");
+  if (!tooltip) return;
+
+  tooltip.style.setProperty("--tooltip-shift", "0px");
+  requestAnimationFrame(() => {
+    if (!tooltip.isConnected) return;
+
+    const inputBar = trigger.closest<HTMLElement>("[data-input-bar]");
+    const inputBarRect = inputBar?.getBoundingClientRect();
+    const rect = tooltip.getBoundingClientRect();
+    const allowedLeft = Math.max(
+      TOOLTIP_VIEWPORT_GAP,
+      (inputBarRect?.left ?? 0) + TOOLTIP_VIEWPORT_GAP,
+    );
+    const allowedRight = Math.min(
+      window.innerWidth - TOOLTIP_VIEWPORT_GAP,
+      (inputBarRect?.right ?? window.innerWidth) - TOOLTIP_VIEWPORT_GAP,
+    );
+    let shift = 0;
+
+    if (rect.left < allowedLeft) {
+      shift = allowedLeft - rect.left;
+    } else if (rect.right > allowedRight) {
+      shift = allowedRight - rect.right;
+    }
+
+    tooltip.style.setProperty("--tooltip-shift", `${shift}px`);
+  });
+};
 
 const formatFileSize = (bytes: number) => {
   if (bytes >= MB) return `${(bytes / MB).toFixed(1)} MB`;
@@ -40,6 +74,7 @@ export default function InputBar({
   onImagesChange,
   placeholder = "Ask anything...",
   variant = "default",
+  isAiResponding = false,
 }: {
   hasInput: boolean;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
@@ -53,6 +88,7 @@ export default function InputBar({
   onImagesChange?: (count: number) => void;
   placeholder?: string;
   variant?: "default" | "project";
+  isAiResponding?: boolean;
 }) {
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
 
@@ -79,6 +115,10 @@ export default function InputBar({
   } | null>(null);
 
   const limits = useMemo(() => getModelLimits(selectedModel), [selectedModel]);
+  const isComingSoon = useMemo(
+    () => isModelComingSoon(selectedModel),
+    [selectedModel],
+  );
   const isImageBlocked = limits.maxImages === 0;
   const maxImageBytes = limits.maxImageSizeMb * MB;
   const isFileBlocked = limits.maxFiles === 0;
@@ -176,6 +216,15 @@ export default function InputBar({
   useEffect(() => {
     onImagesChange?.(images.length);
   }, [images.length, onImagesChange]);
+
+  useLayoutEffect(() => {
+    const textarea = inputRef.current;
+    if (!textarea) return;
+    onChange({
+      target: textarea,
+    } as React.ChangeEvent<HTMLTextAreaElement>);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     onChange(e);
@@ -346,6 +395,7 @@ export default function InputBar({
   };
 
   const handleSend = () => {
+    if (isComingSoon) return;
     if (inputRef.current) {
       const message = inputRef.current.value;
       const hasContent =
@@ -389,11 +439,19 @@ export default function InputBar({
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
   return (
     <div
       className={`${styles.inputContainer} ${
         isMultiline ? styles.multiline : ""
       } ${variant === "project" ? styles.project : ""}`}
+      data-input-bar
     >
       {showAddInput && (
         <div
@@ -447,11 +505,22 @@ export default function InputBar({
                 </svg>
               </button>
               <button
+                className={styles.removeImageBtn}
                 type="button"
                 aria-label="Remove image"
                 onClick={() => removeImage(img.id)}
               >
-                ×
+                <svg
+                  width={12}
+                  height={12}
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path
+                    fill="currentColor"
+                    d="M18.3 5.71a1 1 0 0 0-1.41 0L12 10.59 7.11 5.7A1 1 0 0 0 5.7 7.11L10.59 12 5.7 16.89a1 1 0 1 0 1.41 1.41L12 13.41l4.89 4.89a1 1 0 0 0 1.41-1.41L13.41 12l4.89-4.89a1 1 0 0 0 0-1.4z"
+                  />
+                </svg>
               </button>
             </div>
           ))}
@@ -491,6 +560,10 @@ export default function InputBar({
           <div
             className={styles.iconWrapper}
             tabIndex={0}
+            onPointerEnter={(event) =>
+              fitInputTooltipToViewport(event.currentTarget)
+            }
+            onFocus={(event) => fitInputTooltipToViewport(event.currentTarget)}
             onClick={() => {
               setShowAddInput((prev) => !prev);
             }}
@@ -504,6 +577,13 @@ export default function InputBar({
             >
               <use href="/icons/input-sprite.svg#ib-plus" />
             </svg>
+            <span
+              className={styles.inputTooltip}
+              data-input-tooltip
+              role="tooltip"
+            >
+              Add files and more
+            </span>
           </div>
         </div>
 
@@ -512,13 +592,21 @@ export default function InputBar({
           className={styles.input}
           placeholder={placeholder}
           onChange={handleChange}
+          onKeyDown={handleKeyDown}
           onPaste={handlePaste}
           rows={1}
           maxLength={limits.maxTextChars ?? undefined}
         />
 
         <div className={styles.rightControls} ref={rightControlsRef}>
-          <div className={styles.iconWrapper1} tabIndex={0}>
+          <div
+            className={styles.iconWrapper1}
+            tabIndex={0}
+            onPointerEnter={(event) =>
+              fitInputTooltipToViewport(event.currentTarget)
+            }
+            onFocus={(event) => fitInputTooltipToViewport(event.currentTarget)}
+          >
             <svg
               className={styles.inputIcon}
               width={35}
@@ -528,11 +616,54 @@ export default function InputBar({
             >
               <use href="/icons/input-sprite.svg#ib-microphone" />
             </svg>
+            <span
+              className={styles.inputTooltip}
+              data-input-tooltip
+              role="tooltip"
+            >
+              Dictate
+            </span>
           </div>
 
-          {hasInput || images.length > 0 || files.length > 0 ? (
+          {isAiResponding ? (
             <div
-              className={`${styles.iconWrapper2} ${styles.disabledHover}`}
+              className={styles.iconWrapper2}
+              tabIndex={0}
+              onPointerEnter={(event) =>
+                fitInputTooltipToViewport(event.currentTarget)
+              }
+              onFocus={(event) =>
+                fitInputTooltipToViewport(event.currentTarget)
+              }
+            >
+              <svg
+                className={styles.sendIcon}
+                width={35}
+                height={35}
+                viewBox="0 0 44 44"
+                role="img"
+                aria-label="generating"
+              >
+                <use href="/icons/input-sprite.svg#ib-stop" />
+              </svg>
+              <span
+                className={styles.inputTooltip}
+                data-input-tooltip
+                role="tooltip"
+              >
+                Stop answering
+              </span>
+            </div>
+          ) : hasInput || images.length > 0 || files.length > 0 ? (
+            <div
+              className={styles.iconWrapper2}
+              tabIndex={0}
+              onPointerEnter={(event) =>
+                fitInputTooltipToViewport(event.currentTarget)
+              }
+              onFocus={(event) =>
+                fitInputTooltipToViewport(event.currentTarget)
+              }
               onClick={handleSend}
             >
               <svg
@@ -545,9 +676,25 @@ export default function InputBar({
               >
                 <use href="/icons/input-sprite.svg#ib-send" />
               </svg>
+              <span
+                className={styles.inputTooltip}
+                data-input-tooltip
+                role="tooltip"
+              >
+                Send message
+              </span>
             </div>
           ) : (
-            <div className={styles.iconWrapper2} tabIndex={0}>
+            <div
+              className={styles.iconWrapper2}
+              tabIndex={0}
+              onPointerEnter={(event) =>
+                fitInputTooltipToViewport(event.currentTarget)
+              }
+              onFocus={(event) =>
+                fitInputTooltipToViewport(event.currentTarget)
+              }
+            >
               <svg
                 className={styles.inputIcon}
                 width={35}
@@ -558,12 +705,33 @@ export default function InputBar({
               >
                 <use href="/icons/input-sprite.svg#ib-voice" />
               </svg>
+              <span
+                className={styles.inputTooltip}
+                data-input-tooltip
+                role="tooltip"
+              >
+                Use voice model
+              </span>
             </div>
           )}
         </div>
 
         <span className={styles.measure} ref={measureRef} aria-hidden="true" />
       </div>
+
+      {isComingSoon && (
+        <div className={styles.comingSoonOverlay}>
+          <div className={styles.comingSoonBadge}>
+            <span className={styles.comingSoonDot} />
+            <span className={styles.comingSoonTitle}>
+              This model is coming soon.
+            </span>
+            <span className={styles.comingSoonHint}>
+              Choose another model to continue.
+            </span>
+          </div>
+        </div>
+      )}
 
       {editingImage && (
         <ImageEditorModal

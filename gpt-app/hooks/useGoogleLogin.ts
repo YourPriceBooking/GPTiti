@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { CredentialResponse } from "@react-oauth/google";
 
+import { readErrorMessage } from "@/lib/errorMessage";
 import { useAppDispatch } from "@/redux/hooks";
 import { loginUser } from "@/redux/auth/operations";
 
@@ -23,10 +24,7 @@ export function useGoogleLogin(onSuccess?: () => void) {
       await dispatch(loginUser(res.credential)).unwrap();
       onSuccess?.();
     } catch (err) {
-      const message =
-        typeof err === "string" ? err : "Login failed. Please try again.";
-      console.error("Login failed:", err);
-      setErrorText(message);
+      setErrorText(readErrorMessage(err, "Login failed. Please try again."));
     } finally {
       setLoading(false);
     }

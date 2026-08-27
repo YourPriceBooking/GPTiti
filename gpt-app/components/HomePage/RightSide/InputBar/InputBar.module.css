@@ -7,7 +7,7 @@
   width: 100%;
   border: 0.2px solid #3e3d40;
   border-radius: 33px;
-  background: var(--main-white);
+  background: #fcfdff;
   box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.25);
 }
 
@@ -26,11 +26,13 @@
 }
 
 .inputContainer.project .input {
-  color: #f7faff;
+  color: var(--main-white);
 }
 
 .inputContainer.project .input::placeholder {
   color: #8a9ac0;
+  font-size: 18px;
+  font-weight: 400;
 }
 
 .imagePreviewRow {
@@ -71,7 +73,7 @@
   border: none;
   border-radius: 50%;
   background: rgba(15, 23, 42, 0.85);
-  color: #fff;
+  color: #e4e6e9;
   font-size: 15px;
   line-height: 1;
   cursor: pointer;
@@ -80,7 +82,7 @@
 }
 
 .imageChip button:hover {
-  background: #0f172a;
+  background: #545454;
 }
 
 .imageChip button.editImageBtn {
@@ -154,7 +156,7 @@
   border: none;
   border-radius: 50%;
   background: rgba(15, 23, 42, 0.85);
-  color: #fff;
+  color: #e4e6e9;
   font-size: 13px;
   line-height: 1;
   cursor: pointer;
@@ -197,7 +199,7 @@
 
 .input::placeholder {
   font-family: var(--font-family);
-  font-style: italic;
+  font-style: normal;
   font-weight: 600;
   font-size: 20px;
   color: #94a3b8;
@@ -235,6 +237,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+  width: 35px;
+  height: 35px;
   outline: none;
   cursor: pointer;
   color: var(--flow-fill);
@@ -270,49 +275,89 @@
   opacity: 1;
 }
 
-.iconWrapper::after,
-.iconWrapper1::after,
-.iconWrapper2::after {
+.inputTooltip {
+  --tooltip-shift: 0px;
   position: absolute;
-  top: 50px;
-  left: 0;
+  z-index: 20;
+  top: 52px;
+  left: 50%;
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  max-width: calc(100vw - 16px);
+  transform: translateX(calc(-50% + var(--tooltip-shift)));
   background-color: #1d212a;
   color: var(--main-white);
-  padding: 5px 19px 6px 18px;
+  padding: 0 14px;
   border-radius: 7px;
-  font-size: 14px;
+  font-size: 12px;
+  line-height: 1.2;
   white-space: nowrap;
   opacity: 0;
   visibility: hidden;
+  pointer-events: none;
   transition:
-    opacity 1s ease,
-    visibility 1s ease;
+    opacity 180ms ease,
+    visibility 180ms ease;
 }
 
-.iconWrapper:hover::after,
-.iconWrapper1:hover::after,
-.iconWrapper2:hover::after {
+.iconWrapper:hover .inputTooltip,
+.iconWrapper:focus-visible .inputTooltip,
+.iconWrapper1:hover .inputTooltip,
+.iconWrapper1:focus-visible .inputTooltip,
+.iconWrapper2:hover .inputTooltip,
+.iconWrapper2:focus-visible .inputTooltip {
   opacity: 1;
   visibility: visible;
 }
 
-.iconWrapper::after {
-  content: "Add files and more";
-}
-.iconWrapper1::after {
-  content: "Dictate";
-  top: 58px;
-}
-.iconWrapper2::after {
-  content: "Use voice model";
-  top: 58px;
+/* "Coming soon" model — dims the composer and blocks input/sending */
+.comingSoonOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  border-radius: 33px;
+  background: rgba(148, 163, 184, 0.42);
+  z-index: 6;
 }
 
-.disabledHover:hover::after,
-.disabledHover:focus::before,
-.disabledHover:active::before {
-  opacity: 0 !important;
-  visibility: hidden !important;
+.comingSoonBadge {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  text-align: center;
+  gap: 4px 9px;
+  max-width: 100%;
+  padding: 9px 18px;
+  border-radius: 22px;
+  background: #1d212a;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.25);
+}
+
+.comingSoonDot {
+  width: 9px;
+  height: 9px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #f5b301;
+}
+
+.comingSoonTitle {
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 15px;
+  color: #e4e6e9;
+}
+
+.comingSoonHint {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 13px;
+  color: #9aa6bd;
 }
 
 .modalWrapper {
@@ -348,5 +393,52 @@
   }
   .input::placeholder {
     font-size: 16px;
+  }
+
+  .inputContainer.project {
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+    border-radius: 26px;
+  }
+
+  .inputContainer.project .composerBody {
+    min-height: 58px;
+    flex-wrap: nowrap;
+    gap: 8px;
+    padding: 9px 12px;
+  }
+
+  .inputContainer.project.multiline .composerBody {
+    flex-wrap: wrap;
+  }
+
+  .inputContainer.project .input {
+    min-height: 24px;
+    font-size: 15px;
+    line-height: 1.4;
+  }
+
+  .inputContainer.project .input:placeholder-shown {
+    white-space: nowrap;
+  }
+
+  .inputContainer.project .input::placeholder {
+    font-size: 14px;
+  }
+
+  .inputContainer.project .rightControls {
+    gap: 4px;
+  }
+
+  .comingSoonBadge {
+    gap: 4px 8px;
+    padding: 8px 14px;
+  }
+  .comingSoonTitle {
+    font-size: 13px;
+  }
+  .comingSoonHint {
+    font-size: 12px;
   }
 }

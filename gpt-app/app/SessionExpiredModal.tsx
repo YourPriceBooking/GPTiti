@@ -1,9 +1,15 @@
 "use client";
 
+import dynamic from "next/dynamic";
+
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { selectSessionExpired } from "@/redux/auth/selectors";
 import { clearSessionExpired } from "@/redux/auth/slice";
-import LoginModal from "@/components/HomePage/common/LoginModal/LoginModal";
+
+const LoginModal = dynamic(
+  () => import("@/components/HomePage/common/LoginModal/LoginModal"),
+  { ssr: false },
+);
 
 export default function SessionExpiredModal() {
   const dispatch = useAppDispatch();

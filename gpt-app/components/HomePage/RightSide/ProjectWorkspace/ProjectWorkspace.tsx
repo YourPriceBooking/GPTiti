@@ -1,27 +1,295 @@
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
 import InputBar from "@/components/HomePage/RightSide/InputBar/InputBar";
-import ChooseModelColumn from "@/components/HomePage/RightSide/ChooseModelColumn/ChooseModelColumn";
+import InputComposer from "@/components/HomePage/RightSide/InputComposer/InputComposer";
+import ChatsMenu from "@/components/HomePage/LeftSide/ChatsMenu/ChatsMenu";
+import DeleteModalWindow from "@/components/HomePage/LeftSide/DeleteModalWindow/DeleteModalWindow";
+import type { Chat } from "@/types/types";
 
 import styles from "./ProjectWorkspace.module.css";
 
+const PINNED_CHATS_KEY = "pinnedChatIds";
+const MENU_GAP = 6;
+const MENU_HEIGHT = 240;
+
+const shouldOpenUpwards = (trigger: HTMLElement) =>
+  trigger.getBoundingClientRect().bottom + MENU_GAP + MENU_HEIGHT >
+  window.innerHeight;
+
 type ProjectWorkspaceProps = {
+  projectId: string;
   name: string;
-  chatCount?: number;
+  createdAt?: string;
   onCreateFirstChat: () => void;
   inputProps: React.ComponentProps<typeof InputBar>;
   onChooseModel: () => void;
   showEstimate: boolean;
+  estimateSupported?: boolean;
+  estimatedTokens?: number | null;
+  chats?: Chat[];
+  chatsLoaded?: boolean;
+  onOpenChat?: (id: string) => void;
+  onRemoveChat?: (id: string) => void;
+  onRenameChat?: (id: string, title: string) => void;
+  onAddChatsToProject: (id: string) => void;
+  onRenameProject: (id: string, title: string) => void;
+  onDeleteProject: (id: string) => void;
 };
 
+/**style label from an ISO timestamp. */
+function formatRelativeTime(iso?: string): string | null {
+  if (!iso) return null;
+  const then = new Date(iso).getTime();
+  if (Number.isNaN(then)) return null;
+
+  const sec = Math.max(0, Math.floor((Date.now() - then) / 1000));
+  if (sec < 60) return "just now";
+  const min = Math.floor(sec / 60);
+  if (min < 60) return `${min}m ago`;
+  const hr = Math.floor(min / 60);
+  if (hr < 24) return `${hr}h ago`;
+  const day = Math.floor(hr / 24);
+  if (day < 7) return `${day}d ago`;
+  const wk = Math.floor(day / 7);
+  if (wk < 5) return `${wk}w ago`;
+  const mo = Math.floor(day / 30);
+  if (mo < 12) return `${mo}mo ago`;
+  return `${Math.floor(day / 365)}y ago`;
+}
+
+function formatCreatedDate(iso?: string): string | null {
+  if (!iso) return null;
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return null;
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+function getChatPreview(chat: Chat): string | null {
+  const preview = chat.preview?.trim().replace(/\s+/g, " ");
+  if (preview) return preview;
+
+  const lastAssistant = [...chat.messages]
+    .reverse()
+    .find((m) => m.role === "assistant")?.content;
+  return lastAssistant?.trim().replace(/\s+/g, " ") || null;
+}
+
 export default function ProjectWorkspace({
+  projectId,
   name,
-  chatCount = 0,
+  createdAt,
   onCreateFirstChat,
   inputProps,
   onChooseModel,
   showEstimate,
+  estimateSupported,
+  estimatedTokens,
+  chats = [],
+  chatsLoaded = true,
+  onOpenChat,
+  onRemoveChat,
+  onRenameChat,
+  onAddChatsToProject,
+  onRenameProject,
+  onDeleteProject,
 }: ProjectWorkspaceProps) {
+  const chatCount = chats.length;
+  const hasChats = chatCount > 0;
+
+  const [openMenuChatId, setOpenMenuChatId] = useState<string | null>(null);
+  const [menuUp, setMenuUp] = useState(false);
+  const [deletingChatId, setDeletingChatId] = useState<string | null>(null);
+  const [renamingChatId, setRenamingChatId] = useState<string | null>(null);
+  const [projectMenuOpen, setProjectMenuOpen] = useState(false);
+  const [renamingProject, setRenamingProject] = useState(false);
+  const [deletingProject, setDeletingProject] = useState(false);
+  const [draftProjectName, setDraftProjectName] = useState(name);
+  const [pinnedChatIds, setPinnedChatIds] = useState<string[]>(() => {
+    return JSON.parse(localStorage.getItem(PINNED_CHATS_KEY) || "[]");
+  });
+  const menuRef = useRef<HTMLDivElement | null>(null);
+  const projectMenuRef = useRef<HTMLDivElement | null>(null);
+  const projectNameInputRef = useRef<HTMLInputElement | null>(null);
+  const titleRefs = useRef<Record<string, HTMLSpanElement | null>>({});
+
+  useEffect(() => {
+    localStorage.setItem(PINNED_CHATS_KEY, JSON.stringify(pinnedChatIds));
+  }, [pinnedChatIds]);
+
+  useEffect(() => {
+    if (!renamingProject) return;
+    projectNameInputRef.current?.focus();
+    projectNameInputRef.current?.select();
+  }, [renamingProject]);
+
+  useEffect(() => {
+    if (!projectMenuOpen && !deletingProject) return;
+
+    const closeProjectMenu = (event: MouseEvent) => {
+      if (!projectMenuRef.current?.contains(event.target as Node)) {
+        setProjectMenuOpen(false);
+        setDeletingProject(false);
+      }
+    };
+
+    document.addEventListener("mousedown", closeProjectMenu);
+    return () => document.removeEventListener("mousedown", closeProjectMenu);
+  }, [projectMenuOpen, deletingProject]);
+
+  useEffect(() => {
+    if (!renamingChatId) return;
+
+    const title = titleRefs.current[renamingChatId];
+    if (!title) return;
+
+    title.focus();
+    const range = document.createRange();
+    range.selectNodeContents(title);
+    range.collapse(false);
+
+    const selection = window.getSelection();
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+  }, [renamingChatId]);
+
+  const registerTitleRef = (element: HTMLSpanElement | null) => {
+    const chatId = element?.dataset.chatId;
+    if (element && chatId) titleRefs.current[chatId] = element;
+  };
+
+  const getChatTitle = (chatId: string) =>
+    chats.find((chat) => chat.id === chatId)?.title || "Untitled chat";
+
+  const handleTitleClick = (event: React.MouseEvent<HTMLSpanElement>) => {
+    if (event.currentTarget.isContentEditable) event.stopPropagation();
+  };
+
+  const handleTitleBlur = (event: React.FocusEvent<HTMLSpanElement>) => {
+    const chatId = event.currentTarget.dataset.chatId;
+    if (!chatId || renamingChatId !== chatId) return;
+
+    const currentTitle = getChatTitle(chatId);
+    const newTitle = event.currentTarget.textContent?.trim();
+
+    if (newTitle && newTitle !== currentTitle) {
+      onRenameChat?.(chatId, newTitle);
+    } else if (!newTitle) {
+      event.currentTarget.textContent = currentTitle;
+    }
+
+    setRenamingChatId(null);
+  };
+
+  const handleTitleKeyDown = (
+    event: React.KeyboardEvent<HTMLSpanElement>,
+  ) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      event.currentTarget.blur();
+      return;
+    }
+
+    if (event.key === "Escape") {
+      event.preventDefault();
+      const chatId = event.currentTarget.dataset.chatId;
+      if (chatId) event.currentTarget.textContent = getChatTitle(chatId);
+      setRenamingChatId(null);
+      event.currentTarget.blur();
+    }
+  };
+
+  const startRenamingChat = (chatId: string) => {
+    setRenamingChatId(chatId);
+    setOpenMenuChatId(null);
+  };
+
+  const toggleProjectMenu = () => {
+    setProjectMenuOpen((open) => !open);
+  };
+
+  const addChatsToProject = () => {
+    setProjectMenuOpen(false);
+    onAddChatsToProject(projectId);
+  };
+
+  const startRenamingProject = () => {
+    setProjectMenuOpen(false);
+    setDraftProjectName(name);
+    setRenamingProject(true);
+  };
+
+  const commitProjectRename = () => {
+    const nextName = draftProjectName.trim();
+    if (nextName && nextName !== name) {
+      onRenameProject(projectId, nextName);
+    } else {
+      setDraftProjectName(name);
+    }
+    setRenamingProject(false);
+  };
+
+  const handleProjectNameKeyDown = (
+    event: React.KeyboardEvent<HTMLInputElement>,
+  ) => {
+    if (event.key === "Enter") {
+      event.currentTarget.blur();
+      return;
+    }
+
+    if (event.key === "Escape") {
+      setDraftProjectName(name);
+      setRenamingProject(false);
+    }
+  };
+
+  const requestProjectDelete = () => {
+    setProjectMenuOpen(false);
+    setDeletingProject(true);
+  };
+
+  const cancelProjectDelete = () => setDeletingProject(false);
+
+  const confirmProjectDelete = () => {
+    onDeleteProject(projectId);
+    setDeletingProject(false);
+  };
+
+  const togglePinChat = (id: string) => {
+    setPinnedChatIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+    );
+  };
+
+  const pinnedChats = [...pinnedChatIds]
+    .reverse()
+    .map((id) => chats.find((c) => c.id === id))
+    .filter((c): c is Chat => c !== undefined);
+  const sortedChats = [
+    ...pinnedChats,
+    ...chats.filter((c) => !pinnedChatIds.includes(c.id)),
+  ];
+
+  useEffect(() => {
+    if (!openMenuChatId && !deletingChatId) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+
+      if (target.closest("[data-menu-trigger]")) return;
+
+      if (!menuRef.current?.contains(target)) {
+        setOpenMenuChatId(null);
+        setDeletingChatId(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [openMenuChatId, deletingChatId]);
+
   return (
     <div className={styles.container}>
       <header className={styles.header}>
@@ -34,72 +302,271 @@ export default function ProjectWorkspace({
           />
         </div>
         <div className={styles.headerText}>
-          <h1 className={styles.title}>{name}</h1>
+          <div className={styles.titleRow}>
+            {renamingProject ? (
+              <input
+                ref={projectNameInputRef}
+                className={styles.projectRenameInput}
+                value={draftProjectName}
+                maxLength={60}
+                onChange={(event) => setDraftProjectName(event.target.value)}
+                onBlur={commitProjectRename}
+                onKeyDown={handleProjectNameKeyDown}
+              />
+            ) : (
+              <h1 className={styles.title}>{name}</h1>
+            )}
+            {formatCreatedDate(createdAt) && (
+              <span className={styles.createdDate}>
+                Created · {formatCreatedDate(createdAt)}
+              </span>
+            )}
+          </div>
           <p className={styles.subtitle}>Project workspace</p>
           <p className={styles.description}>
             Organize chats, links, images, edited images and uploaded files in
             one place.
           </p>
         </div>
+        <div className={styles.projectActions} ref={projectMenuRef}>
+          <button
+            type="button"
+            className={`${styles.projectMenuButton} ${
+              projectMenuOpen ? styles.projectMenuButtonOpen : ""
+            }`}
+            aria-label={`Actions for ${name}`}
+            aria-haspopup="menu"
+            aria-expanded={projectMenuOpen}
+            onClick={toggleProjectMenu}
+          >
+            <Image
+              src="/icons/three-points.svg"
+              alt=""
+              width={20}
+              height={20}
+            />
+          </button>
+          {projectMenuOpen && (
+            <div className={styles.projectMenu}>
+              <ChatsMenu
+                isProject
+                showPinToggle={false}
+                onAddChats={addChatsToProject}
+                onRenameRequest={startRenamingProject}
+                onDeleteRequest={requestProjectDelete}
+              />
+            </div>
+          )}
+          {deletingProject && (
+            <div className={styles.projectDeleteModal}>
+              <DeleteModalWindow
+                type="project"
+                onCancel={cancelProjectDelete}
+                onConfirm={confirmProjectDelete}
+              />
+            </div>
+          )}
+        </div>
       </header>
 
       <div className={styles.inputRow}>
-        <InputBar
+        <InputComposer
           {...inputProps}
-          placeholder="Start a new chat in this project"
+          placeholder="Start a new chat"
           variant="project"
+          showEstimate={showEstimate}
+          estimateSupported={estimateSupported}
+          estimatedTokens={estimatedTokens}
+          onChooseModel={onChooseModel}
         />
-        <div className={styles.modelRow}>
-          <ChooseModelColumn
-            selectedModel={inputProps.selectedModel}
-            showEstimate={showEstimate}
-            onChoose={onChooseModel}
-          />
-        </div>
       </div>
 
       <div className={styles.tabsRow}>
         <span className={styles.tab}>Chats</span>
         <span className={styles.counter}>
-          <Image
-            src="/icons/chat-bubble.svg"
-            alt=""
-            width={18}
-            height={18}
-          />
+          <Image src="/icons/chat-bubble.svg" alt="" width={18} height={18} />
           {chatCount} chats
         </span>
       </div>
 
       <div className={styles.divider} />
 
-      <div className={styles.emptyState}>
-        <div className={styles.decorPattern} aria-hidden="true">
-          <div className={styles.decorDots} />
-        </div>
-        <div className={styles.emptyContent}>
-          <div className={styles.emptyIcon}>
-            <Image
-              src="/icons/create-modal-project.svg"
-              alt=""
-              width={36}
-              height={36}
-            />
+      {hasChats ? (
+        <ul className={styles.chatGrid}>
+          {sortedChats.map((chat) => {
+            const preview = getChatPreview(chat);
+            const updated = formatRelativeTime(chat.lastMessageAt);
+            const created = formatCreatedDate(chat.createdAt);
+            const isPinned = pinnedChatIds.includes(chat.id);
+
+            return (
+              <li
+                key={chat.id}
+                className={styles.chatCard}
+                tabIndex={0}
+                onClick={() => onOpenChat?.(chat.id)}
+              >
+                <div className={styles.cardIcon}>
+                  <Image
+                    src="/icons/new-chat.svg"
+                    alt=""
+                    width={24}
+                    height={24}
+                  />
+                </div>
+
+                <div className={styles.cardBody}>
+                  <span
+                    ref={registerTitleRef}
+                    data-chat-id={chat.id}
+                    className={styles.cardTitle}
+                    contentEditable={renamingChatId === chat.id}
+                    suppressContentEditableWarning
+                    onClick={handleTitleClick}
+                    onBlur={handleTitleBlur}
+                    onKeyDown={handleTitleKeyDown}
+                  >
+                    {chat.title || "Untitled chat"}
+                  </span>
+                  {(chat.modelId || created) && (
+                    <span className={styles.cardMetaRow}>
+                      {chat.modelId && (
+                        <span className={styles.cardBadge}>{chat.modelId}</span>
+                      )}
+                      {created && (
+                        <span className={styles.cardCreated}>
+                          Created · {created}
+                        </span>
+                      )}
+                    </span>
+                  )}
+                  {preview && <p className={styles.cardPreview}>{preview}</p>}
+                  {updated && (
+                    <span className={styles.cardMeta}>Updated {updated}</span>
+                  )}
+                </div>
+
+                <div className={styles.cardActions}>
+                  <button
+                    type="button"
+                    className={styles.cardQuickPinBtn}
+                    aria-label={isPinned ? "Unpin chat" : "Pin chat to top"}
+                    title={isPinned ? "Unpin chat" : "Pin chat to top"}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setOpenMenuChatId(null);
+                      setDeletingChatId(null);
+                      togglePinChat(chat.id);
+                    }}
+                  >
+                    <Image
+                      src={isPinned ? "/icons/unpin.svg" : "/icons/pin.svg"}
+                      alt=""
+                      width={14}
+                      height={15}
+                    />
+                  </button>
+
+                  <button
+                    type="button"
+                    className={styles.cardMenuBtn}
+                    aria-label="Chat options"
+                    aria-haspopup="menu"
+                    aria-expanded={openMenuChatId === chat.id}
+                    data-menu-trigger
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDeletingChatId(null);
+                      setMenuUp(shouldOpenUpwards(e.currentTarget));
+                      setOpenMenuChatId((prev) =>
+                        prev === chat.id ? null : chat.id,
+                      );
+                    }}
+                  >
+                    <Image
+                      src="/icons/three-points.svg"
+                      alt=""
+                      width={20}
+                      height={20}
+                    />
+                  </button>
+                </div>
+
+                {openMenuChatId === chat.id && (
+                  <div
+                    ref={menuRef}
+                    className={`${styles.cardMenu} ${
+                      menuUp ? styles.cardMenuUp : ""
+                    }`}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <ChatsMenu
+                      isPinned={pinnedChatIds.includes(chat.id)}
+                      onPinToggle={() => {
+                        togglePinChat(chat.id);
+                        setOpenMenuChatId(null);
+                      }}
+                      showCreateProject
+                      onCreateProject={() => setOpenMenuChatId(null)}
+                      onRenameRequest={() => startRenamingChat(chat.id)}
+                      onDeleteRequest={() => {
+                        setDeletingChatId(chat.id);
+                        setOpenMenuChatId(null);
+                      }}
+                    />
+                  </div>
+                )}
+
+                {deletingChatId === chat.id && (
+                  <div
+                    ref={menuRef}
+                    className={`${styles.cardMenu} ${
+                      menuUp ? styles.cardMenuUp : ""
+                    }`}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <DeleteModalWindow
+                      onCancel={() => setDeletingChatId(null)}
+                      onConfirm={() => {
+                        onRemoveChat?.(chat.id);
+                        setDeletingChatId(null);
+                      }}
+                    />
+                  </div>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      ) : chatsLoaded ? (
+        <div className={styles.emptyState}>
+          <div className={styles.decorPattern} aria-hidden="true">
+            <div className={styles.decorDots} />
           </div>
-          <h2 className={styles.emptyTitle}>No chats yet</h2>
-          <p className={styles.emptyDescription}>
-            Create your first chat in this project. Chats, links, images, edited
-            images, and uploaded files stay in this project history.
-          </p>
-          <button
-            type="button"
-            className={styles.createButton}
-            onClick={onCreateFirstChat}
-          >
-            Create first chat
-          </button>
+          <div className={styles.emptyContent}>
+            <div className={styles.emptyIcon}>
+              <Image
+                src="/icons/create-modal-project.svg"
+                alt=""
+                width={36}
+                height={36}
+              />
+            </div>
+            <h2 className={styles.emptyTitle}>No chats yet</h2>
+            <p className={styles.emptyDescription}>
+              Create your first chat in this project. Chats, links, images,
+              edited images, and uploaded files stay in this project history.
+            </p>
+            <button
+              type="button"
+              className={styles.createButton}
+              onClick={onCreateFirstChat}
+            >
+              Create first chat
+            </button>
+          </div>
         </div>
-      </div>
+      ) : null}
     </div>
   );
 }
