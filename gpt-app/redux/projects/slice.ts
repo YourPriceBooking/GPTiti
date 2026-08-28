@@ -15,7 +15,7 @@ import { refreshError } from "../auth/slice";
 
 interface ProjectsState {
   list: Project[];
-  status: "idle" | "loading" | "error";
+  status: "idle" | "loading" | "loaded" | "error";
   error: string | null;
 }
 
@@ -46,7 +46,7 @@ const projectsSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchProjects.fulfilled, (state, { payload }) => {
-        state.status = "idle";
+        state.status = "loaded";
         const prevById = new Map(state.list.map((p) => [p.id, p]));
         state.list = payload.map((p) => {
           const prev = prevById.get(p.id);

@@ -14,6 +14,7 @@ export type Message = {
   tokens?: number;
   images?: string[];
   modelId?: string;
+  updatedAt?: string;
   streaming?: boolean;
   error?: string;
   retryable?: boolean;
@@ -56,12 +57,7 @@ export type Project = {
 };
 
 export type ModelType =
-  | "gpt-4o"
-  | "gpt-5.1"
-  | "gpt-5.4"
-  | "gpt-5.5"
-  | "0-Series"
-  | "AI tools";
+  "gpt-4o" | "gpt-5.1" | "gpt-5.4" | "gpt-5.5" | "0-Series" | "AI tools";
 
 export type ModelTooltip = {
   title: string;

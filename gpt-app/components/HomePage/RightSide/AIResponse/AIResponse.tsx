@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { formatActivity } from "@/lib/formatActivity";
 import { renderAssistantMarkdown } from "@/lib/markdown";
 import { highlightCodeHtml } from "@/lib/shiki";
 import styles from "./AIResponse.module.css";
@@ -9,9 +10,15 @@ import styles from "./AIResponse.module.css";
 type AIResponseProps = {
   content: string;
   modelId?: string;
+  updatedAt?: string;
 };
 
-export default function AIResponse({ content, modelId }: AIResponseProps) {
+export default function AIResponse({
+  content,
+  modelId,
+  updatedAt,
+}: AIResponseProps) {
+  const updatedLabel = useMemo(() => formatActivity(updatedAt), [updatedAt]);
   const html = useMemo(() => renderAssistantMarkdown(content), [content]);
 
   const [copied, setCopied] = useState(false);
@@ -77,6 +84,9 @@ export default function AIResponse({ content, modelId }: AIResponseProps) {
         />
         <p className={styles.aiParagraph}>GPTiti</p>
         {modelId && <span className={styles.aiModel}>{modelId}</span>}
+        {updatedLabel && (
+          <span className={styles.aiUpdated}>{updatedLabel}</span>
+        )}
 
         <button
           type="button"

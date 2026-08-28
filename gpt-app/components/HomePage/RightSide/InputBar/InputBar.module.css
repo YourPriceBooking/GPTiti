@@ -243,7 +243,8 @@
   outline: none;
   cursor: pointer;
   color: var(--flow-fill);
-  z-index: 1;
+
+  z-index: 3;
 }
 
 .inputIcon,
@@ -279,18 +280,19 @@
   --tooltip-shift: 0px;
   position: absolute;
   z-index: 20;
-  top: 52px;
+
+  top: 42px;
   left: 50%;
   display: inline-flex;
   align-items: center;
-  height: 26px;
+  height: 22px;
   max-width: calc(100vw - 16px);
   transform: translateX(calc(-50% + var(--tooltip-shift)));
   background-color: #1d212a;
   color: var(--main-white);
-  padding: 0 14px;
+  padding: 0 12px;
   border-radius: 7px;
-  font-size: 12px;
+  font-size: 11px;
   line-height: 1.2;
   white-space: nowrap;
   opacity: 0;
