@@ -6,6 +6,7 @@ import SectionGptChats from "./SectionGptChats/SectionGptChats";
 import SectionGptTokens from "./SectionGptTokens/SectionGptTokens";
 import { useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { selectProjectList } from "@/redux/projects/selectors";
 import { renameProject } from "@/redux/projects/slice";
@@ -34,17 +35,22 @@ export default function LeftSide({
   const [isOpen, setIsOpen] = useState(true);
 
   const dispatch = useAppDispatch();
+  const router = useRouter();
   const projectList = useAppSelector(selectProjectList);
   const activeProjectId = useAppSelector(selectActiveProjectId);
 
   const handleSelectProject = (id: string) => {
     dispatch(setActiveProjectId(id));
+    router.push(`/projects/${id}`);
     onSelectProject?.();
   };
 
   const handleDeleteProject = (id: string) => {
     dispatch(removeProject(id));
-    if (id === activeProjectId) dispatch(setActiveProjectId(null));
+    if (id === activeProjectId) {
+      dispatch(setActiveProjectId(null));
+      router.push("/projects");
+    }
   };
 
   const handleRenameProject = (id: string, title: string) => {

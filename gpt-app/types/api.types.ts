@@ -38,6 +38,7 @@ export interface ConversationMessage {
   modelId?: string;
   tokens?: number;
   createdAt: string;
+  updatedAt?: string;
 }
 
 export interface ClaimTokenResponse {

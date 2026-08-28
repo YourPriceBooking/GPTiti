@@ -243,6 +243,7 @@ const chatSlice = createSlice({
       const last = chat.messages[chat.messages.length - 1];
       if (last && last.role === "assistant") {
         last.streaming = false;
+        last.updatedAt = new Date().toISOString();
         if (payload.tokens !== undefined) last.tokens = payload.tokens;
       }
       chat.lastMessageAt = new Date().toISOString();
@@ -324,6 +325,7 @@ const chatSlice = createSlice({
           content: m.content,
           tokens: m.tokens,
           modelId: m.modelId,
+          updatedAt: m.updatedAt ?? m.createdAt,
         }));
         chat.messagesStatus = "loaded";
         const lastModel = [...chat.messages]

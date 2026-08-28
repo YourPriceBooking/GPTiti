@@ -157,6 +157,7 @@ export default function MessageList({
                   <AIResponse
                     content={message.content}
                     modelId={message.modelId}
+                    updatedAt={message.updatedAt}
                   />
                 )}
                 {message.error && (

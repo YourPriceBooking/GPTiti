@@ -5,24 +5,28 @@ import { useEffect, useState } from "react";
 import MessageList from "@/components/HomePage/RightSide/MessageList/MessageList";
 import InputComposer from "@/components/HomePage/RightSide/InputComposer/InputComposer";
 import MainSectionRightSide from "@/components/HomePage/RightSide/MainSectionRightSide/MainSectionRightSide";
-import LeftSideDrawer from "@/components/HomePage/LeftSide/LeftSideDrawer/LeftSideDrawer";
 
-import { setSelectedModelGroup } from "@/redux/model/slice";
 import {
   setFocusMode,
   setHasFirstRequest,
   setIsModalOpen,
   setIsOverlayOpen,
   setIsSectionVisible,
-  setIsCreateProjectModalOpen,
 } from "@/redux/ui/slice";
 
 import { useQuickTasksAccess } from "@/hooks/useFeatureAccess";
 
 import type { HomeController } from "./useHomeController";
+import ChatBreadcrumbs from "./ChatBreadcrumbs";
 import styles from "../page.module.css";
 
-export default function ChatView({ ctrl }: { ctrl: HomeController }) {
+export default function ChatView({
+  ctrl,
+  showBreadcrumbs = false,
+}: {
+  ctrl: HomeController;
+  showBreadcrumbs?: boolean;
+}) {
   const { dispatch, activeChat, inputRef, scrollContainerRef, messagesEndRef } =
     ctrl;
   const [showDisclaimer, setShowDisclaimer] = useState(false);
@@ -71,24 +75,7 @@ export default function ChatView({ ctrl }: { ctrl: HomeController }) {
 
   return (
     <>
-      <LeftSideDrawer
-        className={styles.chatMenuTrigger}
-        onNewChat={ctrl.handleStartNewChat}
-        onNewProject={() => dispatch(setIsCreateProjectModalOpen(true))}
-        isModalOpen={ctrl.isModalOpen}
-        setIsModalOpen={(open) => dispatch(setIsModalOpen(open))}
-        modelMode={ctrl.modelMode}
-        setModelMode={ctrl.setModelMode}
-        chatList={ctrl.sortedChatList}
-        setActiveChatId={ctrl.handleSelectChat}
-        deleteChat={ctrl.handleDeleteChat}
-        renameChat={ctrl.handleRenameChat}
-        modelRef={ctrl.modelRef}
-        selectedModel={ctrl.selectedModel}
-        setSelectedModel={ctrl.handleSelectModel}
-        selectedModelGroup={ctrl.selectedModelGroup}
-        setSelectedModelGroup={(g) => dispatch(setSelectedModelGroup(g))}
-      />
+      {showBreadcrumbs && <ChatBreadcrumbs chat={activeChat} />}
 
       <div className={styles.scrollableContent} ref={scrollContainerRef}>
         {ctrl.streamError && (
