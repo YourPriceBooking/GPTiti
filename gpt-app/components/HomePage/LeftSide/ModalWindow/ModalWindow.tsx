@@ -1,15 +1,16 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+
+import { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
-import styles from "./ModalWindow.module.css";
 import Image from "next/image";
 import Link from "next/link";
-import { ModelType } from "@/types/types";
 import { modelConfig, TOKENS_SUFFIX } from "@/config/models.config";
 import { getModelGroupAndItem } from "@/functions/getModelGroupAndItem";
-import TooltipModalWindow from "../../TooltipModalWindow/TooltipModalWindow";
 import { useAppSelector } from "@/redux/hooks";
 import { selectBalance } from "@/redux/tokens/selectors";
+import { ModelType } from "@/types/types";
+import TooltipModalWindow from "../../TooltipModalWindow/TooltipModalWindow";
+import styles from "./ModalWindow.module.css";
 
 type Props = {
   selectedModelGroup: ModelType;
@@ -18,6 +19,9 @@ type Props = {
   setSelectedModel: (model: string) => void;
   setIsModalOpen: (open: boolean) => void;
 };
+
+const getDetailsId = (title: string) =>
+  `model-details-${title.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}`;
 
 export default function ModalWindow({
   selectedModelGroup,
@@ -30,90 +34,83 @@ export default function ModalWindow({
     (getModelGroupAndItem(selectedModel)?.group as ModelType | undefined) ??
     selectedModelGroup;
   const balance = useAppSelector(selectBalance);
-
   const [viewGroup, setViewGroup] = useState<ModelType>(appliedGroup);
-
-  const closeTimerRef = useRef<NodeJS.Timeout | null>(null);
-  useEffect(
-    () => () => {
-      if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
-    },
-    [],
-  );
+  const [visibleModel, setVisibleModel] = useState<string | null>(null);
+  const tabsRef = useRef<HTMLDivElement>(null);
+  const activeTabRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     setViewGroup(appliedGroup);
   }, [appliedGroup]);
 
-  // Стан для hover (desktop)
-  const [hoveredModel, setHoveredModel] = useState<string | null>(null);
-  // Стан для видимості тултіпа
-  const [visibleModel, setVisibleModel] = useState<string | null>(null);
-  const [isMobile, setIsMobile] = useState(false);
-  // Остання натиснута кнопка групи — тримає hover-ефект до перемикання
-  const [clickedGroup, setClickedGroup] = useState<string | null>(null);
-
-  const getGroupBtnClass = (group: string) =>
-    clsx(
-      styles.btn,
-      appliedGroup === group && styles.groupActive,
-      clickedGroup === group && styles.groupClicked,
-    );
-
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth <= 767);
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
+    const tabs = tabsRef.current;
+    const activeTab = activeTabRef.current;
 
-  useEffect(() => {
-    if (isMobile) return;
-    let showTimer: NodeJS.Timeout;
-    let hideTimer: NodeJS.Timeout;
-
-    if (hoveredModel) {
-      // показати через 2 секунди
-      showTimer = setTimeout(() => {
-        setVisibleModel(hoveredModel);
-      }, 2000);
-    } else {
-      // сховати через 1 секунду
-      hideTimer = setTimeout(() => {
-        setVisibleModel(null);
-      }, 1000);
+    if (
+      !tabs ||
+      !activeTab ||
+      window.matchMedia("(min-width: 601px)").matches
+    ) {
+      return;
     }
 
-    return () => {
-      clearTimeout(showTimer);
-      clearTimeout(hideTimer);
-    };
-  }, [hoveredModel, isMobile]);
+    const tabsRect = tabs.getBoundingClientRect();
+    const activeRect = activeTab.getBoundingClientRect();
+    const edgePadding = 8;
 
-  // Функція для мобільного кліку
-  const toggleTooltip = (model: string) => {
-    if (visibleModel === model) {
-      setTimeout(() => setVisibleModel(null), 1000);
-    } else {
-      setTimeout(() => setVisibleModel(model), 2000);
+    if (activeRect.left < tabsRect.left + edgePadding) {
+      tabs.scrollLeft -= tabsRect.left + edgePadding - activeRect.left;
+    } else if (activeRect.right > tabsRect.right - edgePadding) {
+      tabs.scrollLeft += activeRect.right - tabsRect.right + edgePadding;
     }
+  }, [viewGroup]);
+
+  const selectModel = (title: string) => {
+    setSelectedModel(title);
+    setSelectedModelGroup(viewGroup);
+    setIsModalOpen(false);
   };
 
   return (
     <div className={styles.modalContainer}>
       <header className={styles.header}>
-        <h2 className={styles.title}>Choose a AI tools or model GPT Chat</h2>
+        <div className={styles.headerTop}>
+          <h2 id="model-picker-title" className={styles.title}>
+            Choose AI tools or a GPT model
+          </h2>
+          <button
+            type="button"
+            className={styles.closeButton}
+            onClick={() => setIsModalOpen(false)}
+            aria-label="Close model picker"
+          >
+            <Image width={24} height={24} src="/icons/close.svg" alt="" />
+          </button>
+        </div>
 
-        <div className={styles.btnsContainer}>
+        <div
+          ref={tabsRef}
+          className={styles.btnsContainer}
+          role="tablist"
+          aria-label="Model groups"
+        >
           {Object.keys(modelConfig).map((group) => (
             <button
               key={group}
+              ref={viewGroup === group ? activeTabRef : undefined}
               type="button"
-              className={getGroupBtnClass(group)}
+              className={clsx(
+                styles.btn,
+                viewGroup === group && styles.groupActive,
+              )}
+              role="tab"
+              aria-selected={viewGroup === group}
+              aria-controls="model-list-panel"
               onClick={() => {
                 setViewGroup(group as ModelType);
                 setSelectedModelGroup(group as ModelType);
-                setClickedGroup(group);
+                setVisibleModel(null);
               }}
             >
               <span className={styles.groupLabel}>
@@ -127,98 +124,95 @@ export default function ModalWindow({
         </div>
       </header>
 
-      <section className={styles.mainSection}>
+      <section
+        id="model-list-panel"
+        className={styles.mainSection}
+        role="tabpanel"
+        aria-label={`${viewGroup} models`}
+      >
         <div className={styles.btnsContainer2}>
-          {modelConfig[viewGroup].list.map((item) => (
-            <div
-              key={item.title}
-              className={styles.modelWrapper}
-              onMouseEnter={() => setHoveredModel(item.title)} // desktop
-              onMouseLeave={() => setHoveredModel(null)} // desktop
-            >
-              <button
-                type="button"
-                className={`${styles.btn2} ${
-                  selectedModel === item.title ? styles.modelActive : ""
-                }`}
-                onClick={() => {
-                  setSelectedModel(item.title);
-                  if (closeTimerRef.current)
-                    clearTimeout(closeTimerRef.current);
-                  closeTimerRef.current = setTimeout(
-                    () => setIsModalOpen(false),
-                    1000,
-                  );
-                }}
-              >
-                <div className={styles.mainContainerbtn2}>
-                  <p className={styles.btn2Paragraph}>{item.title}</p>
-                  <span className={styles.btn2Span1}>
-                    {item.amount ? `${item.amount} ≈ ` : ""}
-                    {item.tokens} {TOKENS_SUFFIX}
-                  </span>
-                </div>
-                <span className={styles.btn2Span2}>{item.desc}</span>
-                {item.subDesc && (
-                  <span className={styles.btn2Span2}>{item.subDesc}</span>
-                )}
+          {modelConfig[viewGroup].list.map((item) => {
+            const detailsOpen = visibleModel === item.title;
+            const detailsId = getDetailsId(item.title);
 
-                <span
-                  className={styles.eyeIcon}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleTooltip(item.title);
-                  }}
+            return (
+              <div key={item.title} className={styles.modelWrapper}>
+                <button
+                  type="button"
+                  className={clsx(
+                    styles.btn2,
+                    selectedModel === item.title && styles.modelActive,
+                  )}
+                  onClick={() => selectModel(item.title)}
+                  aria-pressed={selectedModel === item.title}
                 >
-                  <Image
-                    width={30}
-                    height={20}
-                    src="/icons/eye.svg"
-                    alt="eye"
-                  />
-                </span>
-              </button>
+                  <span className={styles.mainContainerbtn2}>
+                    <span className={styles.btn2Paragraph}>{item.title}</span>
+                    <span className={styles.btn2Span1}>
+                      {item.amount ? `${item.amount} ≈ ` : ""}
+                      {item.tokens.toLocaleString()} {TOKENS_SUFFIX}
+                    </span>
+                  </span>
+                  <span className={styles.btn2Span2}>{item.desc}</span>
+                  {item.subDesc && (
+                    <span className={styles.btn2Span2}>{item.subDesc}</span>
+                  )}
+                </button>
 
-              {/* Tooltip */}
-              {visibleModel === item.title && (
-                <div className={styles.tooltipWrapper}>
-                  <TooltipModalWindow
-                    onClose={() => setVisibleModel(null)}
-                    tooltip={item.tooltip}
-                  />
-                </div>
-              )}
-            </div>
-          ))}
+                <button
+                  type="button"
+                  className={styles.eyeIcon}
+                  onClick={() =>
+                    setVisibleModel((current) =>
+                      current === item.title ? null : item.title,
+                    )
+                  }
+                  aria-label={`${detailsOpen ? "Hide" : "Show"} details for ${item.title}`}
+                  aria-expanded={detailsOpen}
+                  aria-controls={detailsId}
+                >
+                  <Image width={30} height={20} src="/icons/eye.svg" alt="" />
+                </button>
+
+                {detailsOpen && (
+                  <div
+                    id={detailsId}
+                    className={styles.tooltipWrapper}
+                    role="region"
+                    aria-label={`Details for ${item.title}`}
+                  >
+                    <TooltipModalWindow
+                      key={item.title}
+                      onClose={() => setVisibleModel(null)}
+                      tooltip={item.tooltip}
+                    />
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </section>
 
-      <footer>
+      <footer className={styles.footer}>
         <article className={styles.gptBalance}>
-          <h2 className={styles.title3}>Balance</h2>
+          <h3 className={styles.title3}>Balance</h3>
           <div className={styles.balanceContainer}>
             <span className={styles.gptSpan1}>{balance.toLocaleString()}</span>
             <Link href="/top-up-your-tokens" className={styles.badgeLink}>
-              <Image
-                width={24}
-                height={24}
-                src="/icons/badge.svg"
-                alt="badge"
-              />
+              <Image width={24} height={24} src="/icons/badge.svg" alt="" />
               <span className={styles.badgeText}>Top up tokens</span>
             </Link>
           </div>
         </article>
 
         <p className={styles.subscriptionsNote}>
-          No subscriptions • Tokens never expire •
+          No subscriptions • Tokens never expire
         </p>
-
-        <span className={styles.footerSpan}>
-          * We show an approximate price based on a typical 30-word message.
-          Real token usage depends on how much you write — shorter prompts cost
-          less, longer ones cost more.
-        </span>
+        <p className={styles.footerSpan}>
+          * Approximate price for a typical 30-word message. Actual usage depends
+          on prompt and response length.
+        </p>
       </footer>
     </div>
   );

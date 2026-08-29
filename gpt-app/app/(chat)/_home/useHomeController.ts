@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 
 import { useModelMode } from "@/hooks/useModelMode";
 import { useScrollDirection } from "@/hooks/useScrollDirection";
@@ -17,6 +18,7 @@ import {
   selectActiveChatMessageCount,
   selectActiveChatMessagesStatus,
   selectSortedChatList,
+  selectChatStatus,
   selectHasInput,
   selectInputSent,
   selectIsTyping,
@@ -62,9 +64,11 @@ import {
   updateProject,
 } from "@/redux/projects/operations";
 import { renameProject } from "@/redux/projects/slice";
+import { selectProjectsStatus } from "@/redux/projects/selectors";
 
 export function useHomeController() {
   const dispatch = useAppDispatch();
+  const router = useRouter();
 
   const sortedChatList = useAppSelector(selectSortedChatList);
   const activeChat = useAppSelector(selectActiveChat);
@@ -73,6 +77,8 @@ export function useHomeController() {
   const activeChatMessagesStatus = useAppSelector(
     selectActiveChatMessagesStatus,
   );
+  const chatListStatus = useAppSelector(selectChatStatus);
+  const projectsStatus = useAppSelector(selectProjectsStatus);
   const hasInput = useAppSelector(selectHasInput);
   const inputSent = useAppSelector(selectInputSent);
   const isTyping = useAppSelector(selectIsTyping);
@@ -106,7 +112,8 @@ export function useHomeController() {
     clearDraft();
     dispatch(setActiveProjectId(null));
     dispatch(handleNewChat());
-  }, [clearDraft, dispatch]);
+    router.push("/");
+  }, [clearDraft, dispatch, router]);
 
   const handleAddChatsToProject = useCallback(
     (projectId: string) => dispatch(setAddChatsProjectId(projectId)),
@@ -129,10 +136,11 @@ export function useHomeController() {
           activeProjectId === projectId
         ) {
           dispatch(setActiveProjectId(null));
+          router.push("/projects");
         }
       });
     },
-    [activeProjectId, dispatch],
+    [activeProjectId, dispatch, router],
   );
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -214,12 +222,15 @@ export function useHomeController() {
           imageUrls,
           imageFiles,
         });
-        if (accepted) draft.consumeDraft();
+        if (accepted) {
+          draft.consumeDraft();
+          router.replace(`/chats/${conversationId}`);
+        }
       } finally {
         sendCycleInFlightRef.current = false;
       }
     },
-    [draft, ensureConversationId, selectedModel, sendMessage],
+    [draft, ensureConversationId, router, selectedModel, sendMessage],
   );
 
   const handleProjectSend = useCallback(
@@ -262,20 +273,32 @@ export function useHomeController() {
           imageUrls,
           imageFiles,
         });
-        if (accepted) draft.consumeDraft();
+        if (accepted) {
+          draft.consumeDraft();
+          router.replace(`/chats/${conv._id}`);
+        }
       } finally {
         sendCycleInFlightRef.current = false;
       }
     },
-    [dispatch, activeProjectId, selectedModel, draft, projects, sendMessage],
+    [
+      dispatch,
+      activeProjectId,
+      selectedModel,
+      draft,
+      projects,
+      router,
+      sendMessage,
+    ],
   );
 
   const handleSelectChat = useCallback(
     (id: string) => {
       dispatch(setActiveProjectId(null));
       dispatch(setActiveChatId(id));
+      router.push(`/chats/${id}`);
     },
-    [dispatch],
+    [dispatch, router],
   );
 
   const handleRetryStream = useCallback(async () => {
@@ -287,8 +310,9 @@ export function useHomeController() {
     (id: string) => {
       if (isDraftId(id)) dispatch(deleteDraftChat(id));
       else dispatch(removeConversation(id));
+      if (id === activeChatId) router.push("/");
     },
-    [dispatch],
+    [activeChatId, dispatch, router],
   );
 
   const handleRenameChat = useCallback(
@@ -314,6 +338,9 @@ export function useHomeController() {
     sortedChatList,
     selectedModel,
     selectedModelGroup,
+    // роутинг: чи вже є дані, щоб вирішити, показувати "not found"
+    chatsLoaded: chatListStatus === "loaded",
+    projectsLoaded: projectsStatus === "loaded",
     // ui flags
     isModalOpen,
     isCreateProjectModalOpen,

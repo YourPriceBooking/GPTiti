@@ -65,13 +65,6 @@ export default function TooltipModalWindow({ onClose, tooltip }: Props) {
   const images = MODEL_IMAGES[tooltip.title] ?? [];
 
   useEffect(() => {
-    indexRef.current = 0;
-    setDisplayed("");
-    setDone(false);
-    setShowImagesPhase(false);
-    setImageIndex(0);
-    setPrevImageIndex(null);
-
     const type = () => {
       const i = indexRef.current;
       if (i < fullText.length) {
@@ -81,8 +74,8 @@ export default function TooltipModalWindow({ onClose, tooltip }: Props) {
         const ch = fullText[i];
         const speed =
           ch === "." || ch === "\n"
-            ? 80 + Math.random() * 40
-            : 10 + Math.random() * 25;
+            ? 35 + Math.random() * 20
+            : 2 + Math.random() * 5;
 
         timerRef.current = setTimeout(type, speed);
       } else {
@@ -121,14 +114,19 @@ export default function TooltipModalWindow({ onClose, tooltip }: Props) {
 
   return (
     <div className={styles.tooltipContainer}>
-      <button className={styles.closeBtn} onClick={onClose}>
-        <Image width={30} height={30} src="/icons/close.svg" alt="close" />
+      <button
+        type="button"
+        className={styles.closeBtn}
+        onClick={onClose}
+        aria-label="Close model details"
+      >
+        <Image width={30} height={30} src="/icons/close.svg" alt="" />
       </button>
 
       <h5 className={styles.tooltipTitle}>{tooltip.title}</h5>
-      <section className={styles.tooltipSection}>
+      <section className={styles.tooltipSection} aria-label={fullText}>
         {!showImages && (
-          <p className={styles.typingText}>
+          <p className={styles.typingText} aria-hidden="true">
             {displayed}
             {!done && <span className={styles.cursor} />}
           </p>

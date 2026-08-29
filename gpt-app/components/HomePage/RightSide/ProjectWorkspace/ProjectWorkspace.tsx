@@ -5,6 +5,7 @@ import InputBar from "@/components/HomePage/RightSide/InputBar/InputBar";
 import InputComposer from "@/components/HomePage/RightSide/InputComposer/InputComposer";
 import ChatsMenu from "@/components/HomePage/LeftSide/ChatsMenu/ChatsMenu";
 import DeleteModalWindow from "@/components/HomePage/LeftSide/DeleteModalWindow/DeleteModalWindow";
+import ChatBubbleIcon from "@/components/common/ChatBubbleIcon";
 import type { Chat } from "@/types/types";
 
 import styles from "./ProjectWorkspace.module.css";
@@ -384,7 +385,7 @@ export default function ProjectWorkspace({
       <div className={styles.tabsRow}>
         <span className={styles.tab}>Chats</span>
         <span className={styles.counter}>
-          <Image src="/icons/chat-bubble.svg" alt="" width={18} height={18} />
+          <ChatBubbleIcon width={18} height={18} />
           {chatCount} chats
         </span>
       </div>
@@ -407,12 +408,7 @@ export default function ProjectWorkspace({
                 onClick={() => onOpenChat?.(chat.id)}
               >
                 <div className={styles.cardIcon}>
-                  <Image
-                    src="/icons/new-chat.svg"
-                    alt=""
-                    width={24}
-                    height={24}
-                  />
+                  <ChatBubbleIcon width={16} height={16} />
                 </div>
 
                 <div className={styles.cardBody}>

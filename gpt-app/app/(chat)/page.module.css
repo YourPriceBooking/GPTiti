@@ -23,14 +23,196 @@
   background: #f8fafc;
 }
 
+.notFound {
+  --nf-text: #e4e6e9;
+  --nf-muted: #afc0de;
+  --nf-panel: rgba(7, 23, 43, 0.75);
+  --nf-panel-border: #0a1522;
+  --nf-ghost-bg: #08182b;
+  --nf-ghost-border: #244d7c;
+  --nf-ghost-text: #b5c6e6;
+  --nf-ghost-hover: rgba(30, 76, 137, 0.48);
+
+  width: 100%;
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 4% 50px;
+}
+
+.rightSectionChat .notFound {
+  --nf-text: #0f172a;
+  --nf-muted: #64748b;
+  --nf-panel: #ffffff;
+  --nf-panel-border: #e2e8f0;
+  --nf-ghost-bg: #ffffff;
+  --nf-ghost-border: #cbd5e1;
+  --nf-ghost-text: #0f172a;
+  --nf-ghost-hover: #f1f5f9;
+}
+
+.notFoundPanel {
+  width: min(100%, 560px);
+  padding: 44px 32px;
+  border: 1px solid var(--nf-panel-border);
+  border-radius: 16px;
+  background: var(--nf-panel);
+  text-align: center;
+}
+
+.notFoundPanel h1 {
+  margin: 0;
+  color: var(--nf-text);
+  font-size: clamp(24px, 2.2vw, 34px);
+  line-height: 1.2;
+  font-weight: 800;
+}
+
+.notFoundPanel p {
+  margin: 12px 0 0;
+  color: var(--nf-muted);
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+.notFoundActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 26px;
+}
+
+.notFoundAction {
+  min-height: 52px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 22px;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 700;
+  text-decoration: none;
+  transition:
+    background 160ms ease,
+    box-shadow 160ms ease,
+    transform 100ms ease;
+}
+
+.notFoundPrimary {
+  color: #e4e6e9;
+  background: linear-gradient(135deg, #327bff 0%, #1761ee 100%);
+  box-shadow: 0 10px 32px rgba(16, 88, 230, 0.12);
+}
+
+.notFoundPrimary:hover {
+  background: linear-gradient(135deg, #4b8cff 0%, #2871ff 100%);
+  box-shadow: 0 12px 32px rgba(35, 104, 245, 0.28);
+}
+
+.notFoundPrimary:active {
+  transform: translateY(1px);
+  background: #0c3593;
+  box-shadow: none;
+}
+
+.notFoundGhost {
+  border: 1px solid var(--nf-ghost-border);
+  color: var(--nf-ghost-text);
+  background: var(--nf-ghost-bg);
+}
+
+.notFoundGhost:hover {
+  background: var(--nf-ghost-hover);
+}
+
+.notFoundGhost:active {
+  transform: translateY(1px);
+}
+
 .chatMenuTrigger {
   color: #64748b;
   background: #f8fafc;
 }
 
+.breadcrumbBar {
+  width: 100%;
+  min-height: 36px;
+  flex: 0 0 36px;
+  display: flex;
+  align-items: center;
+  background: #f8fafc;
+}
+
+.breadcrumbBar + .scrollableContent {
+  margin-top: 0;
+}
+
+.breadcrumbs {
+  width: 100%;
+  max-width: 900px;
+  min-width: 0;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13.5px;
+  font-weight: 700;
+
+  line-height: 1.4;
+}
+
+.breadcrumbIcon {
+  flex: none;
+  width: 24px;
+  height: 20px;
+  color: #475569;
+}
+
+.breadcrumbProject {
+  min-width: 0;
+  margin: 0 -8px 0 -1px;
+  padding: 5px 8px;
+  border-radius: 8px;
+  color: #475569;
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: background-color 140ms ease;
+}
+
+.breadcrumbProject:hover {
+  background: #e2e8f0;
+}
+
+.breadcrumbProject:active {
+  background: #cbd5e1;
+}
+
+.breadcrumbSeparator {
+  flex: none;
+  margin-right: 1px;
+  color: #bcbcbc;
+}
+
+.breadcrumbCurrent {
+  min-width: 0;
+  color: #bcbcbc;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.breadcrumbCurrentOnly {
+  margin-left: 7px;
+}
+
 .scrollableContent {
   width: 100%;
-  overflow-y: auto;
+  overflow: hidden auto;
   margin-top: 10px;
   flex: 1 1 auto;
   min-height: 0;
@@ -124,6 +306,10 @@
   height: 120px;
 }
 
+.scrollAnchor.scrollAnchorEmpty {
+  height: 0;
+}
+
 .overlay {
   position: fixed;
   inset: 0;
@@ -215,8 +401,35 @@
     height: calc(100% - 40px);
     margin-top: 40px;
   }
+  .notFound {
+    min-height: calc(100% - 40px);
+    margin-top: 40px;
+    padding: 20px 16px 32px;
+  }
+  .notFoundPanel {
+    padding: 32px 20px;
+  }
   .scrollableContent {
     margin-top: 40px;
+  }
+  .breadcrumbBar {
+    position: relative;
+    z-index: 41;
+    min-height: 40px;
+    flex-basis: 40px;
+    background: transparent;
+    pointer-events: none;
+  }
+  .breadcrumbs {
+    padding-left: 52px;
+  }
+  .breadcrumbIcon {
+    width: 20px;
+    height: 17px;
+  }
+
+  .breadcrumbProject {
+    pointer-events: auto;
   }
   .overlayContent {
     left: 0;

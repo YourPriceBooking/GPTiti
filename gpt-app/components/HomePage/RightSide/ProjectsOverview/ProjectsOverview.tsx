@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 import type { Project } from "@/types/types";
+import { formatActivity } from "@/lib/formatActivity";
 import ChatsMenu from "@/components/HomePage/LeftSide/ChatsMenu/ChatsMenu";
 import DeleteModalWindow from "@/components/HomePage/LeftSide/DeleteModalWindow/DeleteModalWindow";
 
@@ -37,25 +38,8 @@ const formatDate = (value?: string) => {
   }).format(date);
 };
 
-const formatActivity = (value?: string) => {
-  if (!value) return "Updated recently";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "Updated recently";
-
-  const elapsed = Math.max(0, Date.now() - date.getTime());
-  const hours = Math.floor(elapsed / 3_600_000);
-  const days = Math.floor(elapsed / 86_400_000);
-
-  if (hours < 1) return "Updated just now";
-  if (hours < 24) return `Updated ${hours} ${hours === 1 ? "hour" : "hours"} ago`;
-  if (days < 7) return `Updated ${days} ${days === 1 ? "day" : "days"} ago`;
-  if (days < 30) {
-    const weeks = Math.floor(days / 7);
-    return `Updated ${weeks} ${weeks === 1 ? "week" : "weeks"} ago`;
-  }
-  const months = Math.floor(days / 30);
-  return `Updated ${months} ${months === 1 ? "month" : "months"} ago`;
-};
+const projectActivity = (value?: string) =>
+  formatActivity(value) ?? "Updated recently";
 
 function FolderIcon() {
   return (
@@ -157,13 +141,15 @@ function ProjectRow({
           Created · {formatDate(project.createdAt)}
         </span>
         <span className={styles.activityMobile}>
-          {formatActivity(project.lastActivityAt)}
+          {projectActivity(project.lastActivityAt)}
         </span>
       </div>
       <span className={styles.createdDesktop}>
         Created · {formatDate(project.createdAt)}
       </span>
-      <span className={styles.activity}>{formatActivity(project.lastActivityAt)}</span>
+      <span className={styles.activity}>
+        {projectActivity(project.lastActivityAt)}
+      </span>
       <div className={styles.actions}>
         <button
           type="button"
@@ -220,7 +206,9 @@ export default function ProjectsOverview({
   const [pinnedProjectIds, setPinnedProjectIds] = useState<string[]>(() => {
     if (typeof window === "undefined") return [];
     try {
-      const saved = JSON.parse(localStorage.getItem(PINNED_PROJECTS_KEY) || "[]");
+      const saved = JSON.parse(
+        localStorage.getItem(PINNED_PROJECTS_KEY) || "[]",
+      );
       return Array.isArray(saved) ? saved : [];
     } catch {
       return [];
@@ -280,7 +268,9 @@ export default function ProjectsOverview({
       onOpen={() => onOpenProject(project.id)}
       onMenuToggle={(trigger) => {
         setMenuUp(shouldOpenUpwards(trigger));
-        setOpenMenuId((current) => (current === project.id ? null : project.id));
+        setOpenMenuId((current) =>
+          current === project.id ? null : project.id,
+        );
       }}
       onPinToggle={() => togglePin(project.id)}
       onAddChats={() => {
@@ -316,10 +306,15 @@ export default function ProjectsOverview({
         <div>
           <h1 className={styles.title}>Projects</h1>
           <p className={styles.subtitle}>
-            Organize chats, links, images, edited images and uploaded files in one place.
+            Organize chats, links, images, edited images and uploaded files in
+            one place.
           </p>
         </div>
-        <button type="button" className={styles.createButton} onClick={onCreateProject}>
+        <button
+          type="button"
+          className={styles.createButton}
+          onClick={onCreateProject}
+        >
           <span className={styles.plus} aria-hidden="true" />
           Create project
         </button>
@@ -337,7 +332,8 @@ export default function ProjectsOverview({
           </ul>
         ) : (
           <p className={styles.noPinned}>
-            No pinned projects yet. Pin important projects from the three-dot menu.
+            No pinned projects yet. Pin important projects from the three-dot
+            menu.
           </p>
         )}
       </section>
@@ -362,7 +358,9 @@ export default function ProjectsOverview({
           </>
         ) : (
           <div className={styles.emptyPanel}>
-            <div className={`${styles.sectionHeading} ${styles.emptyPanelHeading}`}>
+            <div
+              className={`${styles.sectionHeading} ${styles.emptyPanelHeading}`}
+            >
               <h2>All projects</h2>
               <span className={styles.count}>{projects.length}</span>
             </div>
@@ -378,11 +376,17 @@ export default function ProjectsOverview({
                 priority
               />
               <p>
-                Create your first project to group chats, links, images and uploaded files.
+                Create your first project to group chats, links, images and
+                uploaded files.
                 <br />
-                Pinned projects will appear at the top automatically after you pin them.
+                Pinned projects will appear at the top automatically after you
+                pin them.
               </p>
-              <button type="button" className={styles.firstProjectButton} onClick={onCreateProject}>
+              <button
+                type="button"
+                className={styles.firstProjectButton}
+                onClick={onCreateProject}
+              >
                 <span className={styles.plus} aria-hidden="true" />
                 Create your first project
               </button>
