@@ -168,6 +168,7 @@
   flex: none;
   width: 24px;
   height: 20px;
+  color: #475569;
 }
 
 .breadcrumbProject {
@@ -211,7 +212,7 @@
 
 .scrollableContent {
   width: 100%;
-  overflow-y: auto;
+  overflow: hidden auto;
   margin-top: 10px;
   flex: 1 1 auto;
   min-height: 0;
@@ -303,6 +304,10 @@
   width: 100%;
   min-width: 0;
   height: 120px;
+}
+
+.scrollAnchor.scrollAnchorEmpty {
+  height: 0;
 }
 
 .overlay {

@@ -36,6 +36,7 @@ export default function ChatView({
 
   const showMainSection =
     !ctrl.restoringActiveChat && !ctrl.isOverlayOpen && ctrl.isNewChat;
+  const hasMessages = Boolean(activeChat && activeChat.messages.length > 0);
   const focusMode = focusOnly ? true : ctrl.focusMode;
   const isSectionVisible = focusOnly ? true : ctrl.isSectionVisible;
 
@@ -139,7 +140,12 @@ export default function ChatView({
             />
           )}
 
-        <div ref={messagesEndRef} className={styles.scrollAnchor} />
+        <div
+          ref={messagesEndRef}
+          className={`${styles.scrollAnchor} ${
+            !hasMessages && dockHidden ? styles.scrollAnchorEmpty : ""
+          }`}
+        />
       </div>
 
       {showQuickTasks && ctrl.isOverlayOpen && (
