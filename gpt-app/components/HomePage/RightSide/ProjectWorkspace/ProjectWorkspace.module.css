@@ -166,18 +166,16 @@
   gap: 14px;
   padding: 16px 18px;
   border-radius: 14px;
-  border: 1px solid rgba(59, 130, 246, 0.01);
+  border: 0;
   background: rgba(14, 27, 52, 0.01);
   cursor: pointer;
   transition:
-    border-color 0.18s ease,
     background 0.18s ease,
     transform 0.18s ease,
     box-shadow 0.18s ease;
 }
 
 .chatCard:hover {
-  border-color: rgba(111, 160, 255, 0.7);
   background: rgba(14, 27, 52, 0.5);
 }
 
@@ -196,18 +194,19 @@
 
 .cardIcon {
   flex-shrink: 0;
-  width: 34px;
-  height: 34px;
-  border-radius: 12px;
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: linear-gradient(100deg, #102e69 0%, #0d1d46 100%);
   border: 1px solid rgba(59, 130, 246, 0.4);
+  color: #c8d2e2;
 }
 
-.cardIcon img {
-  transform: translate(10.5%, 0%);
+.cardIcon svg {
+  transform: translateX(-0.5px);
 }
 
 .cardBody {
@@ -361,7 +360,7 @@
   color: var(--main-white);
   padding: 8px 18px;
   border-radius: 999px;
-  border: 1px solid rgba(59, 130, 246, 0.4);
+  border: 0;
   background: rgba(14, 27, 52, 0.55);
 }
 
@@ -377,7 +376,7 @@
   color: #a5b5d9;
   padding: 8px 28px;
   border-radius: 999px;
-  border: 1px solid rgba(59, 130, 246, 0.22);
+  border: 0;
 }
 
 .emptyState {

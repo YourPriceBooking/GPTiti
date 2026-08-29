@@ -1,28 +1,43 @@
 .modalOverlay {
+  --modal-space-top: clamp(16px, 10dvh, 80px);
+  --modal-space-bottom: max(16px, env(safe-area-inset-bottom));
+
   position: fixed;
   inset: 0;
   z-index: 2000;
+  display: grid;
+  align-items: start;
+  justify-items: center;
+  padding:
+    var(--modal-space-top)
+    max(16px, env(safe-area-inset-right))
+    var(--modal-space-bottom)
+    max(16px, env(safe-area-inset-left));
+  overflow: hidden;
 }
 
 .backdrop {
   position: absolute;
   inset: 0;
   background: rgba(159, 152, 152, 0.3);
-
   opacity: 0;
   transition: opacity 220ms ease;
 }
 
 .modalWrapper {
-  position: fixed;
-  top: 80px;
-  left: 50%;
+  position: relative;
   z-index: 2001;
-
+  width: min(530px, 100%);
+  max-height: calc(100dvh - var(--modal-space-top) - var(--modal-space-bottom));
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 22px;
+  background: var(--foreground);
   opacity: 0;
-  transform: translateX(-50%) translateY(12px) scale(0.96);
-
-  transition: opacity 220ms ease, transform 220ms ease;
+  transform: translateY(12px) scale(0.98);
+  transition:
+    opacity 220ms ease,
+    transform 220ms ease;
   will-change: opacity, transform;
 }
 
@@ -32,7 +47,18 @@
 
 .modalWrapper.open {
   opacity: 1;
-  transform: translateX(-50%) translateY(0) scale(1);
+  transform: translateY(0) scale(1);
+}
+
+@media (max-width: 600px) {
+  .modalOverlay {
+    --modal-space-top: max(16px, env(safe-area-inset-top));
+  }
+
+  .modalWrapper {
+    width: min(100%, 530px);
+    border-radius: 22px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
