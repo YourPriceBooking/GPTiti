@@ -25,6 +25,7 @@ export default function MainSectionRightSide(props: MainSectionRightSideProps) {
     onChooseModel,
     estimateSupported = false,
     estimatedTokens,
+    sendDisabled,
   } = props;
 
   const flow = getModelFlow(selectedModel);
@@ -137,6 +138,7 @@ export default function MainSectionRightSide(props: MainSectionRightSideProps) {
               estimateSupported={estimateSupported}
               estimatedTokens={estimatedTokens}
               onChooseModel={onChooseModel}
+              sendDisabled={sendDisabled}
             />
           </div>
         </>
