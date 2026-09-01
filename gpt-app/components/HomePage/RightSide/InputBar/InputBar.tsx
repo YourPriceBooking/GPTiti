@@ -114,6 +114,7 @@ export default function InputBar({
   >([]);
   const [files, setFiles] = useState<{ id: string; file: File }[]>([]);
   const [isSending, setIsSending] = useState(false);
+  const isSendingRef = useRef(false);
   const [editingImage, setEditingImage] = useState<{
     id: string;
     url: string;
@@ -233,12 +234,13 @@ export default function InputBar({
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    if (isSendingRef.current) return;
     onChange(e);
     syncComposer();
   };
 
   const addImageFiles = async (incoming: File[]) => {
-    if (incoming.length === 0) return;
+    if (isSendingRef.current || incoming.length === 0) return;
 
     if (isImageBlocked) {
       openLimitError("imagesNotSupported");
@@ -284,6 +286,11 @@ export default function InputBar({
       }),
     );
 
+    if (isSendingRef.current) {
+      processed.forEach((image) => URL.revokeObjectURL(image.url));
+      return;
+    }
+
     setImages((prev) => [...prev, ...processed]);
 
     if (rejectedForSize) openLimitError("imageSize");
@@ -291,7 +298,7 @@ export default function InputBar({
   };
 
   const addFiles = (incoming: File[]) => {
-    if (incoming.length === 0) return;
+    if (isSendingRef.current || incoming.length === 0) return;
 
     if (isFileBlocked) {
       openLimitError("filesNotSupported");
@@ -336,6 +343,10 @@ export default function InputBar({
   };
 
   const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    if (isSendingRef.current) {
+      e.preventDefault();
+      return;
+    }
     const items = Array.from(e.clipboardData.items);
     const pastedImages = items
       .filter((item) => item.kind === "file" && item.type.startsWith("image/"))
@@ -366,6 +377,7 @@ export default function InputBar({
   };
 
   const removeImage = (id: string) => {
+    if (isSendingRef.current) return;
     const image = images.find((img) => img.id === id);
     if (image) URL.revokeObjectURL(image.url);
 
@@ -373,6 +385,10 @@ export default function InputBar({
   };
 
   const handleEditedImage = (file: File, url: string) => {
+    if (isSendingRef.current) {
+      URL.revokeObjectURL(url);
+      return;
+    }
     const editedId = editingImage?.id;
     if (!editedId) return;
 
@@ -387,16 +403,19 @@ export default function InputBar({
   };
 
   const handleImageSelect = (files: File[]) => {
+    if (isSendingRef.current) return;
     setShowAddInput(false);
     void addImageFiles(files);
   };
 
   const handleFileSelect = (selected: File[]) => {
+    if (isSendingRef.current) return;
     setShowAddInput(false);
     addFiles(selected);
   };
 
   const removeFile = (id: string) => {
+    if (isSendingRef.current) return;
     setFiles((prev) => prev.filter((f) => f.id !== id));
   };
 
@@ -428,7 +447,11 @@ export default function InputBar({
           openLimitError("filesCount");
           return;
         }
+        isSendingRef.current = true;
+        textarea.readOnly = true;
         setIsSending(true);
+        setShowAddInput(false);
+        setEditingImage(null);
         try {
           const accepted = await onSend(
             message,
@@ -446,6 +469,8 @@ export default function InputBar({
           setIsMultiline(false);
           resizeTextarea();
         } finally {
+          isSendingRef.current = false;
+          textarea.readOnly = false;
           setIsSending(false);
         }
       }
@@ -497,13 +522,17 @@ export default function InputBar({
               <img
                 src={img.url}
                 alt="pasted preview"
-                onClick={() => setEditingImage(img)}
+                onClick={() => {
+                  if (!isSendingRef.current) setEditingImage(img);
+                }}
               />
               <button
                 type="button"
                 aria-label="Edit image"
                 className={styles.editImageBtn}
-                onClick={() => setEditingImage(img)}
+                onClick={() => {
+                  if (!isSendingRef.current) setEditingImage(img);
+                }}
               >
                 <svg
                   width={12}
@@ -572,12 +601,14 @@ export default function InputBar({
         <div className={styles.leftControls} ref={leftControlsRef}>
           <div
             className={styles.iconWrapper}
-            tabIndex={0}
+            tabIndex={isSending ? -1 : 0}
+            aria-disabled={isSending}
             onPointerEnter={(event) =>
               fitInputTooltipToViewport(event.currentTarget)
             }
             onFocus={(event) => fitInputTooltipToViewport(event.currentTarget)}
             onClick={() => {
+              if (isSendingRef.current) return;
               setShowAddInput((prev) => !prev);
             }}
           >
@@ -607,6 +638,7 @@ export default function InputBar({
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           onPaste={handlePaste}
+          readOnly={isSending}
           rows={1}
           maxLength={limits.maxTextChars ?? undefined}
         />
