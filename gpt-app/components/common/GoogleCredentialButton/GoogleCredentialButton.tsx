@@ -40,7 +40,7 @@ const ensureGoogleIdentityInitialized = (
 
   identity.initialize({
     client_id: clientId,
-    use_fedcm_for_button: true,
+    use_fedcm_for_button: false,
     callback: (response) => {
       if (!response.credential) {
         activeLogin?.onError();
