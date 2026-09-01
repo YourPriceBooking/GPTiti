@@ -103,9 +103,9 @@ export default function ChatView({
             isSectionVisible={isSectionVisible}
             hasInput={ctrl.hasInput}
             onChange={ctrl.handleChange}
-            onSend={(_message, imageUrls, imageFiles) => {
-              ctrl.handleSendClick(ctrl.hasFirstRequest, imageUrls, imageFiles);
-            }}
+            onSend={(_message, imageUrls, imageFiles) =>
+              ctrl.handleSendClick(ctrl.hasFirstRequest, imageUrls, imageFiles)
+            }
             inputRef={inputRef}
             onHideSection={() => dispatch(setIsSectionVisible(false))}
             templateTick={ctrl.templateTick}
@@ -126,6 +126,7 @@ export default function ChatView({
             estimateSupported={ctrl.estimateSupported}
             estimatedTokens={ctrl.estimatedTokens}
             onChooseModel={() => dispatch(setIsModalOpen(true))}
+            sendDisabled={ctrl.sendDisabled}
           />
         )}
 
@@ -175,13 +176,14 @@ export default function ChatView({
                 focusMode={false}
                 hasInput={ctrl.hasInput}
                 onChange={ctrl.handleChange}
-                onSend={(_message, imageUrls, imageFiles) => {
-                  ctrl.handleSendClick(
+                onSend={async (_message, imageUrls, imageFiles) => {
+                  const accepted = await ctrl.handleSendClick(
                     ctrl.hasFirstRequest,
                     imageUrls,
                     imageFiles,
                   );
-                  dispatch(setIsOverlayOpen(false));
+                  if (accepted) dispatch(setIsOverlayOpen(false));
+                  return accepted;
                 }}
                 inputRef={inputRef}
                 onHideSection={() => dispatch(setIsOverlayOpen(false))}
@@ -201,6 +203,7 @@ export default function ChatView({
                 onImagesChange={ctrl.setInputImageCount}
                 showEstimate={ctrl.showEstimate}
                 onChooseModel={() => dispatch(setIsModalOpen(true))}
+                sendDisabled={ctrl.sendDisabled}
               />
             </div>
           </div>
@@ -223,13 +226,16 @@ export default function ChatView({
               <InputComposer
                 hasInput={ctrl.hasInput}
                 onChange={ctrl.handleChange}
-                onSend={(_message, imageUrls, imageFiles) => {
-                  ctrl.handleSendClick(
+                onSend={async (_message, imageUrls, imageFiles) => {
+                  const accepted = await ctrl.handleSendClick(
                     ctrl.hasFirstRequest,
                     imageUrls,
                     imageFiles,
                   );
-                  if (!ctrl.hasFirstRequest) dispatch(setHasFirstRequest(true));
+                  if (accepted && !ctrl.hasFirstRequest) {
+                    dispatch(setHasFirstRequest(true));
+                  }
+                  return accepted;
                 }}
                 inputRef={inputRef}
                 onHideSection={() => dispatch(setIsSectionVisible(false))}
@@ -253,6 +259,7 @@ export default function ChatView({
                 estimatedTokens={ctrl.estimatedTokens}
                 showModelSelection={ctrl.isNewChat}
                 onChooseModel={() => dispatch(setIsModalOpen(true))}
+                sendDisabled={ctrl.sendDisabled}
               />
             </div>
           )}

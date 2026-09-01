@@ -15,7 +15,6 @@ import { isModelComingSoon } from "@/config/models.config";
 import { compressImage } from "@/lib/compressImage";
 
 import styles from "./InputBar.module.css";
-import Image from "next/image";
 
 const MB = 1024 * 1024;
 const TOOLTIP_VIEWPORT_GAP = 8;
@@ -75,10 +74,15 @@ export default function InputBar({
   placeholder = "Ask anything...",
   variant = "default",
   isAiResponding = false,
+  sendDisabled = false,
 }: {
   hasInput: boolean;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-  onSend: (message: string, imageUrls?: string[], imageFiles?: File[]) => void;
+  onSend: (
+    message: string,
+    imageUrls?: string[],
+    imageFiles?: File[],
+  ) => Promise<boolean>;
   inputRef: React.RefObject<HTMLTextAreaElement | null>;
   onHideSection: () => void;
   templateTick: number;
@@ -89,6 +93,7 @@ export default function InputBar({
   placeholder?: string;
   variant?: "default" | "project";
   isAiResponding?: boolean;
+  sendDisabled?: boolean;
 }) {
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
 
@@ -108,6 +113,7 @@ export default function InputBar({
     { id: string; url: string; file: File }[]
   >([]);
   const [files, setFiles] = useState<{ id: string; file: File }[]>([]);
+  const [isSending, setIsSending] = useState(false);
   const [editingImage, setEditingImage] = useState<{
     id: string;
     url: string;
@@ -394,10 +400,11 @@ export default function InputBar({
     setFiles((prev) => prev.filter((f) => f.id !== id));
   };
 
-  const handleSend = () => {
-    if (isComingSoon) return;
-    if (inputRef.current) {
-      const message = inputRef.current.value;
+  const handleSend = async () => {
+    if (isComingSoon || sendDisabled || isSending) return;
+    const textarea = inputRef.current;
+    if (textarea) {
+      const message = textarea.value;
       const hasContent =
         message.trim() !== "" || images.length > 0 || files.length > 0;
       if (hasContent) {
@@ -421,28 +428,34 @@ export default function InputBar({
           openLimitError("filesCount");
           return;
         }
-        onSend(
-          message,
-          images.map((img) => img.url),
-          images.map((img) => img.file),
-        );
-        setImages([]);
-        setFiles([]);
-        onHideSection();
-        if (!hasFirstRequest) {
-          setHasFirstRequest(true);
+        setIsSending(true);
+        try {
+          const accepted = await onSend(
+            message,
+            images.map((img) => img.url),
+            images.map((img) => img.file),
+          );
+          if (!accepted) return;
+          images.forEach((image) => URL.revokeObjectURL(image.url));
+          setImages([]);
+          setFiles([]);
+          onHideSection();
+          if (!hasFirstRequest) setHasFirstRequest(true);
+          textarea.value = "";
+          onChange({ target: textarea } as React.ChangeEvent<HTMLTextAreaElement>);
+          setIsMultiline(false);
+          resizeTextarea();
+        } finally {
+          setIsSending(false);
         }
       }
-      inputRef.current.value = "";
-      setIsMultiline(false);
-      resizeTextarea();
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
       e.preventDefault();
-      handleSend();
+      void handleSend();
     }
   };
 
@@ -625,7 +638,7 @@ export default function InputBar({
             </span>
           </div>
 
-          {isAiResponding ? (
+          {isAiResponding || isSending ? (
             <div
               className={styles.iconWrapper2}
               tabIndex={0}
@@ -642,7 +655,7 @@ export default function InputBar({
                 height={35}
                 viewBox="0 0 44 44"
                 role="img"
-                aria-label="generating"
+                aria-label={isSending ? "sending" : "generating"}
               >
                 <use href="/icons/input-sprite.svg#ib-stop" />
               </svg>
@@ -651,20 +664,21 @@ export default function InputBar({
                 data-input-tooltip
                 role="tooltip"
               >
-                Stop answering
+                {isSending ? "Sending..." : "Stop answering"}
               </span>
             </div>
           ) : hasInput || images.length > 0 || files.length > 0 ? (
             <div
               className={styles.iconWrapper2}
-              tabIndex={0}
+              tabIndex={sendDisabled ? -1 : 0}
+              aria-disabled={sendDisabled}
               onPointerEnter={(event) =>
                 fitInputTooltipToViewport(event.currentTarget)
               }
               onFocus={(event) =>
                 fitInputTooltipToViewport(event.currentTarget)
               }
-              onClick={handleSend}
+              onClick={sendDisabled ? undefined : () => void handleSend()}
             >
               <svg
                 className={styles.sendIcon}
@@ -672,7 +686,7 @@ export default function InputBar({
                 height={35}
                 viewBox="0 0 44 44"
                 role="img"
-                aria-label="send"
+                aria-label={sendDisabled ? "chat is still loading" : "send"}
               >
                 <use href="/icons/input-sprite.svg#ib-send" />
               </svg>
@@ -681,7 +695,7 @@ export default function InputBar({
                 data-input-tooltip
                 role="tooltip"
               >
-                Send message
+                {sendDisabled ? "Preparing chat..." : "Send message"}
               </span>
             </div>
           ) : (
