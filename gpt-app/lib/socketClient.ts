@@ -51,6 +51,9 @@ export function ensureSocketConnected(
       resolve();
     };
     const onError = (error: Error) => {
+      // Keep waiting while Socket.IO's Manager is still active and will retry.
+      // Inactive sockets represent non-recoverable namespace/auth failures.
+      if (socket.active) return;
       cleanup();
       reject(error);
     };
@@ -60,7 +63,7 @@ export function ensureSocketConnected(
     }, timeoutMs);
 
     socket.once("connect", onConnect);
-    socket.once("connect_error", onError);
+    socket.on("connect_error", onError);
     socket.connect();
   });
 }
