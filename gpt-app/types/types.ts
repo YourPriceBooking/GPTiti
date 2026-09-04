@@ -39,7 +39,6 @@ export type Chat = {
   lastMessageAt?: string;
   createdAt?: string;
   project?: ChatProject;
-  pinnedAt: string | null;
 };
 
 export type Project = {
@@ -55,7 +54,6 @@ export type Project = {
   conversationIds?: ProjectConversation[];
   lastActivityAt?: string;
   createdAt?: string;
-  pinnedAt: string | null;
 };
 
 export type ModelType =

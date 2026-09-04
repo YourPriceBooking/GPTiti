@@ -49,12 +49,6 @@ export const api = {
     );
     return res.data;
   },
-  updateConversationPin: async (id: string, pinned: boolean) => {
-    const res = await axiosInstance.patch<Conversation>(`/conversations/${id}`, {
-      pinned,
-    });
-    return res.data;
-  },
   getConversationMessages: async (id: string, signal?: AbortSignal) => {
     const res = await axiosInstance.get<ConversationMessage[]>(
       `/conversations/${id}/messages`,

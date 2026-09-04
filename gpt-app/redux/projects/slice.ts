@@ -9,24 +9,20 @@ import {
   fetchProject,
   addProjectConversations,
   removeProjectConversation,
-  updateProjectPin,
 } from "./operations";
 import { logoutUser, refreshUser } from "../auth/operations";
 import { refreshError } from "../auth/slice";
-import { updateConversationPin } from "../chat/operations";
 
 interface ProjectsState {
   list: Project[];
   status: "idle" | "loading" | "loaded" | "error";
   error: string | null;
-  pinMutations: Record<string, string>;
 }
 
 const initialState: ProjectsState = {
   list: [],
   status: "idle",
   error: null,
-  pinMutations: {},
 };
 
 const projectsSlice = createSlice({
@@ -88,27 +84,6 @@ const projectsSlice = createSlice({
       .addCase(removeProject.rejected, (state, { payload }) => {
         state.error = payload ?? "Failed to delete project";
       })
-      .addCase(updateProjectPin.pending, (state, { meta }) => {
-        state.pinMutations[meta.arg.id] = meta.requestId;
-      })
-      .addCase(updateProjectPin.fulfilled, (state, { payload, meta }) => {
-        if (state.pinMutations[meta.arg.id] !== meta.requestId) return;
-        const project = state.list.find((item) => item.id === meta.arg.id);
-        if (project) project.pinnedAt = payload.pinnedAt;
-        delete state.pinMutations[meta.arg.id];
-      })
-      .addCase(updateProjectPin.rejected, (state, { meta }) => {
-        if (state.pinMutations[meta.arg.id] !== meta.requestId) return;
-        delete state.pinMutations[meta.arg.id];
-      })
-      .addCase(updateConversationPin.fulfilled, (state, { payload }) => {
-        for (const project of state.list) {
-          const conversation = project.conversationIds?.find(
-            (item) => item._id === payload._id,
-          );
-          if (conversation) conversation.pinnedAt = payload.pinnedAt ?? null;
-        }
-      })
       .addCase(fetchProject.fulfilled, (state, { payload }) => {
         const i = state.list.findIndex((p) => p.id === payload.id);
         if (i !== -1) state.list[i] = { ...state.list[i], ...payload };
@@ -121,7 +96,7 @@ const projectsSlice = createSlice({
         const existingIds = new Set(existing.map((c) => c._id));
         const added: ProjectConversation[] = payload.conversationIds
           .filter((id) => !existingIds.has(id))
-          .map((id) => ({ _id: id, title: null, pinnedAt: null }));
+          .map((id) => ({ _id: id, title: null }));
         project.conversationIds = [...existing, ...added];
         project.conversationCount = project.conversationIds.length;
       })
@@ -146,7 +121,6 @@ const projectsSlice = createSlice({
           state.list = [];
           state.status = "idle";
           state.error = null;
-          state.pinMutations = {};
         },
       ),
 });

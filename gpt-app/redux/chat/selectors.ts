@@ -4,7 +4,10 @@ import type { RootState } from "../store";
 export const selectChatList = (state: RootState) => state.chat.chatList;
 export const selectSortedChatList = createSelector(
   [selectChatList],
-  (chatList) => chatList,
+  (chatList) =>
+    [...chatList].sort((a, b) =>
+      (b.lastMessageAt ?? "").localeCompare(a.lastMessageAt ?? ""),
+    ),
 );
 export const selectActiveChatId = (state: RootState) => state.chat.activeChatId;
 export const selectActiveChat = (state: RootState) =>
