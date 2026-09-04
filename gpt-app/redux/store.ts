@@ -54,8 +54,9 @@ const tokensPersistConfig = {
 
 const chatPersistConfig = {
   key: "chat",
+  version: 2,
   storage,
-  whitelist: ["activeChatId"],
+  whitelist: ["activeChatId", "pendingTurns"],
 };
 
 const projectsPersistConfig = {

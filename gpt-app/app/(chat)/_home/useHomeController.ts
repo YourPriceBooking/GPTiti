@@ -105,6 +105,7 @@ export function useHomeController() {
     ensureConnectionReady,
     sendMessage,
     retryLastMessage,
+    cancelLastPendingMessage,
     streamError,
     clearStreamError,
   } = useChatStream();
@@ -331,8 +332,15 @@ export function useHomeController() {
 
   const handleRetryStream = useCallback(async () => {
     if (!activeChatId) return false;
-    return retryLastMessage(activeChatId);
-  }, [activeChatId, retryLastMessage]);
+    const accepted = await retryLastMessage(activeChatId);
+    if (accepted) draft.consumeDraft();
+    return accepted;
+  }, [activeChatId, draft, retryLastMessage]);
+
+  const handleCancelPendingMessage = useCallback(() => {
+    if (!activeChatId) return;
+    cancelLastPendingMessage(activeChatId);
+  }, [activeChatId, cancelLastPendingMessage]);
 
   const handleDeleteChat = useCallback(
     (id: string) => {
@@ -415,6 +423,7 @@ export function useHomeController() {
     handleRenameChat,
     handleSendClick,
     handleRetryStream,
+    handleCancelPendingMessage,
     handleProjectSend,
     handleRemoveChatFromProject: projects.unlinkConversation,
     linkConversations: projects.linkConversations,

@@ -38,6 +38,9 @@ export interface ConversationMessage {
   content: string;
   modelId?: string;
   tokens?: number;
+  clientMessageId?: string | null;
+  turnId?: string | null;
+  attempt?: number | null;
   createdAt: string;
   updatedAt?: string;
 }

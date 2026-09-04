@@ -10,6 +10,7 @@ type MessageListProps = {
   isTyping?: boolean;
   hasFirstRequest: boolean;
   onRetry: () => void;
+  onCancelPending: () => void;
 };
 
 const HIDE_DELAY_MS = 1000;
@@ -109,6 +110,21 @@ function UserMessage({ message }: { message: Message }) {
           <p className={styles.userText}>{message.content}</p>
         )}
 
+        {message.deliveryStatus && message.deliveryStatus !== "accepted" && (
+          <span
+            className={`${styles.deliveryStatus} ${
+              message.deliveryStatus === "failed"
+                ? styles.deliveryStatusFailed
+                : ""
+            }`}
+            role="status"
+          >
+            {message.deliveryStatus === "failed"
+              ? "Delivery not confirmed"
+              : "Sending..."}
+          </span>
+        )}
+
         {message.content && (
           <button
             type="button"
@@ -134,6 +150,7 @@ export default function MessageList({
   isTyping = false,
   hasFirstRequest,
   onRetry,
+  onCancelPending,
 }: MessageListProps) {
   return (
     <div className={styles.messageList}>
@@ -174,14 +191,31 @@ export default function MessageList({
                       </p>
                     </div>
                     {message.retryable && (
-                      <button
-                        type="button"
-                        className={styles.retryButton}
-                        onClick={onRetry}
-                        disabled={isTyping}
-                      >
-                        {isTyping ? "Retrying..." : "Retry"}
-                      </button>
+                      <div className={styles.retryActions}>
+                        <button
+                          type="button"
+                          className={styles.retryButton}
+                          onClick={onRetry}
+                          disabled={isTyping}
+                        >
+                          {isTyping ? "Retrying..." : "Retry"}
+                        </button>
+                        {message.errorCode === "DELIVERY_UNKNOWN" && (
+                          <button
+                            type="button"
+                            className={styles.cancelPendingButton}
+                            onClick={() => {
+                              const confirmed = window.confirm(
+                                "Stop local delivery retries? If the server already accepted this message, its response may still arrive.",
+                              );
+                              if (confirmed) onCancelPending();
+                            }}
+                            disabled={isTyping}
+                          >
+                            Cancel
+                          </button>
+                        )}
+                      </div>
                     )}
                   </div>
                 )}

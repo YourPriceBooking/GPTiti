@@ -153,6 +153,19 @@
   max-width: 100%;
 }
 
+.deliveryStatus {
+  display: block;
+  margin-top: 5px;
+  color: #94a3b8;
+  font-size: 11px;
+  line-height: 1.2;
+  text-align: right;
+}
+
+.deliveryStatusFailed {
+  color: #f5a5a5;
+}
+
 .streamError {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
@@ -224,6 +237,34 @@
     transform 0.16s ease;
 }
 
+.retryActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cancelPendingButton {
+  min-height: 34px;
+  padding: 7px 11px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 10px;
+  background: transparent;
+  color: #cbd5e1;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cancelPendingButton:hover:not(:disabled) {
+  border-color: rgba(203, 213, 225, 0.65);
+  background: rgba(148, 163, 184, 0.1);
+}
+
+.cancelPendingButton:disabled {
+  cursor: wait;
+  opacity: 0.62;
+}
+
 .retryButton:hover:not(:disabled) {
   border-color: var(--retry-accent);
   background: rgba(62, 124, 255, 0.25);
@@ -246,6 +287,11 @@
   }
 
   .retryButton {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .retryActions {
     grid-column: 2;
     justify-self: start;
   }
