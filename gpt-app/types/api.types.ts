@@ -27,7 +27,6 @@ export interface Conversation {
   archived?: boolean;
   project?: ConversationProject | null;
   lastMessageAt?: string;
-  pinnedAt: string | null;
   createdAt: string;
   updatedAt?: string;
 }
@@ -59,7 +58,6 @@ export interface ProjectConversation {
   archived?: boolean;
   project?: string;
   lastMessageAt?: string;
-  pinnedAt: string | null;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -78,7 +76,6 @@ export interface ApiProject {
   lastActivityAt: string;
   createdAt: string;
   updatedAt: string;
-  pinnedAt: string | null;
   conversationCount?: number;
   conversations?: ProjectConversation[];
 }
@@ -94,7 +91,6 @@ export interface CreateProjectPayload {
 
 export type UpdateProjectPayload = Partial<CreateProjectPayload> & {
   archived?: boolean;
-  pinned?: boolean;
 };
 
 export interface AddProjectConversationsResponse {

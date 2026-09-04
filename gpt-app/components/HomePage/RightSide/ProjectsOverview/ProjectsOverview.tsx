@@ -7,11 +7,10 @@ import type { Project } from "@/types/types";
 import { formatActivity } from "@/lib/formatActivity";
 import ChatsMenu from "@/components/HomePage/LeftSide/ChatsMenu/ChatsMenu";
 import DeleteModalWindow from "@/components/HomePage/LeftSide/DeleteModalWindow/DeleteModalWindow";
-import { useAppDispatch } from "@/redux/hooks";
-import { updateProjectPin } from "@/redux/projects/operations";
 
 import styles from "./ProjectsOverview.module.css";
 
+const PINNED_PROJECTS_KEY = "pinnedProjectIds";
 const MENU_GAP = 6;
 const MENU_HEIGHT = 240;
 
@@ -204,11 +203,25 @@ export default function ProjectsOverview({
   onDeleteProject,
   onAddChats,
 }: ProjectsOverviewProps) {
-  const dispatch = useAppDispatch();
+  const [pinnedProjectIds, setPinnedProjectIds] = useState<string[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const saved = JSON.parse(
+        localStorage.getItem(PINNED_PROJECTS_KEY) || "[]",
+      );
+      return Array.isArray(saved) ? saved : [];
+    } catch {
+      return [];
+    }
+  });
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [menuUp, setMenuUp] = useState(false);
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  useEffect(() => {
+    localStorage.setItem(PINNED_PROJECTS_KEY, JSON.stringify(pinnedProjectIds));
+  }, [pinnedProjectIds]);
 
   useEffect(() => {
     if (!openMenuId && !deletingId) return;
@@ -224,16 +237,22 @@ export default function ProjectsOverview({
     };
   }, [openMenuId, deletingId]);
 
-  const pinnedProjects = projects.filter((project) => project.pinnedAt);
-  const otherProjects = projects.filter((project) => !project.pinnedAt);
+  const validPinnedIds = pinnedProjectIds.filter((id) =>
+    projects.some((project) => project.id === id),
+  );
+  const pinnedProjects = validPinnedIds
+    .map((id) => projects.find((project) => project.id === id))
+    .filter((project): project is Project => Boolean(project));
+  const otherProjects = projects.filter(
+    (project) => !validPinnedIds.includes(project.id),
+  );
 
   const togglePin = (projectId: string) => {
-    const project = projects.find((item) => item.id === projectId);
-    if (project) {
-      void dispatch(
-        updateProjectPin({ id: projectId, pinned: !Boolean(project.pinnedAt) }),
-      );
-    }
+    setPinnedProjectIds((current) =>
+      current.includes(projectId)
+        ? current.filter((id) => id !== projectId)
+        : [...current, projectId],
+    );
     setOpenMenuId(null);
   };
 
@@ -241,7 +260,7 @@ export default function ProjectsOverview({
     <ProjectRow
       key={project.id}
       project={project}
-      isPinned={Boolean(project.pinnedAt)}
+      isPinned={validPinnedIds.includes(project.id)}
       menuOpen={openMenuId === project.id}
       menuUp={openMenuId === project.id && menuUp}
       renaming={renamingId === project.id}
@@ -273,6 +292,9 @@ export default function ProjectsOverview({
       onDeleteCancel={() => setDeletingId(null)}
       onDeleteConfirm={() => {
         onDeleteProject(project.id);
+        setPinnedProjectIds((current) =>
+          current.filter((id) => id !== project.id),
+        );
         setDeletingId(null);
       }}
     />

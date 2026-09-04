@@ -67,31 +67,6 @@ export const removeConversation = createAsyncThunk<
   }
 });
 
-export const updateConversationPin = createAsyncThunk<
-  Conversation,
-  { id: string; pinned: boolean },
-  { rejectValue: string }
->(
-  "chat/updateConversationPin",
-  async ({ id, pinned }, thunkApi) => {
-    try {
-      return await api.updateConversationPin(id, pinned);
-    } catch (e) {
-      return thunkApi.rejectWithValue(
-        errMessage(e, "Failed to update chat pin"),
-      );
-    }
-  },
-  {
-    condition: ({ id }, { getState }) => {
-      const state = getState() as {
-        chat: { pinMutations: Record<string, string> };
-      };
-      return state.chat.pinMutations[id] === undefined;
-    },
-  },
-);
-
 export const renameConversation = createAsyncThunk<
   { id: string; title: string },
   { id: string; title: string },
