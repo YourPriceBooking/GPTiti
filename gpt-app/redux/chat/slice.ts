@@ -6,6 +6,7 @@ import {
   fetchConversations,
   fetchConversationMessages,
   removeConversation,
+  updateConversationPin,
 } from "./operations";
 import { logoutUser, refreshUser } from "../auth/operations";
 import { refreshError } from "../auth/slice";
@@ -21,6 +22,7 @@ interface ChatState {
   templateTick: number;
   status: ChatListStatus;
   error: string | null;
+  pinMutations: Record<string, string>;
 }
 
 const toChatProject = (
@@ -47,6 +49,7 @@ const makeDraftChat = (): Chat => ({
   title: null,
   messages: [],
   messagesStatus: "loaded",
+  pinnedAt: null,
 });
 
 export const isDraftId = (id: string | null | undefined): boolean =>
@@ -80,6 +83,7 @@ const initialState: ChatState = {
   templateTick: 0,
   status: "idle",
   error: null,
+  pinMutations: {},
 };
 
 const chatSlice = createSlice({
@@ -126,6 +130,7 @@ const chatSlice = createSlice({
           messagesStatus: "loaded",
           modelId: payload.modelId,
           lastMessageAt: new Date().toISOString(),
+          pinnedAt: null,
         });
       }
       state.activeChatId = payload.id;
@@ -291,6 +296,7 @@ const chatSlice = createSlice({
           if (existing) {
             if (c.lastMessageAt) existing.lastMessageAt = c.lastMessageAt;
             existing.project = toChatProject(c.project);
+            existing.pinnedAt = c.pinnedAt ?? null;
             return existing;
           }
           return {
@@ -301,6 +307,7 @@ const chatSlice = createSlice({
             modelId: c.modelId,
             project: toChatProject(c.project),
             lastMessageAt: c.lastMessageAt,
+            pinnedAt: c.pinnedAt ?? null,
           };
         });
         state.chatList = [...drafts, ...serverChats];
@@ -348,6 +355,19 @@ const chatSlice = createSlice({
       .addCase(removeConversation.rejected, (state, { payload }) => {
         state.error = payload ?? "Failed to delete conversation";
       })
+      .addCase(updateConversationPin.pending, (state, { meta }) => {
+        state.pinMutations[meta.arg.id] = meta.requestId;
+      })
+      .addCase(updateConversationPin.fulfilled, (state, { payload, meta }) => {
+        if (state.pinMutations[meta.arg.id] !== meta.requestId) return;
+        const chat = state.chatList.find((item) => item.id === meta.arg.id);
+        if (chat) chat.pinnedAt = payload.pinnedAt ?? null;
+        delete state.pinMutations[meta.arg.id];
+      })
+      .addCase(updateConversationPin.rejected, (state, { meta }) => {
+        if (state.pinMutations[meta.arg.id] !== meta.requestId) return;
+        delete state.pinMutations[meta.arg.id];
+      })
 
       .addMatcher(
         isAnyOf(logoutUser.fulfilled, refreshError, refreshUser.rejected),
@@ -360,6 +380,7 @@ const chatSlice = createSlice({
           state.hasInput = false;
           state.status = "idle";
           state.error = null;
+          state.pinMutations = {};
         },
       ),
 });
