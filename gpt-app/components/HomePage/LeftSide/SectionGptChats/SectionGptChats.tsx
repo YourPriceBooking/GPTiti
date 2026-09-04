@@ -4,16 +4,16 @@ import { useState, useRef, useEffect, type CSSProperties } from "react";
 import styles from "./SectionGptChats.module.css";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { SectionGptChatsProps, Chat, Project } from "@/types/types";
+import { SectionGptChatsProps } from "@/types/types";
 import ChatsMenu from "../ChatsMenu/ChatsMenu";
 import DeleteModalWindow from "../DeleteModalWindow/DeleteModalWindow";
-import { useAppSelector } from "@/redux/hooks";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { selectActiveChatId } from "@/redux/chat/selectors";
+import { updateConversationPin } from "@/redux/chat/operations";
+import { updateProjectPin } from "@/redux/projects/operations";
 import { selectActiveProjectId } from "@/redux/ui/selectors";
 import MyProjectsButton from "./MyProjectsButton";
 
-const PINNED_CHATS_KEY = "pinnedChatIds";
-const PINNED_PROJECTS_KEY = "pinnedProjectIds";
 const NARROW_VIEWPORT = 640;
 const VIEWPORT_EDGE_GAP = 8;
 const DELETE_MODAL_SHIFT = 28;
@@ -59,6 +59,7 @@ export default function SectionGptChats({
   renameChat,
 }: SectionGptChatsProps) {
   const router = useRouter();
+  const dispatch = useAppDispatch();
   const [showAllProjects, setShowAllProjects] = useState(false);
   const projectsCount = projectList.length;
   const hasProjects = projectsCount > 0;
@@ -66,23 +67,6 @@ export default function SectionGptChats({
   const hasMoreProjects = projectsCount > MAX_VISIBLE_PROJECTS;
   const hiddenProjectsCount = projectsCount - MAX_VISIBLE_PROJECTS;
   const isProjectsInteractive = hasMoreProjects;
-
-  const [pinnedChatIds, setPinnedChatIds] = useState<string[]>(() => {
-    if (typeof window === "undefined") return [];
-    return JSON.parse(localStorage.getItem(PINNED_CHATS_KEY) || "[]");
-  });
-  const [pinnedProjectIds, setPinnedProjectIds] = useState<string[]>(() => {
-    if (typeof window === "undefined") return [];
-    return JSON.parse(localStorage.getItem(PINNED_PROJECTS_KEY) || "[]");
-  });
-
-  useEffect(() => {
-    localStorage.setItem(PINNED_CHATS_KEY, JSON.stringify(pinnedChatIds));
-  }, [pinnedChatIds]);
-
-  useEffect(() => {
-    localStorage.setItem(PINNED_PROJECTS_KEY, JSON.stringify(pinnedProjectIds));
-  }, [pinnedProjectIds]);
 
   const [openMenuChatId, setOpenMenuChatId] = useState<string | null>(null);
   const [menuPosition, setMenuPosition] = useState<MenuPosition | null>(null);
@@ -105,21 +89,11 @@ export default function SectionGptChats({
 
   const MAX_VISIBLE_CHATS = 5;
   const titledChats = chatList.filter((chat) => chat.title !== null);
-  const pinnedChats = [...pinnedChatIds]
-    .reverse()
-    .map((id) => titledChats.find((c) => c.id === id))
-    .filter((c): c is Chat => c !== undefined);
-  const unpinnedChats = titledChats.filter(
-    (c) => !pinnedChatIds.includes(c.id),
-  );
+  const pinnedChats = titledChats.filter((chat) => chat.pinnedAt);
+  const unpinnedChats = titledChats.filter((chat) => !chat.pinnedAt);
   const sortedChats = [...pinnedChats, ...unpinnedChats];
-  const pinnedProjects = [...pinnedProjectIds]
-    .reverse()
-    .map((id) => projectList.find((p) => p.id === id))
-    .filter((p): p is Project => p !== undefined);
-  const unpinnedProjects = projectList.filter(
-    (p) => !pinnedProjectIds.includes(p.id),
-  );
+  const pinnedProjects = projectList.filter((project) => project.pinnedAt);
+  const unpinnedProjects = projectList.filter((project) => !project.pinnedAt);
   const sortedProjects = [...pinnedProjects, ...unpinnedProjects];
   const chatsCount = sortedChats.length;
   const hasChats = chatsCount > 0;
@@ -148,14 +122,20 @@ export default function SectionGptChats({
   const projectTriggerRef = useRef<HTMLElement | null>(null);
 
   const togglePinChat = (id: string) => {
-    setPinnedChatIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
-    );
+    const chat = chatList.find((item) => item.id === id);
+    if (chat) {
+      void dispatch(
+        updateConversationPin({ id, pinned: !Boolean(chat.pinnedAt) }),
+      );
+    }
   };
   const togglePinProject = (id: string) => {
-    setPinnedProjectIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
-    );
+    const project = projectList.find((item) => item.id === id);
+    if (project) {
+      void dispatch(
+        updateProjectPin({ id, pinned: !Boolean(project.pinnedAt) }),
+      );
+    }
   };
 
   const deleteModalStyle = (pos: MenuPosition): CSSProperties => ({
@@ -336,7 +316,7 @@ export default function SectionGptChats({
           <ul className={styles.chatsList}>
             {visibleChats.map((chat) => {
               const chatProject = chat.project;
-              const isPinned = pinnedChatIds.includes(chat.id);
+              const isPinned = Boolean(chat.pinnedAt);
               const project = chatProject
                 ? (projectList.find((p) => p.id === chatProject.id) ??
                   chatProject)
@@ -498,7 +478,7 @@ export default function SectionGptChats({
         >
           <ul className={styles.chatsList}>
             {sortedProjects.map((project) => {
-              const isPinned = pinnedProjectIds.includes(project.id);
+              const isPinned = Boolean(project.pinnedAt);
 
               return (
                 <li
@@ -633,7 +613,7 @@ export default function SectionGptChats({
           }}
         >
           <ChatsMenu
-            isPinned={pinnedChatIds.includes(openMenuChatId)}
+            isPinned={Boolean(chatList.find((chat) => chat.id === openMenuChatId)?.pinnedAt)}
             onPinToggle={() => {
               togglePinChat(openMenuChatId);
               setOpenMenuChatId(null);
@@ -665,7 +645,7 @@ export default function SectionGptChats({
         >
           <ChatsMenu
             isProject={true}
-            isPinned={pinnedProjectIds.includes(openMenuProjectId)}
+            isPinned={Boolean(projectList.find((project) => project.id === openMenuProjectId)?.pinnedAt)}
             onPinToggle={() => {
               togglePinProject(openMenuProjectId);
               setOpenMenuProjectId(null);
