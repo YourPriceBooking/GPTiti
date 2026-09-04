@@ -25,7 +25,34 @@ const normalizeProject = (p: ApiProject): Project => ({
   conversationIds: p.conversations,
   lastActivityAt: p.lastActivityAt,
   createdAt: p.createdAt,
+  pinnedAt: p.pinnedAt ?? null,
 });
+
+export const updateProjectPin = createAsyncThunk<
+  Project,
+  { id: string; pinned: boolean },
+  { rejectValue: string }
+>(
+  "projects/updatePin",
+  async ({ id, pinned }, thunkApi) => {
+    try {
+      const project = await api.updateProject(id, { pinned });
+      return normalizeProject(project);
+    } catch (e) {
+      return thunkApi.rejectWithValue(
+        errMessage(e, "Failed to update project pin"),
+      );
+    }
+  },
+  {
+    condition: ({ id }, { getState }) => {
+      const state = getState() as {
+        projects: { pinMutations: Record<string, string> };
+      };
+      return state.projects.pinMutations[id] === undefined;
+    },
+  },
+);
 
 /** Load the user's project list for the sidebar. */
 export const fetchProjects = createAsyncThunk<

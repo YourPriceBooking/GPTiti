@@ -1,8 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { Socket } from "socket.io-client";
-
 import { useSocket } from "@/context/SocketContext";
 import { api } from "@/helpers/api";
 import { clearAccessToken } from "@/lib/authTokenVault";
@@ -30,29 +28,9 @@ import {
 import { useAppDispatch } from "@/redux/hooks";
 import { setBalance } from "@/redux/tokens/slice";
 import type { UploadedFile } from "@/types/api.types";
+import { ensureSocketConnected } from "@/lib/socketClient";
 
 const TURN_ALREADY_RUNNING = "Wait for the current response to finish.";
-const SOCKET_RECONNECT_TIMEOUT_MS = 8000;
-
-const reconnectSocket = (socket: Socket): Promise<boolean> => {
-  if (socket.connected) return Promise.resolve(true);
-
-  return new Promise((resolve) => {
-    const finish = (connected: boolean) => {
-      window.clearTimeout(timer);
-      socket.off("connect", onConnect);
-      resolve(connected);
-    };
-    const onConnect = () => finish(true);
-    const timer = window.setTimeout(
-      () => finish(socket.connected),
-      SOCKET_RECONNECT_TIMEOUT_MS,
-    );
-
-    socket.once("connect", onConnect);
-    socket.connect();
-  });
-};
 
 export type SendChatMessageArgs = {
   conversationId: string;
@@ -63,6 +41,7 @@ export type SendChatMessageArgs = {
 };
 
 export type ChatStream = {
+  ensureConnectionReady: () => Promise<boolean>;
   sendMessage: (args: SendChatMessageArgs) => Promise<boolean>;
   retryLastMessage: (chatId: string) => Promise<boolean>;
   streamError: string | null;
@@ -89,6 +68,22 @@ export function useChatStream(): ChatStream {
   const [streamError, setStreamError] = useState<string | null>(null);
 
   const clearStreamError = useCallback(() => setStreamError(null), []);
+
+  const ensureConnectionReady = useCallback(async () => {
+    if (!socket) {
+      setStreamError(CHAT_CONNECTION_LOST);
+      return false;
+    }
+
+    try {
+      await ensureSocketConnected(socket);
+      setStreamError(null);
+      return true;
+    } catch {
+      setStreamError(CHAT_CONNECTION_LOST);
+      return false;
+    }
+  }, [socket]);
 
   const flushAssistantChunks = useCallback(() => {
     if (chunkFrameRef.current !== null) {
@@ -231,7 +226,7 @@ export function useChatStream(): ChatStream {
           imageFiles.map((file) => api.uploadImage(file).then((r) => r.file)),
         );
 
-        if (!socket?.connected) {
+        if (!(await ensureConnectionReady()) || !socket) {
           endTurn({ reason: "disconnected" });
           return false;
         }
@@ -268,7 +263,7 @@ export function useChatStream(): ChatStream {
         return false;
       }
     },
-    [dispatch, endTurn, socket],
+    [dispatch, endTurn, ensureConnectionReady, socket],
   );
 
   const retryLastMessage = useCallback(
@@ -293,8 +288,7 @@ export function useChatStream(): ChatStream {
       dispatch(setIsTyping(true));
 
       try {
-        const connected = await reconnectSocket(socket);
-        if (!connected) {
+        if (!(await ensureConnectionReady())) {
           dispatch(setIsTyping(false));
           dispatch(
             failAssistantMessage({
@@ -331,10 +325,11 @@ export function useChatStream(): ChatStream {
         retryInFlightRef.current = false;
       }
     },
-    [dispatch, endTurn, socket],
+    [dispatch, endTurn, ensureConnectionReady, socket],
   );
 
   return {
+    ensureConnectionReady,
     sendMessage,
     retryLastMessage,
     streamError,

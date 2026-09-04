@@ -7,10 +7,11 @@ import ChatsMenu from "@/components/HomePage/LeftSide/ChatsMenu/ChatsMenu";
 import DeleteModalWindow from "@/components/HomePage/LeftSide/DeleteModalWindow/DeleteModalWindow";
 import ChatBubbleIcon from "@/components/common/ChatBubbleIcon";
 import type { Chat } from "@/types/types";
+import { useAppDispatch } from "@/redux/hooks";
+import { updateConversationPin } from "@/redux/chat/operations";
 
 import styles from "./ProjectWorkspace.module.css";
 
-const PINNED_CHATS_KEY = "pinnedChatIds";
 const MENU_GAP = 6;
 const MENU_HEIGHT = 240;
 
@@ -100,6 +101,7 @@ export default function ProjectWorkspace({
   onDeleteProject,
 }: ProjectWorkspaceProps) {
   const chatCount = chats.length;
+  const dispatch = useAppDispatch();
   const hasChats = chatCount > 0;
 
   const [openMenuChatId, setOpenMenuChatId] = useState<string | null>(null);
@@ -110,17 +112,10 @@ export default function ProjectWorkspace({
   const [renamingProject, setRenamingProject] = useState(false);
   const [deletingProject, setDeletingProject] = useState(false);
   const [draftProjectName, setDraftProjectName] = useState(name);
-  const [pinnedChatIds, setPinnedChatIds] = useState<string[]>(() => {
-    return JSON.parse(localStorage.getItem(PINNED_CHATS_KEY) || "[]");
-  });
   const menuRef = useRef<HTMLDivElement | null>(null);
   const projectMenuRef = useRef<HTMLDivElement | null>(null);
   const projectNameInputRef = useRef<HTMLInputElement | null>(null);
   const titleRefs = useRef<Record<string, HTMLSpanElement | null>>({});
-
-  useEffect(() => {
-    localStorage.setItem(PINNED_CHATS_KEY, JSON.stringify(pinnedChatIds));
-  }, [pinnedChatIds]);
 
   useEffect(() => {
     if (!renamingProject) return;
@@ -261,18 +256,18 @@ export default function ProjectWorkspace({
   };
 
   const togglePinChat = (id: string) => {
-    setPinnedChatIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
-    );
+    const chat = chats.find((item) => item.id === id);
+    if (chat) {
+      void dispatch(
+        updateConversationPin({ id, pinned: !Boolean(chat.pinnedAt) }),
+      );
+    }
   };
 
-  const pinnedChats = [...pinnedChatIds]
-    .reverse()
-    .map((id) => chats.find((c) => c.id === id))
-    .filter((c): c is Chat => c !== undefined);
+  const pinnedChats = chats.filter((chat) => chat.pinnedAt);
   const sortedChats = [
     ...pinnedChats,
-    ...chats.filter((c) => !pinnedChatIds.includes(c.id)),
+    ...chats.filter((chat) => !chat.pinnedAt),
   ];
 
   useEffect(() => {
@@ -398,7 +393,7 @@ export default function ProjectWorkspace({
             const preview = getChatPreview(chat);
             const updated = formatRelativeTime(chat.lastMessageAt);
             const created = formatCreatedDate(chat.createdAt);
-            const isPinned = pinnedChatIds.includes(chat.id);
+            const isPinned = Boolean(chat.pinnedAt);
 
             return (
               <li
@@ -497,7 +492,7 @@ export default function ProjectWorkspace({
                     onClick={(e) => e.stopPropagation()}
                   >
                     <ChatsMenu
-                      isPinned={pinnedChatIds.includes(chat.id)}
+                      isPinned={Boolean(chat.pinnedAt)}
                       onPinToggle={() => {
                         togglePinChat(chat.id);
                         setOpenMenuChatId(null);

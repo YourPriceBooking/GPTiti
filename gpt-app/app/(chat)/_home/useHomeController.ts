@@ -101,8 +101,13 @@ export function useHomeController() {
   const { selectedModel, selectedModelGroup, selectModel } = useModelSync({
     onModelSwitched: clearDraft,
   });
-  const { sendMessage, retryLastMessage, streamError, clearStreamError } =
-    useChatStream();
+  const {
+    ensureConnectionReady,
+    sendMessage,
+    retryLastMessage,
+    streamError,
+    clearStreamError,
+  } = useChatStream();
   const { restoringActiveChat } = useChatRestore();
   const projects = useProjectChats();
 
@@ -146,6 +151,10 @@ export function useHomeController() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const sendCycleInFlightRef = useRef(false);
+  const pendingProjectConversationRef = useRef<{
+    projectId: string;
+    conversationId: string;
+  } | null>(null);
   useScrollDirection(scrollContainerRef);
 
   const activeChatLoading =
@@ -205,15 +214,15 @@ export function useHomeController() {
       imageUrls: string[] = [],
       imageFiles: File[] = [],
     ) => {
-      if (sendCycleInFlightRef.current) return;
+      if (sendCycleInFlightRef.current) return false;
       sendCycleInFlightRef.current = true;
 
       try {
         const text = draft.readDraftText();
-        if (!text && imageUrls.length === 0) return;
+        if (!text && imageUrls.length === 0) return false;
 
         const conversationId = await ensureConversationId(text);
-        if (!conversationId) return;
+        if (!conversationId) return false;
 
         const accepted = await sendMessage({
           conversationId,
@@ -226,6 +235,7 @@ export function useHomeController() {
           draft.consumeDraft();
           router.replace(`/chats/${conversationId}`);
         }
+        return accepted;
       } finally {
         sendCycleInFlightRef.current = false;
       }
@@ -235,48 +245,65 @@ export function useHomeController() {
 
   const handleProjectSend = useCallback(
     async (imageUrls: string[] = [], imageFiles: File[] = []) => {
-      if (sendCycleInFlightRef.current) return;
+      if (sendCycleInFlightRef.current) return false;
       sendCycleInFlightRef.current = true;
 
       try {
-        if (!activeProjectId) return;
+        if (!activeProjectId) return false;
         const text = draft.readDraftText();
-        if (!text && imageUrls.length === 0) return;
+        if (!text && imageUrls.length === 0) return false;
 
-        let conv;
-        try {
-          conv = await dispatch(
-            createConversation({
-              modelId: selectedModel,
-              title: text.slice(0, 60) || undefined,
+        if (!(await ensureConnectionReady())) return false;
+
+        let conversationId =
+          pendingProjectConversationRef.current?.projectId === activeProjectId
+            ? pendingProjectConversationRef.current.conversationId
+            : null;
+
+        if (!conversationId) {
+          let conv;
+          try {
+            conv = await dispatch(
+              createConversation({
+                modelId: selectedModel,
+                title: text.slice(0, 60) || undefined,
+              }),
+            ).unwrap();
+          } catch {
+            return false;
+          }
+
+          conversationId = conv._id;
+          pendingProjectConversationRef.current = {
+            projectId: activeProjectId,
+            conversationId,
+          };
+
+          dispatch(
+            addConversation({
+              id: conversationId,
+              title: conv.title ?? (text || null),
+              modelId: conv.modelId ?? selectedModel,
             }),
-          ).unwrap();
-        } catch {
-          return;
+          );
+
+          projects.linkConversations(activeProjectId, [conversationId]);
         }
 
-        dispatch(
-          addConversation({
-            id: conv._id,
-            title: conv.title ?? (text || null),
-            modelId: conv.modelId ?? selectedModel,
-          }),
-        );
-
-        projects.linkConversations(activeProjectId, [conv._id]);
-        dispatch(setActiveProjectId(null));
-
         const accepted = await sendMessage({
-          conversationId: conv._id,
+          conversationId,
           modelId: selectedModel,
           text,
           imageUrls,
           imageFiles,
         });
         if (accepted) {
+          pendingProjectConversationRef.current = null;
           draft.consumeDraft();
-          router.replace(`/chats/${conv._id}`);
+          dispatch(setActiveProjectId(null));
+          router.replace(`/chats/${conversationId}`);
         }
+        return accepted;
       } finally {
         sendCycleInFlightRef.current = false;
       }
@@ -284,6 +311,7 @@ export function useHomeController() {
     [
       dispatch,
       activeProjectId,
+      ensureConnectionReady,
       selectedModel,
       draft,
       projects,
@@ -353,6 +381,7 @@ export function useHomeController() {
     isTyping,
     templateTick,
     restoringActiveChat,
+    sendDisabled: !isLoggedIn || !accessTokenReady || restoringActiveChat,
     isNewChat,
     isExistingChat,
     dockHidden,

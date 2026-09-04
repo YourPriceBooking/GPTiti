@@ -39,6 +39,7 @@ export type Chat = {
   lastMessageAt?: string;
   createdAt?: string;
   project?: ChatProject;
+  pinnedAt: string | null;
 };
 
 export type Project = {
@@ -54,6 +55,7 @@ export type Project = {
   conversationIds?: ProjectConversation[];
   lastActivityAt?: string;
   createdAt?: string;
+  pinnedAt: string | null;
 };
 
 export type ModelType =
@@ -132,7 +134,11 @@ export type MainSectionRightSideProps = {
   isSectionVisible: boolean;
   hasInput: boolean;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-  onSend: (message: string, imageUrls?: string[], imageFiles?: File[]) => void;
+  onSend: (
+    message: string,
+    imageUrls?: string[],
+    imageFiles?: File[],
+  ) => Promise<boolean>;
   inputRef: React.RefObject<HTMLTextAreaElement | null>;
   onHideSection: () => void;
   templateTick: number;
@@ -145,6 +151,7 @@ export type MainSectionRightSideProps = {
   onChooseModel: () => void;
   estimateSupported?: boolean;
   estimatedTokens?: number | null;
+  sendDisabled?: boolean;
 };
 
 export type ModelModalOverlayProps = {
