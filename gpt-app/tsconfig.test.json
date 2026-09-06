@@ -14,6 +14,7 @@
     "lib/chat/chatProtocol.ts",
     "lib/chat/chatDelivery.ts",
     "lib/chat/chatState.ts",
+    "lib/authError.ts",
     "types/api.types.ts",
     "types/types.ts",
     "tests/**/*.test.ts"

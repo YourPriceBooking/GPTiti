@@ -1,12 +1,27 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import type { Socket } from "socket.io-client";
 
-import { readAccessToken } from "@/lib/authTokenVault";
+import { clearAccessToken, readAccessToken } from "@/lib/authTokenVault";
+import { isSocketAuthError } from "@/lib/authError";
+import { runSingleFlightRefresh } from "@/lib/authSession";
 import { env } from "@/lib/env";
-import { getOrCreateSocket } from "@/lib/socketClient";
-import { useAppSelector } from "@/redux/hooks";
+import {
+  configureSocketAuth,
+  getOrCreateSocket,
+  resetSocket,
+} from "@/lib/socketClient";
+import { refreshUser } from "@/redux/auth/operations";
+import { refreshError } from "@/redux/auth/slice";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
   selectAccessTokenReady,
   selectIsLoggedIn,
@@ -28,21 +43,21 @@ function resolveSocketConfig() {
 }
 
 export function SocketProvider({ children }: { children: React.ReactNode }) {
+  const dispatch = useAppDispatch();
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
   const accessTokenReady = useAppSelector(selectAccessTokenReady);
-  const socketConfig = useMemo(() => resolveSocketConfig(), []);
+  const [socketConfig] = useState(resolveSocketConfig);
   const allowGuest = env.socketAllowGuest;
+  const authRecoveryAttemptedRef = useRef(false);
 
   const [status, setStatus] = useState<SocketStatus>(() =>
     socketConfig ? "disconnected" : "disabled"
   );
   const [lastError, setLastError] = useState<string | null>(null);
 
-  // Expose a stable instance to consumers (do not mutate this value in render).
-  const socket = useMemo<Socket | null>(() => {
-    if (!socketConfig) return null;
-    return getOrCreateSocket(socketConfig);
-  }, [socketConfig]);
+  const [socket, setSocket] = useState<Socket | null>(() =>
+    socketConfig ? getOrCreateSocket(socketConfig) : null,
+  );
 
   useEffect(() => {
     if (!socketConfig) {
@@ -55,9 +70,13 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    const liveSocket = getOrCreateSocket(socketConfig);
+    if (!socket) return;
+    const liveSocket = socket;
+    let disposed = false;
+    let authRecoveryStarted = false;
 
     const onConnect = () => {
+      authRecoveryAttemptedRef.current = false;
       setStatus("connected");
       setLastError(null);
     };
@@ -69,6 +88,33 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
     const onConnectError = (err: unknown) => {
       setStatus("error");
       setLastError(err instanceof Error ? err.message : String(err));
+
+      if (
+        authRecoveryStarted ||
+        !isLoggedIn ||
+        !accessTokenReady ||
+        !isSocketAuthError(err)
+      ) {
+        return;
+      }
+      authRecoveryStarted = true;
+
+      if (authRecoveryAttemptedRef.current) {
+        clearAccessToken();
+        dispatch(refreshError());
+        return;
+      }
+
+      authRecoveryAttemptedRef.current = true;
+      void runSingleFlightRefresh(() => dispatch(refreshUser()).unwrap())
+        .then(() => {
+          if (disposed) return;
+          resetSocket(liveSocket);
+          setSocket(getOrCreateSocket(socketConfig));
+        })
+        .catch(() => {
+          // refreshUser owns the terminal session-expired state
+        });
     };
 
     liveSocket.on("connect", onConnect);
@@ -76,16 +122,18 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
     liveSocket.on("connect_error", onConnectError);
 
     return () => {
+      disposed = true;
       liveSocket.off("connect", onConnect);
       liveSocket.off("disconnect", onDisconnect);
       liveSocket.off("connect_error", onConnectError);
     };
-  }, [socketConfig]);
+  }, [accessTokenReady, dispatch, isLoggedIn, socket, socketConfig]);
 
   useEffect(() => {
     if (!socketConfig) return;
 
-    const liveSocket = getOrCreateSocket(socketConfig);
+    if (!socket) return;
+    const liveSocket = socket;
 
     if ((!isLoggedIn || !accessTokenReady) && !allowGuest) {
       liveSocket.disconnect();
@@ -94,10 +142,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
 
     // Socket.IO invokes this callback for every handshake/reconnect, so a
     // refreshed token is never captured in a stale React closure.
-    liveSocket.auth = (authorize) => {
-      const token = readAccessToken();
-      authorize(token ? { token } : {});
-    };
+    configureSocketAuth(liveSocket, readAccessToken);
 
     liveSocket.connect();
 
@@ -105,7 +150,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
       // keep singleton instance, but stop network activity if provider unmounts
       liveSocket.disconnect();
     };
-  }, [socketConfig, isLoggedIn, accessTokenReady, allowGuest]);
+  }, [socket, socketConfig, isLoggedIn, accessTokenReady, allowGuest]);
 
   const value = useMemo<SocketContextValue>(
     () => ({ socket, status, lastError }),

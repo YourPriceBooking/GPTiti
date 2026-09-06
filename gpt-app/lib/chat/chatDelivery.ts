@@ -95,3 +95,37 @@ export const classifyStreamSequence = (
   if (incoming.seq <= current.lastSeq) return "duplicate";
   return incoming.seq === current.lastSeq + 1 ? "next" : "gap";
 };
+
+type TurnEventIdentity = {
+  turnId: string;
+  clientMessageId: string;
+  conversationId: string;
+  attempt: number;
+};
+
+export const matchesPendingTurnEvent = (
+  turn: PendingChatTurn,
+  event: TurnEventIdentity,
+): boolean =>
+  turn.clientMessageId === event.clientMessageId &&
+  turn.conversationId === event.conversationId &&
+  (!turn.turnId || turn.turnId === event.turnId) &&
+  turn.attempt === event.attempt;
+
+export type PendingTurnRetryAction =
+  | "resend"
+  | "status"
+  | "generation-retry"
+  | "none";
+
+export const selectPendingTurnRetryAction = (
+  turn: PendingChatTurn,
+): PendingTurnRetryAction => {
+  if (turn.status === "delivery_unknown") {
+    return turn.turnId ? "status" : "resend";
+  }
+  if (turn.status === "failed" && turn.retryable && turn.turnId) {
+    return "generation-retry";
+  }
+  return "none";
+};

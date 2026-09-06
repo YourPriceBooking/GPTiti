@@ -34,6 +34,23 @@ export function disconnectSocket() {
   socketSingleton?.disconnect();
 }
 
+export function resetSocket(socket?: Socket) {
+  if (socket && socketSingleton !== socket) return;
+  socketSingleton?.disconnect();
+  socketSingleton = null;
+  socketKey = null;
+}
+
+export function configureSocketAuth(
+  socket: Socket,
+  readToken: () => string | null,
+) {
+  socket.auth = (authorize) => {
+    const token = readToken();
+    authorize(token ? { token } : {});
+  };
+}
+
 export function ensureSocketConnected(
   socket: Socket,
   timeoutMs = 8000,

@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSocket } from "@/context/SocketContext";
 import { api } from "@/helpers/api";
-import { clearAccessToken } from "@/lib/authTokenVault";
 import {
   CHAT_ACK_TIMEOUT_MS,
   CHAT_CONNECTION_LOST,
@@ -35,10 +34,11 @@ import {
   emitWithAck,
   fingerprintLocalFiles,
   isSamePendingRequest,
+  matchesPendingTurnEvent,
   runTransportRetries,
+  selectPendingTurnRetryAction,
   type AckSocket,
 } from "@/lib/chat/chatDelivery";
-import { refreshError } from "@/redux/auth/slice";
 import { selectPendingTurns } from "@/redux/chat/selectors";
 import {
   appendPendingTurnChunk,
@@ -115,13 +115,12 @@ export function useChatStream(): ChatStream {
     (error: unknown) => {
       const outcome = classifyChatError(error);
       if (outcome.reason === "auth-expired") {
-        clearAccessToken();
-        dispatch(refreshError());
+        setStreamError(CHAT_CONNECTION_LOST);
         return;
       }
       setStreamError(outcome.message);
     },
-    [dispatch],
+    [],
   );
 
   const ensureConnectionReady = useCallback(async () => {
@@ -428,8 +427,7 @@ export function useChatStream(): ChatStream {
       const event = readChatStreamEvent(raw);
       if (!event) return;
       const turn = pendingTurnsRef.current[event.clientMessageId];
-      if (!turn || turn.conversationId !== event.conversationId) return;
-      if (turn.turnId && turn.turnId !== event.turnId) return;
+      if (!turn || !matchesPendingTurnEvent(turn, event)) return;
 
       signalAccepted(event.clientMessageId);
       const currentSequence = sequenceRef.current.get(event.clientMessageId) ?? {
@@ -468,9 +466,7 @@ export function useChatStream(): ChatStream {
       const event: ChatEndEvent | null = readChatEndEvent(raw);
       if (!event) return;
       const turn = pendingTurnsRef.current[event.clientMessageId];
-      if (!turn || turn.conversationId !== event.conversationId) return;
-      if (turn.turnId && turn.turnId !== event.turnId) return;
-      if (turn.attempt !== event.attempt) return;
+      if (!turn || !matchesPendingTurnEvent(turn, event)) return;
       signalAccepted(event.clientMessageId);
       flushChunks();
       dispatch(completePendingTurn(event));
@@ -486,7 +482,7 @@ export function useChatStream(): ChatStream {
       const event: ChatErrorEvent | null = readChatErrorEvent(raw);
       if (!event) return;
       const turn = pendingTurnsRef.current[event.clientMessageId];
-      if (!turn || turn.attempt !== event.attempt) return;
+      if (!turn || !matchesPendingTurnEvent(turn, event)) return;
       signalAccepted(event.clientMessageId);
       flushChunks();
       dispatch(failPendingTurn(event));
@@ -635,13 +631,17 @@ export function useChatStream(): ChatStream {
         );
       if (!turn) return false;
 
-      if (turn.status === "delivery_unknown" || !turn.turnId) {
+      const retryAction = selectPendingTurnRetryAction(turn);
+      if (retryAction === "resend") {
         dispatch(
           restartPendingTurnDelivery({ clientMessageId: turn.clientMessageId }),
         );
         return deliverPendingTurn(turn);
       }
-      if (!turn.retryable) return false;
+      if (retryAction === "status" && turn.turnId) {
+        return requestTurnStatus(turn.turnId);
+      }
+      if (retryAction !== "generation-retry" || !turn.turnId) return false;
       if (generationRetryInFlightRef.current.has(turn.clientMessageId)) {
         return false;
       }
@@ -680,6 +680,7 @@ export function useChatStream(): ChatStream {
       deliverPendingTurn,
       dispatch,
       handleLocalError,
+      requestTurnStatus,
       showProtocolError,
       socket,
     ],

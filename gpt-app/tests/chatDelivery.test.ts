@@ -6,7 +6,9 @@ import {
   emitWithAck,
   fingerprintLocalFiles,
   isSamePendingRequest,
+  matchesPendingTurnEvent,
   runTransportRetries,
+  selectPendingTurnRetryAction,
   type AckSocket,
 } from "../lib/chat/chatDelivery.js";
 import type { PendingChatTurn } from "../types/types.js";
@@ -120,4 +122,86 @@ test("stream sequence rejects duplicates and stale attempts and detects gaps", (
   );
   assert.equal(classifyStreamSequence(current, { attempt: 2, seq: 6 }), "gap");
   assert.equal(classifyStreamSequence(current, { attempt: 2, seq: 5 }), "next");
+});
+
+test("server events must match every turn correlation field", () => {
+  const turn: PendingChatTurn = {
+    clientMessageId: "client-1",
+    turnId: "turn-1",
+    conversationId: "conversation-1",
+    modelId: "model",
+    message: "hello",
+    files: [],
+    localFileFingerprints: [],
+    status: "processing",
+    attempt: 2,
+    lastAppliedSeq: 0,
+    partialContent: "",
+    retryable: false,
+    createdAt: "now",
+  };
+  const matching = {
+    clientMessageId: "client-1",
+    turnId: "turn-1",
+    conversationId: "conversation-1",
+    attempt: 2,
+  };
+
+  assert.equal(matchesPendingTurnEvent(turn, matching), true);
+  assert.equal(
+    matchesPendingTurnEvent(turn, { ...matching, turnId: "foreign-turn" }),
+    false,
+  );
+  assert.equal(
+    matchesPendingTurnEvent(turn, {
+      ...matching,
+      conversationId: "foreign-conversation",
+    }),
+    false,
+  );
+  assert.equal(
+    matchesPendingTurnEvent(turn, { ...matching, attempt: 1 }),
+    false,
+  );
+});
+
+test("retry routing never resends chat:send once turnId is known", () => {
+  const base: PendingChatTurn = {
+    clientMessageId: "client-1",
+    turnId: null,
+    conversationId: "conversation-1",
+    modelId: "model",
+    message: "hello",
+    files: [],
+    localFileFingerprints: [],
+    status: "delivery_unknown",
+    attempt: 1,
+    lastAppliedSeq: 0,
+    partialContent: "",
+    retryable: true,
+    createdAt: "now",
+  };
+
+  assert.equal(selectPendingTurnRetryAction(base), "resend");
+  assert.equal(
+    selectPendingTurnRetryAction({ ...base, turnId: "turn-1" }),
+    "status",
+  );
+  assert.equal(
+    selectPendingTurnRetryAction({
+      ...base,
+      turnId: "turn-1",
+      status: "failed",
+    }),
+    "generation-retry",
+  );
+  assert.equal(
+    selectPendingTurnRetryAction({
+      ...base,
+      turnId: "turn-1",
+      status: "failed",
+      retryable: false,
+    }),
+    "none",
+  );
 });
