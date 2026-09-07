@@ -24,3 +24,4 @@ export const selectHasInput = (state: RootState) => state.chat.hasInput;
 export const selectTemplateTick = (state: RootState) => state.chat.templateTick;
 export const selectChatStatus = (state: RootState) => state.chat.status;
 export const selectChatError = (state: RootState) => state.chat.error;
+export const selectPendingTurns = (state: RootState) => state.chat.pendingTurns;

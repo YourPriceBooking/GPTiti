@@ -1,11 +1,40 @@
 import React from "react";
-import type { ProjectConversation } from "@/types/api.types";
+import type { ProjectConversation, UploadedFile } from "@/types/api.types";
 
 export interface CustomScrollBarProps {
   scrollTargetClass: string;
 }
 
 export type ChatRole = "user" | "assistant";
+
+export type ChatDeliveryStatus = "sending" | "accepted" | "failed";
+
+export type PendingChatTurnStatus =
+  | "awaiting_ack"
+  | "queued"
+  | "processing"
+  | "syncing"
+  | "completed"
+  | "failed"
+  | "delivery_unknown";
+
+export type PendingChatTurn = {
+  clientMessageId: string;
+  turnId: string | null;
+  conversationId: string;
+  modelId: string;
+  message: string;
+  files: UploadedFile[];
+  localFileFingerprints: string[];
+  status: PendingChatTurnStatus;
+  attempt: number;
+  lastAppliedSeq: number;
+  partialContent: string;
+  retryable: boolean;
+  errorCode?: string;
+  errorMessage?: string;
+  createdAt: string;
+};
 
 export type Message = {
   id?: string;
@@ -17,7 +46,12 @@ export type Message = {
   updatedAt?: string;
   streaming?: boolean;
   error?: string;
+  errorCode?: string;
   retryable?: boolean;
+  clientMessageId?: string;
+  turnId?: string;
+  attempt?: number;
+  deliveryStatus?: ChatDeliveryStatus;
 };
 
 export type ChatProject = {
