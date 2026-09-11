@@ -1,0 +1,263 @@
+.markdown > *:first-child {
+  margin-top: 0;
+}
+
+.markdown > *:last-child {
+  margin-bottom: 0;
+}
+
+.markdown p {
+  margin: 0 0 10px;
+  white-space: var(--md-white-space);
+}
+
+.markdown h1,
+.markdown h2,
+.markdown h3,
+.markdown h4 {
+  margin: 18px 0 8px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.markdown h1 {
+  font-size: 21px;
+}
+
+.markdown h2 {
+  font-size: 19px;
+}
+
+.markdown h3 {
+  font-size: 18px;
+}
+
+.markdown h4 {
+  font-size: 16px;
+}
+
+.markdown ul,
+.markdown ol {
+  margin: 8px 0 12px;
+  padding-left: 24px;
+}
+
+.markdown li {
+  margin: 4px 0;
+}
+
+.markdown a {
+  color: var(--md-link);
+  text-decoration: underline;
+}
+
+.markdown blockquote {
+  margin: 10px 0;
+  padding: 4px 0 4px 14px;
+  border-left: 3px solid var(--md-border);
+  color: var(--md-muted);
+}
+
+.markdown hr {
+  margin: 16px 0;
+  border: none;
+  border-top: 1px solid var(--md-border);
+}
+
+.markdown table {
+  margin: 12px 0;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.markdown th,
+.markdown td {
+  border: 1px solid var(--md-border);
+  padding: 6px 10px;
+  text-align: left;
+}
+
+.markdown th {
+  background: var(--md-soft-bg);
+  font-weight: 700;
+}
+
+.markdown code {
+  font-family:
+    ui-monospace, SFMono-Regular, "Cascadia Code", Menlo, Consolas, monospace;
+  font-size: 15px;
+  background: var(--md-soft-bg);
+  color: var(--md-text);
+  border-radius: 5px;
+  padding: 2px 5px;
+}
+
+.markdown :global(.code-block) {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  margin: 12px 0;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.markdown :global(.code-surface) {
+  width: 100%;
+  min-width: 0;
+  overflow: clip;
+  box-sizing: border-box;
+
+  background: var(--md-code-bg);
+  border: 1px solid var(--md-border);
+  border-radius: 12px;
+}
+
+.markdown :global(.code-header) {
+  min-height: 38px;
+  padding: 0 12px 0 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  background: var(--md-soft-bg);
+  border-bottom: 1px solid var(--md-border);
+  border-radius: 11px 11px 0 0;
+}
+
+.markdown :global(.code-lang) {
+  color: var(--md-muted);
+
+  font-family: var(--font-family);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+
+  text-transform: lowercase;
+}
+
+.markdown :global(.code-copy-btn) {
+  align-self: flex-end;
+  width: 30px;
+  height: 30px;
+  margin: 6px 0 0;
+  padding: 0;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  gap: 5px;
+
+  color: var(--md-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+
+  transition:
+    opacity 180ms ease,
+    visibility 0s linear 180ms;
+}
+
+.markdown :global(.code-block:hover > .code-copy-btn),
+.markdown :global(.code-copy-btn:focus-visible),
+.markdown :global(.code-copy-btn.copied) {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition-delay: 0s;
+}
+
+.markdown :global(.code-copy-btn):hover {
+  color: var(--md-text);
+  background: var(--md-soft-bg);
+  border-color: var(--md-border);
+}
+
+.markdown :global(.code-copy-btn.copied),
+.markdown :global(.code-copy-btn.copied):hover {
+  width: auto;
+  padding: 0 9px;
+  color: #15803d;
+  background: #dcfce7;
+  border-color: #bbf7d0;
+}
+
+.markdown :global(.code-copy-label) {
+  display: none;
+  font-family: var(--font-family);
+  font-size: 12px;
+  font-weight: 600;
+  color: #15803d;
+}
+
+.markdown :global(.code-copy-btn.copied .code-copy-label) {
+  display: inline;
+}
+
+.markdown :global(.code-copy-icon) {
+  width: 16px;
+  height: 16px;
+  background-color: currentColor;
+  -webkit-mask: url("/icons/copy.svg") no-repeat center / contain;
+  mask: url("/icons/copy.svg") no-repeat center / contain;
+}
+
+.markdown :global(.code-copy-btn.copied .code-copy-icon) {
+  -webkit-mask-image: url("/icons/copied.svg");
+  mask-image: url("/icons/copied.svg");
+}
+
+.markdown pre {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 14px;
+  overflow-x: hidden;
+  box-sizing: border-box;
+
+  background: transparent;
+  border-radius: 0 0 11px 11px;
+}
+
+.markdown :global(.shiki),
+.markdown :global(.shiki) span {
+  background-color: transparent !important;
+}
+
+.markdown pre code {
+  background: none;
+  padding: 0;
+  border-radius: 0;
+  border: 0;
+  color: var(--md-text);
+
+  font-family:
+    "JetBrains Mono", "Fira Code", Consolas, "Courier New", monospace;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.65;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  tab-size: 2;
+}
+
+.markdown :global(.shiki .line) {
+  min-height: 1.65em;
+}
+
+.noCodeCopy :global(.code-copy-btn) {
+  display: none;
+}

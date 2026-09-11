@@ -36,6 +36,22 @@
   /* model flow theme — default (balanced) */
   --flow-fill: #2563eb;
   --flow-bg: rgba(37, 99, 235, 0.1);
+
+  /* markdown — default (ai response) */
+  --md-text: #1d1d1f;
+  --md-muted: #6e7781;
+  --md-border: #e5e5ea;
+  --md-soft-bg: #f5f5f7;
+  --md-code-bg: #fafafa;
+  --md-link: #2563eb;
+  --md-white-space: normal;
+
+  /* user message card */
+  --user-bg: #eef2f8;
+  --user-border: #d8e1ee;
+  --user-text: #26324a;
+  --user-accent: #394669;
+  --user-soft-bg: #e3e9f3;
 }
 
 /* Per-model flow themes. The flow class/attribute is set on a root

@@ -1,15 +1,23 @@
 import DOMPurify from "dompurify";
 import { marked } from "marked";
 
+import { detectLanguage, normalizeLanguage } from "./shiki";
+
 const escapeHtml = (value: string) =>
   value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 marked.use({
   gfm: true,
   breaks: true,
+  tokenizer: {
+    code() {
+      return undefined;
+    },
+  },
   renderer: {
     code({ text, lang }) {
-      const language = (lang ?? "").trim().split(/\s+/)[0] || "text";
+      const requested = normalizeLanguage((lang ?? "").trim().split(/\s+/)[0]);
+      const language = requested === "text" ? detectLanguage(text) : requested;
       return (
         `<div class="code-block">` +
         `<div class="code-surface">` +
