@@ -113,12 +113,7 @@ export default function ModalWindow({
                 setVisibleModel(null);
               }}
             >
-              <span className={styles.groupLabel}>
-                {group}
-                {group === "gpt-5.5" && (
-                  <span className={styles.newBadge}>New</span>
-                )}
-              </span>
+              <span className={styles.groupLabel}>{group}</span>
             </button>
           ))}
         </div>
@@ -132,6 +127,7 @@ export default function ModalWindow({
       >
         <div className={styles.btnsContainer2}>
           {modelConfig[viewGroup].list.map((item) => {
+            const isSelected = selectedModel === item.title;
             const detailsOpen = visibleModel === item.title;
             const detailsId = getDetailsId(item.title);
 
@@ -141,10 +137,10 @@ export default function ModalWindow({
                   type="button"
                   className={clsx(
                     styles.btn2,
-                    selectedModel === item.title && styles.modelActive,
+                    isSelected && styles.modelActive,
                   )}
                   onClick={() => selectModel(item.title)}
-                  aria-pressed={selectedModel === item.title}
+                  aria-pressed={isSelected}
                 >
                   <span className={styles.mainContainerbtn2}>
                     <span className={styles.btn2Paragraph}>{item.title}</span>
@@ -210,8 +206,8 @@ export default function ModalWindow({
           No subscriptions • Tokens never expire
         </p>
         <p className={styles.footerSpan}>
-          * Approximate price for a typical 30-word message. Actual usage depends
-          on prompt and response length.
+          * Approximate price for a typical 30-word message. Actual usage
+          depends on prompt and response length.
         </p>
       </footer>
     </div>

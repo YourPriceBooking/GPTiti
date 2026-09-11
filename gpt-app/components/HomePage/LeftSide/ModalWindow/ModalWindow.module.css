@@ -86,7 +86,8 @@
   align-items: center;
   gap: 8px;
   overflow-x: auto;
-  padding: 2px 0 12px;
+  padding: 2px 0 0;
+  border-bottom: 1px solid #1e293b;
   overscroll-behavior-x: contain;
   scrollbar-color: rgba(255, 255, 255, 0.28) transparent;
   scrollbar-width: thin;
@@ -107,28 +108,46 @@
   min-height: 44px;
   flex: 0 0 auto;
   padding: 10px 7px;
-  border: 1px solid transparent;
   border-radius: 11px;
-  color: #b8bbc0;
+  color: #64748b;
   font-family: var(--font-family);
   font-weight: 500;
   font-size: 16px;
-  transition:
-    border-color 160ms ease,
-    color 160ms ease,
-    background-color 160ms ease;
+  transition: color 250ms ease;
 }
 
 .btn:hover {
-  border-color: rgba(255, 255, 255, 0.35);
+  color: #94a3b8;
 }
 
 .groupActive,
 .groupActive:hover {
-  border: 2px solid #3b82f6;
-  background: transparent;
-  color: #3b82f6;
-  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.15);
+  color: #ffffff;
+}
+
+.groupActive::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  border-radius: 2px 2px 0 0;
+  background: #3b82f6;
+  box-shadow: 0 -1px 8px rgba(59, 130, 246, 0.5);
+  animation: tabIndicatorIn 200ms ease forwards;
+}
+
+@keyframes tabIndicatorIn {
+  from {
+    opacity: 0;
+    transform: scaleX(0.8);
+  }
+
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+  }
 }
 
 .btn:focus-visible,
@@ -141,25 +160,8 @@
 }
 
 .groupLabel {
-  position: relative;
   display: inline-block;
   white-space: nowrap;
-}
-
-.newBadge {
-  position: absolute;
-  top: -13px;
-  right: -8px;
-  padding: 2px 5px;
-  border-radius: 6px;
-  background: #3b82f6;
-  color: #e4e6e9;
-  font-size: 9px;
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: 0.3px;
-  text-transform: uppercase;
-  pointer-events: none;
 }
 
 .mainSection {
@@ -199,7 +201,7 @@
   text-align: left;
   transition:
     border-color 160ms ease,
-    background-color 160ms ease;
+    background-color 300ms ease;
 }
 
 .btn2:hover {
@@ -208,9 +210,20 @@
 
 .modelActive,
 .modelActive:hover {
-  border-color: #3b82f6;
-  background: #265ed9;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.18);
+  border: 2px dashed #3b82f6;
+  background: #161920;
+}
+
+.modelActive .btn2Paragraph {
+  color: #ffffff;
+}
+
+.modelActive .btn2Span1 {
+  color: #3b82f6;
+}
+
+.modelActive .btn2Span2 {
+  color: #94a3b8;
 }
 
 .mainContainerbtn2 {
@@ -300,11 +313,11 @@
 .balanceContainer {
   width: 100%;
   min-width: 0;
-  min-height: 36px;
+  min-height: 44px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-left: 8px;
+  padding: 4px 4px 4px 12px;
   border: 1px solid var(--main-gray2);
   border-radius: 7px;
 }
@@ -323,23 +336,47 @@
   min-height: 34px;
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 5px 7px;
-  border-radius: 20px 7px 7px 20px;
-  background: var(--button-background);
-  transition: opacity 160ms ease;
+  gap: 8px;
+  padding: 7px 16px;
+  border: 1px solid #2d3748;
+  border-radius: 9999px;
+  background: #1a1f2c;
+  transition:
+    background-color 300ms cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 300ms cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .badgeLink:hover {
-  opacity: 0.82;
+  border-color: #3b82f6;
+  background: #1e293b;
+  box-shadow: 0 0 16px rgba(59, 130, 246, 0.25);
+}
+
+.badgeLink:hover .badgeText {
+  color: #ffffff;
+}
+
+.badgeLink:hover img {
+  transform: translateY(-1px);
+}
+
+.badgeLink:active {
+  transform: scale(0.98);
+}
+
+.badgeLink img {
+  transition: transform 300ms ease;
 }
 
 .badgeText {
-  color: var(--main-gray2);
+  color: #e2e8f0;
   font-family: var(--font-family);
   font-weight: 500;
-  font-size: 13px;
+  font-size: 14px;
   white-space: nowrap;
+  transition: color 300ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .subscriptionsNote {
@@ -366,7 +403,6 @@
     grid-auto-flow: column;
     gap: 5px;
     overflow: visible;
-    padding-bottom: 2px;
     scrollbar-width: none;
   }
 
@@ -386,7 +422,6 @@
 @media (max-width: 600px) {
   .btnsContainer {
     overflow-x: auto;
-    padding-bottom: 6px;
     scrollbar-width: none;
     -ms-overflow-style: none;
   }
@@ -438,6 +473,10 @@
   .badgeText {
     display: none;
   }
+
+  .badgeLink {
+    padding: 7px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -445,7 +484,18 @@
   .btn2,
   .closeButton,
   .eyeIcon,
-  .badgeLink {
+  .badgeLink,
+  .badgeText,
+  .badgeLink img {
     transition: none;
+  }
+
+  .badgeLink:hover img,
+  .badgeLink:active {
+    transform: none;
+  }
+
+  .groupActive::after {
+    animation: none;
   }
 }

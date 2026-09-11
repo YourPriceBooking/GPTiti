@@ -21,7 +21,7 @@ export default function PageNav() {
           href="/"
           className="flex items-center gap-2 hover:opacity-80 transition-opacity"
         >
-          <img src="/icons/rabbit.svg" alt="logo" className="w-8 h-8" />
+          <img src="/icons/rabbit.svg" alt="logo" className="w-9 h-5" />
           <span className="font-bold text-xl tracking-tighter">
             GPT<span className="text-blue-600">iti</span>
           </span>
