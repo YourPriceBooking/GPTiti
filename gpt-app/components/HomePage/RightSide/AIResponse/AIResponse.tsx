@@ -79,7 +79,7 @@ export default function AIResponse({
         <Image
           src="/icons/rabbit.svg"
           alt="logo-rabbit"
-          height={41}
+          height={23}
           width={41}
         />
         <p className={styles.aiParagraph}>GPTiti</p>

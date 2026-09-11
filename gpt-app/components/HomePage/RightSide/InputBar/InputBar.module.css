@@ -5,14 +5,14 @@
   max-width: 900px;
   min-width: 380px;
   width: 100%;
-  border: 0.2px solid #3e3d40;
+  border: 0.2px solid rgba(62, 61, 64, 0.2);
   border-radius: 33px;
   background: #fcfdff;
-  box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.25);
+  box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.05);
 }
 
 .inputContainer:focus-within {
-  border-color: var(--flow-fill);
+  border-color: color-mix(in srgb, var(--flow-fill) 20%, transparent);
 }
 
 /* Project workspace variant — fixed accent, independent of the chat flow theme */
@@ -20,7 +20,7 @@
   --flow-fill: #3e7cff;
   --flow-bg: rgba(62, 124, 255, 0.14);
   max-width: none;
-  border: 1px solid rgba(59, 130, 246, 0.4);
+  border: 1px solid rgba(59, 130, 246, 0.08);
   background: rgba(13, 29, 70, 0.35);
   box-shadow: none;
 }

@@ -147,8 +147,8 @@ export default function TokensPage() {
               className={styles.rabbitLogo}
               src="/icons/rabbit.svg"
               alt="logo-rabbit"
-              width={59}
-              height={75}
+              width={75}
+              height={41}
             />
             <Image
               className={styles.headerTextLogo}

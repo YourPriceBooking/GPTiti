@@ -8,7 +8,7 @@ export default function TypingPlaceholder() {
         <Image
           src="/icons/rabbit.svg"
           alt="logo-rabbit"
-          height={41}
+          height={23}
           width={41}
         />
         <div>

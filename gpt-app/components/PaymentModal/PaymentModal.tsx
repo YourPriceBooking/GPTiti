@@ -101,7 +101,7 @@ export default function PaymentModal({ isOpen, onClose, plan }: Props) {
             >
               <Image
                 className={styles.headerCloseIcon}
-                src="/icons/close.svg"
+                src="/icons/close-plain.svg"
                 width={32}
                 height={32}
                 alt="close-icon"

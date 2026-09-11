@@ -32,7 +32,7 @@
   font-family: var(--font-family);
   font-weight: 700;
   font-size: 34px;
-  color: var(--background);
+  color: #c8d2e2;
 }
 .mobTitle {
   display: none;
@@ -88,7 +88,7 @@
   font-family: var(--font-family);
   font-weight: 700;
   font-size: 16px;
-  color: #e5e7eb;
+  color: #c8d2e2;
   margin-right: 50px;
 }
 .plansContainer {
@@ -225,12 +225,12 @@
 }
 .tokensTitle {
   font-style: italic;
-  color: #e5e7eb;
+  color: #c8d2e2;
 }
 .priceTitle {
   display: flex;
   align-items: center;
-  color: #e4e6e9;
+  color: #c8d2e2;
   margin-top: 19px;
   margin-bottom: 17px;
 }
@@ -332,7 +332,7 @@
   font-family: var(--font-family);
   font-weight: 700;
   font-size: 22px;
-  color: #e5e7eb;
+  color: #c8d2e2;
 }
 .freeTokensReward {
   max-height: 26px;
@@ -706,7 +706,7 @@
     font-family: var(--font-family);
     font-weight: 700;
     font-size: 26px;
-    color: #e4e6e9;
+    color: #c8d2e2;
   }
   .mobileBalanceIcon {
     display: block;

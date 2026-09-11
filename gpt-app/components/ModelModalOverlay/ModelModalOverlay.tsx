@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ModelModalOverlayProps } from "@/types/types";
 import styles from "./ModelModalOverlay.module.css";
 import ModalWindow from "@/components/HomePage/LeftSide/ModalWindow/ModalWindow";
@@ -14,6 +15,7 @@ export default function ModelModalOverlay({
   setSelectedModelGroup,
 }: ModelModalOverlayProps) {
   const modalRef = useRef<HTMLDivElement>(null);
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
     if (!isModalOpen) return;
@@ -21,7 +23,8 @@ export default function ModelModalOverlay({
     const previouslyFocused = document.activeElement as HTMLElement | null;
     const previousOverflow = document.body.style.overflow;
     const previousPaddingRight = document.body.style.paddingRight;
-    const scrollbarGap = window.innerWidth - document.documentElement.clientWidth;
+    const scrollbarGap =
+      window.innerWidth - document.documentElement.clientWidth;
 
     document.body.style.overflow = "hidden";
     if (scrollbarGap > 0) {
@@ -76,32 +79,52 @@ export default function ModelModalOverlay({
     };
   }, [isModalOpen, setIsModalOpen]);
 
-  if (!isModalOpen) return null;
-
   return (
-    <div
-      className={`${styles.modalOverlay} ${styles.open}`}
-      onClick={() => setIsModalOpen(false)}
-    >
-      <div className={styles.backdrop} />
+    <AnimatePresence>
+      {isModalOpen && (
+        <motion.div
+          className={styles.modalOverlay}
+          onClick={() => setIsModalOpen(false)}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{
+            duration: reduceMotion ? 0 : 0.3,
+            ease: [0.22, 1, 0.36, 1],
+          }}
+        >
+          <div className={styles.backdrop} />
 
-      <div
-        className={`${styles.modalWrapper} ${styles.open}`}
-        onClick={(e) => e.stopPropagation()}
-        ref={modalRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="model-picker-title"
-        tabIndex={-1}
-      >
-        <ModalWindow
-          selectedModelGroup={selectedModelGroup}
-          setSelectedModelGroup={setSelectedModelGroup}
-          selectedModel={selectedModel}
-          setSelectedModel={setSelectedModel}
-          setIsModalOpen={setIsModalOpen}
-        />
-      </div>
-    </div>
+          <motion.div
+            className={styles.modalWrapper}
+            onClick={(e) => e.stopPropagation()}
+            ref={modalRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="model-picker-title"
+            tabIndex={-1}
+            initial={
+              reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 12 }
+            }
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={
+              reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.97, y: 8 }
+            }
+            transition={{
+              duration: reduceMotion ? 0 : 0.4,
+              ease: [0.16, 1, 0.3, 1],
+            }}
+          >
+            <ModalWindow
+              selectedModelGroup={selectedModelGroup}
+              setSelectedModelGroup={setSelectedModelGroup}
+              selectedModel={selectedModel}
+              setSelectedModel={setSelectedModel}
+              setIsModalOpen={setIsModalOpen}
+            />
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
