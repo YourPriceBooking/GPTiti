@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import styles from "./MessageList.module.css";
 import TypingPlaceholder from "../../TypingPlaceholder/TypingPlaceholder";
 import AIResponse from "../AIResponse/AIResponse";
+import CollapsibleContent from "@/components/common/CollapsibleContent/CollapsibleContent";
+import MarkdownContent from "@/components/common/MarkdownContent/MarkdownContent";
 import type { Message } from "@/types/types";
 
 type MessageListProps = {
@@ -107,7 +109,21 @@ function UserMessage({ message }: { message: Message }) {
           </div>
         )}
         {message.content && (
-          <p className={styles.userText}>{message.content}</p>
+          <CollapsibleContent
+            className={styles.userTextCard}
+            contentClassName={styles.userText}
+            buttonClassName={styles.expandBtn}
+            contentKey={message.content}
+            expandText="Show full message"
+            collapseText="Collapse"
+          >
+            <MarkdownContent
+              className={styles.userMarkdown}
+              content={message.content}
+              fenceBareCode
+              codeCopy={false}
+            />
+          </CollapsibleContent>
         )}
 
         {message.deliveryStatus && message.deliveryStatus !== "accepted" && (
