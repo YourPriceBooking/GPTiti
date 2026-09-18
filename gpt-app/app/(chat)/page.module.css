@@ -164,11 +164,17 @@
   line-height: 1.4;
 }
 
+.breadcrumbs:has(.breadcrumbProject) {
+  display: grid;
+  grid-template-columns:
+    max-content minmax(0, max-content) max-content minmax(0, max-content);
+}
+
 .breadcrumbIcon {
   flex: none;
   width: 24px;
   height: 20px;
-  color: #475569;
+  color: #bcbcbc;
 }
 
 .breadcrumbProject {
