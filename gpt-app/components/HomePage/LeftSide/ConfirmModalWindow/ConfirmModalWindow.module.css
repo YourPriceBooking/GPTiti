@@ -1,0 +1,153 @@
+.container {
+  width: max-content;
+  max-width: calc(100vw - 16px);
+  min-height: 160px;
+  padding: 18px;
+  border-radius: 11px;
+  background-color: #0f172a;
+
+  display: flex;
+  gap: 12px;
+}
+
+.iconContainer {
+  flex-shrink: 0;
+  width: 30px;
+}
+
+.infoContainer {
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 16px;
+  color: #eee;
+}
+.paragraph {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 13px;
+  color: #eee;
+}
+.buttonsContainer {
+  margin-top: 24px;
+  display: flex;
+}
+
+.cancelButton {
+  flex-shrink: 0;
+  padding: 11px 24px 10px 30px;
+  background-color: #fff;
+  border-radius: 14px;
+  margin-right: 10px;
+}
+
+.cancelButton:hover {
+  background-color: #ded5d5;
+  cursor: pointer;
+}
+
+.confirmButton {
+  flex-shrink: 0;
+  white-space: nowrap;
+  padding: 11px 36px 10px 36px;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.confirmButtonText,
+.cancelButtonText {
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.cancelButtonText {
+  color: #334155;
+}
+
+.confirmButtonText {
+  color: #e4e6e9;
+}
+
+.delete {
+  background-color: #dc2626;
+}
+
+.delete:hover {
+  background-color: #f85959;
+}
+
+.archive {
+  background-color: #1d3d5e;
+}
+
+.archive:hover {
+  background-color: #3d5c7c;
+}
+
+.move {
+  padding-left: 20px;
+  padding-right: 20px;
+  background-color: #2e5daa;
+}
+
+.move:hover {
+  background-color: #3b82f6;
+}
+
+.remove {
+  background-color: #26477c;
+}
+
+.remove:hover {
+  background-color: #547bba;
+}
+
+@media (max-width: 480px) {
+  .container {
+    min-height: 0;
+    padding: 14px;
+    gap: 10px;
+  }
+
+  .iconContainer {
+    width: 32px;
+  }
+
+  .iconContainer img {
+    width: 32px;
+    height: 32px;
+  }
+
+  .title {
+    font-size: 14px;
+  }
+
+  .paragraph {
+    font-size: 12px;
+  }
+
+  .buttonsContainer {
+    margin-top: 16px;
+  }
+
+  .cancelButton,
+  .confirmButton {
+    flex: 1 1 auto;
+    padding: 9px 14px;
+  }
+
+  .cancelButton {
+    margin-right: 8px;
+  }
+
+  .confirmButtonText,
+  .cancelButtonText {
+    font-size: 13px;
+  }
+}

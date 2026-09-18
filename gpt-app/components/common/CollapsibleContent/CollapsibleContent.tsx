@@ -34,7 +34,7 @@ export default function CollapsibleContent({
   buttonClassName = "",
 }: CollapsibleContentProps) {
   const contentRef = useRef<HTMLDivElement | null>(null);
-  const buttonRef = useRef<HTMLButtonElement | null>(null);
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
   const collapsingRef = useRef(false);
 
   const [expanded, setExpanded] = useState(false);
@@ -83,7 +83,7 @@ export default function CollapsibleContent({
   useEffect(() => {
     if (!collapsingRef.current) return;
     collapsingRef.current = false;
-    buttonRef.current?.scrollIntoView({ block: "nearest" });
+    wrapperRef.current?.scrollIntoView({ block: "nearest" });
   }, [expanded]);
 
   const toggle = () => {
@@ -95,7 +95,7 @@ export default function CollapsibleContent({
   const isCollapsed = canCollapse && !expanded;
 
   return (
-    <div className={`${styles.wrapper} ${className}`}>
+    <div ref={wrapperRef} className={`${styles.wrapper} ${className}`}>
       <div
         ref={contentRef}
         id={contentId}
@@ -115,7 +115,6 @@ export default function CollapsibleContent({
 
       {canCollapse && (
         <button
-          ref={buttonRef}
           type="button"
           className={buttonClassName || styles.expandButton}
           onClick={toggle}

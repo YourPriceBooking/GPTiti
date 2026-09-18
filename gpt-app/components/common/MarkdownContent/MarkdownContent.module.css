@@ -61,7 +61,6 @@
 .markdown hr {
   margin: 16px 0;
   border: none;
-  border-top: 1px solid var(--md-border);
 }
 
 .markdown table {
@@ -111,7 +110,6 @@
   box-sizing: border-box;
 
   background: var(--md-code-bg);
-  border: 1px solid var(--md-border);
   border-radius: 12px;
 }
 
@@ -125,8 +123,7 @@
   gap: 12px;
 
   background: var(--md-soft-bg);
-  border-bottom: 1px solid var(--md-border);
-  border-radius: 11px 11px 0 0;
+  border-radius: 12px 12px 0 0;
 }
 
 .markdown :global(.code-lang) {
@@ -228,7 +225,7 @@
   box-sizing: border-box;
 
   background: transparent;
-  border-radius: 0 0 11px 11px;
+  border-radius: 0 0 12px 12px;
 }
 
 .markdown :global(.shiki),

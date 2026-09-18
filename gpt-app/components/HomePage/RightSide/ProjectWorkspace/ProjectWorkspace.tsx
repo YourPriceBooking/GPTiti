@@ -5,15 +5,22 @@ import InputBar from "@/components/HomePage/RightSide/InputBar/InputBar";
 import InputComposer from "@/components/HomePage/RightSide/InputComposer/InputComposer";
 import ChatsMenu from "@/components/HomePage/LeftSide/ChatsMenu/ChatsMenu";
 import DeleteModalWindow from "@/components/HomePage/LeftSide/DeleteModalWindow/DeleteModalWindow";
+import ChatActionModal, {
+  type ChatAction,
+  type PendingChatAction,
+} from "@/components/HomePage/LeftSide/ConfirmModalWindow/ChatActionModal";
+import ProjectPickerModal from "@/components/HomePage/LeftSide/ProjectPickerModal/ProjectPickerModal";
 import ChatBubbleIcon from "@/components/common/ChatBubbleIcon";
 import type { Chat } from "@/types/types";
-import { useAppDispatch } from "@/redux/hooks";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { updateConversationPin } from "@/redux/chat/operations";
+import { selectProjectList } from "@/redux/projects/selectors";
+import { useChatProjectMove } from "@/hooks/useChatProjectMove";
 
 import styles from "./ProjectWorkspace.module.css";
 
 const MENU_GAP = 6;
-const MENU_HEIGHT = 240;
+const MENU_HEIGHT = 360;
 
 const shouldOpenUpwards = (trigger: HTMLElement) =>
   trigger.getBoundingClientRect().bottom + MENU_GAP + MENU_HEIGHT >
@@ -107,6 +114,10 @@ export default function ProjectWorkspace({
   const [openMenuChatId, setOpenMenuChatId] = useState<string | null>(null);
   const [menuUp, setMenuUp] = useState(false);
   const [deletingChatId, setDeletingChatId] = useState<string | null>(null);
+  const [chatAction, setChatAction] = useState<PendingChatAction | null>(null);
+  const [movingChatId, setMovingChatId] = useState<string | null>(null);
+  const projectList = useAppSelector(selectProjectList);
+  const { moveToProject, removeFromProject } = useChatProjectMove();
   const [renamingChatId, setRenamingChatId] = useState<string | null>(null);
   const [projectMenuOpen, setProjectMenuOpen] = useState(false);
   const [renamingProject, setRenamingProject] = useState(false);
@@ -181,9 +192,7 @@ export default function ProjectWorkspace({
     setRenamingChatId(null);
   };
 
-  const handleTitleKeyDown = (
-    event: React.KeyboardEvent<HTMLSpanElement>,
-  ) => {
+  const handleTitleKeyDown = (event: React.KeyboardEvent<HTMLSpanElement>) => {
     if (event.key === "Enter") {
       event.preventDefault();
       event.currentTarget.blur();
@@ -270,8 +279,21 @@ export default function ProjectWorkspace({
     ...chats.filter((chat) => !chat.pinnedAt),
   ];
 
+  const openChatAction = (action: ChatAction, chatId: string) => {
+    setChatAction({ action, chatId });
+    setOpenMenuChatId(null);
+  };
+
+  const confirmChatAction = () => {
+    if (!chatAction) return;
+    const { action, chatId } = chatAction;
+    if (action === "move") setMovingChatId(chatId);
+    if (action === "remove") void removeFromProject(chatId, projectId);
+    setChatAction(null);
+  };
+
   useEffect(() => {
-    if (!openMenuChatId && !deletingChatId) return;
+    if (!openMenuChatId && !deletingChatId && !chatAction) return;
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
 
@@ -280,11 +302,12 @@ export default function ProjectWorkspace({
       if (!menuRef.current?.contains(target)) {
         setOpenMenuChatId(null);
         setDeletingChatId(null);
+        setChatAction(null);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [openMenuChatId, deletingChatId]);
+  }, [openMenuChatId, deletingChatId, chatAction]);
 
   return (
     <div className={styles.container}>
@@ -345,6 +368,7 @@ export default function ProjectWorkspace({
           {projectMenuOpen && (
             <div className={styles.projectMenu}>
               <ChatsMenu
+                onClose={() => setProjectMenuOpen(false)}
                 isProject
                 showPinToggle={false}
                 onAddChats={addChatsToProject}
@@ -492,6 +516,7 @@ export default function ProjectWorkspace({
                     onClick={(e) => e.stopPropagation()}
                   >
                     <ChatsMenu
+                      onClose={() => setOpenMenuChatId(null)}
                       isPinned={Boolean(chat.pinnedAt)}
                       onPinToggle={() => {
                         togglePinChat(chat.id);
@@ -499,6 +524,12 @@ export default function ProjectWorkspace({
                       }}
                       showCreateProject
                       onCreateProject={() => setOpenMenuChatId(null)}
+                      projectTitle={name}
+                      onMoveToProject={() => openChatAction("move", chat.id)}
+                      onArchive={() => openChatAction("archive", chat.id)}
+                      onRemoveFromProject={() =>
+                        openChatAction("remove", chat.id)
+                      }
                       onRenameRequest={() => startRenamingChat(chat.id)}
                       onDeleteRequest={() => {
                         setDeletingChatId(chat.id);
@@ -522,6 +553,22 @@ export default function ProjectWorkspace({
                         onRemoveChat?.(chat.id);
                         setDeletingChatId(null);
                       }}
+                    />
+                  </div>
+                )}
+
+                {chatAction?.chatId === chat.id && (
+                  <div
+                    ref={menuRef}
+                    className={`${styles.cardMenu} ${
+                      menuUp ? styles.cardMenuUp : ""
+                    }`}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <ChatActionModal
+                      action={chatAction.action}
+                      onCancel={() => setChatAction(null)}
+                      onConfirm={confirmChatAction}
                     />
                   </div>
                 )}
@@ -558,6 +605,17 @@ export default function ProjectWorkspace({
           </div>
         </div>
       ) : null}
+
+      {movingChatId && (
+        <ProjectPickerModal
+          projects={projectList.filter((project) => project.id !== projectId)}
+          onClose={() => setMovingChatId(null)}
+          onConfirm={(targetId) => {
+            void moveToProject(movingChatId, targetId, projectId);
+            setMovingChatId(null);
+          }}
+        />
+      )}
     </div>
   );
 }

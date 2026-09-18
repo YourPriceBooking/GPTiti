@@ -1,12 +1,24 @@
 "use client";
 
-import { useState, useRef, useEffect, type CSSProperties } from "react";
+import {
+  useState,
+  useRef,
+  useEffect,
+  useLayoutEffect,
+  type CSSProperties,
+} from "react";
 import styles from "./SectionGptChats.module.css";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { SectionGptChatsProps } from "@/types/types";
 import ChatsMenu from "../ChatsMenu/ChatsMenu";
 import DeleteModalWindow from "../DeleteModalWindow/DeleteModalWindow";
+import ChatActionModal, {
+  type ChatAction,
+  type PendingChatAction,
+} from "../ConfirmModalWindow/ChatActionModal";
+import ProjectPickerModal from "../ProjectPickerModal/ProjectPickerModal";
+import { useChatProjectMove } from "@/hooks/useChatProjectMove";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { selectActiveChatId } from "@/redux/chat/selectors";
 import { updateConversationPin } from "@/redux/chat/operations";
@@ -19,7 +31,7 @@ const VIEWPORT_EDGE_GAP = 8;
 const DELETE_MODAL_SHIFT = 28;
 const MENU_GAP = 6;
 
-const MENU_HEIGHT = 240;
+const MENU_HEIGHT = 300;
 
 type MenuPosition = {
   top?: number;
@@ -28,21 +40,23 @@ type MenuPosition = {
   right?: number;
 };
 
-const menuPositionBelow = (trigger: HTMLElement): MenuPosition => {
+const menuPositionBelow = (
+  trigger: HTMLElement,
+  height = MENU_HEIGHT,
+): MenuPosition => {
   const rect = trigger.getBoundingClientRect();
   const isNarrow = window.innerWidth <= NARROW_VIEWPORT;
   const below = rect.bottom + MENU_GAP;
-  const fitsBelow = below + MENU_HEIGHT <= window.innerHeight;
+  const above = rect.top - MENU_GAP - height;
+  const maxTop = window.innerHeight - VIEWPORT_EDGE_GAP - height;
   const horizontal = isNarrow
     ? { right: VIEWPORT_EDGE_GAP }
     : { left: rect.left };
 
-  if (fitsBelow) return { top: below, ...horizontal };
+  if (below <= maxTop) return { top: below, ...horizontal };
+  if (above >= VIEWPORT_EDGE_GAP) return { top: above, ...horizontal };
 
-  return {
-    bottom: window.innerHeight - rect.top + MENU_GAP,
-    ...horizontal,
-  };
+  return { top: Math.max(VIEWPORT_EDGE_GAP, maxTop), ...horizontal };
 };
 
 export default function SectionGptChats({
@@ -83,7 +97,12 @@ export default function SectionGptChats({
   const [deletingProjectId, setDeletingProjectId] = useState<string | null>(
     null,
   );
+  const [chatAction, setChatAction] = useState<PendingChatAction | null>(
+    null,
+  );
+  const [movingChatId, setMovingChatId] = useState<string | null>(null);
   const [showAllChats, setShowAllChats] = useState(false);
+  const { moveToProject, removeFromProject } = useChatProjectMove();
   const activeChatId = useAppSelector(selectActiveChatId);
   const activeProjectId = useAppSelector(selectActiveProjectId);
 
@@ -144,7 +163,7 @@ export default function SectionGptChats({
     left: pos.left != null ? pos.left + DELETE_MODAL_SHIFT : undefined,
     right:
       pos.right != null
-        ? Math.max(0, pos.right - DELETE_MODAL_SHIFT)
+        ? Math.max(VIEWPORT_EDGE_GAP, pos.right - DELETE_MODAL_SHIFT)
         : undefined,
   });
 
@@ -153,7 +172,33 @@ export default function SectionGptChats({
     setOpenMenuProjectId(null);
     setDeletingChatId(null);
     setDeletingProjectId(null);
+    setChatAction(null);
   };
+
+  const getChatProject = (chatId: string | null) => {
+    const chatProject = chatList.find((chat) => chat.id === chatId)?.project;
+    if (!chatProject) return undefined;
+    return projectList.find((p) => p.id === chatProject.id) ?? chatProject;
+  };
+
+  const openChatAction = (action: ChatAction) => {
+    if (openMenuChatId) setChatAction({ action, chatId: openMenuChatId });
+    setOpenMenuChatId(null);
+  };
+
+  const confirmChatAction = () => {
+    if (!chatAction) return;
+    const { action, chatId } = chatAction;
+    const chatProject = getChatProject(chatId);
+
+    if (action === "move") setMovingChatId(chatId);
+    if (action === "remove" && chatProject) {
+      void removeFromProject(chatId, chatProject.id);
+    }
+    setChatAction(null);
+  };
+
+  const movingFromProject = getChatProject(movingChatId);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -174,21 +219,34 @@ export default function SectionGptChats({
     };
   }, []);
 
-  const chatMenuOpen = openMenuChatId !== null || deletingChatId !== null;
+  const chatMenuOpen =
+    openMenuChatId !== null || deletingChatId !== null || chatAction !== null;
   const projectMenuOpen =
     openMenuProjectId !== null || deletingProjectId !== null;
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!chatMenuOpen && !projectMenuOpen) return;
 
     const reanchor = () => {
       if (chatMenuOpen && chatTriggerRef.current) {
-        setMenuPosition(menuPositionBelow(chatTriggerRef.current));
+        setMenuPosition(
+          menuPositionBelow(
+            chatTriggerRef.current,
+            menuRef.current?.offsetHeight,
+          ),
+        );
       }
       if (projectMenuOpen && projectTriggerRef.current) {
-        setProjectMenuPosition(menuPositionBelow(projectTriggerRef.current));
+        setProjectMenuPosition(
+          menuPositionBelow(
+            projectTriggerRef.current,
+            projectMenuRef.current?.offsetHeight,
+          ),
+        );
       }
     };
+
+    reanchor();
 
     window.addEventListener("scroll", reanchor, true);
     window.addEventListener("resize", reanchor);
@@ -196,7 +254,15 @@ export default function SectionGptChats({
       window.removeEventListener("scroll", reanchor, true);
       window.removeEventListener("resize", reanchor);
     };
-  }, [chatMenuOpen, projectMenuOpen]);
+  }, [
+    chatMenuOpen,
+    projectMenuOpen,
+    openMenuChatId,
+    deletingChatId,
+    chatAction,
+    openMenuProjectId,
+    deletingProjectId,
+  ]);
 
   useEffect(() => {
     if (!renamingChatId) return;
@@ -613,6 +679,7 @@ export default function SectionGptChats({
           }}
         >
           <ChatsMenu
+            onClose={() => setOpenMenuChatId(null)}
             isPinned={Boolean(chatList.find((chat) => chat.id === openMenuChatId)?.pinnedAt)}
             onPinToggle={() => {
               togglePinChat(openMenuChatId);
@@ -620,6 +687,10 @@ export default function SectionGptChats({
             }}
             showCreateProject={true}
             onCreateProject={() => setOpenMenuChatId(null)}
+            projectTitle={getChatProject(openMenuChatId)?.title}
+            onMoveToProject={() => openChatAction("move")}
+            onArchive={() => openChatAction("archive")}
+            onRemoveFromProject={() => openChatAction("remove")}
             onRenameRequest={() => {
               setRenamingChatId(openMenuChatId);
               setOpenMenuChatId(null);
@@ -644,6 +715,7 @@ export default function SectionGptChats({
           }}
         >
           <ChatsMenu
+            onClose={() => setOpenMenuProjectId(null)}
             isProject={true}
             isPinned={Boolean(projectList.find((project) => project.id === openMenuProjectId)?.pinnedAt)}
             onPinToggle={() => {
@@ -680,6 +752,33 @@ export default function SectionGptChats({
             }}
           />
         </div>
+      )}
+
+      {chatAction && menuPosition && (
+        <div
+          ref={menuRef}
+          className={styles.menuContainer}
+          style={deleteModalStyle(menuPosition)}
+        >
+          <ChatActionModal
+            action={chatAction.action}
+            onCancel={() => setChatAction(null)}
+            onConfirm={confirmChatAction}
+          />
+        </div>
+      )}
+
+      {movingChatId && (
+        <ProjectPickerModal
+          projects={sortedProjects.filter(
+            (project) => project.id !== movingFromProject?.id,
+          )}
+          onClose={() => setMovingChatId(null)}
+          onConfirm={(projectId) => {
+            void moveToProject(movingChatId, projectId, movingFromProject?.id);
+            setMovingChatId(null);
+          }}
+        />
       )}
 
       {deletingProjectId && projectMenuPosition && (

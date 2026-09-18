@@ -25,18 +25,26 @@ export default function AddChatsModalOverlay({
   const [mounted, setMounted] = useState(false);
   const [visible, setVisible] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
+  const [wasOpen, setWasOpen] = useState(false);
 
-  useEffect(() => {
+  if (isOpen !== wasOpen) {
+    setWasOpen(isOpen);
     if (isOpen) {
       setSelected([]);
       setMounted(true);
+    } else {
+      setVisible(false);
+    }
+  }
+
+  useEffect(() => {
+    if (isOpen) {
       requestAnimationFrame(() => {
         requestAnimationFrame(() => setVisible(true));
       });
       return;
     }
 
-    setVisible(false);
     const t = window.setTimeout(() => setMounted(false), ANIM_MS);
     return () => window.clearTimeout(t);
   }, [isOpen]);
