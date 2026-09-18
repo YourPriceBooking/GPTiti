@@ -20,7 +20,7 @@ import styles from "./SectionGptTokens.module.css";
 import userStyles from "@/components/HomePage/LeftSide/SectionGptUser/SectionGptUser.module.css";
 
 export default function SectionGptTokens(props: SectionGptTokensProps) {
-  const { modelRef, selectedModel, isModalOpen, setIsModalOpen } = props;
+  const { modelRef, selectedModel, setIsModalOpen } = props;
   const balance = useAppSelector(selectBalance);
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
   const [isLoginOpen, setIsLoginOpen] = React.useState(false);

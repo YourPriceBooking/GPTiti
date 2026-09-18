@@ -19,17 +19,22 @@ export default function CreateProjectModalOverlay({
 }: CreateProjectModalOverlayProps) {
   const [mounted, setMounted] = useState(false);
   const [visible, setVisible] = useState(false);
+  const [wasOpen, setWasOpen] = useState(false);
+
+  if (isOpen !== wasOpen) {
+    setWasOpen(isOpen);
+    if (isOpen) setMounted(true);
+    else setVisible(false);
+  }
 
   useEffect(() => {
     if (isOpen) {
-      setMounted(true);
       requestAnimationFrame(() => {
         requestAnimationFrame(() => setVisible(true));
       });
       return;
     }
 
-    setVisible(false);
     const t = window.setTimeout(() => setMounted(false), ANIM_MS);
     return () => window.clearTimeout(t);
   }, [isOpen]);

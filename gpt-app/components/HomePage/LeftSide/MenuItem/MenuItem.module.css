@@ -1,0 +1,48 @@
+.button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  width: 100%;
+  text-align: left;
+  transition: background-color 0.2s ease;
+}
+
+.button:hover {
+  background-color: #1e293b;
+  cursor: pointer;
+}
+
+.iconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.label {
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 14px;
+  color: #e5e7eb;
+}
+
+.danger {
+  color: #f87171;
+}
+
+.subtitle {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 11px;
+  color: #60a5fa;
+}

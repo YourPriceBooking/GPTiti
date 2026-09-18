@@ -64,6 +64,7 @@ function ProjectRow({
   deleting,
   onOpen,
   onMenuToggle,
+  onMenuClose,
   onPinToggle,
   onRenameRequest,
   onRename,
@@ -80,6 +81,7 @@ function ProjectRow({
   deleting: boolean;
   onOpen: () => void;
   onMenuToggle: (trigger: HTMLButtonElement) => void;
+  onMenuClose: () => void;
   onPinToggle: () => void;
   onRenameRequest: () => void;
   onRename: (title: string) => void;
@@ -170,6 +172,7 @@ function ProjectRow({
             onClick={(event) => event.stopPropagation()}
           >
             <ChatsMenu
+              onClose={onMenuClose}
               isProject
               isPinned={isPinned}
               onPinToggle={onPinToggle}
@@ -253,6 +256,7 @@ export default function ProjectsOverview({
           current === project.id ? null : project.id,
         );
       }}
+      onMenuClose={() => setOpenMenuId(null)}
       onPinToggle={() => togglePin(project.id)}
       onAddChats={() => {
         setOpenMenuId(null);

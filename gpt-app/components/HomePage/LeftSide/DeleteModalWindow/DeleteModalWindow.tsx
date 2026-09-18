@@ -1,33 +1,28 @@
-import React from 'react';
-import Image from 'next/image';
-import styles from './DeleteModalWindow.module.css';
+import ConfirmModalWindow from "../ConfirmModalWindow/ConfirmModalWindow";
 
 type DeleteModalWindowProps = {
   onCancel: () => void;
   onConfirm: () => void;
-  type?: 'chat' | 'project';
+  type?: "chat" | "project";
 };
 
-export default function DeleteModalWindow({ onCancel, onConfirm, type = 'chat' }: DeleteModalWindowProps) {
-  const label = type === 'project' ? 'project' : 'chat';
+export default function DeleteModalWindow({
+  onCancel,
+  onConfirm,
+  type = "chat",
+}: DeleteModalWindowProps) {
   return (
-    <div className={styles.container}>
-        <div className={styles.iconContainer}>
-            <Image src="/icons/delete-modal.svg" alt="delete-modal" width={44} height={44} />
-        </div>
-        <div className={styles.infoContainer}>
-        <h2 className={styles.title}>Delete this {label}?</h2>
-        <p className={styles.paragraph}>This action can&apos;t be undone.</p>
-        <p className={styles.paragraph}>The {label} will be permanently removed.</p>
-        <div className={styles.buttonsContainer}>
-            <button className={styles.cancelButton} onClick={onCancel}>
-            <span className={styles.cancelButtonText}>Cancel</span>
-            </button>
-        <button className={styles.deleteButton} onClick={onConfirm}>
-            <span className={styles.deleteButtonText}>Delete</span>
-        </button>
-        </div>
-        </div>
-    </div>
-  )
+    <ConfirmModalWindow
+      variant="delete"
+      icon="/icons/delete-modal.svg"
+      title={`Delete this ${type}?`}
+      lines={[
+        "This action can't be undone.",
+        `The ${type} will be permanently removed.`,
+      ]}
+      confirmLabel="Delete"
+      onCancel={onCancel}
+      onConfirm={onConfirm}
+    />
+  );
 }
