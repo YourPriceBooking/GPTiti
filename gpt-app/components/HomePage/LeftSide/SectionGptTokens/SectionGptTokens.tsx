@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import ModelGptitiTitleWithIcon from "@/components/ModelGptitiTitleWithIcon/ModelGptitiTitleWithIcon";
 import LoginModal from "@/components/HomePage/common/LoginModal/LoginModal";
+import SendTokensButton from "@/components/SendTokensButton/SendTokensButton";
 
 import { TOKENS_SUFFIX } from "@/config/models.config";
 
@@ -72,19 +73,23 @@ export default function SectionGptTokens(props: SectionGptTokensProps) {
       <LoginModal open={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
 
       <div className={styles.btnContainer}>
-        <Link href="/top-up-your-tokens">
-          <button className={styles.btn}>
+        <Link href="/top-up-your-tokens" className={styles.topUpLink}>
+          <span className={styles.btn}>
             <div className={styles.iconWrapper}>
               <Image
-                width={33}
-                height={33}
+                width={24}
+                height={24}
                 src="/icons/circle-icon.svg"
                 alt="circle-icon"
               />
             </div>
             <span className={styles.btnSpan1}>Top up tokens</span>
-          </button>
+          </span>
         </Link>
+        <SendTokensButton className={styles.sendButton}>
+          <Image src="/icons/send-tokens.svg" alt="" width={15} height={15} />
+          <span>Send tokens</span>
+        </SendTokensButton>
       </div>
     </section>
   );

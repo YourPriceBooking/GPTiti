@@ -19,6 +19,7 @@ import { claimTokens } from "@/redux/tokens/operations";
 import { selectIsLoggedIn } from "@/redux/auth/selectors";
 
 import LoginModal from "@/components/HomePage/common/LoginModal/LoginModal";
+import SendTokensButton from "@/components/SendTokensButton/SendTokensButton";
 const PaymentModal = dynamic(
   () => import("@/components/PaymentModal/PaymentModal"),
   { ssr: false },
@@ -68,10 +69,10 @@ export default function TokensPage() {
   const [justClaimed, setJustClaimed] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
 
-  const isClaimAvailable =
-    !nextClaimTime || new Date(nextClaimTime).getTime() <= Date.now();
+  const isClaimAvailable = !nextClaimTime || countdown === "Available now";
 
   const handleClaim = async () => {
+    if (nextClaimTime && new Date(nextClaimTime).getTime() > Date.now()) return;
     if (!isLoggedIn) {
       setIsLoginOpen(true);
       return;
@@ -171,28 +172,34 @@ export default function TokensPage() {
           </p>
         </div>
 
-        <button className={styles.balanceButton}>
-          <p className={styles.balanceInfo}>
-            <span className={styles.span2}>Balance tokens</span>
-            <span className={styles.strong}>
-              {balance.toLocaleString("en-US")}
-            </span>
-          </p>
-          <Image
-            className={styles.balanceIcon}
-            width={30}
-            height={30}
-            src="/icons/circle-icon2.svg"
-            alt="balance-circle"
-          />
-          <Image
-            className={styles.mobileBalanceIcon}
-            width={26}
-            height={26}
-            src="/icons/blue-circle2.svg"
-            alt="balance-circle"
-          />
-        </button>
+        <div className={styles.balanceActions}>
+          <div className={styles.balanceButton}>
+            <p className={styles.balanceInfo}>
+              <span className={styles.span2}>Balance tokens</span>
+              <span className={styles.strong}>
+                {balance.toLocaleString("en-US")}
+              </span>
+            </p>
+            <Image
+              className={styles.balanceIcon}
+              width={30}
+              height={30}
+              src="/icons/circle-icon2.svg"
+              alt="balance-circle"
+            />
+            <Image
+              className={styles.mobileBalanceIcon}
+              width={26}
+              height={26}
+              src="/icons/blue-circle2.svg"
+              alt="balance-circle"
+            />
+          </div>
+          <SendTokensButton className={styles.sendButton}>
+            <Image src="/icons/send-tokens.svg" alt="" width={16} height={16} />
+            <span>Send tokens</span>
+          </SendTokensButton>
+        </div>
       </header>
 
       <section className={styles.plansContainer}>
