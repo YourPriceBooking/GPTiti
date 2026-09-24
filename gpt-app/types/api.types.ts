@@ -53,6 +53,39 @@ export interface ClaimTokenResponse {
   appTokens: number;
 }
 
+export interface TokenTransferErrorResponse {
+  success: false;
+  code?: string;
+  message?: string;
+  appTokens?: number;
+}
+
+export type TokenTransferRecipientResponse =
+  | {
+      success: true;
+      canTransfer: boolean;
+      recipient: { email: string; status: "active" | "blocked" };
+      appTokens: number;
+      message?: string;
+      code?: string;
+    }
+  | TokenTransferErrorResponse;
+
+export interface SendTokensPayload {
+  email: string;
+  amount: number;
+  clientTransferId: string;
+}
+
+export type SendTokensResponse =
+  | {
+      success: true;
+      alreadyApplied: boolean;
+      appTokens: number;
+      message?: string;
+    }
+  | TokenTransferErrorResponse;
+
 export interface ProjectConversation {
   _id: string;
   user?: string;

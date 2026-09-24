@@ -9,6 +9,9 @@ import type {
   UpdateProjectPayload,
   AddProjectConversationsResponse,
   RemoveProjectConversationResponse,
+  TokenTransferRecipientResponse,
+  SendTokensPayload,
+  SendTokensResponse,
 } from "@/types/api.types";
 
 export const api = {
@@ -65,6 +68,20 @@ export const api = {
   claimToken: async () => {
     const res =
       await axiosInstance.post<ClaimTokenResponse>("/users/claim-token");
+    return res.data;
+  },
+  getTokenTransferRecipient: async (email: string, signal?: AbortSignal) => {
+    const res = await axiosInstance.get<TokenTransferRecipientResponse>(
+      "/users/token-transfers/recipient",
+      { params: { email }, signal },
+    );
+    return res.data;
+  },
+  sendTokens: async (payload: SendTokensPayload) => {
+    const res = await axiosInstance.post<SendTokensResponse>(
+      "/users/token-transfers",
+      payload,
+    );
     return res.data;
   },
   getProjects: async () => {
