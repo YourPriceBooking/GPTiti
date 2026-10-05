@@ -1,5 +1,6 @@
 import SharedLayoutChat from "@/components/SharedLayout/SharedLayoutChat";
 import { SocketProvider } from "@/context/SocketContext";
+import BalanceSync from "@/components/BalanceSync/BalanceSync";
 
 export default function ChatLayout({
   children,
@@ -8,6 +9,7 @@ export default function ChatLayout({
 }) {
   return (
     <SocketProvider>
+      <BalanceSync />
       <SharedLayoutChat>{children}</SharedLayoutChat>
     </SocketProvider>
   );

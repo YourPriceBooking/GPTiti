@@ -45,7 +45,18 @@ export interface ConversationMessage {
   updatedAt?: string;
 }
 
+export interface TokenOperation {
+  id: string;
+  kind: string;
+  status: "pending" | "confirmed" | "failed";
+  source: string;
+  transactionHash?: string | null;
+}
+
 export interface ClaimTokenResponse {
+  userId?: string;
+  balanceVersion?: number;
+  operation?: TokenOperation;
   code: number;
   success: boolean;
   message: string;
@@ -58,6 +69,8 @@ export interface TokenTransferErrorResponse {
   code?: string;
   message?: string;
   appTokens?: number;
+  userId?: string;
+  balanceVersion?: number;
 }
 
 export type TokenTransferRecipientResponse =
@@ -66,6 +79,9 @@ export type TokenTransferRecipientResponse =
       canTransfer: boolean;
       recipient: { email: string; status: "active" | "blocked" };
       appTokens: number;
+      userId?: string;
+      balanceVersion?: number;
+      operation?: TokenOperation | null;
       message?: string;
       code?: string;
     }
@@ -82,6 +98,9 @@ export type SendTokensResponse =
       success: true;
       alreadyApplied: boolean;
       appTokens: number;
+      userId?: string;
+      balanceVersion?: number;
+      operation?: TokenOperation | null;
       message?: string;
     }
   | TokenTransferErrorResponse;

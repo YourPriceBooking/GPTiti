@@ -52,7 +52,7 @@ import {
   restartPendingTurnDelivery,
 } from "@/redux/chat/slice";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { setBalance } from "@/redux/tokens/slice";
+import { refreshCurrentBalance } from "@/redux/tokens/operations";
 import type { PendingChatTurn } from "@/types/types";
 import { ensureSocketConnected } from "@/lib/socketClient";
 
@@ -203,7 +203,7 @@ export function useChatStream(): ChatStream {
       signalAccepted(snapshot.clientMessageId);
       rememberSnapshot(snapshot);
       dispatch(reconcilePendingTurn(snapshot));
-      if (snapshot.billing) dispatch(setBalance(snapshot.billing.balance));
+      if (snapshot.billing) void dispatch(refreshCurrentBalance());
     },
     [dispatch, rememberSnapshot, signalAccepted],
   );
@@ -470,7 +470,7 @@ export function useChatStream(): ChatStream {
       signalAccepted(event.clientMessageId);
       flushChunks();
       dispatch(completePendingTurn(event));
-      dispatch(setBalance(event.payload.billing.balance));
+      void dispatch(refreshCurrentBalance());
       const next = { ...pendingTurnsRef.current };
       delete next[event.clientMessageId];
       pendingTurnsRef.current = next;

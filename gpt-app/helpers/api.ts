@@ -15,6 +15,16 @@ import type {
 } from "@/types/api.types";
 
 export const api = {
+  getBalance: async (signal?: AbortSignal) => {
+    const res = await axiosInstance.get("/users/balance", { signal, timeout: 15_000 });
+    return res.data;
+  },
+  getTokenOperation: async (id: string, signal?: AbortSignal) => {
+    const res = await axiosInstance.get<import("@/types/api.types").TokenOperation>(
+      `/users/token-operations/${encodeURIComponent(id)}`, { signal, timeout: 15_000 },
+    );
+    return res.data;
+  },
   uploadImage: async (file: File) => {
     const formData = new FormData();
     formData.append("file", file);

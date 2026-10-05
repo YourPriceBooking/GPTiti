@@ -49,7 +49,7 @@ const modelPersistConfig = {
 const tokensPersistConfig = {
   key: "tokens",
   storage,
-  whitelist: ["balance", "nextClaimTime"],
+  whitelist: ["balance", "nextClaimTime", "ownerId", "balanceVersion"],
 };
 
 const chatPersistConfig = {

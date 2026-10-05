@@ -3,7 +3,7 @@ import { isRejectedWithValue, type Middleware } from "@reduxjs/toolkit";
 import { showErrorToast } from "@/redux/ui/slice";
 
 const hasDedicatedErrorUi = (actionType: string) =>
-  actionType.startsWith("auth/") || actionType === "tokens/claim/rejected";
+  actionType.startsWith("auth/") || actionType.startsWith("tokens/refreshBalance/") || actionType === "tokens/claim/rejected";
 
 export const errorToastMiddleware: Middleware =
   ({ dispatch }) =>
