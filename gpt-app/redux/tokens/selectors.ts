@@ -6,3 +6,6 @@ export const selectNextClaimTime = (state: RootState) =>
 export const selectCountdown = (state: RootState) => state.tokens.countdown;
 export const selectClaiming = (state: RootState) => state.tokens.claiming;
 export const selectClaimError = (state: RootState) => state.tokens.claimError;
+
+export const selectBalanceReady = (state: RootState) =>
+  state.tokens.balanceReady && state.tokens.ownerId === state.auth.user?.id;

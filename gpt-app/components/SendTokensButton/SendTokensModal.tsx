@@ -1,13 +1,15 @@
 "use client";
 
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import axios from "axios";
 import Image from "next/image";
 
 import { api } from "@/helpers/api";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { selectBalance } from "@/redux/tokens/selectors";
-import { setBalance } from "@/redux/tokens/slice";
+import { selectBalance, selectBalanceReady } from "@/redux/tokens/selectors";
+import { applyBalanceSnapshot } from "@/redux/tokens/slice";
+import { refreshCurrentBalance } from "@/redux/tokens/operations";
+import { readBalanceSnapshot } from "@/lib/balance/balanceProtocol";
 import type {
   SendTokensPayload,
   TokenTransferErrorResponse,
@@ -45,12 +47,20 @@ export default function SendTokensModal({ onClose }: Props) {
   const [lookupStatus, setLookupStatus] = useState<LookupStatus>("idle");
   const [lookupError, setLookupError] = useState("");
   const [verifiedEmail, setVerifiedEmail] = useState("");
-  const [availableTokens, setAvailableTokens] = useState<number | null>(null);
+  const balanceReady = useAppSelector(selectBalanceReady);
+  const availableTokens = balanceReady ? balance : null;
+  const applyResponse = useCallback((data: unknown) => {
+    const snapshot = readBalanceSnapshot(data);
+    if (snapshot) dispatch(applyBalanceSnapshot(snapshot));
+    else void dispatch(refreshCurrentBalance());
+  }, [dispatch]);
   const [sendError, setSendError] = useState("");
   const [sending, setSending] = useState(false);
   const [receipt, setReceipt] = useState<{
     email: string;
     amount: number;
+    status: "pending" | "confirmed" | "failed";
+    operationId?: string;
   } | null>(null);
   const [receiptBalanceState, setReceiptBalanceState] = useState<
     "current" | "refreshing" | "unavailable"
@@ -144,10 +154,7 @@ export default function SendTokensModal({ onClose }: Props) {
           controller.signal,
         );
         if (version !== lookupVersion.current) return;
-        if (typeof result.appTokens === "number") {
-          setAvailableTokens(result.appTokens);
-          dispatch(setBalance(result.appTokens));
-        }
+        applyResponse(result);
         if (result.success && result.canTransfer) {
           setVerifiedEmail(result.recipient.email);
           setLookupStatus("valid");
@@ -164,10 +171,7 @@ export default function SendTokensModal({ onClose }: Props) {
         const data = axios.isAxiosError<TokenTransferErrorResponse>(error)
           ? error.response?.data
           : undefined;
-        if (typeof data?.appTokens === "number") {
-          setAvailableTokens(data.appTokens);
-          dispatch(setBalance(data.appTokens));
-        }
+        applyResponse(data);
         setLookupStatus("error");
         setLookupError(
           errorMessage(data, "Could not check this email. Try again."),
@@ -175,7 +179,27 @@ export default function SendTokensModal({ onClose }: Props) {
       }
     }, 300);
     return () => window.clearTimeout(timer);
-  }, [email, normalizedEmail, emailLooksValid, receipt, stage, dispatch]);
+  }, [email, normalizedEmail, emailLooksValid, receipt, stage, applyResponse]);
+
+  useEffect(() => {
+    if (receipt?.status !== "pending" || !receipt.operationId) return;
+    const controller = new AbortController();
+    let timer: ReturnType<typeof setTimeout>;
+    const poll = async () => {
+      try {
+        const operation = await api.getTokenOperation(receipt.operationId!, controller.signal);
+        if (controller.signal.aborted) return;
+        if (operation.status !== "pending") {
+          setReceipt((current) => current ? { ...current, status: operation.status } : current);
+          void dispatch(refreshCurrentBalance());
+          return;
+        }
+      } catch { if (controller.signal.aborted) return; }
+      timer = setTimeout(() => void poll(), 2000);
+    };
+    timer = setTimeout(() => void poll(), 2000);
+    return () => { controller.abort(); clearTimeout(timer); };
+  }, [receipt?.operationId, receipt?.status, dispatch]);
 
   const changeEmail = (value: string) => {
     lookupVersion.current += 1;
@@ -183,7 +207,6 @@ export default function SendTokensModal({ onClose }: Props) {
     pendingTransfer.current = null;
     setEmail(value);
     setVerifiedEmail("");
-    setAvailableTokens(null);
     setLookupStatus("idle");
     setLookupError("");
     setSendError("");
@@ -204,23 +227,16 @@ export default function SendTokensModal({ onClose }: Props) {
     setStage("confirm");
   };
 
-  const refreshBalanceAfterReplay = (recipientEmail: string) => {
+  const refreshReceiptBalance = () => {
     const controller = new AbortController();
     refreshAbort.current = controller;
-    void api
-      .getTokenTransferRecipient(recipientEmail, controller.signal)
-      .then((check) => {
-        if (controller.signal.aborted) return;
-        if (typeof check.appTokens === "number") {
-          dispatch(setBalance(check.appTokens));
-          setReceiptBalanceState("current");
-        } else {
-          setReceiptBalanceState("unavailable");
-        }
-      })
-      .catch(() => {
-        if (!controller.signal.aborted) setReceiptBalanceState("unavailable");
-      });
+    const request = dispatch(refreshCurrentBalance());
+    if (!request) { setReceiptBalanceState("unavailable"); return; }
+    void request.unwrap().then(() => {
+      if (!controller.signal.aborted) setReceiptBalanceState("current");
+    }).catch(() => {
+      if (!controller.signal.aborted) setReceiptBalanceState("unavailable");
+    });
   };
 
   const finalSend = async () => {
@@ -240,10 +256,7 @@ export default function SendTokensModal({ onClose }: Props) {
           normalizedEmail,
           controller.signal,
         );
-        if (typeof check.appTokens === "number") {
-          setAvailableTokens(check.appTokens);
-          dispatch(setBalance(check.appTokens));
-        }
+        applyResponse(check);
         if (!check.success || !check.canTransfer) {
           setLookupStatus("error");
           setLookupError(
@@ -268,10 +281,7 @@ export default function SendTokensModal({ onClose }: Props) {
       const result = await api.sendTokens(payload);
       if (!result.success) {
         pendingTransfer.current = null;
-        if (typeof result.appTokens === "number") {
-          setAvailableTokens(result.appTokens);
-          dispatch(setBalance(result.appTokens));
-        }
+        applyResponse(result);
         setSendError(
           result.code === "INSUFFICIENT_BALANCE" &&
             typeof result.appTokens === "number"
@@ -295,18 +305,16 @@ export default function SendTokensModal({ onClose }: Props) {
       }
 
       pendingTransfer.current = null;
-      if (!result.alreadyApplied && typeof result.appTokens === "number") {
-        dispatch(setBalance(result.appTokens));
+      if (result.operation?.status === "failed") {
+        setSendError("Transfer failed. Your confirmed balance has not changed.");
+        void dispatch(refreshCurrentBalance());
+        return;
       }
-      setReceiptBalanceState(
-        result.alreadyApplied
-          ? "refreshing"
-          : typeof result.appTokens === "number"
-            ? "current"
-            : "unavailable",
-      );
-      setReceipt({ email: payload.email, amount: payload.amount });
-      if (result.alreadyApplied) refreshBalanceAfterReplay(payload.email);
+      applyResponse(result);
+      setReceiptBalanceState("refreshing");
+      setReceipt({ email: payload.email, amount: payload.amount,
+        status: result.operation?.status ?? "confirmed", operationId: result.operation?.id });
+      refreshReceiptBalance();
     } catch (error) {
       const data = axios.isAxiosError<TokenTransferErrorResponse>(error)
         ? error.response?.data
@@ -317,10 +325,7 @@ export default function SendTokensModal({ onClose }: Props) {
       const wasPostAttempted = pendingTransfer.current !== null;
       if (data?.code || (status && status < 500))
         pendingTransfer.current = null;
-      if (typeof data?.appTokens === "number") {
-        setAvailableTokens(data.appTokens);
-        dispatch(setBalance(data.appTokens));
-      }
+      applyResponse(data);
       setSendError(
         data?.code === "INSUFFICIENT_BALANCE" &&
           typeof data.appTokens === "number"
@@ -353,10 +358,10 @@ export default function SendTokensModal({ onClose }: Props) {
   const sendAnother = () => {
     refreshAbort.current?.abort();
     setReceipt(null);
+    setReceiptBalanceState("current");
     setStage("form");
     setEmail("");
     setAmount("");
-    setAvailableTokens(null);
     setLookupStatus("idle");
     setVerifiedEmail("");
     setSendError("");
@@ -384,9 +389,9 @@ export default function SendTokensModal({ onClose }: Props) {
             <span className={styles.successIcon} aria-hidden="true">
               ✓
             </span>
-            <h2 id="send-tokens-title">Tokens sent</h2>
+            <h2 id="send-tokens-title">{receipt.status === "pending" ? "Transfer submitted" : receipt.status === "failed" ? "Transfer failed" : "Tokens sent"}</h2>
             <p id="send-tokens-description" className={styles.description}>
-              {receipt.amount.toLocaleString("en-US")} tokens sent to{" "}
+              {receipt.amount.toLocaleString("en-US")} tokens {receipt.status === "confirmed" ? "sent" : "submitted"} to{" "}
               {receipt.email}.
             </p>
             <p className={styles.balanceText}>
@@ -496,7 +501,7 @@ export default function SendTokensModal({ onClose }: Props) {
               <form onSubmit={continueToConfirm} noValidate>
                 <div className={styles.balanceRow}>
                   <span>Available balance</span>
-                  <strong>{shownBalance.toLocaleString("en-US")} tokens</strong>
+                  <strong>{balanceReady ? `${shownBalance.toLocaleString("en-US")} tokens` : "Syncing balance…"}</strong>
                 </div>
                 <label className={styles.label} htmlFor="transfer-email">
                   Recipient email
@@ -569,7 +574,7 @@ export default function SendTokensModal({ onClose }: Props) {
                     onClick={() =>
                       changeAmount(String(Math.max(0, availableTokens ?? 0)))
                     }
-                    disabled={lookupStatus !== "valid" || sending}
+                    disabled={!balanceReady || lookupStatus !== "valid" || sending}
                   >
                     Max
                   </button>
