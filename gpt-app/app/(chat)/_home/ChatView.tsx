@@ -76,7 +76,9 @@ export default function ChatView({
 
   return (
     <>
-      {showBreadcrumbs && <ChatBreadcrumbs chat={activeChat} />}
+      {showBreadcrumbs && (
+        <ChatBreadcrumbs chat={activeChat} onRename={ctrl.handleRenameChat} />
+      )}
 
       <div className={styles.scrollableContent} ref={scrollContainerRef}>
         {ctrl.streamError && (

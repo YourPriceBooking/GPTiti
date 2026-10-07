@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useCallback, useMemo, useState } from "react";
 import { formatActivity } from "@/lib/formatActivity";
+import ActionTooltip from "@/components/common/ActionTooltip/ActionTooltip";
 import MarkdownContent from "@/components/common/MarkdownContent/MarkdownContent";
 import styles from "./AIResponse.module.css";
 
@@ -43,20 +44,40 @@ export default function AIResponse({
           <span className={styles.aiUpdated}>{updatedLabel}</span>
         )}
 
-        <button
-          type="button"
-          className={`${styles.copyBtn} ${copied ? styles.copyBtnCopied : ""}`}
-          onClick={handleCopyResponse}
-          aria-label={copied ? "Скопійовано" : "Копіювати відповідь"}
-        >
-          <Image
-            src={copied ? "/icons/copied.svg" : "/icons/copy.svg"}
-            alt=""
-            width={16}
-            height={16}
-          />
-          {copied && <span className={styles.copyBtnLabel}>Copied</span>}
-        </button>
+        <span className={styles.actions}>
+          <button
+            type="button"
+            className={`${styles.actionBtn} ${styles.continueBtn}`}
+            aria-label="Continue in a new chat"
+          >
+            <Image
+              src="/icons/continue-in-new-chat.svg"
+              alt=""
+              width={22}
+              height={22}
+            />
+            <ActionTooltip label="Continue in a new chat" />
+          </button>
+
+          <button
+            type="button"
+            className={`${styles.actionBtn} ${copied ? styles.copyBtnCopied : ""}`}
+            onClick={handleCopyResponse}
+            aria-label={copied ? "Copied" : "Copy response"}
+          >
+            <Image
+              src={copied ? "/icons/copied.svg" : "/icons/copy.svg"}
+              alt=""
+              width={16}
+              height={16}
+            />
+            {copied ? (
+              <span className={styles.copyBtnLabel}>Copied</span>
+            ) : (
+              <ActionTooltip label="Copy response" />
+            )}
+          </button>
+        </span>
       </h2>
 
       <MarkdownContent className={styles.aiContent} content={content} />

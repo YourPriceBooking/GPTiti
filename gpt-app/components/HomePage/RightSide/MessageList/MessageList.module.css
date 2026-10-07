@@ -137,6 +137,8 @@
 
 /* Copy button under the user message bubble */
 .copyBtn {
+  position: relative;
+  z-index: 11;
   align-self: flex-end;
   display: inline-flex;
   align-items: center;

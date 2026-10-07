@@ -113,7 +113,6 @@
   font-family: var(--font-family);
   font-weight: 500;
   font-size: 16px;
-  transition: color 250ms ease;
 }
 
 .btn:hover {
@@ -135,19 +134,6 @@
   border-radius: 2px 2px 0 0;
   background: #3b82f6;
   box-shadow: 0 -1px 8px rgba(59, 130, 246, 0.5);
-  animation: tabIndicatorIn 200ms ease forwards;
-}
-
-@keyframes tabIndicatorIn {
-  from {
-    opacity: 0;
-    transform: scaleX(0.8);
-  }
-
-  to {
-    opacity: 1;
-    transform: scaleX(1);
-  }
 }
 
 .btn:focus-visible,
@@ -480,7 +466,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .btn,
   .btn2,
   .closeButton,
   .eyeIcon,
@@ -493,9 +478,5 @@
   .badgeLink:hover img,
   .badgeLink:active {
     transform: none;
-  }
-
-  .groupActive::after {
-    animation: none;
   }
 }
