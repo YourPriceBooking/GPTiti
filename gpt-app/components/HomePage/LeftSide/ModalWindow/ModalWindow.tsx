@@ -20,6 +20,8 @@ type Props = {
   setIsModalOpen: (open: boolean) => void;
 };
 
+let lastViewedGroup: ModelType | null = null;
+
 const getDetailsId = (title: string) =>
   `model-details-${title.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}`;
 
@@ -34,14 +36,16 @@ export default function ModalWindow({
     (getModelGroupAndItem(selectedModel)?.group as ModelType | undefined) ??
     selectedModelGroup;
   const balance = useAppSelector(selectBalance);
-  const [viewGroup, setViewGroup] = useState<ModelType>(appliedGroup);
+  const [viewGroup, setViewGroup] = useState<ModelType>(
+    () => lastViewedGroup ?? appliedGroup,
+  );
   const [visibleModel, setVisibleModel] = useState<string | null>(null);
   const tabsRef = useRef<HTMLDivElement>(null);
   const activeTabRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    setViewGroup(appliedGroup);
-  }, [appliedGroup]);
+    lastViewedGroup = viewGroup;
+  }, [viewGroup]);
 
   useEffect(() => {
     const tabs = tabsRef.current;
@@ -70,6 +74,18 @@ export default function ModalWindow({
     setSelectedModel(title);
     setSelectedModelGroup(viewGroup);
     setIsModalOpen(false);
+  };
+
+  const showGroup = (group: ModelType) => {
+    setViewGroup(group);
+    setVisibleModel(null);
+  };
+
+  const showGroupOnHover = (
+    event: React.PointerEvent<HTMLButtonElement>,
+    group: ModelType,
+  ) => {
+    if (event.pointerType === "mouse" && group !== viewGroup) showGroup(group);
   };
 
   return (
@@ -107,11 +123,10 @@ export default function ModalWindow({
               role="tab"
               aria-selected={viewGroup === group}
               aria-controls="model-list-panel"
-              onClick={() => {
-                setViewGroup(group as ModelType);
-                setSelectedModelGroup(group as ModelType);
-                setVisibleModel(null);
-              }}
+              onPointerEnter={(event) =>
+                showGroupOnHover(event, group as ModelType)
+              }
+              onClick={() => showGroup(group as ModelType)}
             >
               <span className={styles.groupLabel}>{group}</span>
             </button>

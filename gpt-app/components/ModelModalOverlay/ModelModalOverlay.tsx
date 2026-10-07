@@ -6,6 +6,8 @@ import { ModelModalOverlayProps } from "@/types/types";
 import styles from "./ModelModalOverlay.module.css";
 import ModalWindow from "@/components/HomePage/LeftSide/ModalWindow/ModalWindow";
 
+const POINTER_AWAY_CLOSE_DELAY_MS = 1500;
+
 export default function ModelModalOverlay({
   isModalOpen,
   setIsModalOpen,
@@ -16,6 +18,27 @@ export default function ModelModalOverlay({
 }: ModelModalOverlayProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const reduceMotion = useReducedMotion();
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const stopCloseTimer = () => {
+    if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    closeTimerRef.current = null;
+  };
+
+  const startCloseTimer = () => {
+    stopCloseTimer();
+    closeTimerRef.current = setTimeout(
+      () => setIsModalOpen(false),
+      POINTER_AWAY_CLOSE_DELAY_MS,
+    );
+  };
+
+  useEffect(() => {
+    if (!isModalOpen && closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+  }, [isModalOpen]);
 
   useEffect(() => {
     if (!isModalOpen) return;
@@ -98,6 +121,8 @@ export default function ModelModalOverlay({
           <motion.div
             className={styles.modalWrapper}
             onClick={(e) => e.stopPropagation()}
+            onMouseEnter={stopCloseTimer}
+            onMouseLeave={startCloseTimer}
             ref={modalRef}
             role="dialog"
             aria-modal="true"

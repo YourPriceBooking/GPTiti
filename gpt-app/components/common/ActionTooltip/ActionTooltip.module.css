@@ -1,0 +1,35 @@
+.tooltip {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 1;
+  padding: 10px 22px;
+  border: 1px solid #25314a;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #0b1220 0%, #070b13 100%);
+  color: var(--main-white);
+  font-family: var(--font-family);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 16px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 180ms ease-out;
+}
+
+@media (hover: hover) {
+  :hover > .tooltip {
+    opacity: 1;
+  }
+}
+
+:focus-visible > .tooltip {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tooltip {
+    transition: none;
+  }
+}

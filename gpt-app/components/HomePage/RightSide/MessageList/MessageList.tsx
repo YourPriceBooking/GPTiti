@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import styles from "./MessageList.module.css";
 import TypingPlaceholder from "../../TypingPlaceholder/TypingPlaceholder";
 import AIResponse from "../AIResponse/AIResponse";
+import ActionTooltip from "@/components/common/ActionTooltip/ActionTooltip";
 import CollapsibleContent from "@/components/common/CollapsibleContent/CollapsibleContent";
 import MarkdownContent from "@/components/common/MarkdownContent/MarkdownContent";
 import type { Message } from "@/types/types";
@@ -148,12 +149,16 @@ function UserMessage({ message }: { message: Message }) {
               visible ? styles.copyBtnVisible : ""
             } ${copied ? styles.copyBtnCopied : ""}`}
             onClick={handleCopy}
-            aria-label={copied ? "Copied" : "Copy message"}
+            aria-label={copied ? "Copied" : "Copy prompt"}
           >
             <span className={styles.copyIcon}>
               {copied ? <CheckGlyph /> : <CopyGlyph />}
             </span>
-            {copied && <span className={styles.copyLabel}>Copied</span>}
+            {copied ? (
+              <span className={styles.copyLabel}>Copied</span>
+            ) : (
+              <ActionTooltip label="Copy prompt" />
+            )}
           </button>
         )}
       </div>
