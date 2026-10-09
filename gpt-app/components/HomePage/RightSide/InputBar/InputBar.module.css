@@ -191,6 +191,14 @@
   overflow-y: hidden;
   line-height: 1.4;
   font-size: 18px;
+  width: 100%;
+  display: block;
+}
+
+.inputSlot {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
 }
 
 .input:focus {
@@ -205,7 +213,7 @@
   color: #94a3b8;
 }
 
-.multiline .input {
+.multiline .inputSlot {
   order: -1;
   flex: 0 0 100%;
 }
@@ -218,7 +226,7 @@
 .rightControls {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0;
   margin-left: auto;
 }
 
@@ -251,6 +259,136 @@
 .sendIcon {
   display: block;
   color: var(--flow-fill);
+}
+
+.controlButton {
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: transparent;
+  padding: 0;
+  border-radius: 50%;
+  touch-action: manipulation;
+}
+.iconWrapper {
+  border: none;
+  background: transparent;
+  padding: 0;
+  border-radius: 50%;
+}
+.iconWrapper:disabled,
+.controlButton:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+.iconWrapper:focus-visible,
+.controlButton:focus-visible {
+  outline: 2px solid var(--flow-fill);
+  outline-offset: 3px;
+}
+.dictating .composerBody {
+  flex-wrap: nowrap;
+}
+.dictating .input {
+  height: 40px !important;
+  min-height: 40px;
+  opacity: 0;
+  pointer-events: none;
+}
+.dictationWaveSlot {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  pointer-events: none;
+}
+.voiceSend {
+  animation: voiceSendEnter 180ms ease-out both;
+}
+@keyframes voiceSendEnter {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.buttonSpinner {
+  width: 19px;
+  height: 19px;
+  border: 2px solid color-mix(in srgb, var(--flow-fill) 20%, transparent);
+  border-top-color: var(--flow-fill);
+  border-radius: 50%;
+  animation: spin 800ms linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.dictationStatus {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0 18px 12px;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.recordingTime {
+  font-variant-numeric: tabular-nums;
+}
+.dictationStatus button,
+.recordingActions button {
+  padding: 4px 8px;
+  min-height: 32px;
+  border: none;
+  border-radius: 6px;
+  color: var(--flow-fill);
+  background: transparent;
+  cursor: pointer;
+}
+.dictationStatus button:hover,
+.recordingActions button:hover {
+  background: color-mix(in srgb, var(--flow-fill) 8%, transparent);
+}
+.dictationStatus button:focus-visible,
+.recordingActions button:focus-visible {
+  outline: 2px solid var(--flow-fill);
+  outline-offset: 2px;
+}
+.dictationError {
+  padding: 0 18px 12px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #9f1239;
+}
+.dictationError p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.recordingActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  margin-top: 4px;
+}
+.inputContainer.project .dictationStatus {
+  color: #a5b5d9;
+}
+.inputContainer.project .dictationError {
+  color: #fda4af;
+}
+@media (prefers-reduced-motion: reduce) {
+  .voiceSend,
+  .buttonSpinner {
+    animation: none;
+  }
 }
 
 .iconWrapper::before,
@@ -430,7 +568,7 @@
   }
 
   .inputContainer.project .rightControls {
-    gap: 4px;
+    gap: 0;
   }
 
   .comingSoonBadge {

@@ -1,4 +1,13 @@
-import { useState, useLayoutEffect, useEffect, useRef, useMemo } from "react";
+"use client";
+
+import {
+  useState,
+  useLayoutEffect,
+  useEffect,
+  useRef,
+  useMemo,
+  useCallback,
+} from "react";
 
 import AddSomethingToInput from "../AddSomethingToInput/AddSomethingToInput";
 import LoginModal from "@/components/HomePage/common/LoginModal/LoginModal";
@@ -9,6 +18,15 @@ import ImageEditorModal from "@/components/HomePage/common/ImageEditorModal/Imag
 
 import { useAppSelector } from "@/redux/hooks";
 import { selectIsLoggedIn } from "@/redux/auth/selectors";
+import { selectActiveChatId } from "@/redux/chat/selectors";
+import { selectActiveProjectId } from "@/redux/ui/selectors";
+import { useDictation } from "@/hooks/useDictation";
+import {
+  MAX_DICTATION_MS,
+  insertDictation,
+  type DraftSelection,
+} from "@/lib/dictation/protocol";
+import { DictationStopIcon, DictationWaveform } from "./DictationVisuals";
 
 import { getModelLimits } from "@/config/modelLimits.config";
 import { isModelComingSoon } from "@/config/models.config";
@@ -96,6 +114,64 @@ export default function InputBar({
   sendDisabled?: boolean;
 }) {
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
+  const activeChatId = useAppSelector(selectActiveChatId);
+  const activeProjectId = useAppSelector(selectActiveProjectId);
+  const dictationScope = `${activeChatId ?? "new"}:${activeProjectId ?? "none"}:${selectedModel}`;
+  const dictation = useDictation(dictationScope, isLoggedIn);
+  const voiceBusy = !["idle", "error"].includes(dictation.phase);
+  const waveVisible = ["recording", "stopping", "transcribing"].includes(
+    dictation.phase,
+  );
+  const draftSelectionRef = useRef<DraftSelection | null>(null);
+  const voiceActionRef = useRef({ token: 0, busy: false });
+  const finishVoiceRef = useRef<(action: "edit" | "send") => Promise<void>>(
+    async () => {},
+  );
+  const [clock, setClock] = useState({ startedAt: 0, seconds: 0 });
+  const [voiceNotice, setVoiceNotice] = useState<{
+    scope: string;
+    message: string;
+  } | null>(null);
+  const elapsedSeconds =
+    clock.startedAt === dictation.startedAt ? clock.seconds : 0;
+
+  const cancelDictation = useCallback(() => {
+    voiceActionRef.current = {
+      token: voiceActionRef.current.token + 1,
+      busy: false,
+    };
+    draftSelectionRef.current = null;
+    setVoiceNotice(null);
+    dictation.cancel();
+  }, [dictation.cancel]);
+
+  useLayoutEffect(() => {
+    draftSelectionRef.current = null;
+    voiceActionRef.current = {
+      token: voiceActionRef.current.token + 1,
+      busy: false,
+    };
+  }, [dictationScope, isLoggedIn]);
+
+  useEffect(() => {
+    const startedAt = dictation.startedAt;
+    if (!startedAt || dictation.phase !== "recording") return;
+    const timer = setInterval(() => {
+      const duration = Date.now() - startedAt;
+      setClock({ startedAt, seconds: Math.floor(duration / 1000) });
+      if (duration >= MAX_DICTATION_MS) void finishVoiceRef.current("edit");
+    }, 500);
+    return () => clearInterval(timer);
+  }, [dictation.startedAt, dictation.phase]);
+
+  useEffect(() => {
+    const onEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") cancelDictation();
+    };
+    if (!voiceBusy) return;
+    window.addEventListener("keydown", onEscape);
+    return () => window.removeEventListener("keydown", onEscape);
+  }, [voiceBusy, cancelDictation]);
 
   const modalRef = useRef<HTMLDivElement | null>(null);
   const bodyRef = useRef<HTMLDivElement | null>(null);
@@ -197,7 +273,7 @@ export default function InputBar({
   useLayoutEffect(() => {
     resizeTextarea();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isMultiline]);
+  }, [isMultiline, waveVisible]);
 
   useEffect(() => {
     const onWindowResize = () => syncComposer();
@@ -234,7 +310,8 @@ export default function InputBar({
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    if (isSendingRef.current) return;
+    if (isSendingRef.current || voiceBusy) return;
+    setVoiceNotice(null);
     onChange(e);
     syncComposer();
   };
@@ -420,13 +497,21 @@ export default function InputBar({
   };
 
   const handleSend = async () => {
-    if (isComingSoon || sendDisabled || isSending) return;
+    if (isComingSoon || sendDisabled || isSendingRef.current || isAiResponding)
+      return;
     const textarea = inputRef.current;
     if (textarea) {
       const message = textarea.value;
       const hasContent =
         message.trim() !== "" || images.length > 0 || files.length > 0;
       if (hasContent) {
+        if (
+          limits.maxTextChars !== null &&
+          message.length > limits.maxTextChars
+        ) {
+          openLimitError("textLength");
+          return;
+        }
         if (!isLoggedIn) {
           setIsLoginOpen(true);
           return;
@@ -465,9 +550,17 @@ export default function InputBar({
           onHideSection();
           if (!hasFirstRequest) setHasFirstRequest(true);
           textarea.value = "";
-          onChange({ target: textarea } as React.ChangeEvent<HTMLTextAreaElement>);
+          onChange({
+            target: textarea,
+          } as React.ChangeEvent<HTMLTextAreaElement>);
           setIsMultiline(false);
           resizeTextarea();
+        } catch {
+          setVoiceNotice({
+            scope: dictationScope,
+            message:
+              "Could not send your message. Your text is kept here — try again.",
+          });
         } finally {
           isSendingRef.current = false;
           textarea.readOnly = false;
@@ -477,18 +570,122 @@ export default function InputBar({
     }
   };
 
+  const startDictation = () => {
+    if (
+      isSendingRef.current ||
+      voiceBusy ||
+      dictation.recording ||
+      isComingSoon ||
+      isAiResponding
+    )
+      return;
+    if (!isLoggedIn) {
+      setIsLoginOpen(true);
+      return;
+    }
+    const textarea = inputRef.current;
+    if (!textarea) return;
+    draftSelectionRef.current = {
+      text: textarea.value,
+      start: textarea.selectionStart ?? textarea.value.length,
+      end: textarea.selectionEnd ?? textarea.value.length,
+    };
+    setShowAddInput(false);
+    setVoiceNotice(null);
+    void dictation.start();
+  };
+
+  const finishDictation = async (action: "edit" | "send") => {
+    if (
+      voiceActionRef.current.busy ||
+      (action === "send" && (sendDisabled || isAiResponding))
+    )
+      return;
+    const textarea = inputRef.current;
+    if (!textarea) return;
+    const token = voiceActionRef.current.token + 1;
+    voiceActionRef.current = { token, busy: true };
+    try {
+      const transcript = await dictation.finish();
+      if (
+        !transcript ||
+        voiceActionRef.current.token !== token ||
+        inputRef.current !== textarea ||
+        !textarea.isConnected
+      )
+        return;
+      const saved = draftSelectionRef.current;
+      const selection =
+        saved?.text === textarea.value
+          ? saved
+          : {
+              text: textarea.value,
+              start: textarea.selectionStart ?? textarea.value.length,
+              end: textarea.selectionEnd ?? textarea.value.length,
+            };
+      const result = insertDictation(selection, transcript);
+      textarea.value = result.text;
+      onChange({ target: textarea } as React.ChangeEvent<HTMLTextAreaElement>);
+      syncComposer();
+      const tooLong =
+        limits.maxTextChars !== null &&
+        result.text.length > limits.maxTextChars;
+      if (tooLong) {
+        setVoiceNotice({
+          scope: dictationScope,
+          message:
+            "Your transcript exceeds this model's text limit. Shorten it before sending.",
+        });
+        openLimitError("textLength");
+      }
+      if (action === "send" && !tooLong) await handleSend();
+      else
+        requestAnimationFrame(() => {
+          if (!textarea.isConnected) return;
+          textarea.focus();
+          textarea.setSelectionRange(result.caret, result.caret);
+          syncComposer();
+        });
+    } finally {
+      if (voiceActionRef.current.token === token)
+        voiceActionRef.current.busy = false;
+    }
+  };
+
+  useLayoutEffect(() => {
+    finishVoiceRef.current = finishDictation;
+  });
+
+  const saveRecording = () => {
+    const audio = dictation.recording?.audio;
+    if (!audio) return;
+    const extension = audio.type.includes("mp4")
+      ? "m4a"
+      : audio.type.includes("ogg")
+        ? "ogg"
+        : "webm";
+    const url = URL.createObjectURL(audio);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `gptiti-dictation.${extension}`;
+    document.body.append(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
       e.preventDefault();
-      void handleSend();
+      if (!voiceBusy) void handleSend();
     }
   };
 
   return (
     <div
       className={`${styles.inputContainer} ${
-        isMultiline ? styles.multiline : ""
-      } ${variant === "project" ? styles.project : ""}`}
+        isMultiline && !waveVisible ? styles.multiline : ""
+      } ${variant === "project" ? styles.project : ""} ${waveVisible ? styles.dictating : ""}`}
       data-input-bar
     >
       {showAddInput && (
@@ -599,16 +796,17 @@ export default function InputBar({
 
       <div className={styles.composerBody} ref={bodyRef}>
         <div className={styles.leftControls} ref={leftControlsRef}>
-          <div
+          <button
+            type="button"
+            aria-label="Add files and more"
             className={styles.iconWrapper}
-            tabIndex={isSending ? -1 : 0}
-            aria-disabled={isSending}
+            disabled={isSending || voiceBusy}
             onPointerEnter={(event) =>
               fitInputTooltipToViewport(event.currentTarget)
             }
             onFocus={(event) => fitInputTooltipToViewport(event.currentTarget)}
             onClick={() => {
-              if (isSendingRef.current) return;
+              if (isSendingRef.current || voiceBusy) return;
               setShowAddInput((prev) => !prev);
             }}
           >
@@ -628,49 +826,124 @@ export default function InputBar({
             >
               Add files and more
             </span>
-          </div>
+          </button>
         </div>
 
-        <textarea
-          ref={inputRef}
-          className={styles.input}
-          placeholder={placeholder}
-          onChange={handleChange}
-          onKeyDown={handleKeyDown}
-          onPaste={handlePaste}
-          readOnly={isSending}
-          rows={1}
-          maxLength={limits.maxTextChars ?? undefined}
-        />
+        <div className={styles.inputSlot}>
+          <textarea
+            ref={inputRef}
+            className={styles.input}
+            placeholder={placeholder}
+            onChange={handleChange}
+            onKeyDown={handleKeyDown}
+            onPaste={handlePaste}
+            readOnly={isSending || voiceBusy}
+            aria-label="Message"
+            rows={1}
+            maxLength={limits.maxTextChars ?? undefined}
+          />
+          {waveVisible && (
+            <div className={styles.dictationWaveSlot}>
+              <DictationWaveform stream={dictation.stream} />
+            </div>
+          )}
+        </div>
 
         <div className={styles.rightControls} ref={rightControlsRef}>
-          <div
-            className={styles.iconWrapper1}
-            tabIndex={0}
+          <button
+            type="button"
+            className={`${styles.iconWrapper1} ${styles.controlButton}`}
+            disabled={
+              isSending ||
+              isAiResponding ||
+              isComingSoon ||
+              dictation.phase === "stopping" ||
+              dictation.phase === "transcribing" ||
+              !!dictation.recording
+            }
+            aria-label={
+              dictation.phase === "recording"
+                ? "Stop dictation"
+                : dictation.phase === "requesting"
+                  ? "Cancel microphone request"
+                  : "Dictate"
+            }
             onPointerEnter={(event) =>
               fitInputTooltipToViewport(event.currentTarget)
             }
             onFocus={(event) => fitInputTooltipToViewport(event.currentTarget)}
+            onClick={() => {
+              if (dictation.phase === "recording") void finishDictation("edit");
+              else if (dictation.phase === "requesting") cancelDictation();
+              else startDictation();
+            }}
           >
-            <svg
-              className={styles.inputIcon}
-              width={35}
-              height={35}
-              viewBox="0 0 35 35"
-              aria-hidden="true"
-            >
-              <use href="/icons/input-sprite.svg#ib-microphone" />
-            </svg>
+            {dictation.phase === "recording" ? (
+              <DictationStopIcon active />
+            ) : voiceBusy ? (
+              <span className={styles.buttonSpinner} aria-hidden="true" />
+            ) : (
+              <svg
+                className={styles.inputIcon}
+                width={35}
+                height={35}
+                viewBox="0 0 35 35"
+                aria-hidden="true"
+              >
+                <use href="/icons/input-sprite.svg#ib-microphone" />
+              </svg>
+            )}
             <span
               className={styles.inputTooltip}
               data-input-tooltip
               role="tooltip"
             >
-              Dictate
+              {dictation.phase === "recording"
+                ? "Stop and edit"
+                : dictation.phase === "requesting"
+                  ? "Cancel"
+                  : "Dictate"}
             </span>
-          </div>
+          </button>
 
-          {isAiResponding || isSending ? (
+          {waveVisible || dictation.recording ? (
+            <button
+              type="button"
+              className={`${styles.iconWrapper2} ${styles.controlButton} ${styles.voiceSend}`}
+              disabled={
+                dictation.phase === "stopping" ||
+                dictation.phase === "transcribing" ||
+                sendDisabled ||
+                isAiResponding ||
+                isSending
+              }
+              aria-label="Send dictated message"
+              onPointerEnter={(event) =>
+                fitInputTooltipToViewport(event.currentTarget)
+              }
+              onFocus={(event) =>
+                fitInputTooltipToViewport(event.currentTarget)
+              }
+              onClick={() => void finishDictation("send")}
+            >
+              <svg
+                className={styles.sendIcon}
+                width={35}
+                height={35}
+                viewBox="0 0 44 44"
+                aria-hidden="true"
+              >
+                <use href="/icons/input-sprite.svg#ib-send" />
+              </svg>
+              <span
+                className={styles.inputTooltip}
+                data-input-tooltip
+                role="tooltip"
+              >
+                Send dictated message
+              </span>
+            </button>
+          ) : isAiResponding || isSending ? (
             <div
               className={styles.iconWrapper2}
               tabIndex={0}
@@ -700,25 +973,25 @@ export default function InputBar({
               </span>
             </div>
           ) : hasInput || images.length > 0 || files.length > 0 ? (
-            <div
-              className={styles.iconWrapper2}
-              tabIndex={sendDisabled ? -1 : 0}
-              aria-disabled={sendDisabled}
+            <button
+              type="button"
+              className={`${styles.iconWrapper2} ${styles.controlButton}`}
+              disabled={sendDisabled || voiceBusy}
+              aria-label="Send message"
               onPointerEnter={(event) =>
                 fitInputTooltipToViewport(event.currentTarget)
               }
               onFocus={(event) =>
                 fitInputTooltipToViewport(event.currentTarget)
               }
-              onClick={sendDisabled ? undefined : () => void handleSend()}
+              onClick={() => void handleSend()}
             >
               <svg
                 className={styles.sendIcon}
                 width={35}
                 height={35}
                 viewBox="0 0 44 44"
-                role="img"
-                aria-label={sendDisabled ? "chat is still loading" : "send"}
+                aria-hidden="true"
               >
                 <use href="/icons/input-sprite.svg#ib-send" />
               </svg>
@@ -729,41 +1002,54 @@ export default function InputBar({
               >
                 {sendDisabled ? "Preparing chat..." : "Send message"}
               </span>
-            </div>
-          ) : (
-            <div
-              className={styles.iconWrapper2}
-              tabIndex={0}
-              onPointerEnter={(event) =>
-                fitInputTooltipToViewport(event.currentTarget)
-              }
-              onFocus={(event) =>
-                fitInputTooltipToViewport(event.currentTarget)
-              }
-            >
-              <svg
-                className={styles.inputIcon}
-                width={35}
-                height={35}
-                viewBox="0 0 35 35"
-                role="img"
-                aria-label="voice"
-              >
-                <use href="/icons/input-sprite.svg#ib-voice" />
-              </svg>
-              <span
-                className={styles.inputTooltip}
-                data-input-tooltip
-                role="tooltip"
-              >
-                Use voice model
-              </span>
-            </div>
-          )}
+            </button>
+          ) : null}
         </div>
 
         <span className={styles.measure} ref={measureRef} aria-hidden="true" />
       </div>
+
+      {voiceBusy && (
+        <div className={styles.dictationStatus} role="status">
+          <span>
+            {dictation.phase === "requesting"
+              ? "Preparing microphone…"
+              : dictation.phase === "recording"
+                ? "Listening"
+                : "Transcribing…"}
+          </span>
+          {dictation.phase === "recording" && (
+            <span className={styles.recordingTime} aria-hidden="true">
+              {Math.floor(elapsedSeconds / 60)}:
+              {String(elapsedSeconds % 60).padStart(2, "0")}
+            </span>
+          )}
+          <button type="button" onClick={cancelDictation}>
+            Cancel
+          </button>
+        </div>
+      )}
+      {(dictation.error || voiceNotice?.scope === dictationScope) && (
+        <div className={styles.dictationError}>
+          <p role="alert">{dictation.error || voiceNotice?.message}</p>
+          {dictation.recording && (
+            <div className={styles.recordingActions}>
+              <button
+                type="button"
+                onClick={() => void finishDictation("edit")}
+              >
+                Retry transcription
+              </button>
+              <button type="button" onClick={saveRecording}>
+                Save audio
+              </button>
+              <button type="button" onClick={cancelDictation}>
+                Discard recording
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       {isComingSoon && (
         <div className={styles.comingSoonOverlay}>

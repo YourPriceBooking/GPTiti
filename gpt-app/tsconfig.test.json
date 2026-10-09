@@ -17,6 +17,8 @@
     "lib/authError.ts",
     "lib/balance/balanceProtocol.ts",
     "lib/balance/refreshQueue.ts",
+    "lib/dictation/protocol.ts",
+    "lib/dictation/dictationSession.ts",
     "types/api.types.ts",
     "types/types.ts",
     "tests/**/*.test.ts"
