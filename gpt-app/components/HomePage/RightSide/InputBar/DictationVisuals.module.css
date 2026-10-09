@@ -1,0 +1,56 @@
+.stopIcon {
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.breathing {
+  transform-box: view-box;
+  transform-origin: 32px 32px;
+  animation: breathe 1.8s ease-in-out infinite;
+}
+.inactive {
+  opacity: 0;
+}
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(0.91);
+    opacity: 0.65;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 1;
+  }
+}
+.waveEnter {
+  width: 100%;
+  animation: enter 220ms ease-out both;
+}
+.wave {
+  display: block;
+  width: 100%;
+  height: 40px;
+}
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translateY(3px) scaleY(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scaleY(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .breathing {
+    animation: none;
+    opacity: 0.8;
+  }
+  .waveEnter {
+    animation: none;
+  }
+}
