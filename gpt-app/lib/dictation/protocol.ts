@@ -55,7 +55,7 @@ export function dictationErrorMessage(error: unknown): string {
   if (error instanceof DictationError) return error.message;
   if (error instanceof Error) {
     if (error.name === "NotAllowedError" || error.name === "SecurityError") {
-      return "Allow microphone access in your browser to dictate.";
+      return "Allow microphone access in your browser's site settings, then tap the microphone again. If it is already allowed, check your device's microphone permissions.";
     }
     if (error.name === "NotFoundError") return "No microphone was found.";
     if (error.name === "NotReadableError") {

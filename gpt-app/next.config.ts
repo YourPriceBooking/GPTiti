@@ -83,7 +83,8 @@ const nextConfig: NextConfig = {
           },
           {
             key: "Permissions-Policy",
-            value: "camera=(), microphone=(), geolocation=(), payment=()",
+            // Dictation requests browser permission for this app's origin.
+            value: "camera=(), microphone=(self), geolocation=(), payment=()",
           },
           {
             key: "Strict-Transport-Security",
