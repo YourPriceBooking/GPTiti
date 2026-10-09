@@ -13,6 +13,14 @@ This is a frontend implementation prepared for **our future backend**. No browse
 - Cancel / Escape / unmount / logout / change of chat, project or model: abort transcription, release capture, and ignore late results. Recordings are not stored in localStorage or uploaded before Stop/Send.
 - Maximum recording: 5 minutes or 20 MiB. Reaching the duration stops into the edit workflow; reaching the size limit retains audio for recovery.
 
+## Microphone permission
+
+Clicking the microphone calls `getUserMedia` immediately. The browser requests permission if it has not already been granted or denied; the app does not grant itself permission or request it on page load. The frontend's `Permissions-Policy` must include `microphone=(self)` so its own origin can make that request. The previous `microphone=()` policy prevented any prompt and returned `NotAllowedError`, even when the user had allowed microphone access.
+
+After updating `next.config.ts`, rebuild/restart the frontend and reload the page so the document receives the new header. If the reverse proxy/CDN also sets `Permissions-Policy`, its final response must not reintroduce `microphone=()` for this app. Check the final document response in DevTools → Network; a denied policy is distinct from a user-denied browser permission.
+
+If the user already blocked the microphone, the website cannot force another native prompt. Allow it through the browser's site settings and click the microphone again; also check device-level microphone permission if needed. See [Chrome microphone permissions](https://support.google.com/chrome/answer/2693767) and [the microphone Permissions-Policy directive](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Permissions-Policy/microphone).
+
 ## Connect the backend later
 
 The **only API integration point** is `lib/dictation/backendTranscriber.ts`. The rest of the UI consumes `TranscribeAudio(recording, signal): Promise<string>`.
