@@ -162,7 +162,8 @@
     color 0.18s ease;
 }
 
-.copyBtnVisible {
+.copyBtnVisible,
+.copyBtn:focus-visible {
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
