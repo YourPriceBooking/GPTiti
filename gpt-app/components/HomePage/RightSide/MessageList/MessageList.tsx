@@ -11,7 +11,6 @@ import type { Message } from "@/types/types";
 type MessageListProps = {
   messages: Message[];
   isTyping?: boolean;
-  hasFirstRequest: boolean;
   onRetry: () => void;
   onCancelPending: () => void;
 };
@@ -169,7 +168,6 @@ function UserMessage({ message }: { message: Message }) {
 export default function MessageList({
   messages,
   isTyping = false,
-  hasFirstRequest,
   onRetry,
   onCancelPending,
 }: MessageListProps) {
@@ -241,11 +239,13 @@ export default function MessageList({
                   </div>
                 )}
                 {!message.error &&
-                  hasFirstRequest &&
-                  message.tokens !== undefined && (
+                  typeof message.tokens === "number" &&
+                  Number.isFinite(message.tokens) &&
+                  message.tokens >= 0 && (
                     <div className={styles.costInfo}>
                       <span className={styles.costSpan}>
-                        Used: {message.tokens} tokens
+                        Used: {message.tokens.toLocaleString("en-US")} TITI ·
+                        Request + response
                       </span>
                     </div>
                   )}
