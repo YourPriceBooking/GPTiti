@@ -69,6 +69,7 @@ export default function TokenHistoryPage() {
   const [loginOpen, setLoginOpen] = useState(false);
   const [sample, setSample] = useState(false);
   const [mode, setMode] = useState<"general" | "detailed">("general");
+  const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set());
   const [filter, setFilter] = useState("all");
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
@@ -114,6 +115,7 @@ export default function TokenHistoryPage() {
     setSample(next);
     setEntries(next ? createPreview() : []);
     setSelected(null);
+    setExpandedDays(new Set());
     setNotice("");
     resetFilters();
   };
@@ -125,6 +127,45 @@ export default function TokenHistoryPage() {
         : a.type === "bonus"
           ? "Weekly reward"
           : `${a.model} · ${a.chat}`;
+  const renderActivity = (a: Activity) => (
+    <button
+      key={a.id}
+      className={styles.row}
+      onClick={() => setSelected(selected?.id === a.id ? null : a)}
+      aria-expanded={selected?.id === a.id}
+    >
+      <span
+        className={`${styles.icon} ${styles[a.type === "bonus" ? "bonusIcon" : a.type]}`}
+      >
+        <Icon kind={a.type} />
+      </span>
+      <span className={styles.rowText}>
+        <b>{titles[a.type]}</b>
+        <span>{description(a)}</span>
+      </span>
+      <time dateTime={a.at} title={formatActivity(a.at) || undefined}>
+        {new Date(a.at).toLocaleTimeString("en-GB", {
+          hour: "2-digit",
+          minute: "2-digit",
+        })}
+      </time>
+      <strong className={a.amount > 0 ? styles.positive : styles.negative}>
+        {amount(a.amount)}
+      </strong>
+      <span className={styles.chevron}>›</span>
+      {selected?.id === a.id && (
+        <span className={styles.details}>
+          <span>{new Date(a.at).toLocaleString("en-GB")} · Local time</span>
+          <span>Sample operation · {a.id}</span>
+          {isCharge(a) && (
+            <span>
+              Chat: {a.chat}. Demo chats are not linked to your account.
+            </span>
+          )}
+        </span>
+      )}
+    </button>
+  );
   return (
     <main className={styles.page}>
       <div className={styles.content}>
@@ -381,66 +422,19 @@ export default function TokenHistoryPage() {
                       year: "numeric",
                     })}
                   </h2>
-                  {rows.map((a) => (
-                    <button
-                      key={a.id}
-                      className={styles.row}
-                      onClick={() =>
-                        setSelected(selected?.id === a.id ? null : a)
-                      }
-                      aria-expanded={selected?.id === a.id}
-                    >
-                      <span
-                        className={`${styles.icon} ${styles[a.type === "bonus" ? "bonusIcon" : a.type]}`}
-                      >
-                        <Icon kind={a.type} />
-                      </span>
-                      <span className={styles.rowText}>
-                        <b>{titles[a.type]}</b>
-                        <span>{description(a)}</span>
-                      </span>
-                      <time
-                        dateTime={a.at}
-                        title={formatActivity(a.at) || undefined}
-                      >
-                        {new Date(a.at).toLocaleTimeString("en-GB", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </time>
-                      <strong
-                        className={
-                          a.amount > 0 ? styles.positive : styles.negative
-                        }
-                      >
-                        {amount(a.amount)}
-                      </strong>
-                      <span className={styles.chevron}>›</span>
-                      {selected?.id === a.id && (
-                        <span className={styles.details}>
-                          <span>
-                            {new Date(a.at).toLocaleString("en-GB")} · Local
-                            time
-                          </span>
-                          <span>Sample operation · {a.id}</span>
-                          {isCharge(a) && (
-                            <span>
-                              Chat: {a.chat}. Demo chats are not linked to your
-                              account.
-                            </span>
-                          )}
-                        </span>
-                      )}
-                    </button>
-                  ))}
+                  {rows.map(renderActivity)}
                   {mode === "general" && charges.length > 0 && (
                     <button
                       className={`${styles.row} ${styles.daily}`}
+                      aria-expanded={expandedDays.has(day)}
+                      aria-controls={`charges-${day}`}
                       onClick={() => {
-                        setMode("detailed");
-                        setFrom(day);
-                        setTo(day);
-                        setFilter("usage");
+                        setExpandedDays((current) => {
+                          const next = new Set(current);
+                          if (next.has(day)) next.delete(day);
+                          else next.add(day);
+                          return next;
+                        });
                       }}
                     >
                       <span className={`${styles.icon} ${styles.usage}`}>
@@ -457,12 +451,25 @@ export default function TokenHistoryPage() {
                       <strong>
                         {amount(charges.reduce((s, a) => s + a.amount, 0))}
                         <span className={styles.viewCharges}>
-                          View charges →
+                          {expandedDays.has(day)
+                            ? "Close details ↑"
+                            : "View charges →"}
                         </span>
                       </strong>
                       <span className={styles.chevron}>›</span>
                     </button>
                   )}
+                  {mode === "general" &&
+                    charges.length > 0 &&
+                    expandedDays.has(day) && (
+                      <div
+                        id={`charges-${day}`}
+                        role="region"
+                        aria-label={`Model charges for ${day}`}
+                      >
+                        {charges.map(renderActivity)}
+                      </div>
+                    )}
                 </section>
               );
             })
