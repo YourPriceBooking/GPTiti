@@ -1,5 +1,4 @@
-export type ActivityType =
-  "purchase" | "received" | "sent" | "bonus" | "request" | "response";
+export type ActivityType = "purchase" | "received" | "sent" | "bonus" | "usage";
 export type Activity = {
   id: string;
   type: ActivityType;
@@ -14,8 +13,7 @@ export const localDay = (at: string) => {
   const d = new Date(at);
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 };
-export const isCharge = (a: Activity) =>
-  a.type === "request" || a.type === "response";
+export const isCharge = (a: Activity) => a.type === "usage";
 export function createPreview(now = new Date()): Activity[] {
   const models = [
     "gpt-4o-mini",
@@ -61,9 +59,9 @@ export function createPreview(now = new Date()): Activity[] {
     for (let i = 0; i < 16; i++)
       entries.push({
         id: `charge-${day}-${i}`,
-        type: i % 2 ? "response" : "request",
-        at: date(8 + Math.floor(i / 2), i % 2 ? 21 : 20),
-        amount: -(120 + (i + day * 16) * 37),
+        type: "usage",
+        at: date(7 + Math.floor(i / 2), i % 2 ? 41 : 21),
+        amount: -(240 + (i + day * 16) * 74),
         model: models[Math.floor(i / 2) % models.length],
         chat: [
           "Product launch",

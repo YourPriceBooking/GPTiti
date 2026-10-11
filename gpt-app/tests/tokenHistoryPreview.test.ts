@@ -7,11 +7,11 @@ import {
   localDay,
 } from "../lib/tokenHistoryPreview";
 
-test("preview includes all six types and 32 separately billed request/response charges", () => {
+test("preview includes all five types and 32 combined request/response charges", () => {
   const entries = createPreview(new Date(2026, 9, 11, 20));
   assert.equal(entries.length, 40);
   assert.equal(new Set(entries.map((a) => a.id)).size, 40);
-  assert.equal(new Set(entries.map((a) => a.type)).size, 6);
+  assert.equal(new Set(entries.map((a) => a.type)).size, 5);
   assert.equal(entries.filter(isCharge).length, 32);
   assert.equal(new Set(entries.filter(isCharge).map((a) => a.model)).size, 7);
   assert.ok(

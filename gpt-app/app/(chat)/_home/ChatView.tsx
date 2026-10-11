@@ -138,7 +138,6 @@ export default function ChatView({
             <MessageList
               messages={activeChat.messages}
               isTyping={ctrl.isTyping}
-              hasFirstRequest={ctrl.hasFirstRequest}
               onRetry={() => void ctrl.handleRetryStream()}
               onCancelPending={ctrl.handleCancelPendingMessage}
             />

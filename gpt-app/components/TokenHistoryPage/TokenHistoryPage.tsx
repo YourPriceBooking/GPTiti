@@ -15,14 +15,14 @@ import {
   localDay,
   type Activity,
 } from "@/lib/tokenHistoryPreview";
+import HistoryDateField from "./HistoryDateField";
 import styles from "./TokenHistoryPage.module.css";
 const titles = {
   purchase: "TITI purchase",
   received: "Received TITI",
   sent: "Sent TITI",
   bonus: "Free bonus",
-  request: "Chat request",
-  response: "Chat response",
+  usage: "Chat usage",
 };
 const subscribeTimeZone = () => () => {};
 const getTimeZone = () => Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -277,24 +277,19 @@ export default function TokenHistoryPage() {
             </select>
           </label>
           <div className={styles.dates}>
-            <label>
-              From
-              <input
-                type="date"
-                value={from}
-                max={to || undefined}
-                onChange={(e) => setFrom(e.target.value)}
-              />
-            </label>
-            <label>
-              To
-              <input
-                type="date"
-                value={to}
-                min={from || undefined}
-                onChange={(e) => setTo(e.target.value)}
-              />
-            </label>
+            <HistoryDateField
+              label="From"
+              value={from}
+              max={to}
+              onChange={setFrom}
+            />
+            <HistoryDateField
+              label="To"
+              value={to}
+              min={from}
+              onChange={setTo}
+              alignRight
+            />
             {(from || to || filter !== "all") && (
               <button className={styles.textButton} onClick={resetFilters}>
                 Reset
@@ -306,7 +301,7 @@ export default function TokenHistoryPage() {
           <span>
             {mode === "general"
               ? "Model charges grouped by day."
-              : "Every request and response charge."}
+              : "Each request and response, one total."}
           </span>
           <span>
             Local time · {timeZone || "Your time zone"} · Sample activity
