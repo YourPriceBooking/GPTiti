@@ -90,9 +90,20 @@ export default function TokenHistoryPage() {
     [entries, filter, from, to],
   );
   const groups = groupActivity(visible);
-  const incoming = entries.reduce((s, a) => s + Math.max(0, a.amount), 0);
-  const outgoing = entries.reduce((s, a) => s + Math.min(0, a.amount), 0);
-  const shownBalance = sample ? incoming + outgoing : 0;
+  const periodEntries = entries.filter(
+    (entry) =>
+      (!from || localDay(entry.at) >= from) &&
+      (!to || localDay(entry.at) <= to),
+  );
+  const incoming = periodEntries.reduce(
+    (sum, entry) => sum + Math.max(0, entry.amount),
+    0,
+  );
+  const outgoing = periodEntries.reduce(
+    (sum, entry) => sum + Math.min(0, entry.amount),
+    0,
+  );
+  const netChange = incoming + outgoing;
   const resetFilters = () => {
     setFilter("all");
     setFrom("");
@@ -144,39 +155,53 @@ export default function TokenHistoryPage() {
             <span>Switch preview</span>
           </button>
         </header>
-        <div className={styles.live}>
-          <span>Current account balance</span>
-          <strong aria-live="polite">
-            {loggedIn
-              ? balanceReady
-                ? `${numbers.format(balance)} TITI`
-                : "Syncing…"
-              : "Sign in to see your balance"}
-          </strong>
-          {!loggedIn && (
-            <button
-              className={styles.textButton}
-              onClick={() => setLoginOpen(true)}
+        <section
+          className={styles.balance}
+          aria-label="Current balance and period activity"
+        >
+          <div className={styles.balanceMain}>
+            <span className={styles.label}>Current balance</span>
+            <strong
+              className={
+                loggedIn && balanceReady
+                  ? styles.balanceValue
+                  : styles.balanceStatus
+              }
+              aria-live="polite"
+              data-current-balance
             >
-              Sign in →
-            </button>
-          )}
-        </div>
-        <section className={styles.balance} aria-label="Preview balance">
-          <div>
-            <span className={styles.label}>
-              TITI balance <small>Preview</small>
-            </span>
-            <strong>
-              {numbers.format(shownBalance)} <span>TITI</span>
+              {loggedIn ? (
+                balanceReady ? (
+                  <>
+                    {numbers.format(balance)} <span>TITI</span>
+                  </>
+                ) : (
+                  "Syncing…"
+                )
+              ) : (
+                "Sign in to see your balance"
+              )}
             </strong>
-            <div className={styles.totals}>
+            {!loggedIn && (
+              <button
+                className={styles.textButton}
+                onClick={() => setLoginOpen(true)}
+              >
+                Sign in →
+              </button>
+            )}
+            <div className={styles.totals} aria-label="Selected period totals">
               <span>
-                In <b>{amount(incoming)}</b>
+                In <b>{incoming ? amount(incoming) : "0 TITI"}</b>
               </span>
               <span>
-                Out <b>{amount(outgoing)}</b>
+                Out <b>{outgoing ? amount(outgoing) : "0 TITI"}</b>
               </span>
+            </div>
+            <div className={styles.netChange}>
+              <span>Net change</span>
+              <b>{netChange ? amount(netChange) : "0 TITI"}</b>
+              <span className={styles.periodLabel}>Selected period</span>
             </div>
           </div>
           <div className={styles.actions}>
@@ -185,7 +210,7 @@ export default function TokenHistoryPage() {
             </Link>
             <button
               className={styles.secondary}
-              disabled={!shownBalance}
+              disabled={!loggedIn || !balanceReady || balance <= 0}
               onClick={() =>
                 setNotice(
                   "Sample preview: no TITI was sent. Transfers will be connected when history is available.",
