@@ -25,3 +25,5 @@ No new backend endpoints or real financial mutations are added in this PR.
 Date filters use an English calendar (English month/week labels and `DD / MM / YYYY` placeholder) rather than browser-native date inputs whose placeholder follows operating-system language. Dates are stored as local ISO calendar days. Primary button states animate a consistent background-color; no gradient-to-solid background-image switch occurs on hover. Each Detailed model-usage entry is one combined request + response cost. General groups these combined costs by local day.
 
 Chat usage badges now render whenever a non-error assistant message has a recorded token amount, including restored conversations before a new request is sent. The existing billing total is displayed directly as TITI; request/response amounts are not added again. Missing billing values are not invented.
+
+Model usage expands inline per day in General mode. All other operations and days remain visible; Close details collapses that day without changing date or activity filters. Several days can be expanded independently.
