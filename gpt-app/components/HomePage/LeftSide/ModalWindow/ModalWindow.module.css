@@ -285,7 +285,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  /* Keep the balance heading visible above the history hint. */
+  gap: 46px;
 }
 
 .title3 {
@@ -303,19 +304,10 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 4px 4px 4px 12px;
+  padding: 3px;
+  gap: 8px;
   border: 1px solid var(--main-gray2);
   border-radius: 7px;
-}
-
-.gptSpan1 {
-  min-width: 0;
-  color: var(--main-gray2);
-  font-family: var(--font-family);
-  font-weight: 700;
-  font-size: 16px;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .badgeLink {

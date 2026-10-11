@@ -89,51 +89,6 @@
   align-items: stretch;
 }
 
-.balanceButton {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  min-width: 0;
-  min-height: 54px;
-  padding: 8px 14px;
-  border-radius: 15px;
-  background: #0f172a;
-}
-
-.balanceInfo {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  margin: 0;
-}
-
-.span2 {
-  color: #94a3b8;
-  font-family: var(--font-family);
-  font-size: 12px;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.strong {
-  color: #c8d2e2;
-  font-family: var(--font-family);
-  font-size: 20px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  overflow-wrap: anywhere;
-}
-
-.balanceIcon,
-.mobileBalanceIcon {
-  flex: none;
-}
-
-.mobileBalanceIcon {
-  display: none;
-}
-
 .sendButton {
   display: inline-flex;
   align-items: center;
@@ -566,6 +521,13 @@
   line-height: 1.4;
 }
 
+@media (min-width: 901px) {
+  .container {
+    /* Leave room for the 36 px history hint and its 8 px gap. */
+    padding-top: 56px;
+  }
+}
+
 @media (max-width: 1199px) {
   .headerTextLogo {
     display: none;
@@ -662,7 +624,6 @@
     gap: 10px;
   }
 
-  .balanceButton,
   .sendButton {
     min-height: 52px;
   }
@@ -723,7 +684,6 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .balanceButton,
   .sendButton {
     width: 100%;
   }

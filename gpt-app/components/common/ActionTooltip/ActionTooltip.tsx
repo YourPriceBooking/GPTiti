@@ -7,20 +7,26 @@ import styles from "./ActionTooltip.module.css";
 const GAP = 8;
 const VIEWPORT_MARGIN = 8;
 
-export default function ActionTooltip({ label }: { label: string }) {
+export default function ActionTooltip({
+  label,
+  appearance = "default",
+}: {
+  label: string;
+  appearance?: "default" | "plain";
+}) {
   const markerRef = useRef<HTMLSpanElement>(null);
   const tooltipRef = useRef<HTMLSpanElement>(null);
   const dismissedRef = useRef(false);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    const button = markerRef.current?.closest("button");
-    if (!button) return;
+    const trigger = markerRef.current?.closest<HTMLElement>("button, a[href]");
+    if (!trigger) return;
     let hovered =
-      window.matchMedia("(hover: hover)").matches && button.matches(":hover");
+      window.matchMedia("(hover: hover)").matches && trigger.matches(":hover");
     const syncVisibility = () => {
       setOpen(
-        !dismissedRef.current && (hovered || button.matches(":focus-visible")),
+        !dismissedRef.current && (hovered || trigger.matches(":focus-visible")),
       );
     };
     const onEnter = (event: PointerEvent) => {
@@ -41,24 +47,24 @@ export default function ActionTooltip({ label }: { label: string }) {
       dismissedRef.current = false;
       syncVisibility();
     };
-    button.addEventListener("pointerenter", onEnter);
-    button.addEventListener("pointerleave", onLeave);
-    button.addEventListener("focus", onFocus);
-    button.addEventListener("blur", syncVisibility);
+    trigger.addEventListener("pointerenter", onEnter);
+    trigger.addEventListener("pointerleave", onLeave);
+    trigger.addEventListener("focus", onFocus);
+    trigger.addEventListener("blur", syncVisibility);
     const initialFrame = requestAnimationFrame(syncVisibility);
     return () => {
       cancelAnimationFrame(initialFrame);
-      button.removeEventListener("pointerenter", onEnter);
-      button.removeEventListener("pointerleave", onLeave);
-      button.removeEventListener("focus", onFocus);
-      button.removeEventListener("blur", syncVisibility);
+      trigger.removeEventListener("pointerenter", onEnter);
+      trigger.removeEventListener("pointerleave", onLeave);
+      trigger.removeEventListener("focus", onFocus);
+      trigger.removeEventListener("blur", syncVisibility);
     };
   }, []);
 
   useLayoutEffect(() => {
-    const button = markerRef.current?.closest("button");
+    const trigger = markerRef.current?.closest<HTMLElement>("button, a[href]");
     const tooltip = tooltipRef.current;
-    if (!open || !button || !tooltip) return;
+    if (!open || !trigger || !tooltip) return;
     let frame = 0;
     const viewport = window.visualViewport;
     const position = () => {
@@ -66,15 +72,21 @@ export default function ActionTooltip({ label }: { label: string }) {
       const topEdge = (viewport?.offsetTop ?? 0) + VIEWPORT_MARGIN;
       const width = viewport?.width ?? document.documentElement.clientWidth;
       const height = viewport?.height ?? window.innerHeight;
-      tooltip.style.maxWidth = `${Math.max(0, width - 2 * VIEWPORT_MARGIN)}px`;
-      const anchor = button.getBoundingClientRect();
+      const maxWidth = `${Math.max(0, width - 2 * VIEWPORT_MARGIN)}px`;
+      if (tooltip.style.maxWidth !== maxWidth) tooltip.style.maxWidth = maxWidth;
+      const anchor = trigger.getBoundingClientRect();
       const box = tooltip.getBoundingClientRect();
       const rightLimit = leftEdge + width - 2 * VIEWPORT_MARGIN - box.width;
       const bottomLimit = topEdge + height - 2 * VIEWPORT_MARGIN - box.height;
       // Prefer top-end with an 8 px gap; shift only at viewport boundaries.
-      tooltip.style.left = `${Math.max(leftEdge, Math.min(anchor.right - box.width, rightLimit))}px`;
-      tooltip.style.top = `${Math.max(topEdge, Math.min(anchor.top - box.height - GAP, bottomLimit))}px`;
+      const left = `${Math.max(leftEdge, Math.min(anchor.right - box.width, rightLimit))}px`;
+      const top = `${Math.max(topEdge, Math.min(anchor.top - box.height - GAP, bottomLimit))}px`;
+      if (tooltip.style.left !== left) tooltip.style.left = left;
+      if (tooltip.style.top !== top) tooltip.style.top = top;
       tooltip.style.visibility = "visible";
+      // Model-picker entry uses JS transforms, which ResizeObserver cannot
+      // detect. Follow the anchor while the hint is open without React renders.
+      frame = requestAnimationFrame(position);
     };
     const schedulePosition = () => {
       cancelAnimationFrame(frame);
@@ -93,12 +105,12 @@ export default function ActionTooltip({ label }: { label: string }) {
     viewport?.addEventListener("scroll", schedulePosition);
     const resizeObserver = new ResizeObserver(schedulePosition);
     resizeObserver.observe(tooltip);
-    resizeObserver.observe(button);
-    if (button.parentElement) resizeObserver.observe(button.parentElement);
+    resizeObserver.observe(trigger);
+    if (trigger.parentElement) resizeObserver.observe(trigger.parentElement);
     const visibilityObserver = new IntersectionObserver(([entry]) => {
       if (!entry.isIntersecting) setOpen(false);
     });
-    visibilityObserver.observe(button);
+    visibilityObserver.observe(trigger);
     return () => {
       cancelAnimationFrame(frame);
       resizeObserver.disconnect();
@@ -109,7 +121,7 @@ export default function ActionTooltip({ label }: { label: string }) {
       viewport?.removeEventListener("resize", schedulePosition);
       viewport?.removeEventListener("scroll", schedulePosition);
     };
-  }, [open, label]);
+  }, [open, label, appearance]);
 
   return (
     <>
@@ -118,7 +130,7 @@ export default function ActionTooltip({ label }: { label: string }) {
         createPortal(
           <span
             ref={tooltipRef}
-            className={styles.tooltip}
+            className={`${styles.tooltip} ${appearance === "plain" ? styles.plain : ""}`}
             aria-hidden="true"
             data-action-tooltip
           >

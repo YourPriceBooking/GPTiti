@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 
 import { getModelLimits } from "@/config/modelLimits.config";
 import {
@@ -15,20 +16,30 @@ import {
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { selectSelectedModel } from "@/redux/model/selectors";
 import { selectIsOverlayOpen } from "@/redux/ui/selectors";
+import { selectUser } from "@/redux/auth/selectors";
+import {
+  clearTokenHistoryDraft,
+  registerTokenHistoryDraft,
+  takeTokenHistoryDraft,
+} from "@/lib/tokenHistoryDraft";
 
 export function useInputDraft() {
   const dispatch = useAppDispatch();
   const selectedModel = useAppSelector(selectSelectedModel);
   const isOverlayOpen = useAppSelector(selectIsOverlayOpen);
+  const ownerId = useAppSelector(selectUser)?.id;
+  const pathname = usePathname();
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const pendingTemplateRef = useRef<string | null>(null);
+  const latestTextRef = useRef("");
 
   const [inputCharCount, setInputCharCount] = useState(0);
   const [inputImageCount, setInputImageCount] = useState(0);
 
   const syncFromValue = useCallback(
     (value: string) => {
+      latestTextRef.current = value;
       dispatch(setHasInput(value.trim().length > 0));
       setInputCharCount(value.length);
     },
@@ -55,6 +66,45 @@ export function useInputDraft() {
     },
     [dispatch, syncFromValue],
   );
+
+  useLayoutEffect(() => {
+    if (!ownerId) {
+      clearTokenHistoryDraft();
+      return;
+    }
+    return registerTokenHistoryDraft(() => {
+      const textarea = inputRef.current;
+      const text = textarea?.value ?? latestTextRef.current;
+      return {
+        ownerId,
+        pathname,
+        text,
+        selectionStart: textarea?.selectionStart ?? text.length,
+        selectionEnd: textarea?.selectionEnd ?? text.length,
+      };
+    });
+  }, [ownerId, pathname]);
+
+  useLayoutEffect(() => {
+    const textarea = inputRef.current;
+    if (!ownerId || !textarea) return;
+    const frame = requestAnimationFrame(() => {
+      // Wait for the uncontrolled composer to mount; Strict Mode can cancel
+      // this frame without consuming the saved draft.
+      if (textarea.value) return;
+      const saved = takeTokenHistoryDraft(ownerId, pathname);
+      if (!saved) return;
+      const text = clipToModelLimit(saved.text);
+      textarea.value = text;
+      textarea.setSelectionRange(
+        Math.min(saved.selectionStart, text.length),
+        Math.min(saved.selectionEnd, text.length),
+      );
+      syncFromValue(text);
+      dispatch(bumpTemplateTick());
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [ownerId, pathname, isOverlayOpen, clipToModelLimit, syncFromValue, dispatch]);
 
   useEffect(() => {
     const textarea = inputRef.current;
@@ -101,6 +151,8 @@ export function useInputDraft() {
   );
 
   const resetFields = useCallback(() => {
+    clearTokenHistoryDraft();
+    latestTextRef.current = "";
     if (inputRef.current) inputRef.current.value = "";
     setInputCharCount(0);
     setInputImageCount(0);
