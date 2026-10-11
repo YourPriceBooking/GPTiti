@@ -65,19 +65,6 @@
   font-size: 11px;
   margin-top: 4px;
 }
-.live {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-bottom: 15px;
-  color: #687791;
-  font-size: 12px;
-}
-.live strong {
-  color: #273b61;
-  font-size: 13px;
-}
 .balance {
   display: flex;
   align-items: center;
@@ -92,26 +79,52 @@
   color: #516384;
   font-size: 14px;
 }
-.label small {
-  margin-left: 8px;
-  font-size: 10px;
-  background: #dceaff;
-  border-radius: 5px;
-  padding: 3px 5px;
-  color: #3061ac;
+.balanceMain {
+  min-width: 0;
+  flex: 1;
 }
-.balance strong {
+.balanceValue {
   display: block;
-  font-size: clamp(28px, 4vw, 38px);
-  letter-spacing: -1px;
-  margin: 7px 0 12px;
+  font-size: clamp(32px, 4vw, 46px);
+  font-weight: 750;
+  letter-spacing: -1.3px;
+  margin: 10px 0 18px;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.balanceValue span {
+  font-size: 0.7em;
+  white-space: nowrap;
+}
+.balanceStatus {
+  display: block;
+  font-size: 18px;
+  line-height: 1.5;
+  margin: 14px 0;
+  color: #516384;
+}
+.netChange {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-top: 20px;
+  color: #6b7c96;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.netChange b {
+  color: #566a87;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
-.balance strong span {
-  font-size: 0.75em;
+.periodLabel::before {
+  content: "·";
+  margin-right: 12px;
 }
 .totals {
   display: flex;
+  flex-wrap: wrap;
   gap: 26px;
   font-size: 13px;
   color: #5f6c85;
@@ -790,4 +803,31 @@
 .textButton:active,
 .preview:active {
   background-color: #d6e7ff;
+}
+
+@media (max-width: 480px) {
+  .balance {
+    background: transparent;
+    padding: 0;
+    gap: 14px;
+  }
+  .balanceMain {
+    width: 100%;
+    padding: 22px;
+    border-radius: 18px;
+    background: linear-gradient(110deg, #eef7ff, #e6f2ff);
+  }
+  .balanceValue {
+    font-size: 34px;
+  }
+  .netChange {
+    border-top: 1px solid #d3e2f2;
+    padding-top: 14px;
+    margin-top: 16px;
+    font-size: 11px;
+    gap: 5px 8px;
+  }
+  .periodLabel::before {
+    margin-right: 8px;
+  }
 }
