@@ -9,6 +9,7 @@ import { getModelGroupAndItem } from "@/functions/getModelGroupAndItem";
 import { useAppSelector } from "@/redux/hooks";
 import { selectBalance } from "@/redux/tokens/selectors";
 import { ModelType } from "@/types/types";
+import TokenBalanceLink from "@/components/common/TokenBalanceLink/TokenBalanceLink";
 import TooltipModalWindow from "../../TooltipModalWindow/TooltipModalWindow";
 import styles from "./ModalWindow.module.css";
 
@@ -209,7 +210,11 @@ export default function ModalWindow({
         <article className={styles.gptBalance}>
           <h3 className={styles.title3}>Balance</h3>
           <div className={styles.balanceContainer}>
-            <span className={styles.gptSpan1}>{balance.toLocaleString()}</span>
+            <TokenBalanceLink
+              balance={balance}
+              variant="compact"
+              onNavigate={() => setIsModalOpen(false)}
+            />
             <Link href="/top-up-your-tokens" className={styles.badgeLink}>
               <Image width={24} height={24} src="/icons/badge.svg" alt="" />
               <span className={styles.badgeText}>Top up tokens</span>

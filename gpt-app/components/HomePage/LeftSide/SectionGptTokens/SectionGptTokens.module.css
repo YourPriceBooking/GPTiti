@@ -34,29 +34,11 @@
 .gptBalance {
   margin-top: 18px;
   display: flex;
-  gap: 27px;
+  gap: 14px;
+  align-items: center;
 }
 
 .title2 {
-  font-family: var(--font-family);
-  font-weight: 700;
-  font-size: 20px;
-  color: var(--main-gray2);
-}
-
-.balanceContainer {
-  padding: 0 4px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border: 0.2px solid var(--main-gray2);
-  border-radius: 7px;
-  width: 100%;
-  max-width: 150px;
-  min-height: 31px;
-}
-
-.gptSpan1 {
   font-family: var(--font-family);
   font-weight: 700;
   font-size: 20px;

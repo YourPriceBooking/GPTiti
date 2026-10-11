@@ -19,6 +19,7 @@ import { claimTokens } from "@/redux/tokens/operations";
 import { selectIsLoggedIn } from "@/redux/auth/selectors";
 
 import LoginModal from "@/components/HomePage/common/LoginModal/LoginModal";
+import TokenBalanceLink from "@/components/common/TokenBalanceLink/TokenBalanceLink";
 import SendTokensButton from "@/components/SendTokensButton/SendTokensButton";
 const PaymentModal = dynamic(
   () => import("@/components/PaymentModal/PaymentModal"),
@@ -173,28 +174,7 @@ export default function TokensPage() {
         </div>
 
         <div className={styles.balanceActions}>
-          <div className={styles.balanceButton}>
-            <p className={styles.balanceInfo}>
-              <span className={styles.span2}>Balance tokens</span>
-              <span className={styles.strong}>
-                {balance.toLocaleString("en-US")}
-              </span>
-            </p>
-            <Image
-              className={styles.balanceIcon}
-              width={30}
-              height={30}
-              src="/icons/circle-icon2.svg"
-              alt="balance-circle"
-            />
-            <Image
-              className={styles.mobileBalanceIcon}
-              width={26}
-              height={26}
-              src="/icons/blue-circle2.svg"
-              alt="balance-circle"
-            />
-          </div>
+          <TokenBalanceLink balance={balance} variant="card" />
           <SendTokensButton className={styles.sendButton}>
             <Image src="/icons/send-tokens.svg" alt="" width={16} height={16} />
             <span>Send tokens</span>

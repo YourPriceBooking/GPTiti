@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import ModelGptitiTitleWithIcon from "@/components/ModelGptitiTitleWithIcon/ModelGptitiTitleWithIcon";
 import LoginModal from "@/components/HomePage/common/LoginModal/LoginModal";
+import TokenBalanceLink from "@/components/common/TokenBalanceLink/TokenBalanceLink";
 import SendTokensButton from "@/components/SendTokensButton/SendTokensButton";
 
 import { TOKENS_SUFFIX } from "@/config/models.config";
@@ -44,10 +45,7 @@ export default function SectionGptTokens(props: SectionGptTokensProps) {
       {isLoggedIn ? (
         <article className={styles.gptBalance}>
           <h2 className={styles.title2}>Balance</h2>
-          <div className={styles.balanceContainer}>
-            <span className={styles.gptSpan1}>{balance.toLocaleString()}</span>
-            <Image width={24} height={24} src="/icons/badge.svg" alt="badge" />
-          </div>
+          <TokenBalanceLink balance={balance} />
         </article>
       ) : (
         <button
