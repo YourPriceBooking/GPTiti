@@ -29,6 +29,7 @@ import { claimTokens } from "@/redux/tokens/operations";
 import { clearTokenHistoryDraft } from "@/lib/tokenHistoryDraft";
 import { formatActivity } from "@/lib/formatActivity";
 import {
+  formatHistoryPeriod,
   activityDescription,
   historyDays,
   uniqueActivity,
@@ -444,15 +445,6 @@ export default function TokenHistoryPage() {
             <h1>Token history</h1>
             <p>Your TITI, every move.</p>
           </div>
-          {enabled && (
-            <button
-              className={styles.textButton}
-              onClick={() => setReload((value) => value + 1)}
-              disabled={history.loading}
-            >
-              Refresh activity ↻
-            </button>
-          )}
         </header>
         <section
           className={styles.balance}
@@ -492,6 +484,7 @@ export default function TokenHistoryPage() {
             <div
               className={styles.totals}
               aria-label="Selected period totals"
+              aria-describedby="history-period"
               aria-busy={summaryState.loading}
             >
               <span>
@@ -504,7 +497,9 @@ export default function TokenHistoryPage() {
             <div className={styles.netChange}>
               <span>Net change</span>
               <b>{summary ? amount(summary.netChange) : "—"}</b>
-              <span className={styles.periodLabel}>Selected period</span>
+              <span id="history-period" className={styles.periodLabel}>
+                {formatHistoryPeriod(from, to)}
+              </span>
             </div>
             {summaryState.error && (
               <RequestError
@@ -596,12 +591,16 @@ export default function TokenHistoryPage() {
           <div className={styles.dates}>
             <HistoryDateField
               label="From"
+              rangeFrom={from}
+              rangeTo={to}
               value={from}
               max={to}
               onChange={setFrom}
             />
             <HistoryDateField
               label="To"
+              rangeFrom={from}
+              rangeTo={to}
               value={to}
               min={from}
               onChange={setTo}
