@@ -11,6 +11,8 @@ type Props = {
   max?: string;
   onChange: (value: string) => void;
   alignRight?: boolean;
+  rangeFrom?: string;
+  rangeTo?: string;
 };
 export default function HistoryDateField({
   label,
@@ -19,6 +21,8 @@ export default function HistoryDateField({
   max,
   onChange,
   alignRight,
+  rangeFrom,
+  rangeTo,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [month, setMonth] = useState<Date | null>(null);
@@ -149,6 +153,12 @@ export default function HistoryDateField({
                     { month: "long", day: "numeric", year: "numeric" },
                   )}
                   aria-pressed={day === value}
+                  data-in-range={Boolean(
+                    (rangeFrom || rangeTo) &&
+                    (!rangeFrom || day >= rangeFrom) &&
+                    (!rangeTo || day <= rangeTo),
+                  )}
+                  data-range-edge={day === rangeFrom || day === rangeTo}
                   onClick={() => select(day)}
                 >
                   {i + 1}

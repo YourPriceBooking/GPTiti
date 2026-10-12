@@ -89,3 +89,16 @@ export function localDay(date: string | Date) {
   const value = new Date(date);
   return `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, "0")}-${String(value.getDate()).padStart(2, "0")}`;
 }
+
+export function formatHistoryPeriod(from: string, to: string) {
+  const date = (day: string) =>
+    new Date(`${day}T12:00:00`).toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  if (!from && !to) return "All time";
+  if (from && to)
+    return from === to ? date(from) : `${date(from)} – ${date(to)}`;
+  return from ? `From ${date(from)} onwards` : `Until ${date(to)}`;
+}

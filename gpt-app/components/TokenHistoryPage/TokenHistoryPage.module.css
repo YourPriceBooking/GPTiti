@@ -899,3 +899,12 @@
     width: 100%;
   }
 }
+
+.calendarGrid button[data-in-range="true"]:not(:disabled) {
+  background: #e8f2ff;
+  color: #2363d8;
+}
+.calendarGrid button[data-range-edge="true"]:not(:disabled) {
+  background: #2f78ff;
+  color: #fff;
+}
