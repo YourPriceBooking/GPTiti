@@ -1,29 +1,20 @@
-# TITI history frontend preview
+# Token history — live API integration
 
-`/token-history` now provides the approved light layout with General and Detailed views. General is the default. All values use the TITI name and ticker.
+`/token-history` uses authenticated backend history. The preview switch, sample records, sample claim and sample transfer callbacks have been removed.
 
-## Preview behavior
+## Contract
 
-- Each visit starts with empty preview activity. The main **Current balance** value uses the existing authenticated Redux balance synchronization and never reads its value from demo fixtures. In / Out and the smaller Net change show sample activity for the selected local date range; the activity-type filter does not alter period totals. Signed-out visitors cannot see a cached account balance.
-- **Switch preview** toggles empty/sample states. Sample mode contains 40 operations across two local calendar days: two purchases (illustrative USD amounts), two incoming transfers, two outgoing transfers, two bonuses, and 32 combined request + response charges across seven model labels. Sample model labels and prices are illustrative, not a pricing catalog.
-- **Claim 10,000 TITI** only adds a local sample bonus and shows the next sample date seven days later. No claim API is called. Reloading resets it.
-- **Send TITI** is disabled when the current account balance is zero, unavailable, or signed out. In the populated preview it displays a sample-only confirmation; it never invokes the existing real transfer flow.
-- **Top up** navigates to the existing top-up page.
-- General preserves purchases, bonuses and transfers and aggregates only model charges, once per local calendar day. **View charges** opens Detailed filtered to that day's model usage.
-- Activity type and inclusive local date filters work in both modes. Reset clears all filters. Rows expand to show exact local timestamps and operation IDs. Sample chat names have no fake chat links.
-- `formatActivity` is reused for relative time on timestamp titles. Exact local timestamps remain visible in the expanded row. Time zone is initialized after mounting to avoid hydration differences.
-- Buttons, links, selectors and rows have 170 ms hover/pressed transitions, keyboard focus, and reduced-motion support. The layout adapts down to 320 px.
+- `GET /users/token-history`: General pages by local day, Detailed pages by operation. Mode, type, inclusive from/to and the browser's IANA time zone are sent to the server. Opaque cursors stay with the same query/account.
+- `GET /users/token-history/summary`: full period Incoming / Outgoing / Net change. Its query ignores the activity filter and loaded page count. Loading/error totals display a dash rather than invented zero values.
+- `GET /users/token-history/days/:day/charges`: lazy, separately paginated combined request+response TITI costs, appended inline beneath that day. Close details collapses locally; other days and operations remain. Expanded days are independent.
+- General days with more than 100 nonusage records expose a separate continuation using the server-provided `activityQuery` and `nextActivityCursor`.
 
-## Backend integration seam
+Current balance and bonus eligibility still use the existing versioned Redux balance flow. Historical `balanceAfter` receipts never update current balance. History and summaries reload when the balance version changes, after a claim or transfer modal closes, or on Refresh activity. Initial reads, pagination and day reads abort on query/account change or unmount; data is scoped so stale/foreign responses never appear under a new query/account. Requests wait for authenticated access-token readiness. Failed pagination keeps earlier pages and retries the same cursor.
 
-Fixtures and local day grouping are isolated in `lib/tokenHistoryPreview.ts`. Replace the local preview source with authenticated history data, remove Switch preview and sample actions, and retain the real balance in the main balance card. Replace the demo claim/transfer callbacks with the agreed backend contract once available. Keep demo records out of account state and persistence. Real chat links require genuine conversation identifiers; weekly eligibility must come from the server. Daily grouping must use the user's time zone consistently with server pagination/aggregation.
+The weekly claim dispatches the existing `claimTokens` thunk, disables duplicate submissions, reads next eligibility from the server and shows the actual server outcome. Send TITI opens the existing real transfer modal with recipient lookup, confirmation, idempotent send and receipt handling; zero/unavailable balances disable it. Top up keeps the existing checkout route.
 
-No new backend endpoints or real financial mutations are added in this PR.
+Payments display the actual currency and Stripe minor-unit amount, including ISK/UGX compatibility units (https://docs.stripe.com/currencies#special-cases). Missing amount/currency is not replaced with a fake dollar amount. Refund and adjustment types have separate rows/filters. Refund rows show the actual TITI effect, without presenting the original purchase price as a cash-refund amount. Welcome bonuses and weekly bonuses use the server reason. A row expands to show the real operation ID and historical balance. Real conversation IDs link to the existing `/chats/:id` route; unavailable model/chat metadata remains explicitly unknown.
 
-## Interaction corrections
+The footer reflects journal coverage; it does not imply pre-ledger activity was reconstructed. No historical payment collection is merged client-side, which would risk duplicate purchases and inaccurate totals.
 
-Date filters use an English calendar (English month/week labels and `DD / MM / YYYY` placeholder) rather than browser-native date inputs whose placeholder follows operating-system language. Dates are stored as local ISO calendar days. Primary button states animate a consistent background-color; no gradient-to-solid background-image switch occurs on hover. Each Detailed model-usage entry is one combined request + response cost. General groups these combined costs by local day.
-
-Chat usage badges now render whenever a non-error assistant message has a recorded token amount, including restored conversations before a new request is sent. The existing billing total is displayed directly as TITI; request/response amounts are not added again. Missing billing values are not invented.
-
-Model usage expands inline per day in General mode. All other operations and days remain visible; Close details collapses that day without changing date or activity filters. Several days can be expanded independently.
+The approved balance hierarchy, English date calendar, consistent hover/pressed colors and mobile layout remain. Async states include signing in, loading, empty/filtered activity, initial errors, summary errors, detail errors and pagination retry. All labels are English.

@@ -831,3 +831,71 @@
     margin-right: 8px;
   }
 }
+.primary:disabled {
+  background: #e6ebf2;
+  border-color: #d5ddea;
+  color: #8691a6;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+.requestError {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 14px 16px;
+  border: 1px solid #f0d3d3;
+  border-radius: 10px;
+  background: #fff5f5;
+  color: #9a3d3d;
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 12px 0;
+}
+.loading,
+.loadError {
+  padding: 16px;
+  color: #667795;
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 0;
+}
+.loadError {
+  color: #9a3d3d;
+}
+.loadMore {
+  display: flex;
+  justify-content: center;
+  padding: 14px;
+}
+.loadMore button {
+  white-space: normal;
+}
+.chatLink {
+  padding: 0 17px 16px 73px;
+  background: #f8fbff;
+  font-size: 12px;
+}
+.chatLink a {
+  display: inline-block;
+  padding: 8px 0;
+  color: #2363d8;
+  text-decoration: none;
+}
+.refund {
+  background: #fff0df;
+  color: #b86b20;
+}
+.adjustment {
+  background: #edf1f7;
+  color: #667795;
+}
+@media (max-width: 480px) {
+  .chatLink {
+    padding-left: 50px;
+  }
+  .bonus .primary {
+    width: 100%;
+  }
+}

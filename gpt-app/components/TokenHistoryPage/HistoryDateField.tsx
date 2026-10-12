@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { localDay } from "@/lib/tokenHistoryPreview";
+import { localDay } from "@/lib/tokenHistory";
 import styles from "./TokenHistoryPage.module.css";
 
 type Props = {

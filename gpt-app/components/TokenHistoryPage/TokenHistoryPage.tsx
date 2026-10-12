@@ -1,20 +1,47 @@
 "use client";
-import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import LoginModal from "@/components/HomePage/common/LoginModal/LoginModal";
-import { useAppSelector } from "@/redux/hooks";
-import { selectIsLoggedIn } from "@/redux/auth/selectors";
-import { selectBalance, selectBalanceReady } from "@/redux/tokens/selectors";
+import SendTokensModal from "@/components/SendTokensButton/SendTokensModal";
+import { api } from "@/helpers/api";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import {
+  selectIsLoggedIn,
+  selectAccessTokenReady,
+  selectUser,
+} from "@/redux/auth/selectors";
+import {
+  selectBalance,
+  selectBalanceReady,
+  selectNextClaimTime,
+  selectClaiming,
+} from "@/redux/tokens/selectors";
+import { claimTokens } from "@/redux/tokens/operations";
 import { clearTokenHistoryDraft } from "@/lib/tokenHistoryDraft";
 import { formatActivity } from "@/lib/formatActivity";
 import {
-  createPreview,
-  groupActivity,
-  isCharge,
-  localDay,
-  type Activity,
-} from "@/lib/tokenHistoryPreview";
+  activityDescription,
+  historyDays,
+  uniqueActivity,
+} from "@/lib/tokenHistory";
+import type {
+  HistoryActivity,
+  HistoryMode,
+  HistoryFilter,
+  HistoryQuery,
+  HistoryDay,
+  DetailedHistory,
+} from "@/types/tokenHistory.types";
+import { useHistoryPages } from "./useHistoryPages";
 import HistoryDateField from "./HistoryDateField";
 import styles from "./TokenHistoryPage.module.css";
 const titles = {
@@ -23,15 +50,21 @@ const titles = {
   sent: "Sent TITI",
   bonus: "Free bonus",
   usage: "Chat usage",
+  refund: "Payment refund",
+  adjustment: "Balance adjustment",
 };
 const subscribeTimeZone = () => () => {};
 const getTimeZone = () => Intl.DateTimeFormat().resolvedOptions().timeZone;
 const numbers = new Intl.NumberFormat("en-US");
-const amount = (v: number) =>
-  `${v >= 0 ? "+" : "−"}${numbers.format(Math.abs(v))} TITI`;
+const amount = (value: number) =>
+  value === 0
+    ? "0 TITI"
+    : `${value > 0 ? "+" : "−"}${numbers.format(Math.abs(value))} TITI`;
 function Icon({ kind }: { kind: string }) {
   const paths: Record<string, string> = {
     purchase: "M3 7h18v12H3z M3 11h18 M6 15h4",
+    refund: "M3 10a9 9 0 1 1 2 9 M3 4v6h6",
+    adjustment: "M3 7h18 M3 17h18 M8 4v6 M16 14v6",
     received: "M12 3v18 M5 14l7 7 7-7",
     sent: "M5 19L19 5 M5 5h14v14",
     bonus:
@@ -56,116 +89,340 @@ function Icon({ kind }: { kind: string }) {
     </svg>
   );
 }
+function ActivityRow({ activity }: { activity: HistoryActivity }) {
+  const [open, setOpen] = useState(false);
+  const iconKind = activity.type === "bonus" ? "bonusIcon" : activity.type;
+  return (
+    <div>
+      <button
+        className={styles.row}
+        onClick={() => setOpen((value) => !value)}
+        aria-expanded={open}
+      >
+        <span className={`${styles.icon} ${styles[iconKind]}`}>
+          <Icon kind={activity.type} />
+        </span>
+        <span className={styles.rowText}>
+          <b>{titles[activity.type]}</b>
+          <span>{activityDescription(activity)}</span>
+        </span>
+        <time
+          dateTime={activity.at}
+          title={formatActivity(activity.at) || undefined}
+        >
+          {new Date(activity.at).toLocaleTimeString("en-GB", {
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
+        </time>
+        <strong
+          className={activity.amount > 0 ? styles.positive : styles.negative}
+        >
+          {amount(activity.amount)}
+        </strong>
+        <span className={styles.chevron}>›</span>
+        {open && (
+          <span className={styles.details}>
+            <span>
+              {new Date(activity.at).toLocaleString("en-GB")} · Local time
+            </span>
+            <span>Operation · {activity.id}</span>
+            <span>
+              Balance after this operation:{" "}
+              {numbers.format(activity.balanceAfter)} TITI
+            </span>
+            {activity.type === "usage" && !activity.detailsAvailable && (
+              <span>
+                Model and chat details are unavailable for this older charge.
+              </span>
+            )}
+          </span>
+        )}
+      </button>
+      {open && activity.conversationId && (
+        <div className={styles.chatLink}>
+          <Link href={`/chats/${encodeURIComponent(activity.conversationId)}`}>
+            Open chat →
+          </Link>
+        </div>
+      )}
+    </div>
+  );
+}
+function RequestError({ text, retry }: { text: string; retry: () => void }) {
+  return (
+    <div role="alert" className={styles.requestError}>
+      <span>{text}</span>
+      <button className={styles.textButton} onClick={retry}>
+        Try again
+      </button>
+    </div>
+  );
+}
+type Controls = {
+  nextCursor: string | null;
+  loadingMore: boolean;
+  moreError?: string;
+  loadMore: () => Promise<void>;
+};
+function MoreActivity({
+  controls,
+  label = "Load more activity",
+}: {
+  controls: Controls;
+  label?: string;
+}) {
+  return (
+    <>
+      {controls.moreError && (
+        <p role="alert" className={styles.loadError}>
+          {controls.moreError}
+        </p>
+      )}
+      {controls.nextCursor && (
+        <div className={styles.loadMore}>
+          <button
+            className={styles.secondary}
+            disabled={controls.loadingMore}
+            onClick={() => void controls.loadMore()}
+          >
+            {controls.loadingMore
+              ? "Loading…"
+              : controls.moreError
+                ? "Try loading more again"
+                : label}
+          </button>
+        </div>
+      )}
+    </>
+  );
+}
+function DayCharges({
+  day,
+  timeZone,
+  scope,
+}: {
+  day: string;
+  timeZone: string;
+  scope: string;
+}) {
+  const load = useCallback(
+    (cursor: string | undefined, signal: AbortSignal) =>
+      api.getTokenHistoryDayCharges(day, { timeZone, cursor }, signal),
+    [day, timeZone],
+  );
+  const result = useHistoryPages(`${scope}:charges:${day}`, true, load);
+  const activity = uniqueActivity(result.pages.flatMap((page) => page.items));
+  return (
+    <div
+      id={`charges-${day}`}
+      role="region"
+      aria-label={`Model charges for ${day}`}
+      aria-busy={result.loading}
+    >
+      {result.loading && (
+        <p role="status" className={styles.loading}>
+          Loading charges…
+        </p>
+      )}
+      {result.error && (
+        <RequestError text={result.error} retry={result.retry} />
+      )}
+      {activity.map((item) => (
+        <ActivityRow key={item.id} activity={item} />
+      ))}
+      {!result.loading && !result.error && !activity.length && (
+        <p className={styles.loading}>No charges for this day.</p>
+      )}
+      <MoreActivity controls={result} label="Load more charges" />
+    </div>
+  );
+}
+function DayContinuation({ day, scope }: { day: HistoryDay; scope: string }) {
+  const [requested, setRequested] = useState(false);
+  const load = useCallback(
+    async (cursor: string | undefined, signal: AbortSignal) => {
+      const result = await api.getTokenHistory(
+        {
+          ...day.activityQuery,
+          cursor: cursor || day.nextActivityCursor || undefined,
+        },
+        signal,
+      );
+      if (result.mode !== "detailed")
+        throw new Error("Unexpected history response");
+      return result as DetailedHistory;
+    },
+    [day.activityQuery, day.nextActivityCursor],
+  );
+  const result = useHistoryPages(
+    `${scope}:operations:${day.day}`,
+    requested,
+    load,
+  );
+  if (!requested)
+    return (
+      <div className={styles.loadMore}>
+        <button
+          className={styles.textButton}
+          onClick={() => setRequested(true)}
+        >
+          Load more operations for this day →
+        </button>
+      </div>
+    );
+  const loadedIds = new Set(day.activity.map((item) => item.id));
+  return (
+    <>
+      {result.loading && (
+        <p role="status" className={styles.loading}>
+          Loading operations…
+        </p>
+      )}
+      {result.error && (
+        <RequestError text={result.error} retry={result.retry} />
+      )}
+      {uniqueActivity(result.pages.flatMap((page) => page.items))
+        .filter((item) => !loadedIds.has(item.id))
+        .map((item) => (
+          <ActivityRow key={item.id} activity={item} />
+        ))}
+      <MoreActivity
+        controls={result}
+        label="Load more operations for this day"
+      />
+    </>
+  );
+}
 export default function TokenHistoryPage() {
   const router = useRouter();
+  const dispatch = useAppDispatch();
   const loggedIn = useAppSelector(selectIsLoggedIn);
+  const accessReady = useAppSelector(selectAccessTokenReady);
+  const user = useAppSelector(selectUser);
   const balance = useAppSelector(selectBalance);
   const balanceReady = useAppSelector(selectBalanceReady);
+  const balanceVersion = useAppSelector((state) => state.tokens.balanceVersion);
+  const nextClaim = useAppSelector(selectNextClaimTime);
+  const claiming = useAppSelector(selectClaiming);
   const timeZone = useSyncExternalStore(
     subscribeTimeZone,
     getTimeZone,
     () => "",
   );
   const [loginOpen, setLoginOpen] = useState(false);
-  const [sample, setSample] = useState(false);
-  const [mode, setMode] = useState<"general" | "detailed">("general");
-  const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set());
-  const [filter, setFilter] = useState("all");
+  const [sendOwner, setSendOwner] = useState<string | null>(null);
+  const [mode, setMode] = useState<HistoryMode>("general");
+  const [filter, setFilter] = useState<HistoryFilter>("all");
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
-  const [entries, setEntries] = useState<Activity[]>([]);
-  const [selected, setSelected] = useState<Activity | null>(null);
-  const [notice, setNotice] = useState("");
+  const [reload, setReload] = useState(0);
+  const [notice, setNotice] = useState<{ owner: string; text: string } | null>(
+    null,
+  );
+  const [now, setNow] = useState(() => Date.now());
+  const claimInFlight = useRef(false);
+  const owner = loggedIn ? user?.id || "" : "";
+  const enabled = Boolean(owner && accessReady && timeZone);
+  const scope = JSON.stringify([owner, balanceVersion, reload, timeZone]);
+  const viewScope = JSON.stringify([scope, mode, filter, from, to]);
+  const expansionScope = JSON.stringify([
+    owner,
+    mode,
+    filter,
+    from,
+    to,
+    timeZone,
+  ]);
+  const [expansion, setExpansion] = useState<{
+    scope: string;
+    days: Set<string>;
+  }>({ scope: "", days: new Set() });
+  const expandedDays =
+    expansion.scope === expansionScope ? expansion.days : new Set<string>();
   useEffect(() => {
     if (!loggedIn) clearTokenHistoryDraft();
   }, [loggedIn]);
-  const visible = useMemo(
-    () =>
-      entries.filter(
-        (a) =>
-          (filter === "all" ||
-            (filter === "usage" ? isCharge(a) : a.type === filter)) &&
-          (!from || localDay(a.at) >= from) &&
-          (!to || localDay(a.at) <= to),
-      ),
-    [entries, filter, from, to],
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+  const query = useMemo<HistoryQuery>(
+    () => ({
+      mode,
+      type: filter,
+      from: from || undefined,
+      to: to || undefined,
+      timeZone,
+    }),
+    [mode, filter, from, to, timeZone],
   );
-  const groups = groupActivity(visible);
-  const periodEntries = entries.filter(
-    (entry) =>
-      (!from || localDay(entry.at) >= from) &&
-      (!to || localDay(entry.at) <= to),
+  const load = useCallback(
+    (cursor: string | undefined, signal: AbortSignal) =>
+      api.getTokenHistory({ ...query, cursor }, signal),
+    [query],
   );
-  const incoming = periodEntries.reduce(
-    (sum, entry) => sum + Math.max(0, entry.amount),
-    0,
+  const history = useHistoryPages(viewScope, enabled, load);
+  const summaryQuery = useMemo(
+    () => ({ from: from || undefined, to: to || undefined, timeZone }),
+    [from, to, timeZone],
   );
-  const outgoing = periodEntries.reduce(
-    (sum, entry) => sum + Math.min(0, entry.amount),
-    0,
+  const loadSummary = useCallback(
+    async (_cursor: string | undefined, signal: AbortSignal) => ({
+      summary: await api.getTokenHistorySummary(summaryQuery, signal),
+      nextCursor: null,
+    }),
+    [summaryQuery],
   );
-  const netChange = incoming + outgoing;
+  const summaryState = useHistoryPages(
+    JSON.stringify([scope, from, to]),
+    enabled,
+    loadSummary,
+  );
+  const summary = summaryState.pages[0]?.summary;
+  const days = historyDays(history.pages);
   const resetFilters = () => {
     setFilter("all");
     setFrom("");
     setTo("");
   };
-  const toggleSample = () => {
-    const next = !sample;
-    setSample(next);
-    setEntries(next ? createPreview() : []);
-    setSelected(null);
-    setExpandedDays(new Set());
-    setNotice("");
-    resetFilters();
+  const closeSend = useCallback(() => {
+    setSendOwner(null);
+    setReload((value) => value + 1);
+  }, []);
+  const nextClaimAt = nextClaim ? Date.parse(nextClaim) : null;
+  const eligible =
+    balanceReady &&
+    (nextClaimAt === null ||
+      (Number.isFinite(nextClaimAt) && nextClaimAt <= now));
+  const claim = async () => {
+    if (!loggedIn) {
+      setLoginOpen(true);
+      return;
+    }
+    if (!enabled || !eligible || claiming || claimInFlight.current) return;
+    claimInFlight.current = true;
+    try {
+      const result = await dispatch(claimTokens()).unwrap();
+      setNotice({
+        owner,
+        text: result.success
+          ? "10,000 TITI added to your balance."
+          : result.message,
+      });
+      setReload((value) => value + 1);
+    } catch (error) {
+      setNotice({
+        owner,
+        text:
+          typeof error === "string"
+            ? error
+            : "Could not claim your bonus. Please try again.",
+      });
+    } finally {
+      claimInFlight.current = false;
+    }
   };
-  const description = (a: Activity) =>
-    a.type === "purchase"
-      ? `${new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(a.price || 0)} · Card payment`
-      : a.peer
-        ? `${a.type === "sent" ? "To" : "From"} ${a.peer}`
-        : a.type === "bonus"
-          ? "Weekly reward"
-          : `${a.model} · ${a.chat}`;
-  const renderActivity = (a: Activity) => (
-    <button
-      key={a.id}
-      className={styles.row}
-      onClick={() => setSelected(selected?.id === a.id ? null : a)}
-      aria-expanded={selected?.id === a.id}
-    >
-      <span
-        className={`${styles.icon} ${styles[a.type === "bonus" ? "bonusIcon" : a.type]}`}
-      >
-        <Icon kind={a.type} />
-      </span>
-      <span className={styles.rowText}>
-        <b>{titles[a.type]}</b>
-        <span>{description(a)}</span>
-      </span>
-      <time dateTime={a.at} title={formatActivity(a.at) || undefined}>
-        {new Date(a.at).toLocaleTimeString("en-GB", {
-          hour: "2-digit",
-          minute: "2-digit",
-        })}
-      </time>
-      <strong className={a.amount > 0 ? styles.positive : styles.negative}>
-        {amount(a.amount)}
-      </strong>
-      <span className={styles.chevron}>›</span>
-      {selected?.id === a.id && (
-        <span className={styles.details}>
-          <span>{new Date(a.at).toLocaleString("en-GB")} · Local time</span>
-          <span>Sample operation · {a.id}</span>
-          {isCharge(a) && (
-            <span>
-              Chat: {a.chat}. Demo chats are not linked to your account.
-            </span>
-          )}
-        </span>
-      )}
-    </button>
-  );
   return (
     <main className={styles.page}>
       <div className={styles.content}>
@@ -187,14 +444,15 @@ export default function TokenHistoryPage() {
             <h1>Token history</h1>
             <p>Your TITI, every move.</p>
           </div>
-          <button
-            className={styles.preview}
-            aria-pressed={sample}
-            onClick={toggleSample}
-          >
-            {sample ? "◉ Sample activity" : "○ Empty account"}
-            <span>Switch preview</span>
-          </button>
+          {enabled && (
+            <button
+              className={styles.textButton}
+              onClick={() => setReload((value) => value + 1)}
+              disabled={history.loading}
+            >
+              Refresh activity ↻
+            </button>
+          )}
         </header>
         <section
           className={styles.balance}
@@ -231,19 +489,29 @@ export default function TokenHistoryPage() {
                 Sign in →
               </button>
             )}
-            <div className={styles.totals} aria-label="Selected period totals">
+            <div
+              className={styles.totals}
+              aria-label="Selected period totals"
+              aria-busy={summaryState.loading}
+            >
               <span>
-                In <b>{incoming ? amount(incoming) : "0 TITI"}</b>
+                In <b>{summary ? amount(summary.incoming) : "—"}</b>
               </span>
               <span>
-                Out <b>{outgoing ? amount(outgoing) : "0 TITI"}</b>
+                Out <b>{summary ? amount(summary.outgoing) : "—"}</b>
               </span>
             </div>
             <div className={styles.netChange}>
               <span>Net change</span>
-              <b>{netChange ? amount(netChange) : "0 TITI"}</b>
+              <b>{summary ? amount(summary.netChange) : "—"}</b>
               <span className={styles.periodLabel}>Selected period</span>
             </div>
+            {summaryState.error && (
+              <RequestError
+                text="Could not load period totals."
+                retry={summaryState.retry}
+              />
+            )}
           </div>
           <div className={styles.actions}>
             <Link className={styles.primary} href="/top-up-your-tokens">
@@ -251,95 +519,78 @@ export default function TokenHistoryPage() {
             </Link>
             <button
               className={styles.secondary}
-              disabled={!loggedIn || !balanceReady || balance <= 0}
-              onClick={() =>
-                setNotice(
-                  "Sample preview: no TITI was sent. Transfers will be connected when history is available.",
-                )
-              }
+              disabled={!enabled || !balanceReady || balance <= 0}
+              onClick={() => setSendOwner(owner)}
             >
               Send TITI
             </button>
           </div>
         </section>
-        {sample && entries.some((a) => a.id === "claimed-preview") && (
-          <section className={styles.bonus}>
-            <span className={`${styles.icon} ${styles.bonusIcon}`}>
-              <Icon kind="bonus" />
-            </span>
-            <div>
-              <span className={styles.eyebrow}>YOUR WEEKLY GIFT</span>
-              <h2>10,000 TITI claimed</h2>
-              <p>
-                Next sample bonus:{" "}
-                {new Date(
-                  new Date(entries[0].at).getTime() + 7 * 86400000,
-                ).toLocaleString("en-GB")}
-              </p>
-            </div>
-            <button className={styles.secondary} disabled>
-              Bonus claimed
-            </button>
-          </section>
-        )}
-        {!sample && (
-          <section className={styles.bonus}>
-            <span className={`${styles.icon} ${styles.bonusIcon}`}>
-              <Icon kind="bonus" />
-            </span>
-            <div>
-              <span className={styles.eyebrow}>A LITTLE GIFT. EVERY WEEK.</span>
-              <h2>10,000 TITI, on us.</h2>
-              <p>
-                Get 10,000 free TITI every week. Make room for your next idea.
-              </p>
-            </div>
-            <button
-              className={styles.primary}
-              onClick={() => {
-                setSample(true);
-                setEntries([
-                  {
-                    id: "claimed-preview",
-                    type: "bonus",
-                    at: new Date().toISOString(),
-                    amount: 10000,
-                  },
-                ]);
-                setNotice(
-                  "Sample bonus added. Your actual account balance has not changed.",
-                );
-              }}
-            >
-              Claim 10,000 TITI
-            </button>
-          </section>
-        )}
+        <section className={styles.bonus}>
+          <span className={`${styles.icon} ${styles.bonusIcon}`}>
+            <Icon kind="bonus" />
+          </span>
+          <div>
+            <span className={styles.eyebrow}>A LITTLE GIFT. EVERY WEEK.</span>
+            <h2>10,000 TITI, on us.</h2>
+            <p>
+              {loggedIn &&
+              balanceReady &&
+              nextClaimAt !== null &&
+              Number.isFinite(nextClaimAt) &&
+              nextClaimAt > now
+                ? `Next bonus: ${new Date(nextClaimAt).toLocaleString("en-GB")}`
+                : "Get 10,000 free TITI every week. Make room for your next idea."}
+            </p>
+          </div>
+          <button
+            className={styles.primary}
+            disabled={loggedIn && (!enabled || !eligible || claiming)}
+            onClick={() => void claim()}
+          >
+            {!loggedIn
+              ? "Sign in to claim"
+              : claiming
+                ? "Claiming…"
+                : !balanceReady
+                  ? "Checking eligibility…"
+                  : eligible
+                    ? "Claim 10,000 TITI"
+                    : "Bonus claimed"}
+          </button>
+        </section>
         <div className={styles.toolbar}>
           <div
             className={styles.segment}
             role="group"
             aria-label="History view"
           >
-            {(["general", "detailed"] as const).map((v) => (
+            {(["general", "detailed"] as const).map((view) => (
               <button
-                key={v}
-                aria-pressed={mode === v}
-                onClick={() => setMode(v)}
+                key={view}
+                aria-pressed={mode === view}
+                onClick={() => setMode(view)}
               >
-                {v === "general" ? "General" : "Detailed"}
+                {view === "general" ? "General" : "Detailed"}
               </button>
             ))}
           </div>
           <label className={styles.filter}>
             <span className={styles.srOnly}>Activity type</span>
-            <select value={filter} onChange={(e) => setFilter(e.target.value)}>
+            <select
+              value={filter}
+              onChange={(event) =>
+                setFilter(event.target.value as HistoryFilter)
+              }
+            >
               <option value="all">All activity</option>
               <option value="purchase">Purchases</option>
               <option value="bonus">Free bonuses</option>
               <option value="received">Received TITI</option>
               <option value="sent">Sent TITI</option>
               <option value="usage">Model usage</option>
+              <option value="refund">Payment refunds</option>
+              <option value="adjustment">Balance adjustments</option>
             </select>
           </label>
           <div className={styles.dates}>
@@ -369,73 +620,103 @@ export default function TokenHistoryPage() {
               ? "Model charges grouped by day."
               : "Each request and response, one total."}
           </span>
-          <span>
-            Local time · {timeZone || "Your time zone"} · Sample activity
-          </span>
+          <span>Local time · {timeZone || "Your time zone"}</span>
         </div>
-        {notice && (
+        {notice?.owner === owner && (
           <div role="status" className={styles.notice}>
-            {notice}
+            <span>{notice.text}</span>
             <button
               aria-label="Dismiss notification"
-              onClick={() => setNotice("")}
+              onClick={() => setNotice(null)}
             >
               ×
             </button>
           </div>
         )}
-        <div aria-live="polite">
-          {!groups.length ? (
+        <div aria-live="polite" aria-busy={history.loading}>
+          {!loggedIn ? (
+            <section className={styles.empty}>
+              <h2>Sign in to see your activity</h2>
+              <p>
+                Your purchases, bonuses, transfers and model usage, all in one
+                place.
+              </p>
+              <button
+                className={styles.primary}
+                onClick={() => setLoginOpen(true)}
+              >
+                Sign in
+              </button>
+            </section>
+          ) : !enabled || history.loading ? (
+            <section className={styles.empty}>
+              <p role="status">Loading your activity…</p>
+            </section>
+          ) : history.error ? (
+            <RequestError text={history.error} retry={history.retry} />
+          ) : !days.length ? (
             <section className={styles.empty}>
               <span className={`${styles.icon} ${styles.usage}`}>
                 <Icon kind="usage" />
               </span>
               <h2>
-                {entries.length
+                {from || to || filter !== "all"
                   ? "No matching activity"
                   : "Your story starts here"}
               </h2>
               <p>
-                {entries.length
+                {from || to || filter !== "all"
                   ? "Try a different date or activity filter."
-                  : "Your bonuses, purchases, transfers and model usage will appear here."}
+                  : "Your recorded bonuses, purchases, transfers and model usage will appear here."}
               </p>
-              {entries.length ? (
+              {(from || to || filter !== "all") && (
                 <button className={styles.textButton} onClick={resetFilters}>
                   Clear filters →
                 </button>
-              ) : (
-                <span>One place for every TITI.</span>
               )}
             </section>
           ) : (
-            groups.map(([day, items]) => {
-              const charges = items.filter(isCharge);
-              const rows =
-                mode === "general" ? items.filter((a) => !isCharge(a)) : items;
-              return (
-                <section className={styles.day} key={day} aria-label={day}>
-                  <h2>
-                    {new Date(`${day}T12:00:00`).toLocaleDateString("en-GB", {
-                      day: "numeric",
-                      month: "short",
-                      year: "numeric",
-                    })}
-                  </h2>
-                  {rows.map(renderActivity)}
-                  {mode === "general" && charges.length > 0 && (
+            days.map((day) => (
+              <section
+                className={styles.day}
+                key={day.day}
+                aria-label={day.day}
+              >
+                <h2>
+                  {new Date(`${day.day}T12:00:00`).toLocaleDateString("en-GB", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </h2>
+                {day.activity.map((activity) => (
+                  <ActivityRow key={activity.id} activity={activity} />
+                ))}
+                {day.general?.nextActivityCursor && (
+                  <DayContinuation day={day.general} scope={viewScope} />
+                )}
+                {day.general?.usage && (
+                  <>
                     <button
                       className={`${styles.row} ${styles.daily}`}
-                      aria-expanded={expandedDays.has(day)}
-                      aria-controls={`charges-${day}`}
-                      onClick={() => {
-                        setExpandedDays((current) => {
-                          const next = new Set(current);
-                          if (next.has(day)) next.delete(day);
-                          else next.add(day);
-                          return next;
-                        });
-                      }}
+                      aria-expanded={expandedDays.has(day.day)}
+                      aria-controls={
+                        expandedDays.has(day.day)
+                          ? `charges-${day.day}`
+                          : undefined
+                      }
+                      onClick={() =>
+                        setExpansion((previous) => {
+                          const next = new Set(
+                            previous.scope === expansionScope
+                              ? previous.days
+                              : [],
+                          );
+                          if (next.has(day.day)) next.delete(day.day);
+                          else next.add(day.day);
+                          return { scope: expansionScope, days: next };
+                        })
+                      }
                     >
                       <span className={`${styles.icon} ${styles.usage}`}>
                         <Icon kind="usage" />
@@ -443,46 +724,55 @@ export default function TokenHistoryPage() {
                       <span className={styles.rowText}>
                         <b>Model usage</b>
                         <span>
-                          {charges.length} charges ·{" "}
-                          {new Set(charges.map((a) => a.model)).size} models
+                          {day.general.usage.chargeCount} charges ·{" "}
+                          {day.general.usage.modelCount} models
+                          {day.general.usage.unknownModelCharges > 0
+                            ? " · Some model details unavailable"
+                            : ""}
                         </span>
                       </span>
                       <span className={styles.dailyLabel}>Daily total</span>
                       <strong>
-                        {amount(charges.reduce((s, a) => s + a.amount, 0))}
+                        {amount(day.general.usage.amount)}
                         <span className={styles.viewCharges}>
-                          {expandedDays.has(day)
+                          {expandedDays.has(day.day)
                             ? "Close details ↑"
                             : "View charges →"}
                         </span>
                       </strong>
                       <span className={styles.chevron}>›</span>
                     </button>
-                  )}
-                  {mode === "general" &&
-                    charges.length > 0 &&
-                    expandedDays.has(day) && (
-                      <div
-                        id={`charges-${day}`}
-                        role="region"
-                        aria-label={`Model charges for ${day}`}
-                      >
-                        {charges.map(renderActivity)}
-                      </div>
+                    {expandedDays.has(day.day) && (
+                      <DayCharges
+                        day={day.day}
+                        timeZone={timeZone}
+                        scope={viewScope}
+                      />
                     )}
-                </section>
-              );
-            })
+                  </>
+                )}
+              </section>
+            ))
           )}
         </div>
-        {!!groups.length && (
-          <p className={styles.end}>End of sample activity</p>
+        {enabled && !history.loading && !history.error && (
+          <MoreActivity controls={history} />
         )}
-        <p className={styles.footer}>
-          Preview only. Sample actions never change your account balance.
-        </p>
+        {!!days.length && !history.nextCursor && (
+          <p className={styles.end}>End of recorded activity</p>
+        )}
+        {summary && (
+          <p className={styles.footer}>
+            {summary.coverage.firstRecordedAt
+              ? `Recorded activity from ${new Date(summary.coverage.firstRecordedAt).toLocaleDateString("en-GB")}. Earlier activity may not be available.`
+              : "Earlier activity may not be available in your history."}
+          </p>
+        )}
       </div>
       <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
+      {enabled &&
+        sendOwner === owner &&
+        createPortal(<SendTokensModal onClose={closeSend} />, document.body)}
     </main>
   );
 }

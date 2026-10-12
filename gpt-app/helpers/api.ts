@@ -15,14 +15,58 @@ import type {
 } from "@/types/api.types";
 
 export const api = {
+  getTokenHistory: async (
+    params: import("@/types/tokenHistory.types").HistoryQuery,
+    signal?: AbortSignal,
+  ) => {
+    const res = await axiosInstance.get<
+      import("@/types/tokenHistory.types").HistoryPage
+    >("/users/token-history", { params, signal, timeout: 15_000 });
+    return res.data;
+  },
+  getTokenHistorySummary: async (
+    params: Pick<
+      import("@/types/tokenHistory.types").HistoryQuery,
+      "from" | "to" | "timeZone"
+    >,
+    signal?: AbortSignal,
+  ) => {
+    const res = await axiosInstance.get<
+      import("@/types/tokenHistory.types").HistorySummary
+    >("/users/token-history/summary", { params, signal, timeout: 15_000 });
+    return res.data;
+  },
+  getTokenHistoryDayCharges: async (
+    day: string,
+    params: Pick<
+      import("@/types/tokenHistory.types").HistoryQuery,
+      "timeZone" | "cursor"
+    >,
+    signal?: AbortSignal,
+  ) => {
+    const res = await axiosInstance.get<
+      import("@/types/tokenHistory.types").DetailedHistory
+    >(`/users/token-history/days/${encodeURIComponent(day)}/charges`, {
+      params,
+      signal,
+      timeout: 15_000,
+    });
+    return res.data;
+  },
   getBalance: async (signal?: AbortSignal) => {
-    const res = await axiosInstance.get("/users/balance", { signal, timeout: 15_000 });
+    const res = await axiosInstance.get("/users/balance", {
+      signal,
+      timeout: 15_000,
+    });
     return res.data;
   },
   getTokenOperation: async (id: string, signal?: AbortSignal) => {
-    const res = await axiosInstance.get<import("@/types/api.types").TokenOperation>(
-      `/users/token-operations/${encodeURIComponent(id)}`, { signal, timeout: 15_000 },
-    );
+    const res = await axiosInstance.get<
+      import("@/types/api.types").TokenOperation
+    >(`/users/token-operations/${encodeURIComponent(id)}`, {
+      signal,
+      timeout: 15_000,
+    });
     return res.data;
   },
   uploadImage: async (file: File) => {
@@ -63,9 +107,12 @@ export const api = {
     return res.data;
   },
   updateConversationPin: async (id: string, pinned: boolean) => {
-    const res = await axiosInstance.patch<Conversation>(`/conversations/${id}`, {
-      pinned,
-    });
+    const res = await axiosInstance.patch<Conversation>(
+      `/conversations/${id}`,
+      {
+        pinned,
+      },
+    );
     return res.data;
   },
   getConversationMessages: async (id: string, signal?: AbortSignal) => {
@@ -107,7 +154,10 @@ export const api = {
     return res.data;
   },
   updateProject: async (id: string, payload: UpdateProjectPayload) => {
-    const res = await axiosInstance.patch<ApiProject>(`/project/${id}`, payload);
+    const res = await axiosInstance.patch<ApiProject>(
+      `/project/${id}`,
+      payload,
+    );
     return res.data;
   },
   deleteProject: async (id: string) => {
