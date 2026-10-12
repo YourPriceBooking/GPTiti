@@ -383,3 +383,11 @@
     animation: none;
   }
 }
+
+.tokenNote {
+  margin: -6px 0 20px;
+  color: #94a3b8;
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: center;
+}

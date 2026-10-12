@@ -11,6 +11,7 @@ import { createPortal } from "react-dom";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import LoginModal from "@/components/HomePage/common/LoginModal/LoginModal";
+import ActionTooltip from "@/components/common/ActionTooltip/ActionTooltip";
 import SendTokensModal from "@/components/SendTokensButton/SendTokensModal";
 import { api } from "@/helpers/api";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
@@ -518,6 +519,7 @@ export default function TokenHistoryPage() {
               onClick={() => setSendOwner(owner)}
             >
               Send TITI
+              <ActionTooltip label="Send TITI tokens" appearance="plain" />
             </button>
           </div>
         </section>

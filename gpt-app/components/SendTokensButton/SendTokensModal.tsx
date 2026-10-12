@@ -389,14 +389,14 @@ export default function SendTokensModal({ onClose }: Props) {
             <span className={styles.successIcon} aria-hidden="true">
               ✓
             </span>
-            <h2 id="send-tokens-title">{receipt.status === "pending" ? "Transfer submitted" : receipt.status === "failed" ? "Transfer failed" : "Tokens sent"}</h2>
+            <h2 id="send-tokens-title">{receipt.status === "pending" ? "Transfer submitted" : receipt.status === "failed" ? "Transfer failed" : "TITI sent"}</h2>
             <p id="send-tokens-description" className={styles.description}>
-              {receipt.amount.toLocaleString("en-US")} tokens {receipt.status === "confirmed" ? "sent" : "submitted"} to{" "}
+              {receipt.amount.toLocaleString("en-US")} TITI {receipt.status === "confirmed" ? "sent" : "submitted"} to{" "}
               {receipt.email}.
             </p>
             <p className={styles.balanceText}>
               {receiptBalanceState === "current"
-                ? `Current balance: ${balance.toLocaleString("en-US")} tokens`
+                ? `Current balance: ${balance.toLocaleString("en-US")} TITI`
                 : receiptBalanceState === "refreshing"
                   ? "Refreshing balance…"
                   : "Balance unavailable right now."}
@@ -424,13 +424,15 @@ export default function SendTokensModal({ onClose }: Props) {
               <Image src="/icons/send-tokens-modal.svg" alt="" width={32} height={32} />
             </div>
             <h2 id="send-tokens-title">
-              {stage === "confirm" ? "Confirm transfer" : "Send tokens"}
+              {stage === "confirm" ? "Confirm transfer" : "Send TITI tokens"}
             </h2>
             <p id="send-tokens-description" className={styles.description}>
               {stage === "confirm"
                 ? "Review the details before sending."
-                : "Enter the recipient email and token amount."}
+                : "Enter the recipient email and TITI amount."}
             </p>
+
+            <p className={styles.tokenNote}>Transfers use TITI, the tokens in your GPTiti balance.</p>
 
             {stage === "confirm" ? (
               <div className={styles.confirmation}>
@@ -447,7 +449,7 @@ export default function SendTokensModal({ onClose }: Props) {
                   <div className={styles.summaryRow}>
                     <span>Amount</span>
                     <strong>
-                      {parsedAmount.toLocaleString("en-US")} tokens
+                      {parsedAmount.toLocaleString("en-US")} TITI
                     </strong>
                   </div>
                   <div className={styles.summaryRow}>
@@ -456,7 +458,7 @@ export default function SendTokensModal({ onClose }: Props) {
                       {Math.max(0, shownBalance - parsedAmount).toLocaleString(
                         "en-US",
                       )}{" "}
-                      tokens
+                      TITI
                     </strong>
                   </div>
                 </div>
@@ -493,7 +495,7 @@ export default function SendTokensModal({ onClose }: Props) {
                   >
                     {sending
                       ? "Sending…"
-                      : `Send ${parsedAmount.toLocaleString("en-US")} tokens`}
+                      : `Send ${parsedAmount.toLocaleString("en-US")} TITI`}
                   </button>
                 </div>
               </div>
@@ -501,7 +503,7 @@ export default function SendTokensModal({ onClose }: Props) {
               <form onSubmit={continueToConfirm} noValidate>
                 <div className={styles.balanceRow}>
                   <span>Available balance</span>
-                  <strong>{balanceReady ? `${shownBalance.toLocaleString("en-US")} tokens` : "Syncing balance…"}</strong>
+                  <strong>{balanceReady ? `${shownBalance.toLocaleString("en-US")} TITI` : "Syncing balance…"}</strong>
                 </div>
                 <label className={styles.label} htmlFor="transfer-email">
                   Recipient email
@@ -567,7 +569,7 @@ export default function SendTokensModal({ onClose }: Props) {
                     aria-invalid={insufficientBalance}
                     aria-describedby="amount-feedback"
                   />
-                  <span className={styles.unit}>tokens</span>
+                  <span className={styles.unit}>TITI</span>
                   <button
                     type="button"
                     className={styles.maxButton}
@@ -595,7 +597,7 @@ export default function SendTokensModal({ onClose }: Props) {
                       />
                       <span>
                         Insufficient balance. You can send up to{" "}
-                        {shownBalance.toLocaleString("en-US")} tokens.
+                        {shownBalance.toLocaleString("en-US")} TITI.
                       </span>
                     </>
                   ) : pendingMatches && !amountIsValid ? (
@@ -603,7 +605,7 @@ export default function SendTokensModal({ onClose }: Props) {
                   ) : amount && !amountIsPositive ? (
                     "Enter a positive whole number."
                   ) : amountIsValid ? (
-                    `Balance after transfer: ${(shownBalance - parsedAmount).toLocaleString("en-US")} tokens`
+                    `Balance after transfer: ${(shownBalance - parsedAmount).toLocaleString("en-US")} TITI`
                   ) : (
                     ""
                   )}
