@@ -53,6 +53,7 @@ import {
   selectIsSectionVisible,
 } from "@/redux/ui/selectors";
 import {
+  setIsModalOpen,
   setFocusMode,
   setIsSectionVisible,
   setActiveProjectId,
@@ -98,17 +99,36 @@ export function useHomeController() {
 
   const draft = useInputDraft();
   const { clearDraft } = draft;
-  const { selectedModel, selectedModelGroup, selectModel } = useModelSync({
-    onModelSwitched: clearDraft,
+  const preserveDraftOnModelSwitch = useRef(false);
+  const { selectedModel, selectedModelGroup, selectModel: selectModelBase } = useModelSync({
+    onModelSwitched: () => {
+      if (!preserveDraftOnModelSwitch.current) clearDraft();
+    },
   });
+  const selectModel = useCallback((model: string) => {
+    const savedText = preserveDraftOnModelSwitch.current ? draft.readDraftText() : null;
+    selectModelBase(model);
+    preserveDraftOnModelSwitch.current = false;
+    if (savedText) requestAnimationFrame(() => draft.insertTemplate(savedText));
+  }, [selectModelBase, draft]);
   const {
     ensureConnectionReady,
     sendMessage,
     retryLastMessage,
     cancelLastPendingMessage,
+    balanceNotice,
+    dismissBalanceNotice,
     streamError,
     clearStreamError,
   } = useChatStream();
+  const chooseCheaperModel = useCallback(() => {
+    preserveDraftOnModelSwitch.current = true;
+    dismissBalanceNotice();
+    dispatch(setIsModalOpen(true));
+  }, [dismissBalanceNotice, dispatch]);
+  useEffect(() => {
+    if (!isModalOpen) preserveDraftOnModelSwitch.current = false;
+  }, [isModalOpen]);
   const { restoringActiveChat } = useChatRestore();
   const projects = useProjectChats();
 
@@ -394,6 +414,9 @@ export function useHomeController() {
     isExistingChat,
     dockHidden,
     // errors
+    chooseCheaperModel,
+    balanceNotice,
+    dismissBalanceNotice,
     streamError,
     clearStreamError,
     // estimate

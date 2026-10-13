@@ -171,3 +171,35 @@ test("parses safe terminal errors and status snapshots", () => {
   });
   assert.equal(status?.ok, true);
 });
+
+test("balance rejection supports old servers without inventing amounts", () => {
+  const ack = readChatSendAck({ ok: false, protocolVersion: 2, error: {
+    code: "INSUFFICIENT_BALANCE", message: "Insufficient balance", retryable: false,
+  } });
+  assert.ok(ack && !ack.ok);
+  assert.equal(ack.error.details, undefined);
+});
+
+test("balance errors retain finite server amounts including negative balances and zero", () => {
+  const error = { code: "BALANCE_LIMIT_EXCEEDED", message: "Top up", retryable: false,
+    details: { balance: -1200, availableTokens: 0, estimatedTokens: 400 } };
+  const ack = readChatSendAck({ ok: false, protocolVersion: 2, error });
+  assert.ok(ack && !ack.ok);
+  assert.deepEqual(ack.error.details, error.details);
+  const event = readChatErrorEvent({ protocolVersion: 2, event: "chat:error", type: "failed",
+    turnId, clientMessageId, conversationId, attempt: 1, payload: { error } });
+  assert.deepEqual(event?.payload.error.details, error.details);
+  const status = readChatStatusAck({ ok: true, protocolVersion: 2,
+    turn: { ...snapshot, status: "failed", error } });
+  assert.ok(status?.ok);
+  assert.deepEqual(status.turn.error?.details, error.details);
+});
+
+test("malformed optional amounts cannot poison a valid balance rejection", () => {
+  const ack = readChatSendAck({ ok: false, protocolVersion: 2, error: {
+    code: "INSUFFICIENT_BALANCE", message: "Top up", retryable: false,
+    details: { balance: Infinity, availableTokens: "250", estimatedTokens: -1 },
+  } });
+  assert.ok(ack && !ack.ok);
+  assert.equal(ack.error.details, undefined);
+});

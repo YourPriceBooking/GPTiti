@@ -12,6 +12,8 @@ import {
   CHAT_STATUS_EVENT,
   ChatServerEvent,
   classifyChatError,
+  isBalanceError,
+  type BalanceNotice,
   createClientMessageId,
   makeChatRetryEnvelope,
   makeChatSendEnvelope,
@@ -72,6 +74,8 @@ export type ChatStream = {
   sendMessage: (args: SendChatMessageArgs) => Promise<boolean>;
   retryLastMessage: (chatId: string) => Promise<boolean>;
   cancelLastPendingMessage: (chatId: string) => void;
+  balanceNotice: BalanceNotice | null;
+  dismissBalanceNotice: () => void;
   streamError: string | null;
   clearStreamError: () => void;
 };
@@ -102,6 +106,9 @@ export function useChatStream(): ChatStream {
   const generationRetryInFlightRef = useRef(new Set<string>());
   const chunkQueueRef = useRef<ChatStreamEvent[]>([]);
   const chunkFrameRef = useRef<number | null>(null);
+
+  const [balanceNotice, setBalanceNotice] = useState<BalanceNotice | null>(null);
+  const dismissBalanceNotice = useCallback(() => setBalanceNotice(null), []);
 
   const [streamError, setStreamError] = useState<string | null>(null);
 
@@ -201,6 +208,10 @@ export function useChatStream(): ChatStream {
   const applySnapshot = useCallback(
     (snapshot: ChatTurnSnapshot) => {
       signalAccepted(snapshot.clientMessageId);
+      const previous = pendingTurnsRef.current[snapshot.clientMessageId];
+      if (snapshot.error && isBalanceError(snapshot.error) && previous?.status !== "failed") {
+        setBalanceNotice({ error: snapshot.error, requestRejected: false });
+      }
       rememberSnapshot(snapshot);
       dispatch(reconcilePendingTurn(snapshot));
       if (snapshot.billing) void dispatch(refreshCurrentBalance());
@@ -208,7 +219,12 @@ export function useChatStream(): ChatStream {
     [dispatch, rememberSnapshot, signalAccepted],
   );
 
-  const showProtocolError = useCallback((error: ChatProtocolError) => {
+  const showProtocolError = useCallback((error: ChatProtocolError, requestRejected = false) => {
+    if (isBalanceError(error)) {
+      setBalanceNotice({ error, requestRejected });
+      setStreamError(null);
+      return;
+    }
     setStreamError(error.message);
   }, []);
 
@@ -358,7 +374,7 @@ export function useChatStream(): ChatStream {
             const next = { ...pendingTurnsRef.current };
             delete next[turn.clientMessageId];
             pendingTurnsRef.current = next;
-            showProtocolError(ack.error);
+            showProtocolError(ack.error, true);
             return false;
           }
           applySnapshot(ack.turn);
@@ -486,6 +502,9 @@ export function useChatStream(): ChatStream {
       signalAccepted(event.clientMessageId);
       flushChunks();
       dispatch(failPendingTurn(event));
+      if (isBalanceError(event.payload.error)) {
+        setBalanceNotice({ error: event.payload.error, requestRejected: false });
+      }
       pendingTurnsRef.current = {
         ...pendingTurnsRef.current,
         [event.clientMessageId]: {
@@ -711,6 +730,8 @@ export function useChatStream(): ChatStream {
     sendMessage,
     retryLastMessage,
     cancelLastPendingMessage,
+    balanceNotice,
+    dismissBalanceNotice,
     streamError,
     clearStreamError,
   };

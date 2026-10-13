@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import BalanceNoticeModal from "@/components/BalanceNotice/BalanceNoticeModal";
 import MessageList from "@/components/HomePage/RightSide/MessageList/MessageList";
 import InputComposer from "@/components/HomePage/RightSide/InputComposer/InputComposer";
 import MainSectionRightSide from "@/components/HomePage/RightSide/MainSectionRightSide/MainSectionRightSide";
@@ -76,6 +77,13 @@ export default function ChatView({
 
   return (
     <>
+      {ctrl.balanceNotice && (
+        <BalanceNoticeModal
+          notice={ctrl.balanceNotice}
+          onClose={ctrl.dismissBalanceNotice}
+          onChooseModel={ctrl.chooseCheaperModel}
+        />
+      )}
       {showBreadcrumbs && (
         <ChatBreadcrumbs chat={activeChat} onRename={ctrl.handleRenameChat} />
       )}
