@@ -25,6 +25,7 @@ export const CHAT_ERROR_CODES = [
   "CONVERSATION_NOT_FOUND",
   "MODEL_NOT_AVAILABLE",
   "INSUFFICIENT_BALANCE",
+  "BALANCE_LIMIT_EXCEEDED",
   "IDEMPOTENCY_CONFLICT",
   "TURN_NOT_FOUND",
   "TURN_NOT_RETRYABLE",
@@ -40,6 +41,7 @@ export type ChatProtocolError = {
   code: ChatProtocolErrorCode;
   message: string;
   retryable: boolean;
+  details?: { balance?: number; availableTokens?: number; estimatedTokens?: number };
 };
 
 export type AssistantMessageDTO = {
@@ -205,7 +207,17 @@ const readProtocolError = (value: unknown): ChatProtocolError | null => {
   const message = readNonEmptyString(value.message);
   if (!code || !ERROR_CODES.has(code) || !message) return null;
   if (typeof value.retryable !== "boolean") return null;
+  const details: NonNullable<ChatProtocolError["details"]> = {};
+  if (isRecord(value.details)) {
+    for (const key of ["balance", "availableTokens", "estimatedTokens"] as const) {
+      const amount = readFiniteNumber(value.details[key]);
+      if (amount !== null && (key !== "estimatedTokens" || amount >= 0)) {
+        details[key] = amount;
+      }
+    }
+  }
   return {
+    ...(Object.keys(details).length ? { details } : {}),
     code: code as ChatProtocolErrorCode,
     message,
     retryable: value.retryable,
@@ -506,3 +518,8 @@ export const classifyChatError = (
   }
   return { reason: "failed", message: message ?? CHAT_ERROR_FALLBACK };
 };
+
+export const isBalanceError = (error: ChatProtocolError): boolean =>
+  error.code === "INSUFFICIENT_BALANCE" || error.code === "BALANCE_LIMIT_EXCEEDED";
+
+export type BalanceNotice = { error: ChatProtocolError; requestRejected: boolean };
