@@ -59,7 +59,7 @@ export default function BalanceNoticeModal({ notice, onClose, onChooseModel }: P
           {blocked ? <><rect x="19" y="22" width="10" height="8" rx="2" fill="var(--notice-panel)" /><path d="M21 22v-3a3 3 0 0 1 6 0v3M24 25v2" /></> : <><path d="M26 17h-6a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h6z" /><path d="M22 20h.1" /></>}
         </svg>
       </div>
-      <h2 id={titleId} className={styles.title}>{blocked ? "Top up to continue" : "Not enough tokens"}</h2>
+      <h2 id={titleId} className={styles.title}>{blocked ? "Top up to continue" : "Not enough TITI"}</h2>
       <p id={descriptionId} className={styles.description}>
         {blocked
           ? "Your balance is below −1,000 TITI. New requests are paused for all models."
@@ -68,22 +68,22 @@ export default function BalanceNoticeModal({ notice, onClose, onChooseModel }: P
             : "You don’t have enough available tokens for this request. Top up to continue."}
       </p>
       {blocked ? (
-        balance !== undefined && <div className={styles.summary}><span>Current balance</span><strong className={styles.debt}>{formatTokens(balance)}</strong></div>
+        balance !== undefined && <div className={styles.summary}><div className={styles.row}><span>Current balance</span><strong className={styles.debt}>{formatTokens(balance)}</strong></div></div>
       ) : (
         (availableTokens !== undefined || estimatedTokens !== undefined) && <dl className={styles.summary}>
           {availableTokens !== undefined && <div className={styles.row}><dt>Available</dt><dd>{formatTokens(availableTokens)}</dd></div>}
           {estimatedTokens !== undefined && <div className={styles.row}><dt>Estimated cost</dt><dd>{formatTokens(estimatedTokens)}</dd></div>}
         </dl>
       )}
-      {blocked ? <p className={styles.note}>Your top-up will cover the negative balance first.<br />Add enough tokens for your next request.</p>
-        : notice.requestRejected && <p className={styles.note}>Your request hasn’t been sent.</p>}
       <div className={styles.actions}>
         <Link className={styles.primary} href="/top-up-your-tokens" onClick={() => { captureTokenHistoryDraft(); onClose(); }}>
-          Top up tokens <span aria-hidden="true">→</span>
+          Top up tokens
         </Link>
         {canChooseModel ? <button type="button" className={styles.secondary} onClick={onChooseModel}>Choose a cheaper model</button>
           : <button type="button" className={styles.back} onClick={onClose}>Back to chat</button>}
       </div>
+      {blocked ? <p className={styles.note}>Your top-up will cover the negative balance first.<br />Add enough tokens for your next request.</p>
+        : notice.requestRejected && <p className={styles.note}>Your request hasn’t been sent.</p>}
     </dialog>
   );
 }
