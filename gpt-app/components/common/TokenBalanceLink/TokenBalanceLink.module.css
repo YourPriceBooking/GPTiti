@@ -123,3 +123,7 @@
     transition: none;
   }
 }
+
+.reservations { display: grid; gap: 3px; padding: 7px 0 4px; color: #a9bedc; font-size: 11px; line-height: 1.45; font-weight: 400; overflow-wrap: anywhere; }
+.reservations strong { color: #d5e6ff; font-weight: 600; font-variant-numeric: tabular-nums; }
+.card .reservations { font-size: 12px; }

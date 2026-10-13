@@ -6,7 +6,7 @@ import Image from "next/image";
 
 import { api } from "@/helpers/api";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { selectBalance, selectBalanceReady } from "@/redux/tokens/selectors";
+import { selectBalance, selectBalanceReady, selectMaxTransferTokens, selectReservedTokens } from "@/redux/tokens/selectors";
 import { applyBalanceSnapshot } from "@/redux/tokens/slice";
 import { refreshCurrentBalance } from "@/redux/tokens/operations";
 import { readBalanceSnapshot } from "@/lib/balance/balanceProtocol";
@@ -48,11 +48,13 @@ export default function SendTokensModal({ onClose }: Props) {
   const [lookupError, setLookupError] = useState("");
   const [verifiedEmail, setVerifiedEmail] = useState("");
   const balanceReady = useAppSelector(selectBalanceReady);
-  const availableTokens = balanceReady ? balance : null;
+  const maximum = useAppSelector(selectMaxTransferTokens);
+  const reservedTokens = useAppSelector(selectReservedTokens);
+  const availableTokens = balanceReady ? maximum : null;
   const applyResponse = useCallback((data: unknown) => {
     const snapshot = readBalanceSnapshot(data);
     if (snapshot) dispatch(applyBalanceSnapshot(snapshot));
-    else void dispatch(refreshCurrentBalance());
+    if (snapshot?.reservedAppTokens === undefined) void dispatch(refreshCurrentBalance());
   }, [dispatch]);
   const [sendError, setSendError] = useState("");
   const [sending, setSending] = useState(false);
@@ -265,7 +267,10 @@ export default function SendTokensModal({ onClose }: Props) {
           setStage("form");
           return;
         }
-        if (parsedAmount > check.appTokens) {
+        const freshBalance = readBalanceSnapshot(await api.getBalance(controller.signal));
+        if (!freshBalance) throw new Error("Could not verify the available balance.");
+        dispatch(applyBalanceSnapshot(freshBalance));
+        if (parsedAmount > (freshBalance.maxTransferTokens ?? Math.max(0, freshBalance.appTokens))) {
           setSendError("Insufficient balance. Please reduce the amount.");
           setStage("form");
           return;
@@ -433,6 +438,9 @@ export default function SendTokensModal({ onClose }: Props) {
             </p>
 
             <p className={styles.tokenNote}>Transfers use TITI, the tokens in your GPTiti balance.</p>
+            {reservedTokens > 0 && <p className={styles.tokenNote} aria-live="polite">
+              Reserved for requests: {reservedTokens.toLocaleString("en-US")} TITI. Reserved tokens cannot be transferred.
+            </p>}
 
             {stage === "confirm" ? (
               <div className={styles.confirmation}>
@@ -453,7 +461,7 @@ export default function SendTokensModal({ onClose }: Props) {
                     </strong>
                   </div>
                   <div className={styles.summaryRow}>
-                    <span>Balance after transfer</span>
+                    <span>Available after transfer</span>
                     <strong>
                       {Math.max(0, shownBalance - parsedAmount).toLocaleString(
                         "en-US",
@@ -472,6 +480,9 @@ export default function SendTokensModal({ onClose }: Props) {
                     Check the recipient email carefully.
                   </span>
                 </p>
+                {insufficientBalance && <p className={styles.error} role="alert">
+                  Your available balance has changed. You can send up to {maximum.toLocaleString("en-US")} TITI. Go back to reduce the amount.
+                </p>}
                 {sendError && (
                   <p className={styles.error} role="alert">
                     {sendError}

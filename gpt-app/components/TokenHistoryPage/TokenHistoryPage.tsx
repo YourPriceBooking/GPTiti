@@ -23,6 +23,9 @@ import {
 import {
   selectBalance,
   selectBalanceReady,
+  selectReservedTokens,
+  selectAvailableTokens,
+  selectMaxTransferTokens,
   selectNextClaimTime,
   selectClaiming,
 } from "@/redux/tokens/selectors";
@@ -304,6 +307,9 @@ export default function TokenHistoryPage() {
   const user = useAppSelector(selectUser);
   const balance = useAppSelector(selectBalance);
   const balanceReady = useAppSelector(selectBalanceReady);
+  const reservedTokens = useAppSelector(selectReservedTokens);
+  const availableTokens = useAppSelector(selectAvailableTokens);
+  const maxTransferTokens = useAppSelector(selectMaxTransferTokens);
   const balanceVersion = useAppSelector((state) => state.tokens.balanceVersion);
   const nextClaim = useAppSelector(selectNextClaimTime);
   const claiming = useAppSelector(selectClaiming);
@@ -474,6 +480,12 @@ export default function TokenHistoryPage() {
                 "Sign in to see your balance"
               )}
             </strong>
+            {loggedIn && balanceReady && reservedTokens > 0 && (
+              <div className={styles.reservations} aria-live="polite" aria-atomic="true">
+                <span>Reserved for requests: <strong>{numbers.format(reservedTokens)} TITI</strong></span>
+                <span>Available: <strong>{numbers.format(availableTokens)} TITI</strong></span>
+              </div>
+            )}
             {!loggedIn && (
               <button
                 className={styles.textButton}
@@ -515,7 +527,7 @@ export default function TokenHistoryPage() {
             </Link>
             <button
               className={styles.secondary}
-              disabled={!enabled || !balanceReady || balance <= 0}
+              disabled={!enabled || !balanceReady || maxTransferTokens <= 0}
               onClick={() => setSendOwner(owner)}
             >
               Send TITI
