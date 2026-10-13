@@ -248,11 +248,11 @@
   max-width: 760px;
   margin-top: 8px;
   padding: 11px 12px;
-  border: 1px solid rgba(148, 163, 184, 0.16);
-  border-radius: 14px;
-  background: linear-gradient(180deg, #182236 0%, #131c2e 100%);
-  box-shadow: 0 10px 26px rgba(2, 6, 23, 0.2);
-  color: var(--main-white);
+  border: 1px solid #d8e7f8;
+  border-radius: 16px;
+  background: #edf5ff;
+  box-shadow: 0 3px 12px rgba(31, 65, 112, 0.04);
+  color: #101a38;
 }
 
 .streamErrorIcon {
@@ -262,14 +262,15 @@
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background: rgba(239, 80, 80, 0.14);
-  color: var(--error-soft);
+  background: #fbe3e3;
+  color: #bd4545;
   font-size: 14px;
   font-weight: 800;
 }
 
 .streamErrorBody {
   min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .streamErrorTitle,
@@ -280,14 +281,14 @@
 .streamErrorTitle {
   font-size: 14px;
   font-weight: 700;
-  color: #f1f5f9;
+  color: #101a38;
 }
 
 .streamErrorMessage {
   margin-top: 3px;
   font-size: 13px;
   line-height: 1.4;
-  color: var(--muted);
+  color: #516384;
 }
 
 .retryButton {
@@ -300,7 +301,7 @@
   border: 1px solid rgba(62, 124, 255, 0.55);
   border-radius: 10px;
   background: rgba(62, 124, 255, 0.14);
-  color: #e5edff;
+  color: #2359a5;
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
@@ -322,14 +323,14 @@
   border: 1px solid rgba(148, 163, 184, 0.3);
   border-radius: 10px;
   background: transparent;
-  color: #cbd5e1;
+  color: #516384;
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
 }
 
 .cancelPendingButton:hover:not(:disabled) {
-  border-color: rgba(203, 213, 225, 0.65);
+  border-color: #9cb4d3;
   background: rgba(148, 163, 184, 0.1);
 }
 
@@ -344,8 +345,9 @@
   transform: translateY(-1px);
 }
 
-.retryButton:focus-visible {
-  outline: 2px solid var(--retry-accent);
+.retryButton:focus-visible,
+.cancelPendingButton:focus-visible {
+  outline: 2px solid #3e7cff;
   outline-offset: 2px;
 }
 
