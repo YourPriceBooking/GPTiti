@@ -9,3 +9,7 @@ export const selectClaimError = (state: RootState) => state.tokens.claimError;
 
 export const selectBalanceReady = (state: RootState) =>
   state.tokens.balanceReady && state.tokens.ownerId === state.auth.user?.id;
+
+export const selectReservedTokens = (state: RootState) => selectBalanceReady(state) ? state.tokens.reservedTokens ?? 0 : 0;
+export const selectAvailableTokens = (state: RootState) => state.tokens.availableTokens;
+export const selectMaxTransferTokens = (state: RootState) => state.tokens.maxTransferTokens;

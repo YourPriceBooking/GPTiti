@@ -6,7 +6,8 @@ import { cancelBalanceRequests } from "@/lib/balance/balanceRequests";
 import { selectAccessTokenReady, selectIsLoggedIn, selectUser } from "@/redux/auth/selectors";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { refreshBalance } from "@/redux/tokens/operations";
-import { setBalanceOwner } from "@/redux/tokens/slice";
+import { readBalanceSnapshot } from "@/lib/balance/balanceProtocol";
+import { applyBalanceSnapshot, setBalanceOwner } from "@/redux/tokens/slice";
 
 export default function BalanceSync() {
   const dispatch = useAppDispatch();
@@ -21,7 +22,12 @@ export default function BalanceSync() {
     const refresh = () => { void dispatch(refreshBalance({ userId })); };
     const onUpdated = (event: unknown) => {
       if (event && typeof event === "object" &&
-          "userId" in event && event.userId === userId) refresh();
+          "userId" in event && event.userId === userId) {
+        const snapshot = readBalanceSnapshot(event);
+        if (snapshot?.reservedAppTokens !== undefined) dispatch(applyBalanceSnapshot(snapshot));
+        // Repair legacy invalidations and any in-flight GET with the existing queue.
+        refresh();
+      }
     };
     const onVisible = () => { if (document.visibilityState === "visible") refresh(); };
     const onOnline = () => { socket?.connect(); refresh(); };

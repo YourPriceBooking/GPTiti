@@ -96,6 +96,20 @@
   font-size: 0.7em;
   white-space: nowrap;
 }
+.reservations {
+  display: grid;
+  gap: 5px;
+  margin: -6px 0 18px;
+  color: #516384;
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.reservations strong {
+  color: #2359a5;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
 .balanceStatus {
   display: block;
   font-size: 18px;

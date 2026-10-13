@@ -52,3 +52,29 @@ test("a temporary GET failure permits a later retry", async () => {
   await assert.rejects(queue.request(), /offline/);
   assert.equal(await queue.request(), 130);
 });
+
+test("reservation snapshots preserve holds and zero transfer availability in debt", () => {
+  const held = { userId: "user", appTokens: 100, reservedAppTokens: 30, availableTokens: 70, maxTransferTokens: 70, balanceVersion: 2 };
+  assert.deepEqual(readBalanceSnapshot(held), held);
+  const debt = { ...held, appTokens: -1200, reservedAppTokens: 0, availableTokens: -1200, maxTransferTokens: 0, balanceVersion: 3 };
+  assert.deepEqual(readBalanceSnapshot(debt), debt);
+  assert.equal(canApplyBalance("user", 3, held), false);
+  assert.equal(canApplyBalance("another-user", 0, debt), false);
+});
+
+test("partial or inconsistent reservation fields cannot increase transfer allowance", () => {
+  const base = { userId: "user", appTokens: 100, balanceVersion: 1 };
+  for (const fields of [
+    { reservedAppTokens: 30 },
+    { reservedAppTokens: -1, availableTokens: 101, maxTransferTokens: 101 },
+    { reservedAppTokens: 30, availableTokens: 100, maxTransferTokens: 100 },
+    { reservedAppTokens: 30, availableTokens: 70, maxTransferTokens: 100 },
+    { reservedAppTokens: NaN, availableTokens: 70, maxTransferTokens: 70 },
+  ]) assert.equal(readBalanceSnapshot({ ...base, ...fields }), null);
+});
+
+test("release at a newer version removes the reservation without changing the total", () => {
+  const released = { userId: "user", appTokens: 100, reservedAppTokens: 0, availableTokens: 100, maxTransferTokens: 100, balanceVersion: 3 };
+  assert.deepEqual(readBalanceSnapshot(released), released);
+  assert.equal(canApplyBalance("user", 2, released), true);
+});

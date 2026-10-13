@@ -6,6 +6,9 @@ import { canApplyBalance, readBalanceSnapshot, type BalanceSnapshot } from "@/li
 
 interface TokensState {
   balance: number;
+  reservedTokens: number | null;
+  availableTokens: number;
+  maxTransferTokens: number;
   ownerId: string | null;
   balanceVersion: number;
   balanceReady: boolean;
@@ -15,12 +18,18 @@ interface TokensState {
   claimError: string | null;
 }
 const initialState: TokensState = {
-  balance: 0, ownerId: null, balanceVersion: -1, balanceReady: false,
+  balance: 0, reservedTokens: null, availableTokens: 0, maxTransferTokens: 0, ownerId: null, balanceVersion: -1, balanceReady: false,
   nextClaimTime: null, countdown: "Available now", claiming: false, claimError: null,
 };
 
 function applySnapshot(state: TokensState, snapshot: BalanceSnapshot) {
   if (!canApplyBalance(state.ownerId, state.balanceVersion, snapshot)) return;
+  // Legacy transfer receipts omit holds; wait for the authoritative GET rather
+  // than replacing a known reservation snapshot with incomplete information.
+  if (state.reservedTokens !== null && snapshot.reservedAppTokens === undefined) return;
+  state.reservedTokens = snapshot.reservedAppTokens ?? null;
+  state.availableTokens = snapshot.availableTokens ?? snapshot.appTokens;
+  state.maxTransferTokens = snapshot.maxTransferTokens ?? Math.max(0, snapshot.appTokens);
   state.balance = snapshot.appTokens;
   state.balanceVersion = snapshot.balanceVersion;
   state.balanceReady = true;
