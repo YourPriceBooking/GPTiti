@@ -1,3 +1,4 @@
+import { readFiles, readFileResult } from "@/lib/files/types";
 import { createSlice, isAnyOf, type PayloadAction } from "@reduxjs/toolkit";
 import type { Chat, ChatProject, Message, PendingChatTurn } from "@/types/types";
 import type { ConversationProject } from "@/types/api.types";
@@ -142,6 +143,8 @@ const reconcileSnapshot = (state: ChatState, snapshot: ChatTurnSnapshot) => {
     id: completedMessage?.id ?? existingAssistant?.id ?? `client-assistant:${snapshot.clientMessageId}`,
     role: "assistant",
     content: completedMessage?.content ?? snapshot.partialContent,
+    attachments: completedMessage?.attachments ?? [],
+    fileResult: completedMessage?.fileResult ?? null,
     modelId: completedMessage?.modelId ?? existingAssistant?.modelId ?? turn.modelId,
     tokens:
       snapshot.billing?.appTokensSpent ??
@@ -290,6 +293,7 @@ const chatSlice = createSlice({
         role: "user",
         content: turn.message,
         images: payload.images,
+        attachments: readFiles(payload.turn.files),
         clientMessageId: turn.clientMessageId,
         attempt: turn.attempt,
         deliveryStatus: "sending",
@@ -381,6 +385,8 @@ const chatSlice = createSlice({
           id: dto.id,
           role: "assistant",
           content: dto.content,
+          attachments: dto.attachments ?? [],
+          fileResult: dto.fileResult ?? null,
           modelId: dto.modelId,
           tokens: payload.payload.billing.appTokensSpent,
           updatedAt: dto.updatedAt,
@@ -573,6 +579,9 @@ const chatSlice = createSlice({
           id: message._id,
           role: message.role,
           content: message.content,
+          attachments: readFiles(message.attachments),
+          fileResult: readFileResult(message.fileResult),
+          images: undefined,
           tokens: message.tokens,
           modelId: message.modelId,
           updatedAt: message.updatedAt ?? message.createdAt,
