@@ -1,3 +1,4 @@
+import { FileCards } from "@/components/Files/FileWorkspace";
 import { useEffect, useRef, useState } from "react";
 
 import styles from "./MessageList.module.css";
@@ -56,7 +57,7 @@ function CheckGlyph() {
 }
 
 function UserMessage({ message }: { message: Message }) {
-  const hasImages = !!message.images && message.images.length > 0;
+  const hasImages = !message.attachments?.length && !!message.images && message.images.length > 0;
   const [hovered, setHovered] = useState(false);
   const [copied, setCopied] = useState(false);
   const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -108,6 +109,7 @@ function UserMessage({ message }: { message: Message }) {
             ))}
           </div>
         )}
+        <FileCards files={message.attachments} />
         {message.content && (
           <CollapsibleContent
             className={styles.userTextCard}
@@ -177,8 +179,8 @@ export default function MessageList({
         const key = message.id ?? index;
 
         if (message.role === "user") {
-          const hasImages = !!message.images && message.images.length > 0;
-          if (!message.content && !hasImages) return null;
+          const hasImages = !message.attachments?.length && !!message.images && message.images.length > 0;
+          if (!message.content && !hasImages && !message.attachments?.length) return null;
           return <UserMessage key={key} message={message} />;
         }
 
@@ -189,8 +191,10 @@ export default function MessageList({
               <TypingPlaceholder />
             ) : (
               <>
-                {message.content && (
+                {(message.content || message.attachments?.length || message.fileResult) && (
                   <AIResponse
+                    attachments={message.attachments}
+                    fileResult={message.fileResult}
                     content={message.content}
                     modelId={message.modelId}
                     updatedAt={message.updatedAt}
