@@ -45,3 +45,33 @@ export function tablePreview(text: string, delimiter: string, truncated = false)
   if (!truncated && rows.length < 200 && (cell || row.length)) { push(); rows.push(row); }
   return rows;
 }
+
+export type PreviewCell = string | number | boolean | null;
+export type DocumentBlock = { type: 'heading' | 'paragraph' | 'bullet'; text: string } | { type: 'table'; rows: string[][] };
+export type StructuredPreview = { kind: 'document'; title: string; blocks: DocumentBlock[]; truncated: boolean } | { kind: 'workbook'; sheets: { name: string; rows: PreviewCell[][] }[]; truncated: boolean };
+// Treat server JSON as unknown; never pass document contents to HTML or Office engines.
+export function readStructuredPreview(input: unknown): StructuredPreview | null {
+  if (!input || typeof input !== 'object' || JSON.stringify(input).length > 65536) return null;
+  const data = input as Record<string, unknown>;
+  const string = (v: unknown): v is string => typeof v === 'string' && v.length <= 8000;
+  const rows = (v: unknown, maxRows: number, maxCols: number, stringsOnly: boolean) => Array.isArray(v) && v.length <= maxRows && v.every(row => Array.isArray(row) && row.length <= maxCols && row.every(cell => string(cell) || (!stringsOnly && (cell === null || typeof cell === 'boolean' || (typeof cell === 'number' && Number.isFinite(cell))))));
+  if (data.kind === 'document' && string(data.title) && Array.isArray(data.blocks) && data.blocks.length <= 300) {
+    const blocks: DocumentBlock[] = [];
+    for (const item of data.blocks) {
+      if (!item || typeof item !== 'object') return null;
+      if (item.type === 'table' && rows(item.rows, 300, 8, true)) blocks.push({ type: 'table', rows: item.rows });
+      else if (['heading', 'paragraph', 'bullet'].includes(item.type) && string(item.text)) blocks.push({ type: item.type, text: item.text });
+      else return null;
+    }
+    return { kind: 'document', title: data.title, blocks, truncated: data.truncated === true };
+  }
+  if (data.kind === 'workbook' && Array.isArray(data.sheets) && data.sheets.length > 0 && data.sheets.length <= 10) {
+    const sheets: { name: string; rows: PreviewCell[][] }[] = [];
+    for (const sheet of data.sheets) {
+      if (!sheet || !string(sheet.name) || sheet.name.length > 31 || !rows(sheet.rows, 200, 30, false)) return null;
+      sheets.push({ name: sheet.name, rows: sheet.rows });
+    }
+    return { kind: 'workbook', sheets, truncated: data.truncated === true };
+  }
+  return null;
+}
