@@ -39,3 +39,21 @@ The backend currently blocks document inputs. The composer now explains that lim
 - Check mobile, keyboard tabbing, Escape and chat switching while preview is loading.
 
 No new dependencies. No backend changes or endpoint stubs are included in this PR. No automatic retry or extra provider call is added by the frontend.
+
+
+## PDF / DOCX / XLSX (backend patch 07)
+
+Requires backend patch 07 after patches 01–03, 05–06; optional 04 is not required.
+No new frontend endpoint or dependency. Authenticated GET `/files/:id/preview`
+adds `{kind:"document",title,blocks,truncated}` and
+`{kind:"workbook",sheets:[{name,rows}],truncated}`. Download remains the full binary.
+PDF/DOCX preview shows safely escaped headings, paragraphs, bullets and tables,
+not exact page layout. XLSX provides sheet buttons, preserves numbers/booleans,
+and displays at most 200 rows and 30 columns per sheet. Server also caps preview
+JSON; the UI explains truncation. No Office ZIP parsing or active document content.
+Existing uploads without generated previews remain downloadable with unavailable preview.
+
+Smoke test: request each format naturally; open preview, switch XLSX sheets,
+download and open in a document reader, refresh and reopen from history.
+Verify partial preview notice with a large workbook, unavailable preview for
+an older upload, and owner isolation/deleted-file errors. No format picker.
