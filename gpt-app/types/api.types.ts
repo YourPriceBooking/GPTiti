@@ -1,10 +1,12 @@
 export interface UploadedFile {
   url: string;
-  publicId: string;
+  publicId?: string;
+  fileId?: string;
+  status?: "ready" | "deleted" | "expired";
   mimetype: string;
   size: number;
   originalName: string;
-  expiresAt: string;
+  expiresAt: string | null;
 }
 
 export interface UploadFileResponse {
@@ -33,6 +35,8 @@ export interface Conversation {
 }
 
 export interface ConversationMessage {
+  attachments?: import("@/lib/files/types").ManagedFile[];
+  fileResult?: import("@/lib/files/types").FileResult | null;
   _id: string;
   role: "user" | "assistant";
   content: string;
