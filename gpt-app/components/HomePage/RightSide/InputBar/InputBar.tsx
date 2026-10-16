@@ -204,7 +204,7 @@ export default function InputBar({
   );
   const isImageBlocked = limits.maxImages === 0;
   const maxImageBytes = limits.maxImageSizeMb * MB;
-  const isFileBlocked = limits.maxFiles === 0;
+  const isFileBlocked = true; // V2 document processing is not enabled on the backend yet.
   const maxFileBytes = limits.maxFileSizeMb * MB;
 
   const openLimitError = (kind: LimitKind) => {
@@ -378,7 +378,7 @@ export default function InputBar({
     if (isSendingRef.current || incoming.length === 0) return;
 
     if (isFileBlocked) {
-      openLimitError("filesNotSupported");
+      openLimitError("documentProcessingUnavailable");
       return;
     }
 
@@ -525,7 +525,7 @@ export default function InputBar({
           return;
         }
         if (files.length > 0 && isFileBlocked) {
-          openLimitError("filesNotSupported");
+          openLimitError("documentProcessingUnavailable");
           return;
         }
         if (files.length > limits.maxFiles) {
@@ -706,7 +706,7 @@ export default function InputBar({
             isFileBlocked={isFileBlocked}
             onFileBlocked={() => {
               setShowAddInput(false);
-              openLimitError("filesNotSupported");
+              openLimitError("documentProcessingUnavailable");
             }}
           />
         </div>
