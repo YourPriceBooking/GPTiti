@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import FileWorkspace from "@/components/Files/FileWorkspace";
 import BalanceNoticeModal from "@/components/BalanceNotice/BalanceNoticeModal";
 import MessageList from "@/components/HomePage/RightSide/MessageList/MessageList";
 import InputComposer from "@/components/HomePage/RightSide/InputComposer/InputComposer";
@@ -76,7 +77,7 @@ export default function ChatView({
   ]);
 
   return (
-    <>
+    <FileWorkspace key={activeChat?.id ?? "new"}>
       {ctrl.balanceNotice && (
         <BalanceNoticeModal
           notice={ctrl.balanceNotice}
@@ -275,6 +276,6 @@ export default function ChatView({
           )}
         </div>
       </div>
-    </>
+    </FileWorkspace>
   );
 }
