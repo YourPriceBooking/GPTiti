@@ -12,6 +12,7 @@ type MarkdownContentProps = {
   highlightCode?: boolean;
   fenceBareCode?: boolean;
   codeCopy?: boolean;
+  disableImages?: boolean;
 };
 
 export default function MarkdownContent({
@@ -20,12 +21,13 @@ export default function MarkdownContent({
   highlightCode = true,
   fenceBareCode = false,
   codeCopy = true,
+  disableImages = false,
 }: MarkdownContentProps) {
   const html = useMemo(() => {
     const source = fenceBareCode ? fenceBareCodeBlocks(content) : content;
 
-    return renderAssistantMarkdown(source);
-  }, [content, fenceBareCode]);
+    return renderAssistantMarkdown(source, disableImages);
+  }, [content, fenceBareCode, disableImages]);
 
   const [highlighted, setHighlighted] = useState({ source: "", html: "" });
 
