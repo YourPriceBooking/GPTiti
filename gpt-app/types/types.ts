@@ -37,6 +37,8 @@ export type PendingChatTurn = {
 };
 
 export type Message = {
+  attachments?: import("@/lib/files/types").ManagedFile[];
+  fileResult?: import("@/lib/files/types").FileResult | null;
   id?: string;
   role: ChatRole;
   content: string;
