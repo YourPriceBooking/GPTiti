@@ -1,5 +1,6 @@
 "use client";
 
+import { FileCards } from "@/components/Files/FileWorkspace";
 import Image from "next/image";
 import { useCallback, useMemo, useState } from "react";
 import { formatActivity } from "@/lib/formatActivity";
@@ -8,6 +9,8 @@ import MarkdownContent from "@/components/common/MarkdownContent/MarkdownContent
 import styles from "./AIResponse.module.css";
 
 type AIResponseProps = {
+  attachments?: import("@/lib/files/types").ManagedFile[];
+  fileResult?: import("@/lib/files/types").FileResult | null;
   content: string;
   modelId?: string;
   updatedAt?: string;
@@ -17,6 +20,8 @@ export default function AIResponse({
   content,
   modelId,
   updatedAt,
+  attachments,
+  fileResult,
 }: AIResponseProps) {
   const updatedLabel = useMemo(() => formatActivity(updatedAt), [updatedAt]);
 
@@ -81,6 +86,7 @@ export default function AIResponse({
       </h2>
 
       <MarkdownContent className={styles.aiContent} content={content} />
+      <FileCards files={attachments} result={fileResult} />
     </div>
   );
 }
