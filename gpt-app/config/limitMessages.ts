@@ -1,6 +1,7 @@
 import { getModelLimits } from "./modelLimits.config";
 
 export type LimitKind =
+  | "documentProcessingUnavailable"
   | "imagesCount"
   | "imagesNotSupported"
   | "imageSize"
@@ -21,6 +22,7 @@ export type LimitMessage = {
 };
 
 const HEADINGS: Record<LimitKind, string> = {
+  documentProcessingUnavailable: "Document inputs are not available yet",
   imagesCount: "Image limit reached",
   imagesNotSupported: "Images are not supported",
   imageSize: "Image is too large",
@@ -38,6 +40,7 @@ const HEADINGS: Record<LimitKind, string> = {
 type Templater = (model: string, value: number) => string;
 
 const UNIVERSAL: Record<LimitKind, Templater> = {
+  documentProcessingUnavailable: () => "You can attach supported images or paste text. Reading document attachments is coming later; you can already ask for a downloadable text, code or SVG file.",
   imagesCount: (m, n) =>
     `You can add up to ${n} image${n === 1 ? "" : "s"} per request with ${m}.`,
   imagesNotSupported: (m) => `${m} does not support image inputs.`,
