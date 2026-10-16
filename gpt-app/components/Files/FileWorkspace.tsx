@@ -3,7 +3,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import { loadPreview, downloadFile, fileError, type Preview } from '@/lib/files/api';
-import { extension, fileSize, tablePreview, type ManagedFile, type FileResult } from '@/lib/files/types';
+import { extension, fileSize, tablePreview, type ManagedFile, type FileResult, type StructuredPreview, type PreviewCell } from '@/lib/files/types';
 import MarkdownContent from '@/components/common/MarkdownContent/MarkdownContent';
 import styles from './Files.module.css';
 
@@ -70,6 +70,20 @@ function TextPreview({ file, text, truncated }: { file: ManagedFile; text: strin
   const fence = '`'.repeat(Math.max(3, ...Array.from(code.matchAll(/`+/g), m => m[0].length + 1)));
   return <MarkdownContent content={`${fence}${ext}\n${code}\n${fence}`} disableImages />;
 }
+function PreviewTable({ rows }: { rows: PreviewCell[][] }) {
+  return <div className={styles.tableScroll}><table><tbody>{rows.map((row, i) => <tr key={i}>{row.map((cell, j) => i === 0 ? <th scope="col" key={j}>{cell === null ? '' : String(cell)}</th> : <td key={j}>{cell === null ? '' : String(cell)}</td>)}</tr>)}</tbody></table></div>;
+}
+function OfficePreview({ data }: { data: StructuredPreview }) {
+  const [sheet, setSheet] = useState(0);
+  return <div className={styles.document}>
+    <p className={styles.note}>{data.kind === 'document' ? 'Content preview. Download to see the document’s page layout.' : 'Data preview: up to 200 rows and 30 columns per sheet.'}</p>
+    {data.truncated && <p className={styles.note}>Showing part of the content. Download the complete file.</p>}
+    {data.kind === 'document' ? <>{data.title && <h2>{data.title}</h2>}{data.blocks.map((block, i) => block.type === 'table' ? <PreviewTable key={i} rows={block.rows} /> : block.type === 'heading' ? <h3 key={i}>{block.text}</h3> : block.type === 'bullet' ? <ul key={i}><li>{block.text}</li></ul> : <p key={i}>{block.text}</p>)}</> : <>
+      <div className={styles.sheets} aria-label="Workbook sheets">{data.sheets.map((item, i) => <button type="button" key={i} aria-pressed={sheet === i} onClick={() => setSheet(i)}>{item.name}</button>)}</div>
+      <PreviewTable rows={data.sheets[sheet]?.rows ?? []} />
+    </>}
+  </div>;
+}
 function PreviewPanel({ file, close }: { file: ManagedFile; close: () => void }) {
   const [retry, setRetry] = useState(0);
   const state = usePreview(file, true, retry);
@@ -96,6 +110,7 @@ function PreviewPanel({ file, close }: { file: ManagedFile; close: () => void })
       {state.error && <div role="alert"><p>{state.error}</p><button className={styles.previewButton} onClick={() => setRetry(n => n + 1)}>Try again</button></div>}
       {state.data?.kind === 'image' && state.url && <img className={styles.image} src={state.url} alt={file.originalName} />}
       {state.data?.kind === 'text' && <>{state.data.truncated && <p className={styles.note}>Showing the first 64 KB. Download to view the full file.</p>}<TextPreview file={file} text={state.data.text} truncated={state.data.truncated} /></>}
+      {(state.data?.kind === 'document' || state.data?.kind === 'workbook') && <OfficePreview data={state.data} />}
       {state.data?.kind === 'unavailable' && <p>Preview is not available for this format. You can download the file.</p>}
     </div>
     <footer><Download file={file} /></footer>
