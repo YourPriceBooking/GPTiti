@@ -73,7 +73,7 @@ export const api = {
     const formData = new FormData();
     formData.append("file", file);
     const res = await axiosInstance.post<UploadFileResponse>(
-      "/upload",
+      "/files",
       formData,
       { headers: { "Content-Type": "multipart/form-data" } },
     );
