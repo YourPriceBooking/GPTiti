@@ -1,3 +1,4 @@
+import { readFiles, readFileResult } from "../files/types";
 import type { UploadedFile } from "@/types/api.types";
 
 export const CHAT_PROTOCOL_VERSION = 2 as const;
@@ -45,6 +46,8 @@ export type ChatProtocolError = {
 };
 
 export type AssistantMessageDTO = {
+  attachments?: import("../files/types").ManagedFile[];
+  fileResult?: import("../files/types").FileResult | null;
   id: string;
   role: "assistant";
   content: string;
@@ -258,6 +261,8 @@ const readAssistantMessage = (value: unknown): AssistantMessageDTO | null => {
   return {
     id,
     role: "assistant",
+    attachments: readFiles(value.attachments),
+    fileResult: readFileResult(value.fileResult),
     content,
     modelId,
     tokens,
