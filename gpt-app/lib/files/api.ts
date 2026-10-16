@@ -1,16 +1,18 @@
 import { axiosInstance } from '@/lib/axiosInstance';
-import type { ManagedFile } from './types';
+import { readStructuredPreview, type StructuredPreview, type ManagedFile } from './types';
 const route = (id: string, suffix = '') => {
   if (!/^[a-f0-9]{24}$/i.test(id)) throw new Error('Invalid file ID.');
   // Never send credentials to a URL supplied by a model or attachment DTO.
   return `/files/${id}${suffix}`;
 };
-export type Preview = { kind: 'image'; blob: Blob } | { kind: 'text' | 'unavailable'; text: string; truncated: boolean };
+export type Preview = StructuredPreview | { kind: 'image'; blob: Blob } | { kind: 'text' | 'unavailable'; text: string; truncated: boolean };
 export async function loadPreview(id: string, signal: AbortSignal): Promise<Preview> {
   const res = await axiosInstance.get<Blob>(route(id, '/preview'), { responseType: 'blob', signal, timeout: 30000 });
   const mime = res.data.type.split(';')[0];
   if (['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml'].includes(mime)) return { kind: 'image', blob: res.data };
   const data = JSON.parse(await res.data.text());
+  const structured = readStructuredPreview(data);
+  if (structured) return structured;
   if (data.kind === 'text' && typeof data.text === 'string') return { kind: 'text', text: data.text, truncated: data.truncated === true };
   return { kind: 'unavailable', text: '', truncated: false };
 }
