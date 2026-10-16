@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { readFiles, readFileResult, tablePreview } from '../lib/files/types.js';
+import { readFiles, readFileResult, tablePreview, readStructuredPreview } from '../lib/files/types.js';
 import { readChatEndEvent, readChatTurnSnapshot } from '../lib/chat/chatProtocol.js';
 import { mergeServerMessages } from '../lib/chat/chatState.js';
 const file = { fileId: '0123456789abcdef01234567', originalName: 'cat.svg', mimetype: 'image/svg+xml', size: 3405, status: 'ready' };
@@ -33,4 +33,18 @@ test('table preview respects quotes, multiline fields, truncation and limits', (
   assert.deepEqual(tablePreview('a,b\n"incomplete', ',', true), [['a', 'b']]);
   assert.equal(tablePreview('a,b\n'.repeat(300), ',').length, 200);
   assert.equal(tablePreview(Array(100).fill('a').join(','), ',')[0].length, 50);
+});
+
+test('document preview preserves safe text and rejects unsupported blocks', () => {
+  const data = { kind: 'document', title: 'Report', blocks: [{ type: 'paragraph', text: '<script>alert(1)</script>' }, { type: 'table', rows: [['A'], ['B']] }], truncated: true };
+  assert.deepEqual(readStructuredPreview(data), data);
+  assert.equal(readStructuredPreview({ ...data, blocks: [{ type: 'html', text: '<img>' }] }), null);
+  assert.equal(readStructuredPreview({ ...data, blocks: [{ type: 'table', rows: [[{ formula: 'NOW()' }]] }] }), null);
+});
+test('workbook preview retains primitive cells and rejects active objects and oversized rows', () => {
+  const data = { kind: 'workbook', sheets: [{ name: 'Sales', rows: [['Name', 'Value'], ['Item', 42], [true, null], ['=SUM(A1)', 0]] }], truncated: false };
+  assert.deepEqual(readStructuredPreview(data), data);
+  assert.equal(readStructuredPreview({ ...data, sheets: [{ name: 'X', rows: [[{ hyperlink: 'https://evil.test' }]] }] }), null);
+  assert.equal(readStructuredPreview({ ...data, sheets: [{ name: 'X', rows: Array(201).fill(['a']) }] }), null);
+  assert.equal(readStructuredPreview({ ...data, sheets: [] }), null);
 });
