@@ -104,14 +104,14 @@ const registerLinkHook = () => {
   });
 };
 
-export const renderAssistantMarkdown = (markdown: string): string => {
+export const renderAssistantMarkdown = (markdown: string, disableImages = false): string => {
   const raw = marked.parse(markdown, { async: false });
   if (!DOMPurify.isSupported) return escapeHtml(raw);
 
   registerLinkHook();
 
   return DOMPurify.sanitize(raw, {
-    ALLOWED_TAGS,
+    ALLOWED_TAGS: disableImages ? ALLOWED_TAGS.filter(tag => tag !== "img") : ALLOWED_TAGS,
     ALLOWED_ATTR,
     ALLOWED_URI_REGEXP,
     ALLOW_DATA_ATTR: false,
