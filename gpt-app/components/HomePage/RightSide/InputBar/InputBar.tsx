@@ -30,6 +30,7 @@ import { DictationStopIcon, DictationWaveform } from "./DictationVisuals";
 
 import { getModelLimits } from "@/config/modelLimits.config";
 import { isModelComingSoon } from "@/config/models.config";
+import { inputKind, validateInputFiles, validateTextBytes } from "@/lib/files/input";
 import { compressImage } from "@/lib/compressImage";
 
 import styles from "./InputBar.module.css";
@@ -191,6 +192,9 @@ export default function InputBar({
   const [files, setFiles] = useState<{ id: string; file: File }[]>([]);
   const [isSending, setIsSending] = useState(false);
   const isSendingRef = useRef(false);
+  const preparingRef = useRef(false);
+  const [isPreparing, setIsPreparing] = useState(false);
+  const [attachmentError, setAttachmentError] = useState<string | null>(null);
   const [editingImage, setEditingImage] = useState<{
     id: string;
     url: string;
@@ -203,9 +207,6 @@ export default function InputBar({
     [selectedModel],
   );
   const isImageBlocked = limits.maxImages === 0;
-  const maxImageBytes = limits.maxImageSizeMb * MB;
-  const isFileBlocked = true; // V2 document processing is not enabled on the backend yet.
-  const maxFileBytes = limits.maxFileSizeMb * MB;
 
   const openLimitError = (kind: LimitKind) => {
     setLimitErrorKind(kind);
@@ -316,108 +317,40 @@ export default function InputBar({
     syncComposer();
   };
 
-  const addImageFiles = async (incoming: File[]) => {
-    if (isSendingRef.current || incoming.length === 0) return;
-
-    if (isImageBlocked) {
-      openLimitError("imagesNotSupported");
-      return;
-    }
-
-    const remaining = Math.max(0, limits.maxImages - images.length);
-    if (remaining === 0) {
-      openLimitError("imagesCount");
-      return;
-    }
-
-    const accepted: File[] = [];
-    let trimmedForCount = false;
-    let rejectedForSize = false;
-
-    for (const file of incoming) {
-      if (accepted.length >= remaining) {
-        trimmedForCount = true;
-        break;
+  const addAttachments = async (incoming: File[], imagesOnly = false) => {
+    if (isSendingRef.current || preparingRef.current || voiceBusy || !incoming.length) return;
+    setAttachmentError(null);
+    const existing = [...images.map(image => image.file), ...files.map(item => item.file)];
+    const error = imagesOnly && incoming.some(file => inputKind(file) !== "image")
+      ? "Choose PNG, JPG or WEBP images. Use Add files for text and code."
+      : validateInputFiles([...existing, ...incoming], limits);
+    if (error) { setAttachmentError(error); return; }
+    preparingRef.current = true;
+    setIsPreparing(true);
+    try {
+      for (const file of incoming.filter(file => inputKind(file) === "text")) {
+        const invalid = validateTextBytes(await file.arrayBuffer());
+        if (invalid) { setAttachmentError(`${file.name}: ${invalid}`); return; }
       }
-      if (maxImageBytes > 0 && file.size > maxImageBytes) {
-        rejectedForSize = true;
-        continue;
-      }
-      accepted.push(file);
+      const processed = await Promise.all(incoming.map(async file =>
+        inputKind(file) === "image" ? compressImage(file).catch(() => file) : file,
+      ));
+      const invalid = validateInputFiles([...existing, ...processed], limits);
+      if (invalid) { setAttachmentError(invalid); return; }
+      const newImages = processed.filter(file => inputKind(file) === "image").map(file => ({
+        id: crypto.randomUUID(), url: URL.createObjectURL(file), file,
+      }));
+      const newFiles = processed.filter(file => inputKind(file) === "text").map(file => ({ id: crypto.randomUUID(), file }));
+      setImages(prev => [...prev, ...newImages]);
+      setFiles(prev => [...prev, ...newFiles]);
+    } catch {
+      setAttachmentError("Could not read the selected files. Please select them again.");
+    } finally {
+      preparingRef.current = false;
+      setIsPreparing(false);
     }
-
-    if (accepted.length === 0) {
-      if (rejectedForSize) openLimitError("imageSize");
-      else if (trimmedForCount) openLimitError("imagesCount");
-      return;
-    }
-
-    const processed = await Promise.all(
-      accepted.map(async (file) => {
-        const compressed = await compressImage(file).catch(() => file);
-        return {
-          id: crypto.randomUUID(),
-          url: URL.createObjectURL(compressed),
-          file: compressed,
-        };
-      }),
-    );
-
-    if (isSendingRef.current) {
-      processed.forEach((image) => URL.revokeObjectURL(image.url));
-      return;
-    }
-
-    setImages((prev) => [...prev, ...processed]);
-
-    if (rejectedForSize) openLimitError("imageSize");
-    else if (trimmedForCount) openLimitError("imagesCount");
   };
-
-  const addFiles = (incoming: File[]) => {
-    if (isSendingRef.current || incoming.length === 0) return;
-
-    if (isFileBlocked) {
-      openLimitError("documentProcessingUnavailable");
-      return;
-    }
-
-    const remaining = Math.max(0, limits.maxFiles - files.length);
-    if (remaining === 0) {
-      openLimitError("filesCount");
-      return;
-    }
-
-    const accepted: File[] = [];
-    let trimmedForCount = false;
-    let rejectedForSize = false;
-
-    for (const file of incoming) {
-      if (accepted.length >= remaining) {
-        trimmedForCount = true;
-        break;
-      }
-      if (maxFileBytes > 0 && file.size > maxFileBytes) {
-        rejectedForSize = true;
-        continue;
-      }
-      accepted.push(file);
-    }
-
-    if (accepted.length === 0) {
-      if (rejectedForSize) openLimitError("fileSize");
-      else if (trimmedForCount) openLimitError("filesCount");
-      return;
-    }
-
-    setFiles((prev) => [
-      ...prev,
-      ...accepted.map((file) => ({ id: crypto.randomUUID(), file })),
-    ]);
-
-    if (rejectedForSize) openLimitError("fileSize");
-    else if (trimmedForCount) openLimitError("filesCount");
-  };
+  const addImageFiles = (incoming: File[]) => addAttachments(incoming, true);
 
   const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
     if (isSendingRef.current) {
@@ -488,7 +421,7 @@ export default function InputBar({
   const handleFileSelect = (selected: File[]) => {
     if (isSendingRef.current) return;
     setShowAddInput(false);
-    addFiles(selected);
+    void addAttachments(selected);
   };
 
   const removeFile = (id: string) => {
@@ -497,7 +430,7 @@ export default function InputBar({
   };
 
   const handleSend = async () => {
-    if (isComingSoon || sendDisabled || isSendingRef.current || isAiResponding)
+    if (isComingSoon || sendDisabled || isSendingRef.current || preparingRef.current || isAiResponding)
       return;
     const textarea = inputRef.current;
     if (textarea) {
@@ -516,22 +449,14 @@ export default function InputBar({
           setIsLoginOpen(true);
           return;
         }
-        if (images.length > 0 && isImageBlocked) {
-          openLimitError("imagesNotSupported");
+        const attachmentFiles = [...images.map(image => image.file), ...files.map(item => item.file)];
+        const invalid = validateInputFiles(attachmentFiles, limits);
+        if (invalid) { setAttachmentError(invalid); return; }
+        if (files.length && !message.trim()) {
+          setAttachmentError("Add a message describing what to do with these files.");
           return;
         }
-        if (images.length > limits.maxImages) {
-          openLimitError("imagesCount");
-          return;
-        }
-        if (files.length > 0 && isFileBlocked) {
-          openLimitError("documentProcessingUnavailable");
-          return;
-        }
-        if (files.length > limits.maxFiles) {
-          openLimitError("filesCount");
-          return;
-        }
+        setAttachmentError(null);
         isSendingRef.current = true;
         textarea.readOnly = true;
         setIsSending(true);
@@ -541,7 +466,7 @@ export default function InputBar({
           const accepted = await onSend(
             message,
             images.map((img) => img.url),
-            images.map((img) => img.file),
+            attachmentFiles, // Legacy onSend argument carries all upload types through V2.
           );
           if (!accepted) return;
           images.forEach((image) => URL.revokeObjectURL(image.url));
@@ -686,6 +611,12 @@ export default function InputBar({
       className={`${styles.inputContainer} ${
         isMultiline && !waveVisible ? styles.multiline : ""
       } ${variant === "project" ? styles.project : ""} ${waveVisible ? styles.dictating : ""}`}
+      onDragOver={event => { if (event.dataTransfer.types.includes("Files")) event.preventDefault(); }}
+      onDrop={event => {
+        if (!event.dataTransfer.files.length) return;
+        event.preventDefault();
+        void addAttachments(Array.from(event.dataTransfer.files));
+      }}
       data-input-bar
     >
       {showAddInput && (
@@ -703,15 +634,15 @@ export default function InputBar({
               openLimitError("imagesNotSupported");
             }}
             onFileSelect={handleFileSelect}
-            isFileBlocked={isFileBlocked}
-            onFileBlocked={() => {
-              setShowAddInput(false);
-              openLimitError("documentProcessingUnavailable");
-            }}
+            maxImages={limits.maxImages}
+            maxImageSizeMb={limits.maxImageSizeMb}
           />
         </div>
       )}
 
+      {attachmentError && <p className={styles.attachmentError} role="alert">{attachmentError}</p>}
+      {(isPreparing || (isSending && (images.length > 0 || files.length > 0))) &&
+        <p className={styles.attachmentStatus} role="status">{isPreparing ? "Preparing attachments…" : "Uploading and sending attachments…"}</p>}
       {images.length > 0 && (
         <div className={styles.imagePreviewRow}>
           {images.map((img) => (
@@ -783,7 +714,8 @@ export default function InputBar({
               </div>
               <button
                 type="button"
-                aria-label="Remove file"
+                aria-label={`Remove ${f.file.name}`}
+                disabled={isSending || isPreparing}
                 className={styles.fileChipRemove}
                 onClick={() => removeFile(f.id)}
               >
@@ -800,7 +732,7 @@ export default function InputBar({
             type="button"
             aria-label="Add files and more"
             className={styles.iconWrapper}
-            disabled={isSending || voiceBusy}
+            disabled={isSending || isPreparing || voiceBusy}
             onPointerEnter={(event) =>
               fitInputTooltipToViewport(event.currentTarget)
             }
@@ -976,7 +908,7 @@ export default function InputBar({
             <button
               type="button"
               className={`${styles.iconWrapper2} ${styles.controlButton}`}
-              disabled={sendDisabled || voiceBusy}
+              disabled={sendDisabled || voiceBusy || isPreparing}
               aria-label="Send message"
               onPointerEnter={(event) =>
                 fitInputTooltipToViewport(event.currentTarget)
