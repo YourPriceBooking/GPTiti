@@ -590,3 +590,7 @@
     margin-right: 0;
   }
 }
+
+.attachmentError, .attachmentStatus { margin: 6px 12px; font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
+.attachmentError { color: #a32d25; }
+.attachmentStatus { color: #526577; }
