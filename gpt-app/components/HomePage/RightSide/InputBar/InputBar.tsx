@@ -322,7 +322,7 @@ export default function InputBar({
     setAttachmentError(null);
     const existing = [...images.map(image => image.file), ...files.map(item => item.file)];
     const error = imagesOnly && incoming.some(file => inputKind(file) !== "image")
-      ? "Choose PNG, JPG or WEBP images. Use Add files for text and code."
+      ? "Choose PNG, JPG or WEBP images. Use Add files for documents, text and code."
       : validateInputFiles([...existing, ...incoming], limits);
     if (error) { setAttachmentError(error); return; }
     preparingRef.current = true;
@@ -340,7 +340,7 @@ export default function InputBar({
       const newImages = processed.filter(file => inputKind(file) === "image").map(file => ({
         id: crypto.randomUUID(), url: URL.createObjectURL(file), file,
       }));
-      const newFiles = processed.filter(file => inputKind(file) === "text").map(file => ({ id: crypto.randomUUID(), file }));
+      const newFiles = processed.filter(file => inputKind(file) !== "image").map(file => ({ id: crypto.randomUUID(), file }));
       setImages(prev => [...prev, ...newImages]);
       setFiles(prev => [...prev, ...newFiles]);
     } catch {
