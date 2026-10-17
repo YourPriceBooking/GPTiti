@@ -215,3 +215,18 @@ test("attachment errors preserve server reasons in rejected ACKs and terminal ev
     assert.deepEqual(event.payload.error, error);
   }
 });
+
+
+test("PDF errors preserve server explanations and retry policy across ACK, event and recovery", () => {
+  for (const code of ["PDF_INPUT_DISABLED", "PDF_ATTACHMENT_TOO_LARGE", "PDF_PAGE_LIMIT", "PDF_EXTRACTED_TEXT_TOO_LARGE", "PDF_OCR_REQUIRED", "PDF_PASSWORD_PROTECTED", "INVALID_PDF_DOCUMENT", "PDF_PROCESSING_TIMEOUT", "PDF_PROCESSING_BUSY"]) {
+    const error = { code, message: "PDF explanation with next steps", retryable: code === "PDF_PROCESSING_BUSY" };
+    const ack = readChatSendAck({ ok: false, protocolVersion: 2, error });
+    assert.ok(ack && !ack.ok);
+    assert.deepEqual(ack.error, error);
+    const event = readChatErrorEvent({ protocolVersion: 2, event: "chat:error", type: "failed", turnId, clientMessageId, conversationId, attempt: 1, payload: { error } });
+    assert.deepEqual(event?.payload.error, error);
+    const status = readChatStatusAck({ ok: true, protocolVersion: 2, turn: { ...snapshot, status: "failed", error } });
+    assert.ok(status?.ok);
+    assert.deepEqual(status.turn.error, error);
+  }
+});
