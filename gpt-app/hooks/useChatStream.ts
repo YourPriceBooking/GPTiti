@@ -605,7 +605,7 @@ export function useChatStream(): ChatStream {
       setStreamError(null);
       try {
         const files = await Promise.all(
-          imageFiles.map((file) => api.uploadImage(file).then((response) => response.file)),
+          imageFiles.map((file) => api.uploadFile(file).then((response) => response.file)),
         );
         const clientMessageId = createClientMessageId();
         const turn: PendingChatTurn = {
