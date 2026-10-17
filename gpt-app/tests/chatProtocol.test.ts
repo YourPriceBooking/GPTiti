@@ -203,3 +203,15 @@ test("malformed optional amounts cannot poison a valid balance rejection", () =>
   assert.ok(ack && !ack.ok);
   assert.equal(ack.error.details, undefined);
 });
+
+test("attachment errors preserve server reasons in rejected ACKs and terminal events", () => {
+  for (const code of ["OFFICE_INPUT_DISABLED", "OFFICE_ATTACHMENT_TOO_LARGE", "OFFICE_EXTRACTED_TEXT_TOO_LARGE", "OFFICE_DOCUMENT_LIMIT", "OFFICE_DOCUMENT_UNSUPPORTED", "INVALID_OFFICE_DOCUMENT", "OFFICE_DOCUMENT_EMPTY", "OFFICE_PROCESSING_TIMEOUT", "OFFICE_PROCESSING_BUSY", "TEXT_ATTACHMENT_TOO_LARGE", "TEXT_ATTACHMENTS_CONTEXT_TOO_LARGE", "TEXT_INPUT_DISABLED", "INVALID_UTF8", "INVALID_TEXT", "DOCUMENT_PROCESSING_NOT_ENABLED", "FILE_NOT_FOUND", "FILE_UNAVAILABLE", "INVALID_ATTACHMENTS", "ATTACHMENTS_TOO_LARGE", "FILE_ID_REQUIRED"]) {
+    const error = { code, message: "Specific server explanation", retryable: code === "OFFICE_PROCESSING_BUSY" };
+    const ack = readChatSendAck({ ok: false, protocolVersion: 2, error });
+    assert.ok(ack && !ack.ok);
+    if (ack && !ack.ok) assert.deepEqual(ack.error, error);
+    const event = readChatErrorEvent({ protocolVersion: 2, event: "chat:error", type: "failed", turnId, clientMessageId, conversationId, attempt: 1, payload: { error } });
+    assert.ok(event);
+    assert.deepEqual(event.payload.error, error);
+  }
+});
