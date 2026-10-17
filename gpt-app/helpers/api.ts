@@ -69,7 +69,7 @@ export const api = {
     });
     return res.data;
   },
-  uploadImage: async (file: File) => {
+  uploadFile: async (file: File) => {
     const formData = new FormData();
     formData.append("file", file);
     const res = await axiosInstance.post<UploadFileResponse>(
