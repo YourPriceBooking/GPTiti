@@ -76,6 +76,26 @@ export default function ChatView({
     scrollContainerRef,
   ]);
 
+  const feedback = <>
+      {ctrl.fileProgress && <div className={styles.filePreparation} role="status" aria-live="polite">
+        <span className={styles.filePreparationSpinner} aria-hidden="true" />
+        <span>{ctrl.fileProgress.phase === "recognizing" ? "Recognizing text…" : "Uploading file…"} {ctrl.fileProgress.index}/{ctrl.fileProgress.total} — {ctrl.fileProgress.name}</span>
+      </div>}
+      {ctrl.fileWarnings.length > 0 && <div className={styles.filePreparation} role="status">
+        <span>ⓘ Text recognition may be inaccurate for {ctrl.fileWarnings.join(", ")}. Check names, numbers and important details against the original.</span>
+        <button type="button" onClick={ctrl.dismissFileWarnings}>Dismiss</button>
+      </div>}
+        {ctrl.streamError && (
+          <div className={styles.streamNotice} role="alert">
+            <span>{ctrl.streamError}</span>
+            <button type="button" onClick={ctrl.clearStreamError}>
+              Dismiss
+            </button>
+          </div>
+        )}
+
+  </>;
+
   return (
     <FileWorkspace key={activeChat?.id ?? "new"}>
       {ctrl.balanceNotice && (
@@ -89,26 +109,10 @@ export default function ChatView({
         <ChatBreadcrumbs chat={activeChat} onRename={ctrl.handleRenameChat} />
       )}
 
-      {ctrl.fileProgress && <div className={styles.filePreparation} role="status" aria-live="polite">
-        <span className={styles.filePreparationSpinner} aria-hidden="true" />
-        <span>{ctrl.fileProgress.phase === "recognizing" ? "Recognizing text…" : "Uploading file…"} {ctrl.fileProgress.index}/{ctrl.fileProgress.total} — {ctrl.fileProgress.name}</span>
-      </div>}
-      {ctrl.fileWarnings.length > 0 && <div className={styles.filePreparation} role="status">
-        <span>ⓘ Text recognition may be inaccurate for {ctrl.fileWarnings.join(", ")}. Check names, numbers and important details against the original.</span>
-        <button type="button" onClick={ctrl.dismissFileWarnings}>Dismiss</button>
-      </div>}
       <div className={styles.scrollableContent} ref={scrollContainerRef}>
-        {ctrl.streamError && (
-          <div className={styles.streamNotice} role="alert">
-            <span>{ctrl.streamError}</span>
-            <button type="button" onClick={ctrl.clearStreamError}>
-              Dismiss
-            </button>
-          </div>
-        )}
-
         {showMainSection && (
           <MainSectionRightSide
+            feedback={feedback}
             insertTemplate={ctrl.insertTemplate}
             setFocusMode={(updater) => {
               if (focusOnly) return;
@@ -180,6 +184,7 @@ export default function ChatView({
               onClick={(e) => e.stopPropagation()}
             >
               <MainSectionRightSide
+            feedback={feedback}
                 insertTemplate={(template) => {
                   ctrl.insertTemplate(template);
                   dispatch(setIsOverlayOpen(false));
@@ -243,6 +248,7 @@ export default function ChatView({
           {!dockHidden && (
             <div className={styles.inputBottomInner}>
               <InputComposer
+                feedback={feedback}
                 hasInput={ctrl.hasInput}
                 onChange={ctrl.handleChange}
                 onSend={async (_message, imageUrls, imageFiles) => {
