@@ -118,6 +118,9 @@ export function useHomeController() {
     cancelLastPendingMessage,
     balanceNotice,
     dismissBalanceNotice,
+    fileProgress,
+    fileWarnings,
+    dismissFileWarnings,
     streamError,
     clearStreamError,
   } = useChatStream();
@@ -417,6 +420,9 @@ export function useHomeController() {
     chooseCheaperModel,
     balanceNotice,
     dismissBalanceNotice,
+    fileProgress,
+    fileWarnings,
+    dismissFileWarnings,
     streamError,
     clearStreamError,
     // estimate
