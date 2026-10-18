@@ -9,7 +9,7 @@ test('mixed attachments accept supported extensions and reject unreadable docume
   assert.equal(inputKind(file('a.JSON')), 'text');
 });
 test('universal picker respects image model limits and combined attachment count', () => {
-  assert.ok(validateInputFiles([file('a.png')], { ...limits, maxImages: 0 }));
+  assert.equal(validateInputFiles([file('a.png')], { ...limits, maxImages: 0 }), null);
   assert.ok(validateInputFiles(Array.from({length: 4}, () => file('a.png')), limits));
   assert.ok(validateInputFiles(Array.from({length: 11}, () => file('a.txt')), limits));
   assert.ok(validateInputFiles([file('a.png', 6 * 1024 * 1024)], limits));
@@ -44,7 +44,7 @@ test('mixed Office attachments still share count, total-size and image restricti
   assert.equal(validateInputFiles([file('a.docx'), file('b.xlsx'), file('c.csv'), file('d.png')], limits), null);
   assert.ok(validateInputFiles(Array.from({length: 11}, () => file('a.docx')), limits));
   assert.ok(validateInputFiles(Array.from({length: 6}, () => file('a.xlsx', OFFICE_FILE_BYTES)), limits));
-  assert.ok(validateInputFiles([file('a.docx'), file('b.png')], {maxImages: 0, maxImageSizeMb: 0}));
+  assert.equal(validateInputFiles([file('a.docx'), file('b.png')], {maxImages: 0, maxImageSizeMb: 0}), null);
 });
 
 
@@ -60,8 +60,15 @@ test('PDF picker and validation accept exact size on text-only models without tr
 });
 test('PDF shares aggregate limits with documents and images', () => {
   assert.equal(validateInputFiles([file('a.pdf'), file('b.png'), file('c.csv')], limits), null);
-  assert.ok(validateInputFiles([file('a.pdf'), file('b.png')], { maxImages: 0, maxImageSizeMb: 0 }));
+  assert.equal(validateInputFiles([file('a.pdf'), file('b.png')], { maxImages: 0, maxImageSizeMb: 0 }), null);
   assert.ok(validateInputFiles(Array.from({length: 11}, () => file('a.pdf')), limits));
   assert.equal(validateInputFiles(Array.from({length: 5}, () => file('a.pdf', PDF_FILE_BYTES)), limits), null);
   assert.match(validateInputFiles([...Array.from({length: 5}, () => file('a.pdf', PDF_FILE_BYTES)), file('b.docx')], limits)!, /25 MiB/);
+});
+
+test('OCR images respect 5 MiB even when vision allows more, and are readable on text-only models', () => {
+  for (const model of [{maxImages: 10,maxImageSizeMb: 20},{maxImages: 0,maxImageSizeMb: 0}]) {
+    assert.equal(validateInputFiles([file('scan.png', PDF_FILE_BYTES)], model), null);
+    assert.ok(validateInputFiles([file('scan.png', PDF_FILE_BYTES + 1)], model));
+  }
 });
