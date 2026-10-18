@@ -8,6 +8,7 @@ import ChooseModelColumn from "../ChooseModelColumn/ChooseModelColumn";
 import styles from "./InputComposer.module.css";
 
 type InputComposerProps = React.ComponentProps<typeof InputBar> & {
+  feedback?: React.ReactNode;
   showEstimate: boolean;
   estimateSupported?: boolean;
   estimatedTokens?: number | null;
@@ -17,6 +18,7 @@ type InputComposerProps = React.ComponentProps<typeof InputBar> & {
 };
 
 export default function InputComposer({
+  feedback,
   showEstimate,
   estimateSupported,
   estimatedTokens,
@@ -44,6 +46,7 @@ export default function InputComposer({
         </span>
       )}
 
+      {feedback}
       <div className={styles.inputWrap}>
         <InputBar {...inputBarProps} />
       </div>
