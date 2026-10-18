@@ -1,5 +1,8 @@
 "use client";
 
+import { selectUser } from "@/redux/auth/selectors";
+import { AttachmentPreparation, preparationErrorMessage, type PreparationProgress } from "@/lib/files/preparation";
+
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSocket } from "@/context/SocketContext";
 import { api } from "@/helpers/api";
@@ -76,6 +79,9 @@ export type ChatStream = {
   cancelLastPendingMessage: (chatId: string) => void;
   balanceNotice: BalanceNotice | null;
   dismissBalanceNotice: () => void;
+  fileProgress: PreparationProgress | null;
+  fileWarnings: string[];
+  dismissFileWarnings: () => void;
   streamError: string | null;
   clearStreamError: () => void;
 };
@@ -94,6 +100,18 @@ export function useChatStream(): ChatStream {
   const dispatch = useAppDispatch();
   const pendingTurns = useAppSelector(selectPendingTurns);
   const { socket } = useSocket();
+
+  const userId = useAppSelector(selectUser)?.id;
+  const preparationRef = useRef(new AttachmentPreparation());
+  const preparationAbortRef = useRef<AbortController | null>(null);
+  const [fileProgress, setFileProgress] = useState<PreparationProgress | null>(null);
+  const [warningState, setWarningState] = useState<{owner?: string; names: string[]}>({names: []});
+  const fileWarnings = warningState.owner === userId ? warningState.names : [];
+  const dismissFileWarnings = useCallback(() => setWarningState({names: []}), []);
+  useEffect(() => {
+    preparationRef.current = new AttachmentPreparation();
+    return () => { preparationAbortRef.current?.abort(); };
+  }, [userId]);
 
   const pendingTurnsRef = useRef(pendingTurns);
   const acceptanceWaitersRef = useRef(
@@ -602,11 +620,23 @@ export function useChatStream(): ChatStream {
         return false;
       }
 
+      if (preparationAbortRef.current && !preparationAbortRef.current.signal.aborted) return false;
+      const controller = new AbortController();
+      preparationAbortRef.current = controller;
       setStreamError(null);
+      setWarningState({owner: userId, names: []});
+      let preparing = true;
       try {
-        const files = await Promise.all(
-          imageFiles.map((file) => api.uploadFile(file).then((response) => response.file)),
-        );
+        const files = await preparationRef.current.run(imageFiles, modelId, {
+          upload: (file) => api.uploadFile(file, controller.signal).then(response => response.file),
+          prepare: (id, model) => api.prepareFile(id, model, controller.signal),
+          progress: setFileProgress,
+          warning: (name) => setWarningState(current => ({owner: userId, names: [...current.names, name]})),
+          signal: controller.signal,
+        });
+        controller.signal.throwIfAborted();
+        setFileProgress(null);
+        preparing = false;
         const clientMessageId = createClientMessageId();
         const turn: PendingChatTurn = {
           clientMessageId,
@@ -631,11 +661,19 @@ export function useChatStream(): ChatStream {
         dispatch(registerPendingTurn({ turn, images: imageUrls }));
         return await deliverPendingTurn(turn);
       } catch (error) {
-        handleLocalError(error);
+        if (!controller.signal.aborted) {
+          if (preparing) setStreamError(preparationErrorMessage(error));
+          else handleLocalError(error);
+        }
         return false;
+      } finally {
+        if (preparationAbortRef.current === controller) {
+          preparationAbortRef.current = null;
+          setFileProgress(null);
+        }
       }
     },
-    [deliverPendingTurn, dispatch, handleLocalError],
+    [deliverPendingTurn, dispatch, handleLocalError, userId],
   );
 
   const retryLastMessage = useCallback(
@@ -732,6 +770,9 @@ export function useChatStream(): ChatStream {
     cancelLastPendingMessage,
     balanceNotice,
     dismissBalanceNotice,
+    fileProgress,
+    fileWarnings,
+    dismissFileWarnings,
     streamError,
     clearStreamError,
   };
