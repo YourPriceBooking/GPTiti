@@ -1,3 +1,4 @@
+import { readFilePreparation } from "@/lib/files/preparation";
 import { axiosInstance } from "@/lib/axiosInstance";
 import type {
   Conversation,
@@ -15,6 +16,10 @@ import type {
 } from "@/types/api.types";
 
 export const api = {
+  prepareFile: async (id: string, modelId: string, signal?: AbortSignal) => {
+    const res = await axiosInstance.post(`/files/${encodeURIComponent(id)}/prepare`, { modelId }, { signal, timeout: 65_000 });
+    return readFilePreparation(res.data);
+  },
   getTokenHistory: async (
     params: import("@/types/tokenHistory.types").HistoryQuery,
     signal?: AbortSignal,
@@ -69,13 +74,13 @@ export const api = {
     });
     return res.data;
   },
-  uploadFile: async (file: File) => {
+  uploadFile: async (file: File, signal?: AbortSignal) => {
     const formData = new FormData();
     formData.append("file", file);
     const res = await axiosInstance.post<UploadFileResponse>(
       "/files",
       formData,
-      { headers: { "Content-Type": "multipart/form-data" } },
+      { headers: { "Content-Type": "multipart/form-data" }, signal, timeout: 65_000 },
     );
     return res.data;
   },
