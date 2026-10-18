@@ -31,7 +31,6 @@ import { DictationStopIcon, DictationWaveform } from "./DictationVisuals";
 import { getModelLimits } from "@/config/modelLimits.config";
 import { isModelComingSoon } from "@/config/models.config";
 import { inputKind, validateInputFiles, validateTextBytes } from "@/lib/files/input";
-import { compressImage } from "@/lib/compressImage";
 
 import styles from "./InputBar.module.css";
 
@@ -206,7 +205,6 @@ export default function InputBar({
     () => isModelComingSoon(selectedModel),
     [selectedModel],
   );
-  const isImageBlocked = limits.maxImages === 0;
 
   const openLimitError = (kind: LimitKind) => {
     setLimitErrorKind(kind);
@@ -332,9 +330,8 @@ export default function InputBar({
         const invalid = validateTextBytes(await file.arrayBuffer());
         if (invalid) { setAttachmentError(`${file.name}: ${invalid}`); return; }
       }
-      const processed = await Promise.all(incoming.map(async file =>
-        inputKind(file) === "image" ? compressImage(file).catch(() => file) : file,
-      ));
+      // Preserve scan pixels and file identity for OCR and retrying uploaded IDs.
+      const processed = incoming;
       const invalid = validateInputFiles([...existing, ...processed], limits);
       if (invalid) { setAttachmentError(invalid); return; }
       const newImages = processed.filter(file => inputKind(file) === "image").map(file => ({
@@ -628,11 +625,6 @@ export default function InputBar({
         >
           <AddSomethingToInput
             onImageSelect={handleImageSelect}
-            isImageBlocked={isImageBlocked}
-            onImageBlocked={() => {
-              setShowAddInput(false);
-              openLimitError("imagesNotSupported");
-            }}
             onFileSelect={handleFileSelect}
             maxImages={limits.maxImages}
             maxImageSizeMb={limits.maxImageSizeMb}
@@ -642,7 +634,7 @@ export default function InputBar({
 
       {attachmentError && <p className={styles.attachmentError} role="alert">{attachmentError}</p>}
       {(isPreparing || (isSending && (images.length > 0 || files.length > 0))) &&
-        <p className={styles.attachmentStatus} role="status">{isPreparing ? "Preparing attachments…" : "Uploading and sending attachments…"}</p>}
+        <p className={styles.attachmentStatus} role="status">{isPreparing ? "Preparing attachments…" : "Preparing attachments before sending…"}</p>}
       {images.length > 0 && (
         <div className={styles.imagePreviewRow}>
           {images.map((img) => (
