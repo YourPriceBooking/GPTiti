@@ -1,3 +1,4 @@
+import { OCR_ERROR_CODES } from "../files/preparation";
 import { readFiles, readFileResult } from "../files/types";
 import type { UploadedFile } from "@/types/api.types";
 
@@ -20,6 +21,7 @@ export type ChatServerEvent =
 export type ChatTurnStatus = "queued" | "processing" | "completed" | "failed";
 
 export const CHAT_ERROR_CODES = [
+  ...OCR_ERROR_CODES,
   "TEXT_ATTACHMENT_TOO_LARGE",
   "TEXT_ATTACHMENTS_CONTEXT_TOO_LARGE",
   "TEXT_INPUT_DISABLED",
