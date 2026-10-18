@@ -34,11 +34,11 @@ export function validateInputFiles(files: InputFile[], limits: { maxImages: numb
       // Extracted Office text and historical content are budgeted by the server, not ZIP size.
     } else {
       images++;
-      if (!limits.maxImages) return 'The selected model does not support image attachments. Choose another model or remove the images.';
-      if (file.size > Math.min(TOTAL_FILE_BYTES, limits.maxImageSizeMb * 1024 * 1024)) return `${file.name}: the image exceeds this model’s ${limits.maxImageSizeMb} MB limit.`;
+      const imageLimit = Math.min(5, limits.maxImages > 0 ? limits.maxImageSizeMb : 5);
+      if (file.size > imageLimit * 1024 * 1024) return `${file.name}: images must be ${imageLimit} MiB or smaller for text recognition.`;
     }
   }
-  if (images > limits.maxImages) return `The selected model allows up to ${limits.maxImages} images.`;
+  if (limits.maxImages > 0 && images > limits.maxImages) return `The selected model allows up to ${limits.maxImages} images.`;
   if (textBytes > TEXT_CONTEXT_BYTES) return 'Text attachments exceed 128 KiB. Use smaller files. Earlier attachments in this chat also count toward the server’s context limit.';
   if (totalBytes > TOTAL_FILE_BYTES) return 'Attachments exceed the 25 MiB total limit. Use smaller files.';
   return null;
