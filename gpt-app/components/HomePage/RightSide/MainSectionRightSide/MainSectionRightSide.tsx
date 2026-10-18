@@ -6,6 +6,7 @@ import { getModelFlow } from "@/config/modelFlows.config";
 
 export default function MainSectionRightSide(props: MainSectionRightSideProps) {
   const {
+    feedback,
     insertTemplate,
     setFocusMode,
     isSectionVisible,
@@ -123,6 +124,7 @@ export default function MainSectionRightSide(props: MainSectionRightSideProps) {
               <p className={styles.focusSubtitle}>{flow.subtitle}</p>
             </div>
             <InputComposer
+              feedback={feedback}
               showDisclaimer
               hasInput={hasInput}
               onChange={onChange}
