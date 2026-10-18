@@ -164,6 +164,7 @@ export type SectionGptChatsProps = Pick<
 };
 
 export type MainSectionRightSideProps = {
+  feedback?: React.ReactNode;
   insertTemplate: (text: string) => void;
   setFocusMode: React.Dispatch<React.SetStateAction<boolean>>;
   focusMode: boolean;
