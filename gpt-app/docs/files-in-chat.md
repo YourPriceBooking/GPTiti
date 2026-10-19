@@ -57,3 +57,9 @@ Smoke test: request each format naturally; open preview, switch XLSX sheets,
 download and open in a document reader, refresh and reopen from history.
 Verify partial preview notice with a large workbook, unavailable preview for
 an older upload, and owner isolation/deleted-file errors. No format picker.
+
+
+## Saved OCR preview (backend patch 16)
+PDF and PNG/JPEG/WEBP previews offer File / Recognized text. GET /files/:id/ocr returns the existing owner-only cache; ?download=1 returns its exact UTF-8 bytes. Missing cache (409) never triggers recognition. Copy includes all notes and page markers; page view only groups existing markers and collapses leading notes. React renders plain text, including markup, without executing it. Abort on close/change; check again retries only the read. Original Download remains available.
+
+Deploy backend patch 16 before merging. Manually verify mobile/desktop, keyboard focus/Escape, owner isolation, deleted files, absent cache, RTL text, clipboard failure, exact TXT and persistence after reload. This feature exposes saved extraction and does not improve OCR accuracy.
