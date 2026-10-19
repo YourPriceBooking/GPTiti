@@ -2,10 +2,11 @@
 /* eslint-disable @next/next/no-img-element -- Authenticated local Blob URLs must not use the image optimization proxy. */
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
-import { loadPreview, downloadFile, fileError, type Preview } from '@/lib/files/api';
+import { loadPreview, loadOcr, downloadOcr, downloadFile, fileError, type Preview } from '@/lib/files/api';
 import { extension, fileSize, tablePreview, type ManagedFile, type FileResult, type StructuredPreview, type PreviewCell } from '@/lib/files/types';
 import MarkdownContent from '@/components/common/MarkdownContent/MarkdownContent';
 import styles from './Files.module.css';
+import { ocrSections, ocrError, type OcrPreview } from '@/lib/files/ocr';
 
 const FileContext = createContext<(file: ManagedFile) => void>(() => {});
 function usePreview(file: ManagedFile, enabled = true, retry = 0) {
@@ -84,9 +85,41 @@ function OfficePreview({ data }: { data: StructuredPreview }) {
     </>}
   </div>;
 }
+function RecognizedText({ file }: { file: ManagedFile }) {
+  const [data, setData] = useState<OcrPreview | null>(null);
+  const [error, setError] = useState(''); const [retry, setRetry] = useState(0);
+  const [action, setAction] = useState(''); const [busy, setBusy] = useState(false);
+  const [raw, setRaw] = useState(false);
+  useEffect(() => {
+    const controller = new AbortController();
+    loadOcr(file.fileId, controller.signal).then(value => { if (!controller.signal.aborted) setData(value); })
+      .catch(e => { if (!controller.signal.aborted) setError(ocrError(e) || fileError(e)); });
+    return () => controller.abort();
+  }, [file.fileId, retry]);
+  if (error) return <div className={styles.ocrEmpty} role="status"><span aria-hidden="true">▤</span><h3>Recognized text is unavailable</h3><p>{error}</p><button className={styles.previewButton} onClick={() => { setError(''); setData(null); setRetry(n => n + 1); }}>Check again</button></div>;
+  if (!data) return <div className={styles.ocrEmpty} role="status"><p>Loading saved text…</p></div>;
+  return <div className={styles.ocrView}>
+    <div className={styles.ocrBadge}><span aria-hidden="true">●</span> Saved extraction · No AI rewriting</div>
+    <div className={styles.ocrNotice}><strong>{data.uncertain ? 'Some text may be inaccurate' : 'Check important details'}</strong><p>Recognition can misread names, dates, numbers and line order. This is the saved extraction, not a verified copy of the original.</p>{data.legacy && <p>This text was saved with an earlier recognition version.</p>}</div>
+    <div className={styles.ocrTools}>
+      <button className={styles.previewButton} disabled={busy} onClick={async () => {
+        setBusy(true); setAction(''); try { await navigator.clipboard.writeText(data.text); setAction('Full saved text copied.'); } catch { setAction('Could not copy. Download the TXT file instead.'); } finally { setBusy(false); }
+      }}>Copy all text</button>
+      <button className={styles.download} disabled={busy} onClick={async () => {
+        setBusy(true); setAction(''); try { await downloadOcr(file); setAction('TXT downloaded.'); } catch (e) { setAction(fileError(e)); } finally { setBusy(false); }
+      }}>Download TXT</button>
+    </div>
+    <p className={styles.ocrCaption}>Copy and TXT include the full saved text and recognition notes. No model request or extra token charge.</p>
+    <div role="status" className={styles.ocrFeedback}>{action}</div>
+    <button className={styles.rawToggle} aria-pressed={raw} onClick={() => setRaw(v => !v)}>{raw ? 'Show pages' : 'Show raw text'}</button>
+    {raw ? <pre dir="auto" className={styles.ocrText}>{data.text}</pre> : ocrSections(data.text).map((section, index) => <section className={styles.ocrPage} key={index}>{section.label === 'Recognition notes' ? <details><summary>Recognition notes</summary><pre dir="auto" className={styles.ocrText}>{section.text}</pre></details> : <><h3>{section.label}</h3><pre dir="auto" className={styles.ocrText}>{section.text}</pre></>}</section>)}
+  </div>;
+}
 function PreviewPanel({ file, close }: { file: ManagedFile; close: () => void }) {
   const [retry, setRetry] = useState(0);
-  const state = usePreview(file, true, retry);
+  const [tab, setTab] = useState<'file' | 'ocr'>('file');
+  const hasOcr = ['application/pdf', 'image/png', 'image/jpeg', 'image/webp'].includes(file.mimetype);
+  const state = usePreview(file, tab === 'file', retry);
   const ref = useRef<HTMLElement>(null);
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null;
@@ -105,13 +138,16 @@ function PreviewPanel({ file, close }: { file: ManagedFile; close: () => void })
   }, [close]);
   return <aside ref={ref} className={styles.panel} role="dialog" aria-label={`Preview ${file.originalName}`}>
     <header><div><h2>{file.originalName}</h2><p>{extension(file.originalName).toUpperCase()} · {fileSize(file.size)}</p></div><button type="button" onClick={close} aria-label="Close preview" className={styles.close}>×</button></header>
+    {hasOcr && <div className={styles.previewTabs} role="group" aria-label="Preview mode"><button aria-pressed={tab === 'file'} onClick={() => setTab('file')}>File</button><button aria-pressed={tab === 'ocr'} onClick={() => setTab('ocr')}>Recognized text</button></div>}
     <div className={styles.previewBody}>
+      {tab === 'ocr' ? <RecognizedText file={file} /> : <>
       {!state.data && !state.error && <p role="status">Loading preview…</p>}
       {state.error && <div role="alert"><p>{state.error}</p><button className={styles.previewButton} onClick={() => setRetry(n => n + 1)}>Try again</button></div>}
       {state.data?.kind === 'image' && state.url && <img className={styles.image} src={state.url} alt={file.originalName} />}
       {state.data?.kind === 'text' && <>{state.data.truncated && <p className={styles.note}>Showing the first 64 KB. Download to view the full file.</p>}<TextPreview file={file} text={state.data.text} truncated={state.data.truncated} /></>}
       {(state.data?.kind === 'document' || state.data?.kind === 'workbook') && <OfficePreview data={state.data} />}
-      {state.data?.kind === 'unavailable' && <p>Preview is not available for this format. You can download the file.</p>}
+      {state.data?.kind === 'unavailable' && <div className={styles.ocrEmpty}><h3>Your original file</h3><p>Download to view the original layout.{hasOcr ? ' Open Recognized text to read the saved extraction.' : ''}</p></div>}
+      </>}
     </div>
     <footer><Download file={file} /></footer>
   </aside>;
