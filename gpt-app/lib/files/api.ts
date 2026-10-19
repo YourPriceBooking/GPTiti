@@ -1,3 +1,4 @@
+import { readOcrPreview } from './ocr';
 import { axiosInstance } from '@/lib/axiosInstance';
 import { readStructuredPreview, type StructuredPreview, type ManagedFile } from './types';
 const route = (id: string, suffix = '') => {
@@ -28,4 +29,15 @@ export function fileError(error: unknown): string {
   if (status === 403 || status === 404) return 'This file is deleted, expired or no longer accessible.';
   if (status === 429) return 'Too many requests. Please try again shortly.';
   return 'Could not load this file. Please try again.';
+}
+
+export async function loadOcr(id: string, signal: AbortSignal) {
+  const res = await axiosInstance.get(route(id, '/ocr'), { signal, timeout: 30000 });
+  return readOcrPreview(res.data);
+}
+export async function downloadOcr(file: ManagedFile) {
+  const res = await axiosInstance.get<Blob>(route(file.fileId, '/ocr?download=1'), { responseType: 'blob', timeout: 30000 });
+  const url = URL.createObjectURL(new Blob([res.data], { type: 'text/plain;charset=utf-8' }));
+  const a = document.createElement('a'); a.href = url; a.download = file.originalName + '.ocr.txt';
+  document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
