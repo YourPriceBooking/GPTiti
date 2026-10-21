@@ -47,9 +47,9 @@
   min-height: 54px;
   padding: 0 20px;
   border-radius: 14px;
-  color: #ffffff;
-  background: linear-gradient(135deg, #327bff 0%, #1761ee 100%);
-  box-shadow: 0 10px 32px rgba(16, 88, 230, 0.12);
+  color: #355577;
+  background: #e7eef7;
+  box-shadow: none;
   font-size: 16px;
   font-weight: 700;
   transition:
@@ -60,14 +60,14 @@
 
 .createButton:hover,
 .firstProjectButton:hover {
-  background: linear-gradient(135deg, #4b8cff 0%, #2871ff 100%);
-  box-shadow: 0 12px 32px rgba(35, 104, 245, 0.28);
+  background: #dce7f3;
+  box-shadow: none;
 }
 
 .createButton:active,
 .firstProjectButton:active {
   transform: translateY(1px);
-  background: #0c3593;
+  background: #cedded;
   box-shadow: none;
 }
 
