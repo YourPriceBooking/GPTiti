@@ -266,7 +266,6 @@ export default function ImageEditor({
     canvas.height = Math.round(displaySize.h * dpr);
     ctx.scale(dpr, dpr);
     drawStrokes(ctx);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, displaySize]);
 
   const getCanvasPos = (e: React.PointerEvent) => {

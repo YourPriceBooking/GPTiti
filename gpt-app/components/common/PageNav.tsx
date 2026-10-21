@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 export default function PageNav() {
@@ -21,7 +22,14 @@ export default function PageNav() {
           href="/"
           className="flex items-center gap-2 hover:opacity-80 transition-opacity"
         >
-          <img src="/icons/rabbit.svg" alt="logo" className="w-9 h-5" />
+          <Image
+            src="/icons/rabbit.svg"
+            alt="logo"
+            width={36}
+            height={20}
+            unoptimized
+            className="w-9 h-5"
+          />
           <span className="font-bold text-xl tracking-tighter">
             GPT<span className="text-blue-600">iti</span>
           </span>

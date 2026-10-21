@@ -99,7 +99,9 @@ function UserMessage({ message }: { message: Message }) {
       >
         {hasImages && (
           <div className={styles.userImages}>
+            {/* Keep attachment URLs direct; do not proxy them through image optimization. */}
             {message.images!.map((src, i) => (
+              // eslint-disable-next-line @next/next/no-img-element
               <img
                 key={i}
                 src={src}
