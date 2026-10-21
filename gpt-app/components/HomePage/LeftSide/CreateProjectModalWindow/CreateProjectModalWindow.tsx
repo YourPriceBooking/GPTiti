@@ -4,7 +4,7 @@ import styles from "./CreateProjectModalWindow.module.css";
 
 type CreateProjectModalWindowProps = {
   onCancel: () => void;
-  onCreate: (name: string) => void;
+  onCreate: (name: string) => void | Promise<void>;
 };
 
 export default function CreateProjectModalWindow({
@@ -12,6 +12,9 @@ export default function CreateProjectModalWindow({
   onCreate,
 }: CreateProjectModalWindowProps) {
   const [name, setName] = useState("");
+  const [isCreating, setIsCreating] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
+  const submittingRef = useRef(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const trimmedName = name.trim();
   const canCreate = trimmedName.length > 0;
@@ -28,9 +31,19 @@ export default function CreateProjectModalWindow({
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [onCancel]);
 
-  const handleCreate = () => {
-    if (!canCreate) return;
-    onCreate(trimmedName);
+  const handleCreate = async () => {
+    if (!canCreate || submittingRef.current) return;
+    submittingRef.current = true;
+    setIsCreating(true);
+    setCreateError(null);
+    try {
+      await onCreate(trimmedName);
+    } catch {
+      setCreateError("Could not create the project. Please try again.");
+    } finally {
+      submittingRef.current = false;
+      setIsCreating(false);
+    }
   };
 
   return (
@@ -83,12 +96,23 @@ export default function CreateProjectModalWindow({
           placeholder="Example: Website Redesign"
           maxLength={30}
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          disabled={isCreating}
+          aria-invalid={Boolean(createError)}
+          aria-describedby={createError ? "create-project-error" : undefined}
+          onChange={(e) => {
+            setName(e.target.value);
+            setCreateError(null);
+          }}
           onKeyDown={(e) => {
-            if (e.key === "Enter") handleCreate();
+            if (e.key === "Enter") void handleCreate();
           }}
         />
 
+        {createError && (
+          <p id="create-project-error" role="alert" className={styles.error}>
+            {createError}
+          </p>
+        )}
         <div className={styles.infoBox}>
           <div className={styles.infoIcon}>
             <Image
@@ -118,9 +142,10 @@ export default function CreateProjectModalWindow({
             type="button"
             className={styles.createButton}
             onClick={handleCreate}
-            disabled={!canCreate}
+            disabled={!canCreate || isCreating}
+            aria-busy={isCreating}
           >
-            Create project
+            {isCreating ? "Creating…" : "Create project"}
           </button>
         </footer>
     </div>

@@ -9,7 +9,7 @@ const ANIM_MS = 220;
 type CreateProjectModalOverlayProps = {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
-  onCreate: (name: string) => void;
+  onCreate: (name: string) => void | Promise<void>;
 };
 
 export default function CreateProjectModalOverlay({

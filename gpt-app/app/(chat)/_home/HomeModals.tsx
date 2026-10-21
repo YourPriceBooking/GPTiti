@@ -41,16 +41,12 @@ export default function HomeModals({
         isOpen={ctrl.isCreateProjectModalOpen}
         setIsOpen={(open) => dispatch(setIsCreateProjectModalOpen(open))}
         onCreate={async (name) => {
+          const created = await dispatch(
+            createProject({ title: name, defaultModel: ctrl.selectedModel }),
+          ).unwrap();
           dispatch(setIsCreateProjectModalOpen(false));
-          try {
-            const created = await dispatch(
-              createProject({ title: name, defaultModel: ctrl.selectedModel }),
-            ).unwrap();
-            dispatch(setActiveProjectId(created.id));
-            onProjectCreated?.(created.id);
-          } catch {
-            // creation failed → the modal is already closed, error is in the store
-          }
+          dispatch(setActiveProjectId(created.id));
+          onProjectCreated?.(created.id);
         }}
       />
 
