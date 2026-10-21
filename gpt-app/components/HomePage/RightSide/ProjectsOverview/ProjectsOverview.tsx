@@ -46,7 +46,7 @@ function FolderIcon() {
   return (
     <span className={styles.projectIcon} aria-hidden="true">
       <Image
-        src="/icons/create-modal-project.svg"
+        src="/icons/projects-overview-folder.svg"
         alt=""
         width={38}
         height={31}
@@ -164,7 +164,7 @@ function ProjectRow({
             onMenuToggle(event.currentTarget);
           }}
         >
-          <Image src="/icons/three-points.svg" alt="" width={18} height={12} />
+          <Image src="/icons/projects-overview-actions.svg" alt="" width={18} height={12} />
         </button>
         {menuOpen && (
           <div
@@ -304,7 +304,7 @@ export default function ProjectsOverview({
 
       <section className={styles.section}>
         <div className={styles.sectionHeading}>
-          <Image src="/icons/pin.svg" alt="" width={14} height={15} />
+          <Image src="/icons/projects-overview-pin.svg" alt="" width={14} height={15} />
           <h2>Pinned projects</h2>
           <span className={styles.count}>{pinnedProjects.length}</span>
         </div>
@@ -351,7 +351,7 @@ export default function ProjectsOverview({
               <h3>No projects yet</h3>
               <Image
                 className={styles.emptyIllustration}
-                src="/icons/projects-empty-illustration.svg"
+                src="/icons/projects-overview-empty.svg"
                 alt=""
                 width={319}
                 height={290}
