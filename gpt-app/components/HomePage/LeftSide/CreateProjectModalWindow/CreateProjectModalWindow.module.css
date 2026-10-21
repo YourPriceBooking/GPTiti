@@ -4,9 +4,8 @@
   padding: 28px;
   padding-bottom: 16px;
   border-radius: 20px;
-  /* background: linear-gradient(135deg, #0c1b3a 0%, #07152e 45%, #050d1e 100%); */
-  background: #061127;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+  background: #ffffff;
+  box-shadow: 0 24px 60px rgba(16, 36, 58, 0.16);
   display: flex;
   flex-direction: column;
 }
@@ -25,7 +24,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(100deg, #102e69 0%, #0d1d46 100%);
+  background: #eaf0f8;
 }
 
 .headerText {
@@ -37,7 +36,7 @@
   font-family: var(--font-family);
   font-weight: 700;
   font-size: 20px;
-  color: var(--main-white);
+  color: #10243a;
   margin: 0;
 }
 
@@ -45,7 +44,7 @@
   font-family: var(--font-family);
   font-weight: 400;
   font-size: 14px;
-  color: #a5b5d9;
+  color: #60758f;
   margin: 4px 0 0;
 }
 
@@ -69,7 +68,7 @@
   font-family: var(--font-family);
   font-weight: 700;
   font-size: 14px;
-  color: var(--main-white);
+  color: #10243a;
   margin-top: 26px;
   margin-bottom: 10px;
 }
@@ -78,9 +77,9 @@
   width: 100%;
   padding: 16px 18px;
   border-radius: 10px;
-  border: 1px solid #306bff;
-  background-color: transparent;
-  color: #f8fafc;
+  border: 1px solid #cbd9e8;
+  background-color: #f8fafc;
+  color: #10243a;
   font-family: var(--font-family);
   font-size: 15px;
   outline: none;
@@ -88,11 +87,11 @@
 }
 
 .input::placeholder {
-  color: #64748b;
+  color: #60758f;
 }
 
 .input:focus {
-  border-color: #3b82f6;
+  border-color: #6386b2;
 }
 
 .infoBox {
@@ -103,7 +102,7 @@
   margin-top: 22px;
   padding: 20px;
   border-radius: 14px;
-  background: rgba(14, 27, 52, 0.55);
+  background: #f0f5fb;
 }
 
 .infoBox::after {
@@ -114,10 +113,10 @@
   bottom: 19px;
   width: 140px;
   background-image:
-    radial-gradient(circle, rgba(62, 124, 255, 0.45) 1px, transparent 1.5px),
+    radial-gradient(circle, rgba(99, 134, 178, 0.16) 1px, transparent 1.5px),
     radial-gradient(
       ellipse at 78% 50%,
-      rgba(43, 105, 255, 0.3) 0%,
+      rgba(99, 134, 178, 0.08) 0%,
       transparent 65%
     );
   background-size:
@@ -137,7 +136,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid #2f80ff;
+  border: 2px solid #6386b2;
   border-radius: 50%;
 }
 
@@ -152,7 +151,7 @@
   font-family: var(--font-family);
   font-weight: 700;
   font-size: 15px;
-  color: var(--main-white);
+  color: #10243a;
   margin: 0 0 6px;
 }
 
@@ -161,7 +160,7 @@
   font-weight: 400;
   font-size: 14px;
   line-height: 2.3;
-  color: #a7b6d8;
+  color: #60758f;
   margin: 0;
 }
 
@@ -173,7 +172,7 @@
   margin-left: -28px;
   margin-right: -28px;
   padding: 20px 28px 0;
-  border-top: 1px solid rgba(59, 130, 246, 0.22);
+  border-top: 1px solid #e7edf3;
 }
 
 .cancelButton {
@@ -182,8 +181,8 @@
   font-family: var(--font-family);
   font-weight: 700;
   font-size: 15px;
-  color: #e4e6e9;
-  background: linear-gradient(135deg, #0b1730 0%, #081221 100%);
+  color: #355577;
+  background: #f0f5fb;
   border-radius: 10px;
   padding: 14px 55px;
   cursor: pointer;
@@ -195,7 +194,7 @@
   inset: 0;
   z-index: -1;
   border-radius: inherit;
-  background: linear-gradient(100deg, #102245 0%, #0e1727 100%);
+  background: #e4edf7;
   opacity: 0;
   transition: opacity 0.2s ease;
 }
@@ -214,10 +213,10 @@
   font-family: var(--font-family);
   font-weight: 700;
   font-size: 15px;
-  color: #e4e6e9;
+  color: #355577;
   padding: 14px 65px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+  background: #e7eef7;
   cursor: pointer;
 }
 
@@ -227,7 +226,7 @@
   inset: 0;
   z-index: -1;
   border-radius: inherit;
-  background: linear-gradient(135deg, #4a8dff 0%, #2f73ff 25%, #1a5dff 100%);
+  background: #dce7f3;
   opacity: 0;
   transition: opacity 0.5s ease;
 }
@@ -237,14 +236,14 @@
 }
 
 .createButton:disabled {
-  color: #c2cbdc;
-  background: linear-gradient(135deg, #3c465b 0%, #2d374a 100%);
-  opacity: 0.5;
+  color: #60758f;
+  background: #edf2f7;
+  opacity: 1;
   cursor: not-allowed;
 }
 
 .createButton:active:not(:disabled)::before {
-  background: #0c3593;
+  background: #cedded;
 }
 
 /* --- Adaptive --- */
@@ -359,7 +358,7 @@
 
 .error {
   margin: 10px 0 0;
-  color: var(--error-soft);
+  color: #b42338;
   font-size: 14px;
   line-height: 1.4;
 }

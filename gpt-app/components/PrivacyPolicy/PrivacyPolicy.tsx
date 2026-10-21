@@ -8,8 +8,8 @@ const PrivacyPolicy = () => {
 
         <div className="space-y-8 leading-relaxed text-lg text-slate-800">
           <p>
-            This Privacy Policy explains how Your Price Booking OÜ ("we", "us",
-            "our") collects and uses your data when you use GPTiti ("Service").
+            This Privacy Policy explains how Your Price Booking OÜ (&quot;we&quot;, &quot;us&quot;,
+            &quot;our&quot;) collects and uses your data when you use GPTiti (&quot;Service&quot;).
           </p>
 
           <section>

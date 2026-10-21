@@ -89,8 +89,8 @@ const SmartSearch = () => (
         <li>👉 GPT models like GPT-5.4-mini or GPT-4o (for answers)</li>
       </ul>
       <p className="text-gray-700 text-lg leading-relaxed">
-        Embeddings handle "finding the right information", while GPT handles
-        "explaining it clearly".
+        Embeddings handle &quot;finding the right information&quot;, while GPT handles
+        &quot;explaining it clearly&quot;.
       </p>
     </motion.div>
 
@@ -114,8 +114,8 @@ const SmartSearch = () => (
       </ul>
       <p className="text-gray-700 text-lg leading-relaxed">Example:</p>
       <ul className="list-none text-gray-700 text-lg leading-relaxed space-y-1 pl-5">
-        <li>Search: "cheap AI model"</li>
-        <li>Result: GPT-4o-mini (even if phrase doesn't match exactly)</li>
+        <li>Search: &quot;cheap AI model&quot;</li>
+        <li>Result: GPT-4o-mini (even if phrase doesn&apos;t match exactly)</li>
       </ul>
     </motion.div>
 

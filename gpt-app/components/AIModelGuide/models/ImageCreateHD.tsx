@@ -180,7 +180,7 @@ const ImageCreateHD = () => (
       </h2>
       <p className="text-gray-700 text-lg leading-relaxed">
         Unlike raw API tools, GPTiti provides a simplified interface for AI
-        image generation. You don't need to manage models or settings — just
+        image generation. You don&apos;t need to manage models or settings — just
         describe your idea and get results.
       </p>
       <ul className="list-none text-gray-700 text-lg leading-relaxed space-y-1 pl-5">

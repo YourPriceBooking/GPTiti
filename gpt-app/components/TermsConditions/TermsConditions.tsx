@@ -8,8 +8,8 @@ const TermsConditions = () => {
 
         <div className="space-y-8 leading-relaxed text-lg text-slate-800">
           <p>
-            These Terms and Conditions ("Terms") govern your use of the GPTiti
-            service ("Service") operated by Your Price Booking OÜ.
+            These Terms and Conditions (&quot;Terms&quot;) govern your use of the GPTiti
+            service (&quot;Service&quot;) operated by Your Price Booking OÜ.
           </p>
 
           <section>
@@ -174,7 +174,7 @@ const TermsConditions = () => {
             </h2>
             <p>To the maximum extent permitted by law:</p>
             <ul className="list-disc ml-6 space-y-2 mt-2">
-              <li>The Service is provided "as is"</li>
+              <li>The Service is provided &quot;as is&quot;</li>
               <li>
                 We make no warranties regarding accuracy, reliability, or
                 availability

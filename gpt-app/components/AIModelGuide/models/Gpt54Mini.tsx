@@ -66,7 +66,7 @@ const Gpt54Mini = () => (
       </h2>
       <p className="text-gray-700 text-lg leading-relaxed">
         This model is ideal when you need better quality than basic AI, but
-        don't want to spend too many tokens.
+        don&apos;t want to spend too many tokens.
       </p>
       <ul className="list-none text-gray-700 text-lg leading-relaxed space-y-1 pl-5">
         <li>✔️ Daily work with higher expectations</li>
