@@ -31,7 +31,6 @@ type ProjectWorkspaceProps = {
   projectId: string;
   name: string;
   createdAt?: string;
-  onCreateFirstChat: () => void;
   inputProps: React.ComponentProps<typeof InputBar>;
   onChooseModel: () => void;
   showEstimate: boolean;
@@ -93,7 +92,6 @@ export default function ProjectWorkspace({
   projectId,
   name,
   createdAt,
-  onCreateFirstChat,
   inputProps,
   onChooseModel,
   showEstimate,
@@ -591,9 +589,6 @@ export default function ProjectWorkspace({
         </ul>
       ) : chatsLoaded ? (
         <div className={styles.emptyState}>
-          <div className={styles.decorPattern} aria-hidden="true">
-            <div className={styles.decorDots} />
-          </div>
           <div className={styles.emptyContent}>
             <div className={styles.emptyIcon}>
               <Image
@@ -608,13 +603,6 @@ export default function ProjectWorkspace({
               Create your first chat in this project. Chats, links, images,
               edited images, and uploaded files stay in this project history.
             </p>
-            <button
-              type="button"
-              className={styles.createButton}
-              onClick={onCreateFirstChat}
-            >
-              Create first chat
-            </button>
           </div>
         </div>
       ) : null}

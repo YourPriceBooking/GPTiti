@@ -33,7 +33,6 @@ export default function ProjectView({ ctrl }: { ctrl: HomeController }) {
         onAddChatsToProject={ctrl.handleAddChatsToProject}
         onRenameProject={ctrl.handleRenameProject}
         onDeleteProject={ctrl.handleDeleteProject}
-        onCreateFirstChat={() => inputRef.current?.focus()}
         inputProps={{
           hasInput: ctrl.hasInput,
           onChange: ctrl.handleChange,
