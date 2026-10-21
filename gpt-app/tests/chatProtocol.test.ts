@@ -3,6 +3,7 @@ import { test } from "node:test";
 
 import {
   CHAT_PROTOCOL_VERSION,
+  UNKNOWN_SERVER_ERROR_MESSAGE,
   makeChatRetryEnvelope,
   makeChatSendEnvelope,
   makeChatStatusEnvelope,
@@ -10,6 +11,7 @@ import {
   readChatErrorEvent,
   readChatSendAck,
   readChatStatusAck,
+  readChatRetryAck,
   readChatStreamEvent,
 } from "../lib/chat/chatProtocol.js";
 
@@ -66,7 +68,7 @@ test("accepts a valid accepted or duplicate send ACK", () => {
   assert.equal(duplicate?.ok, true);
 });
 
-test("rejects legacy, malformed and unknown-code ACKs", () => {
+test("rejects legacy and malformed ACKs while sanitizing unknown server errors", () => {
   assert.equal(readChatSendAck({ ok: true, turn: snapshot }), null);
   assert.equal(
     readChatSendAck({
@@ -77,13 +79,13 @@ test("rejects legacy, malformed and unknown-code ACKs", () => {
     }),
     null,
   );
-  assert.equal(
+  assert.deepEqual(
     readChatSendAck({
       ok: false,
       protocolVersion: 2,
       error: { code: "RAW_PROVIDER_ERROR", message: "secret", retryable: true },
     }),
-    null,
+    { ok: false, protocolVersion: 2, error: { code: "RAW_PROVIDER_ERROR", message: UNKNOWN_SERVER_ERROR_MESSAGE, retryable: true } },
   );
 });
 
@@ -229,4 +231,38 @@ test("PDF errors preserve server explanations and retry policy across ACK, event
     assert.ok(status?.ok);
     assert.deepEqual(status.turn.error, error);
   }
+});
+
+
+test("new server errors remain explicit rejections across send, status, retry and events", () => {
+  for (const code of ["WEB_TIMEOUT", "FUTURE_SERVICE_UNAVAILABLE"]) {
+    for (const retryable of [false, true]) {
+      const error = { code, message: "The source could not be read. Please try later.", retryable };
+      const expectedError = { ...error, message: code === "WEB_TIMEOUT" ? error.message : UNKNOWN_SERVER_ERROR_MESSAGE };
+      const rejected = { ok: false, protocolVersion: 2, error };
+      const expected = { ...rejected, error: expectedError };
+      assert.deepEqual(readChatSendAck(rejected), expected);
+      assert.deepEqual(readChatStatusAck(rejected), expected);
+      assert.deepEqual(readChatRetryAck(rejected), expected);
+      const status = readChatStatusAck({ ok: true, protocolVersion: 2,
+        turn: { ...snapshot, status: "failed", error } });
+      assert.ok(status?.ok);
+      assert.deepEqual(status.turn.error, expectedError);
+      const event = readChatErrorEvent({ protocolVersion: 2, event: "chat:error", type: "failed",
+        turnId, clientMessageId, conversationId, attempt: 1, payload: { error } });
+      assert.deepEqual(event?.payload.error, expectedError);
+    }
+  }
+});
+
+test("forward compatible errors still reject malformed envelopes", () => {
+  const error = { code: "FUTURE_ERROR", message: "Request rejected", retryable: false };
+  for (const invalid of [
+    { ...error, code: "" }, { ...error, code: "bad code" },
+    { ...error, code: "A".repeat(129) }, { ...error, code: 42 },
+    { ...error, message: "" }, { ...error, retryable: "false" },
+  ]) {
+    assert.equal(readChatSendAck({ ok: false, protocolVersion: 2, error: invalid }), null);
+  }
+  assert.equal(readChatSendAck({ ok: false, protocolVersion: 3, error }), null);
 });
