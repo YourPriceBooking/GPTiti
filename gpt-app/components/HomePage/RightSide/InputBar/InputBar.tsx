@@ -118,6 +118,7 @@ export default function InputBar({
   const activeProjectId = useAppSelector(selectActiveProjectId);
   const dictationScope = `${activeChatId ?? "new"}:${activeProjectId ?? "none"}:${selectedModel}`;
   const dictation = useDictation(dictationScope, isLoggedIn);
+  const { cancel: cancelRecording } = dictation;
   const voiceBusy = !["idle", "error"].includes(dictation.phase);
   const waveVisible = ["recording", "stopping", "transcribing"].includes(
     dictation.phase,
@@ -142,8 +143,8 @@ export default function InputBar({
     };
     draftSelectionRef.current = null;
     setVoiceNotice(null);
-    dictation.cancel();
-  }, [dictation.cancel]);
+    cancelRecording();
+  }, [cancelRecording]);
 
   useLayoutEffect(() => {
     draftSelectionRef.current = null;
@@ -639,6 +640,8 @@ export default function InputBar({
         <div className={styles.imagePreviewRow}>
           {images.map((img) => (
             <div key={img.id} className={styles.imageChip}>
+              {/* Local blob previews keep their direct URLs for editing and cleanup. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={img.url}
                 alt="pasted preview"
