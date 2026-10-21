@@ -21,16 +21,16 @@
   --flow-bg: rgba(62, 124, 255, 0.14);
   max-width: none;
   border: 1px solid rgba(59, 130, 246, 0.08);
-  background: rgba(13, 29, 70, 0.35);
+  background: #fcfdff;
   box-shadow: none;
 }
 
 .inputContainer.project .input {
-  color: var(--main-white);
+  color: #10243a;
 }
 
 .inputContainer.project .input::placeholder {
-  color: #8a9ac0;
+  color: #60758f;
   font-size: 18px;
   font-weight: 400;
 }
@@ -379,10 +379,10 @@
   margin-top: 4px;
 }
 .inputContainer.project .dictationStatus {
-  color: #a5b5d9;
+  color: #60758f;
 }
 .inputContainer.project .dictationError {
-  color: #fda4af;
+  color: #b42338;
 }
 @media (prefers-reduced-motion: reduce) {
   .voiceSend,

@@ -2,6 +2,8 @@
 
 import ProjectWorkspace from "@/components/HomePage/RightSide/ProjectWorkspace/ProjectWorkspace";
 
+import { removeConversation } from "@/redux/chat/operations";
+import { fetchProject } from "@/redux/projects/operations";
 import { setHasFirstRequest, setIsModalOpen } from "@/redux/ui/slice";
 
 import type { HomeController } from "./useHomeController";
@@ -20,7 +22,13 @@ export default function ProjectView({ ctrl }: { ctrl: HomeController }) {
         chats={ctrl.projectChats}
         chatsLoaded={activeProject.conversationIds !== undefined}
         onOpenChat={ctrl.handleSelectChat}
-        onRemoveChat={ctrl.handleRemoveChatFromProject}
+        onDeleteChat={(id) => {
+          void dispatch(removeConversation(id)).then((action) => {
+            if (removeConversation.fulfilled.match(action)) {
+              dispatch(fetchProject(activeProject.id));
+            }
+          });
+        }}
         onRenameChat={ctrl.handleRenameChat}
         onAddChatsToProject={ctrl.handleAddChatsToProject}
         onRenameProject={ctrl.handleRenameProject}

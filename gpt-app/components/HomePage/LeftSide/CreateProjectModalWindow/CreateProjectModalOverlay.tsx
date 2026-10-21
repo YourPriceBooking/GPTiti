@@ -39,7 +39,7 @@ export default function CreateProjectModalOverlay({
     return () => window.clearTimeout(t);
   }, [isOpen]);
 
-  if (!mounted) return null;
+  if (!isOpen && !mounted) return null;
 
   return (
     <div
