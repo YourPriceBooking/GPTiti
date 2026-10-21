@@ -60,23 +60,23 @@
 }
 
 .chooseModelColumn.project .inputSpan2 {
-  color: #a5b5d9;
+  color: #60758f;
 }
 
 .chooseModelColumn.project .chooseModelBtn {
-  color: var(--main-white);
-  background: rgba(14, 27, 52, 0.55);
-  border-color: rgba(59, 130, 246, 0.4);
+  color: #355577;
+  background: #eaf0f8;
+  border-color: #d8e3ef;
   border-radius: 999px;
 }
 
 .chooseModelColumn.project .chooseModelBtn:hover {
-  background: rgba(14, 27, 52, 0.8);
-  border-color: rgba(111, 160, 255, 0.7);
+  background: #e4edf7;
+  border-color: #6386b2;
 }
 
 .chooseModelColumn.project .chooseModelBtn:active {
-  background: rgba(14, 27, 52, 0.95);
+  background: #d6e3f2;
   border-color: #3e7cff;
 }
 

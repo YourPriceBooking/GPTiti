@@ -14,6 +14,7 @@ import ChatBubbleIcon from "@/components/common/ChatBubbleIcon";
 import type { Chat } from "@/types/types";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { updateConversationPin } from "@/redux/chat/operations";
+import { setIsCreateProjectModalOpen } from "@/redux/ui/slice";
 import { selectProjectList } from "@/redux/projects/selectors";
 import { useChatProjectMove } from "@/hooks/useChatProjectMove";
 
@@ -39,7 +40,7 @@ type ProjectWorkspaceProps = {
   chats?: Chat[];
   chatsLoaded?: boolean;
   onOpenChat?: (id: string) => void;
-  onRemoveChat?: (id: string) => void;
+  onDeleteChat?: (id: string) => void;
   onRenameChat?: (id: string, title: string) => void;
   onAddChatsToProject: (id: string) => void;
   onRenameProject: (id: string, title: string) => void;
@@ -101,7 +102,7 @@ export default function ProjectWorkspace({
   chats = [],
   chatsLoaded = true,
   onOpenChat,
-  onRemoveChat,
+  onDeleteChat,
   onRenameChat,
   onAddChatsToProject,
   onRenameProject,
@@ -314,7 +315,7 @@ export default function ProjectWorkspace({
       <header className={styles.header}>
         <div className={styles.headerIcon}>
           <Image
-            src="/icons/create-modal-project.svg"
+            src="/icons/projects-overview-folder.svg"
             alt="project"
             width={40}
             height={40}
@@ -359,7 +360,7 @@ export default function ProjectWorkspace({
             onClick={toggleProjectMenu}
           >
             <Image
-              src="/icons/three-points.svg"
+              src="/icons/projects-overview-actions.svg"
               alt=""
               width={20}
               height={20}
@@ -424,7 +425,16 @@ export default function ProjectWorkspace({
                 key={chat.id}
                 className={styles.chatCard}
                 tabIndex={0}
-                onClick={() => onOpenChat?.(chat.id)}
+                onClick={() => {
+                  if (renamingChatId !== chat.id) onOpenChat?.(chat.id);
+                }}
+                onKeyDown={(event) => {
+                  if (event.target !== event.currentTarget) return;
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    onOpenChat?.(chat.id);
+                  }
+                }}
               >
                 <div className={styles.cardIcon}>
                   <ChatBubbleIcon width={16} height={16} />
@@ -475,7 +485,7 @@ export default function ProjectWorkspace({
                     }}
                   >
                     <Image
-                      src={isPinned ? "/icons/unpin.svg" : "/icons/pin.svg"}
+                      src={isPinned ? "/icons/project-workspace-unpin.svg" : "/icons/projects-overview-pin.svg"}
                       alt=""
                       width={14}
                       height={15}
@@ -499,7 +509,7 @@ export default function ProjectWorkspace({
                     }}
                   >
                     <Image
-                      src="/icons/three-points.svg"
+                      src="/icons/projects-overview-actions.svg"
                       alt=""
                       width={20}
                       height={20}
@@ -523,7 +533,10 @@ export default function ProjectWorkspace({
                         setOpenMenuChatId(null);
                       }}
                       showCreateProject
-                      onCreateProject={() => setOpenMenuChatId(null)}
+                      onCreateProject={() => {
+                        setOpenMenuChatId(null);
+                        dispatch(setIsCreateProjectModalOpen(true));
+                      }}
                       projectTitle={name}
                       onMoveToProject={() => openChatAction("move", chat.id)}
                       onArchive={() => openChatAction("archive", chat.id)}
@@ -550,7 +563,7 @@ export default function ProjectWorkspace({
                     <DeleteModalWindow
                       onCancel={() => setDeletingChatId(null)}
                       onConfirm={() => {
-                        onRemoveChat?.(chat.id);
+                        onDeleteChat?.(chat.id);
                         setDeletingChatId(null);
                       }}
                     />
@@ -584,7 +597,7 @@ export default function ProjectWorkspace({
           <div className={styles.emptyContent}>
             <div className={styles.emptyIcon}>
               <Image
-                src="/icons/create-modal-project.svg"
+                src="/icons/projects-overview-folder.svg"
                 alt=""
                 width={36}
                 height={36}
