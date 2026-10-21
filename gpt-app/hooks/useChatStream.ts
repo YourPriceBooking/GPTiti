@@ -293,7 +293,7 @@ export function useChatStream(): ChatStream {
   );
 
   const requestTurnStatus = useCallback(
-    (turnId: string): Promise<boolean> => {
+    (turnId: string, background = false): Promise<boolean> => {
       const inFlight = statusPromisesRef.current.get(turnId);
       if (inFlight) return inFlight;
       if (!socket) return Promise.resolve(false);
@@ -310,13 +310,19 @@ export function useChatStream(): ChatStream {
           const ack = readChatStatusAck(raw);
           if (!ack) throw new Error(INVALID_SERVER_RESPONSE);
           if (!ack.ok) {
+            if (background) return false;
             showProtocolError(ack.error);
             markStatusUnknown(turnId, ack.error.message);
             return false;
           }
+          if (background) {
+            const current = pendingTurnsRef.current[ack.turn.clientMessageId];
+            if (!current || !["queued", "processing", "syncing"].includes(current.status) || current.lastAppliedSeq > ack.turn.lastSeq || current.attempt > ack.turn.attempt) return false;
+          }
           applySnapshot(ack.turn);
           return true;
         } catch (error) {
+          if (background) return false;
           handleLocalError(error);
           markStatusUnknown(turnId, CHAT_DELIVERY_UNKNOWN);
           return false;
@@ -430,6 +436,17 @@ export function useChatStream(): ChatStream {
     },
     [applySnapshot, dispatch, emitSendAttempt, showProtocolError],
   );
+
+  // Browser planning has no text stream. Poll snapshots, never resend requests.
+  useEffect(() => {
+    const timer = setInterval(() => {
+      if (!socket?.connected || document.visibilityState === "hidden") return;
+      for (const turn of Object.values(pendingTurnsRef.current)) {
+        if (turn.turnId && ["queued", "processing"].includes(turn.status) && !turn.partialContent && turn.lastAppliedSeq === 0) void requestTurnStatus(turn.turnId, true);
+      }
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [socket, requestTurnStatus]);
 
   const recoverPendingTurns = useCallback(async () => {
     const turns = Object.values(pendingTurnsRef.current);

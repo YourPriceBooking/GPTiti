@@ -38,6 +38,8 @@ export type PendingChatTurn = {
 
 export type Message = {
   attachments?: import("@/lib/files/types").ManagedFile[];
+  webSources?: import("@/lib/web/sources").WebSource[];
+  webStatus?: import("@/lib/web/sources").WebStatus | null;
   fileResult?: import("@/lib/files/types").FileResult | null;
   id?: string;
   role: ChatRole;
