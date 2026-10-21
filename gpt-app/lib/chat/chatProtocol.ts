@@ -22,6 +22,23 @@ export type ChatTurnStatus = "queued" | "processing" | "completed" | "failed";
 
 export const CHAT_ERROR_CODES = [
   ...OCR_ERROR_CODES,
+  "WEB_TOO_MANY_URLS",
+  "WEB_INVALID_URL",
+  "WEB_BLOCKED_ADDRESS",
+  "WEB_INPUT_DISABLED",
+  "WEB_CONTEXT_TOO_LARGE",
+  "WEB_CONFIGURATION_ERROR",
+  "WEB_INVALID_TOOL_RESULT",
+  "WEB_TIMEOUT",
+  "WEB_REDIRECT_LIMIT",
+  "WEB_UNAVAILABLE",
+  "WEB_ACCESS_DENIED",
+  "WEB_UNSUPPORTED_TYPE",
+  "WEB_UNSUPPORTED_ENCODING",
+  "WEB_PAGE_TOO_LARGE",
+  "WEB_JAVASCRIPT_REQUIRED",
+  "WEB_NO_READABLE_TEXT",
+
   "TEXT_ATTACHMENT_TOO_LARGE",
   "TEXT_ATTACHMENTS_CONTEXT_TOO_LARGE",
   "TEXT_INPUT_DISABLED",
@@ -71,7 +88,8 @@ export const CHAT_ERROR_CODES = [
 export type ChatProtocolErrorCode = (typeof CHAT_ERROR_CODES)[number];
 
 export type ChatProtocolError = {
-  code: ChatProtocolErrorCode;
+  // Server deployments may introduce codes before the client is updated.
+  code: string;
   message: string;
   retryable: boolean;
   details?: { balance?: number; availableTokens?: number; estimatedTokens?: number };
@@ -199,7 +217,6 @@ export type ChatErrorEvent = ServerEnvelope<
 
 const UUID_V4_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-const ERROR_CODES = new Set<string>(CHAT_ERROR_CODES);
 const TURN_STATUSES = new Set<string>([
   "queued",
   "processing",
@@ -236,11 +253,16 @@ const readUuid = (value: unknown): string | null => {
   return text && UUID_V4_RE.test(text) ? text : null;
 };
 
+const ERROR_CODES = new Set<string>(CHAT_ERROR_CODES);
+export const UNKNOWN_SERVER_ERROR_MESSAGE =
+  "The request could not be completed. Please try again or contact support.";
+
 const readProtocolError = (value: unknown): ChatProtocolError | null => {
   if (!isRecord(value)) return null;
   const code = readNonEmptyString(value.code);
   const message = readNonEmptyString(value.message);
-  if (!code || !ERROR_CODES.has(code) || !message) return null;
+  // Validate the envelope, not a closed list of server error codes.
+  if (!code || !/^[A-Z][A-Z0-9_]{0,127}$/.test(code) || !message) return null;
   if (typeof value.retryable !== "boolean") return null;
   const details: NonNullable<ChatProtocolError["details"]> = {};
   if (isRecord(value.details)) {
@@ -253,8 +275,8 @@ const readProtocolError = (value: unknown): ChatProtocolError | null => {
   }
   return {
     ...(Object.keys(details).length ? { details } : {}),
-    code: code as ChatProtocolErrorCode,
-    message,
+    code,
+    message: ERROR_CODES.has(code) ? message : UNKNOWN_SERVER_ERROR_MESSAGE,
     retryable: value.retryable,
   };
 };
