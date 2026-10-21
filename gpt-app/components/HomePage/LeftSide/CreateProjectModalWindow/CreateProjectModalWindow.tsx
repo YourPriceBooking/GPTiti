@@ -56,7 +56,7 @@ export default function CreateProjectModalWindow({
       <header className={styles.header}>
           <div className={styles.headerIcon}>
             <Image
-              src="/icons/create-modal-project.svg"
+              src="/icons/projects-overview-folder.svg"
               alt="create-project"
               width={36}
               height={36}
@@ -77,7 +77,7 @@ export default function CreateProjectModalWindow({
             aria-label="Close"
           >
             <Image
-              src="/icons/close-modal-project.svg"
+              src="/icons/create-project-close-light.svg"
               alt="close"
               width={20}
               height={20}
@@ -116,7 +116,7 @@ export default function CreateProjectModalWindow({
         <div className={styles.infoBox}>
           <div className={styles.infoIcon}>
             <Image
-              src="/icons/info-modal-project.svg"
+              src="/icons/create-project-info-light.svg"
               alt="info"
               width={4}
               height={26}

@@ -14,7 +14,7 @@ const TextToSpeech = () => (
       className="text-gray-700 text-lg leading-relaxed"
     >
       Text to Speech (TTS) is an AI technology that converts written text into
-      spoken voice. It allows AI to "talk" using natural-sounding speech instead
+      spoken voice. It allows AI to &quot;talk&quot; using natural-sounding speech instead
       of just displaying text.
     </motion.p>
 
