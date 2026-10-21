@@ -1,3 +1,4 @@
+import { readWebSources, readWebStatus } from "../web/sources";
 import { OCR_ERROR_CODES } from "../files/preparation";
 import { readFiles, readFileResult } from "../files/types";
 import type { UploadedFile } from "@/types/api.types";
@@ -97,6 +98,7 @@ export type ChatProtocolError = {
 
 export type AssistantMessageDTO = {
   attachments?: import("../files/types").ManagedFile[];
+  webSources?: import("../web/sources").WebSource[];
   fileResult?: import("../files/types").FileResult | null;
   id: string;
   role: "assistant";
@@ -121,6 +123,7 @@ export type ChatTurnSnapshot = {
   status: ChatTurnStatus;
   attempt: number;
   lastSeq: number;
+  webStatus?: import("../web/sources").WebStatus | null;
   partialContent: string;
   assistantMessage: AssistantMessageDTO | null;
   billing: BillingDTO | null;
@@ -317,6 +320,7 @@ const readAssistantMessage = (value: unknown): AssistantMessageDTO | null => {
     role: "assistant",
     attachments: readFiles(value.attachments),
     fileResult: readFileResult(value.fileResult),
+    webSources: readWebSources(value.webSources),
     content,
     modelId,
     tokens,
@@ -377,7 +381,7 @@ export const readChatTurnSnapshot = (
     attempt,
     lastSeq,
     partialContent,
-    assistantMessage,
+    webStatus: readWebStatus(value.webStatus),    assistantMessage,
     billing,
     error,
     createdAt,

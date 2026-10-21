@@ -36,6 +36,8 @@ export interface Conversation {
 
 export interface ConversationMessage {
   attachments?: import("@/lib/files/types").ManagedFile[];
+  webSources?: import("@/lib/web/sources").WebSource[];
+  webStatus?: import("@/lib/web/sources").WebStatus | null;
   fileResult?: import("@/lib/files/types").FileResult | null;
   _id: string;
   role: "user" | "assistant";

@@ -1,3 +1,4 @@
+import { readWebSources } from "../../lib/web/sources";
 import { readFiles, readFileResult } from "@/lib/files/types";
 import { createSlice, isAnyOf, type PayloadAction } from "@reduxjs/toolkit";
 import type { Chat, ChatProject, Message, PendingChatTurn } from "@/types/types";
@@ -145,6 +146,8 @@ const reconcileSnapshot = (state: ChatState, snapshot: ChatTurnSnapshot) => {
     content: completedMessage?.content ?? snapshot.partialContent,
     attachments: completedMessage?.attachments ?? [],
     fileResult: completedMessage?.fileResult ?? null,
+    webSources: completedMessage?.webSources ?? [],
+    webStatus: snapshot.status === "processing" ? snapshot.webStatus : null,
     modelId: completedMessage?.modelId ?? existingAssistant?.modelId ?? turn.modelId,
     tokens:
       snapshot.billing?.appTokensSpent ??
@@ -387,6 +390,8 @@ const chatSlice = createSlice({
           content: dto.content,
           attachments: dto.attachments ?? [],
           fileResult: dto.fileResult ?? null,
+          webSources: dto.webSources ?? [],
+          webStatus: null,
           modelId: dto.modelId,
           tokens: payload.payload.billing.appTokensSpent,
           updatedAt: dto.updatedAt,
@@ -581,6 +586,7 @@ const chatSlice = createSlice({
           content: message.content,
           attachments: readFiles(message.attachments),
           fileResult: readFileResult(message.fileResult),
+          webSources: readWebSources(message.webSources),
           images: undefined,
           tokens: message.tokens,
           modelId: message.modelId,

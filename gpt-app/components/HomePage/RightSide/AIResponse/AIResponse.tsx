@@ -1,5 +1,7 @@
 "use client";
 
+import WebSources from "@/components/Web/WebSources";
+import { withoutWebFooter, type WebSource } from "@/lib/web/sources";
 import { FileCards } from "@/components/Files/FileWorkspace";
 import Image from "next/image";
 import { useCallback, useMemo, useState } from "react";
@@ -11,6 +13,7 @@ import styles from "./AIResponse.module.css";
 type AIResponseProps = {
   attachments?: import("@/lib/files/types").ManagedFile[];
   fileResult?: import("@/lib/files/types").FileResult | null;
+  webSources?: WebSource[];
   content: string;
   modelId?: string;
   updatedAt?: string;
@@ -22,6 +25,7 @@ export default function AIResponse({
   updatedAt,
   attachments,
   fileResult,
+  webSources = [],
 }: AIResponseProps) {
   const updatedLabel = useMemo(() => formatActivity(updatedAt), [updatedAt]);
 
@@ -85,7 +89,8 @@ export default function AIResponse({
         </span>
       </h2>
 
-      <MarkdownContent className={styles.aiContent} content={content} />
+      <MarkdownContent className={styles.aiContent} content={withoutWebFooter(content, webSources)} />
+      <WebSources sources={webSources} />
       <FileCards files={attachments} result={fileResult} />
     </div>
   );
