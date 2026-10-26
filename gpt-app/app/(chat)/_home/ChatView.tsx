@@ -79,7 +79,7 @@ export default function ChatView({
   const feedback = <>
       {ctrl.fileProgress && <div className={styles.filePreparation} role="status" aria-live="polite">
         <span className={styles.filePreparationSpinner} aria-hidden="true" />
-        <span>{ctrl.fileProgress.phase === "recognizing" ? "Recognizing text…" : "Uploading file…"} {ctrl.fileProgress.index}/{ctrl.fileProgress.total} — {ctrl.fileProgress.name}</span>
+        <span>{ctrl.fileProgress.phase === "unpacking" ? "Preparing ZIP archive…" : ctrl.fileProgress.phase === "recognizing" ? "Recognizing text…" : "Uploading file…"} {ctrl.fileProgress.index}/{ctrl.fileProgress.total} — {ctrl.fileProgress.name}</span>
       </div>}
       {ctrl.fileWarnings.length > 0 && <div className={styles.filePreparation} role="status">
         <span>ⓘ Text recognition may be inaccurate for {ctrl.fileWarnings.join(", ")}. Check names, numbers and important details against the original.</span>

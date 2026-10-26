@@ -145,7 +145,14 @@ function PreviewPanel({ file, close }: { file: ManagedFile; close: () => void })
       {state.error && <div role="alert"><p>{state.error}</p><button className={styles.previewButton} onClick={() => setRetry(n => n + 1)}>Try again</button></div>}
       {state.data?.kind === 'image' && state.url && <img className={styles.image} src={state.url} alt={file.originalName} />}
       {state.data?.kind === 'text' && <>{state.data.truncated && <p className={styles.note}>Showing the first 64 KB. Download to view the full file.</p>}<TextPreview file={file} text={state.data.text} truncated={state.data.truncated} /></>}
-      {(state.data?.kind === 'document' || state.data?.kind === 'workbook') && <OfficePreview data={state.data} />}
+      {state.data?.kind === 'archive' && <div className={styles.archive}>
+        <div className={styles.archiveHeading}><strong>Archive contents</strong><span>{state.data.entries.length} files</span></div>
+        <p className={styles.note}>Paths and file sizes inside this ZIP. Download the archive to open its files. No code is executed.</p>
+        <ul className={styles.archiveList}>{state.data.entries.map(entry => <li key={entry.path}>
+          <span className={styles.archiveIcon} aria-hidden="true">↳</span><div><strong>{entry.path}</strong><small>{fileSize(entry.size)} · {entry.status === 'created' ? 'Created' : entry.status === 'read' ? 'Text extracted' : 'Ignored — OS metadata'}</small></div>
+        </li>)}</ul>
+      </div>}
+      {(state.data?.kind === 'document'  || state.data?.kind === 'workbook') && <OfficePreview data={state.data} />}
       {state.data?.kind === 'unavailable' && <div className={styles.ocrEmpty}><h3>Your original file</h3><p>Download to view the original layout.{hasOcr ? ' Open Recognized text to read the saved extraction.' : ''}</p></div>}
       </>}
     </div>
