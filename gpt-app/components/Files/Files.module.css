@@ -47,3 +47,13 @@
 @media(max-width:600px) { .previewTabs { margin:0 16px 16px; }.ocrText { padding:14px; font-size:12px; } }
 .ocrPage summary { padding:14px 16px; color:#64758e; font-size:12px; cursor:pointer; background:#f7f9fc; }
 .ocrPage summary:focus-visible { outline:2px solid #4582df; outline-offset:-3px; }
+
+.archive { padding: 4px 0; }
+.archiveHeading { display:flex; justify-content:space-between; align-items:center; gap:12px; color:#1e293b; }
+.archiveHeading span { color:#64748b; font-size:12px; padding:4px 9px; background:#f1f5f9; border-radius:12px; }
+.archiveList { list-style:none; padding:0; margin:16px 0; border:1px solid #e2e8f0; border-radius:14px; overflow:hidden; }
+.archiveList li { display:flex; gap:12px; align-items:flex-start; padding:12px 14px; background:#fff; }
+.archiveList li+li { border-top:1px solid #f1f5f9; }
+.archiveList strong { display:block; color:#334155; font-size:13px; font-weight:500; overflow-wrap:anywhere; }
+.archiveList small { display:block; color:#64748b; font-size:11px; margin-top:4px; }
+.archiveIcon { background:#eff6ff; color:#2563eb; border-radius:8px; padding:6px 9px; flex:none; }

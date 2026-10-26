@@ -1,6 +1,24 @@
 import type { UploadedFile } from '../../types/api.types';
 
 export const OCR_ERROR_MESSAGES = {
+  ZIP_INPUT_DISABLED: 'ZIP reading is disabled for this model. Choose another model or attach files separately.',
+  ZIP_OUTPUT_DISABLED: 'ZIP creation is disabled for this model.',
+  ZIP_TOO_LARGE: 'ZIP archives must be 10 MiB or smaller. Split the archive.',
+  ZIP_LIMIT: 'ZIP exceeds 20 files, 100 total entries, 5 MiB per file or 25 MiB expanded. Split the archive.',
+  ZIP_TEXT_TOO_LARGE: 'Extracted ZIP text exceeds 128 KiB. Use a smaller archive.',
+  ZIP_ENCRYPTED: 'Password-protected ZIP archives cannot be read. Upload an unencrypted copy you are authorized to use.',
+  ZIP_UNSAFE_PATH: 'ZIP contains unsafe or conflicting paths. Recreate it with unique relative file paths.',
+  ZIP_UNSUPPORTED: 'Use a standard stored or deflated ZIP without ZIP64, encryption or symbolic links.',
+  ZIP_FILENAME_ENCODING: 'Recreate the ZIP using UTF-8 filenames.',
+  ZIP_UNSUPPORTED_ENTRY: 'ZIP contains an unsupported file. Use text/code, PDF, DOCX, XLSX or PNG/JPG/WEBP. Nested archives, SVG and executables cannot be read.',
+  ZIP_EMPTY: 'The ZIP contains no readable files.',
+  ZIP_OCR_LIMIT: 'Use at most two files requiring OCR and ten recognized pages per ZIP.',
+  INVALID_ZIP: 'The ZIP is damaged. Recreate it and try again.',
+  INVALID_ZIP_OUTPUT: 'The model could not produce a valid ZIP file.',
+  ZIP_PROCESSING_BUSY: 'Archive processing is busy. Send again shortly; the uploaded ZIP will be reused.',
+  ZIP_PROCESSING_TIMEOUT: 'Archive processing took too long. Split the archive.',
+  ZIP_NOT_READY: 'Your ZIP is still preparing. Send again shortly; the uploaded ZIP will be reused.',
+
   OCR_INPUT_DISABLED: 'Text recognition is disabled for this model. Choose another model or attach a text file.',
   OCR_UNAVAILABLE: 'Text recognition is temporarily unavailable. Try again later with the same attachment.',
   OCR_FILE_TOO_LARGE: 'OCR accepts files up to 5 MiB. Split or resize this file.',
@@ -18,7 +36,7 @@ export const OCR_ERROR_MESSAGES = {
 export const OCR_ERROR_CODES = Object.keys(OCR_ERROR_MESSAGES) as (keyof typeof OCR_ERROR_MESSAGES)[];
 
 export type FilePreparation = { status: 'not_required' } | {
-  status: 'ready'; method: 'local_ocr'; ocrPages: number; textBytes: number;
+  status: 'ready'; method: 'local_ocr' | 'zip'; ocrPages: number; textBytes: number;
   scripts: string[]; uncertain: boolean;
 };
 export function readFilePreparation(value: unknown): FilePreparation {
@@ -26,9 +44,9 @@ export function readFilePreparation(value: unknown): FilePreparation {
   const p = data?.processing;
   if (data?.success !== true || !p) throw new Error('Invalid file preparation response. Please try again.');
   if ((p.status as string) === 'not_required') return { status: 'not_required' };
-  if (p.status !== 'ready' || p.method !== 'local_ocr' ||
+  if (p.status !== 'ready' || !['local_ocr', 'zip'].includes(p.method ?? '') ||
       !Number.isInteger(p.ocrPages) || p.ocrPages! < 0 || p.ocrPages! > 10 ||
-      !Number.isInteger(p.textBytes) || p.textBytes! < 0 || p.textBytes! > 65536 ||
+      !Number.isInteger(p.textBytes) || p.textBytes! < 0 || p.textBytes! > (p.method === 'zip' ? 131072 : 65536) ||
       !Array.isArray(p.scripts) || !p.scripts.every(s => typeof s === 'string') ||
       typeof p.uncertain !== 'boolean') throw new Error('Invalid file preparation response. Please try again.');
   return p as Extract<FilePreparation, {status: 'ready'}>;
@@ -43,7 +61,7 @@ export function preparationErrorMessage(error: unknown): string {
   return e?.response?.data?.message || e?.message || 'Could not prepare this attachment. Please try again.';
 }
 
-export type PreparationProgress = { phase: 'uploading' | 'recognizing'; name: string; index: number; total: number };
+export type PreparationProgress = { phase: 'uploading' | 'recognizing' | 'unpacking'; name: string; index: number; total: number };
 
 // File identity, not name/size, prevents reuse for different bytes. Weak keys release removed drafts.
 // This cache belongs to one signed-in session and never persists private IDs in browser storage.
@@ -66,8 +84,9 @@ export class AttachmentPreparation {
         deps.signal.throwIfAborted();
         this.uploads.set(file, stored);
       }
-      if (stored.fileId && (stored.mimetype === 'application/pdf' || ['image/png', 'image/jpeg', 'image/webp'].includes(stored.mimetype))) {
-        deps.progress({ phase: 'recognizing', name: file.name, index: index + 1, total: files.length });
+      const isZip = /\.zip$/i.test(file.name);
+      if (stored.fileId && (isZip || stored.mimetype === 'application/pdf' || ['image/png', 'image/jpeg', 'image/webp'].includes(stored.mimetype))) {
+        deps.progress({ phase: isZip ? 'unpacking' : 'recognizing', name: file.name, index: index + 1, total: files.length });
         const processing = await deps.prepare(stored.fileId, modelId);
         deps.signal.throwIfAborted();
         if (processing.status === 'ready' && processing.uncertain) deps.warning(file.name);

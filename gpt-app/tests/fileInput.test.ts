@@ -5,7 +5,7 @@ const limits = { maxImages: 3, maxImageSizeMb: 5 };
 const file = (name: string, size = 10) => ({ name, size });
 test('mixed attachments accept supported extensions and reject unreadable documents', () => {
   assert.equal(validateInputFiles([file('notes.TXT'), file('photo.webp'), file('code.ts')], limits), null);
-  for (const ext of ['doc','xls','docm','xlsm','svg','zip']) assert.ok(validateInputFiles([file('a.' + ext)], limits));
+  for (const ext of ['doc','xls','docm','xlsm','svg']) assert.ok(validateInputFiles([file('a.' + ext)], limits));
   assert.equal(inputKind(file('a.JSON')), 'text');
 });
 test('universal picker respects image model limits and combined attachment count', () => {
