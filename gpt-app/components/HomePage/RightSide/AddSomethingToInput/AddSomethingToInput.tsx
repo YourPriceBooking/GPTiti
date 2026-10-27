@@ -25,7 +25,7 @@ export default function AddSomethingToInput({ onImageSelect, onImageBlocked, isI
     event.target.value = '';
     if (files.length) (images ? onImageSelect : onFileSelect)(files);
   };
-  return <div className={styles.menu} onKeyDown={event => {
+  return <div className={styles.menu} onMouseEnter={cancelClose} onMouseLeave={() => { cancelClose(); if (!pinned) timer.current = setTimeout(() => setInfo(false), 250); }} onKeyDown={event => {
     if (event.key === 'Escape' && info) { event.stopPropagation(); close(); infoButton.current?.focus(); }
   }}>
     <input ref={imageInput} type="file" accept={IMAGE_ACCEPT} multiple hidden onChange={e => select(e, true)} />
@@ -34,7 +34,7 @@ export default function AddSomethingToInput({ onImageSelect, onImageBlocked, isI
       <button type="button" className={styles.item} onClick={() => fileInput.current?.click()}>
         <svg className={styles.icon} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" aria-hidden="true"><path d="m8 12 6-6a3 3 0 0 1 4 4l-8 8a5 5 0 0 1-7-7l9-9"/><path d="m7 13 7-7"/></svg><span><strong>Add files</strong><small>ZIP, PDF, DOCX, XLSX, text, code, images</small></span>
       </button>
-      <div className={styles.infoTrigger} onMouseEnter={() => { cancelClose(); setInfo(true); }} onMouseLeave={() => { if (!pinned) timer.current = setTimeout(() => setInfo(false), 250); }}>
+      <div className={styles.infoTrigger} onMouseEnter={() => { cancelClose(); setInfo(true); }}>
         <button ref={infoButton} type="button" className={styles.infoButton} aria-label="Supported files, limits and pricing" aria-expanded={info} aria-controls={id}
           onClick={() => { cancelClose(); if (pinned) close(); else { setPinned(true); setInfo(true); } }}>ⓘ</button>
       </div>
@@ -44,7 +44,7 @@ export default function AddSomethingToInput({ onImageSelect, onImageBlocked, isI
       <span><strong>Add image</strong><small>PNG, JPG, WEBP</small></span>
     </button>
     <p className={styles.footer}>Attachment content counts toward request cost.</p>
-    {info && <section id={id} className={styles.infoPanel} aria-label="Attachment guide" onFocusCapture={() => { cancelClose(); setPinned(true); }} onMouseEnter={cancelClose} onMouseLeave={() => { if (!pinned) timer.current = setTimeout(() => setInfo(false), 250); }}>
+    {info && <section id={id} className={styles.infoPanel} aria-label="Attachment guide" onFocusCapture={() => { cancelClose(); setPinned(true); }} onMouseEnter={cancelClose}>
       <header><strong>Files you can use</strong><button type="button" aria-label="Close attachment guide" onClick={() => { close(); infoButton.current?.focus(); }}>×</button></header>
       <div className={styles.infoBody} tabIndex={0}>
         <h3>Supported formats</h3>
