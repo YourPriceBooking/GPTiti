@@ -1,4 +1,4 @@
-.menu { width: 100%; max-width: 360px; border-radius: 18px; padding: 10px; color: #1b2d49; background: #fff; border: 1px solid #e3e9f0; box-shadow: 0 12px 36px #19304c1c; max-height: min(620px, 65dvh); overflow-y: auto; }
+.menu { width: 100%; max-width: 360px; border-radius: 18px; padding: 10px; color: #1b2d49; background: #fff; border: 1px solid #e3e9f0; box-shadow: 0 12px 36px #19304c1c; max-height: min(620px, 65dvh); overflow-y: auto; scrollbar-gutter: stable; overscroll-behavior: contain; }
 .fileRow { display: flex; align-items: center; }
 .item { display: flex; flex: 1; width: 100%; align-items: center; gap: 12px; text-align: left; padding: 10px; border: 0; border-radius: 10px; background: transparent; color: inherit; cursor: pointer; font: inherit; }
 .item:hover { background: #f0f6f8; }
@@ -13,8 +13,7 @@
 .infoPanel { margin-top: 10px; border-radius: 12px; background: #f6f9fc; border: 1px solid #e2eaf2; }
 .infoPanel header { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; font-size: 14px; }
 .infoPanel header button { border: 0; background: transparent; color: #52627a; font-size: 24px; width: 36px; height: 36px; cursor: pointer; border-radius: 8px; }
-.infoBody { max-height: 280px; overflow-y: auto; overscroll-behavior: contain; padding: 0 14px 14px; font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
+.infoBody { padding: 0 14px 14px; font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
 .infoBody h3 { font-size: 12px; font-weight: 700; margin: 14px 0 5px; color: #1b2d49; }
 .infoBody p { margin: 5px 0; color: #52627a; }
 .infoBody ul { margin: 5px 0; padding-left: 18px; color: #52627a; }
-@media (max-width: 600px) { .infoBody { max-height: 30dvh; } }
