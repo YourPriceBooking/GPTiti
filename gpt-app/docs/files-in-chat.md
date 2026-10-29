@@ -4,7 +4,7 @@ Users ask for a file in the normal composer. No format picker or `outputFile` is
 
 ## API wiring
 
-All requests use the existing authenticated `axiosInstance`, its configured `NEXT_PUBLIC_BACKEND_API_URL`, credentials and refresh interceptor. Paths below are relative to that base (normally `/gpt-titi/api`).
+All requests use the existing authenticated `axiosInstance`, its configured `NEXT_PUBLIC_BACKEND_API_URL`, credentials and refresh interceptor. Paths below are relative to that base (production: `https://gptiti.com/api/`).
 
 | Operation | Endpoint | Response |
 | --- | --- | --- |

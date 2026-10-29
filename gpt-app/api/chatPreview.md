@@ -11,7 +11,7 @@
 | Параметр  | Значення                                          |
 | --------- | ------------------------------------------------- |
 | Метод     | `GET`                                             |
-| URL       | `http://localhost:7000/gpt-titi/api/chat/history` |
+| URL       | `https://gptiti.com/api/chat/history` |
 | Заголовок | `Authorization: Bearer <user_token>`              |
 
 ---

@@ -11,7 +11,7 @@
 | Параметр | Значення                                             |
 | -------- | ---------------------------------------------------- |
 | Метод    | `POST`                                               |
-| URL      | `https://ypbooking.chost.com.ua/gpt-titi/api/upload` |
+| URL      | `https://gptiti.com/api/upload` |
 | Body     | `multipart/form-data` — сам файл                     |
 
 #### Успішна відповідь — `200 OK`
@@ -102,11 +102,11 @@ socket.emit("chat:send", {
 
 ## 3. Підключення до сокету
 
-Підключення до сервера: `https://ypbooking.chost.com.ua`  
+Підключення до сервера: `https://gptiti.com`
 У параметрі `auth` передаємо токен користувача.
 
 ```js
-const socket = io("https://ypbooking.chost.com.ua", {
+const socket = io("https://gptiti.com", {
   auth: {
     token,
   },
@@ -197,7 +197,7 @@ socket.on("chat:error", (err) => {
 function connectSocket() {
   const token = document.getElementById("token").value;
 
-  const socket = io("https://ypbooking.chost.com.ua", {
+  const socket = io("https://gptiti.com", {
     auth: { token },
   });
 

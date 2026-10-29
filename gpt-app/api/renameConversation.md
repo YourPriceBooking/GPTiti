@@ -3,7 +3,7 @@
 ## Endpoint
 
 ```
-PATCH https://ypbooking.chost.com.ua/gpt-titi/api/conversations/rename-conversation
+PATCH https://gptiti.com/api/conversations/rename-conversation
 ```
 
 ## Headers

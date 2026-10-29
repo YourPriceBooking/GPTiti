@@ -9,7 +9,7 @@
 | Параметр  | Значення                                                        |
 | --------- | --------------------------------------------------------------- |
 | Метод     | `POST`                                                          |
-| URL       | `https://ypbooking.chost.com.ua/gpt-titi/api/users/claim-token` |
+| URL       | `https://gptiti.com/api/users/claim-token` |
 | Заголовок | `Authorization: Bearer <user_token>`                            |
 | Body      | —                                                               |
 

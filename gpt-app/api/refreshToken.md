@@ -2,7 +2,7 @@
 
 ## Запит
 
-- **URL:** `https://ypbooking.chost.com.ua/gpt-titi/api/users/refresh`
+- **URL:** `https://gptiti.com/api/users/refresh`
 - **Метод:** `POST`
 - **Тіло запиту:** не потрібне
 

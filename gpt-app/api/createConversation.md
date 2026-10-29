@@ -9,7 +9,7 @@
 | Параметр  | Значення                                            |
 | --------- | --------------------------------------------------- |
 | Метод     | `POST`                                              |
-| URL       | `http://localhost:7000/gpt-titi/api/conversations/` |
+| URL       | `https://gptiti.com/api/conversations/` |
 | Заголовок | `Authorization: Bearer <user_token>`                |
 
 ### Тіло запиту (Body)
@@ -62,7 +62,7 @@
 | Параметр  | Значення                                            |
 | --------- | --------------------------------------------------- |
 | Метод     | `GET`                                               |
-| URL       | `http://localhost:7000/gpt-titi/api/conversations/` |
+| URL       | `https://gptiti.com/api/conversations/` |
 | Заголовок | `Authorization: Bearer <user_token>`                |
 
 ### Успішна відповідь — `200 OK`
@@ -108,7 +108,7 @@
 | Параметр  | Значення                                               |
 | --------- | ------------------------------------------------------ |
 | Метод     | `DELETE`                                               |
-| URL       | `http://localhost:7000/gpt-titi/api/conversations/:id` |
+| URL       | `https://gptiti.com/api/conversations/:id` |
 | Заголовок | `Authorization: Bearer <user_token>`                   |
 
 > Для користувача чат **видаляється**, для системи — **архівується**.
@@ -147,7 +147,7 @@
 | Параметр  | Значення                                                        |
 | --------- | --------------------------------------------------------------- |
 | Метод     | `GET`                                                           |
-| URL       | `http://localhost:7000/gpt-titi/api/conversations/:id/messages` |
+| URL       | `https://gptiti.com/api/conversations/:id/messages` |
 | Заголовок | `Authorization: Bearer <user_token>`                            |
 
 де `:id` — ідентифікатор діалогу (наприклад, `69fdedc85c91ced88597b14d`).
