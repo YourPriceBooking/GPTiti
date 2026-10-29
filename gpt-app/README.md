@@ -56,8 +56,9 @@ Frontend uses `socket.io-client` (pinned) and is wired via `SocketProvider`.
 
 To enable the connection set these env vars (at build time):
 
-- `NEXT_PUBLIC_SOCKET_URL` (example: `http://localhost:4000` or `https://your-domain.com`)
-- `NEXT_PUBLIC_SOCKET_PATH` (optional, example: `/gpt-titi/socket.io`; default is Socket.IO standard `/socket.io` when omitted)
+- `NEXT_PUBLIC_BACKEND_API_URL` (default: `https://gptiti.com/api/`)
+- `NEXT_PUBLIC_SOCKET_URL` (default: the API origin, `https://gptiti.com`)
+- `NEXT_PUBLIC_SOCKET_PATH` (default: `/socket.io`; set explicitly if your reverse proxy uses a different path)
 
 Optional for local testing without auth:
 
@@ -74,9 +75,10 @@ Auth token is sent as: `socket.handshake.auth.token`.
 Додайте у файл .env.local (або .env) лише ці змінні:
 
 ```
-NEXT_PUBLIC_SOCKET_URL=http://localhost:7000
+NEXT_PUBLIC_BACKEND_API_URL=https://gptiti.com/api/
+NEXT_PUBLIC_SOCKET_URL=https://gptiti.com
 NEXT_PUBLIC_SOCKET_PATH=/socket.io
-NEXT_PUBLIC_SOCKET_ALLOW_GUEST=true
+NEXT_PUBLIC_SOCKET_ALLOW_GUEST=false
 ```
 
 - `NEXT_PUBLIC_SOCKET_URL` — адреса вашого WS-сервера.
@@ -153,3 +155,23 @@ useEffect(() => {
 ---
 
 Вся взаємодія з WebSocket централізована через хук `useWs` та типи з `ws.types.ts`. За потреби адаптуйте приклади під свій компонент.
+
+
+### Backend domain migration
+
+Production REST API: `https://gptiti.com/api/`. The shared Axios client covers auth,
+refresh, uploads, private downloads/previews, conversations, projects and token APIs.
+Socket.IO connects to `https://gptiti.com` with transport path `/socket.io`, not an
+`/api/` namespace. The reverse proxy must route both `/api/` and `/socket.io/` to
+the backend and support WebSocket upgrades. Preserve the backend's internal route
+prefix when configuring proxy rewrites; this frontend change does not modify it.
+
+Update existing deployment variables to the values above (remove old host/path
+values), then rebuild and restart the frontend. `NEXT_PUBLIC_*` values are embedded
+at build time; changing only the running process environment is insufficient.
+Explicit overrides remain available for local development and staging. The CSP
+uses the same resolved API/socket origins as the clients.
+
+After deployment verify sign-in/refresh, a V2 streamed reply, upload, preview,
+download and history after reload. The production proxy and authenticated live
+flows must be checked on the server; local tests do not verify them.

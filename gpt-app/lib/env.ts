@@ -1,3 +1,5 @@
+import { resolveBackendConfig } from "@/config/backend.config";
+
 const required = (value: string | undefined, name: string): string => {
   const trimmed = value?.trim();
   if (trimmed) return trimmed;
@@ -6,19 +8,15 @@ const required = (value: string | undefined, name: string): string => {
   );
 };
 
-const optional = (value: string | undefined): string | null =>
-  value?.trim() || null;
-
 export const env = {
-  backendApiUrl: required(
+  ...resolveBackendConfig(
     process.env.NEXT_PUBLIC_BACKEND_API_URL,
-    "NEXT_PUBLIC_BACKEND_API_URL",
+    process.env.NEXT_PUBLIC_SOCKET_URL,
+    process.env.NEXT_PUBLIC_SOCKET_PATH,
   ),
   googleClientId: required(
     process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
     "NEXT_PUBLIC_GOOGLE_CLIENT_ID",
   ),
-  socketUrl: optional(process.env.NEXT_PUBLIC_SOCKET_URL),
-  socketPath: optional(process.env.NEXT_PUBLIC_SOCKET_PATH),
   socketAllowGuest: process.env.NEXT_PUBLIC_SOCKET_ALLOW_GUEST === "true",
 } as const;

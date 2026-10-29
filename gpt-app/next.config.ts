@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { resolveBackendConfig } from "./config/backend.config";
 
 const toOrigin = (url: string | undefined): string => {
   if (!url) return "";
@@ -9,8 +10,13 @@ const toOrigin = (url: string | undefined): string => {
   }
 };
 
-const backendOrigin = toOrigin(process.env.NEXT_PUBLIC_BACKEND_API_URL);
-const socketOrigin = toOrigin(process.env.NEXT_PUBLIC_SOCKET_URL);
+const backend = resolveBackendConfig(
+  process.env.NEXT_PUBLIC_BACKEND_API_URL,
+  process.env.NEXT_PUBLIC_SOCKET_URL,
+  process.env.NEXT_PUBLIC_SOCKET_PATH,
+);
+const backendOrigin = toOrigin(backend.backendApiUrl);
+const socketOrigin = toOrigin(backend.socketUrl);
 
 const connectSources = [
   "'self'",

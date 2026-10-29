@@ -1,6 +1,6 @@
 1. Проверка получателя
    После ввода email с задержкой около 300 мс:
-   GET /gpt-titi/api/users/token-transfers/recipient?email=alex%40example.com
+   GET https://gptiti.com/api/users/token-transfers/recipient?email=alex%40example.com
    Успешный ответ:
    {
    "success": true,
@@ -15,7 +15,7 @@
 2. Ввод суммы
    Разрешать отправку, когда получатель подтверждён, сумма — положительное целое число и не превышает appTokens. Кнопка Max подставляет Math.max(0, appTokens).
 3. Отправка
-   POST /gpt-titi/api/users/token-transfers
+   POST https://gptiti.com/api/users/token-transfers
    Content-Type: application/json
    {
    "email": "alex@example.com",
