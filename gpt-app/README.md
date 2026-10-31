@@ -1,177 +1,108 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+name: Deploy GPTiti Frontend
 
-## Getting Started
+on:
+push:
+branches: - main
 
-First, run the development server:
+env:
+PROJECT_SUBDIR: gpt-app
+APP_DIR: /root/server/GPTiti
+RELEASES_DIR: /root/server/GPTiti/releases
+CURRENT_LINK: /root/server/GPTiti/current
+ECOSYSTEM: /root/server/GPTiti/ecosystem.config.js
 
-```bash
-npm run dev
-# not to use
-  # or
-  # yarn dev
-  # or
-  # pnpm dev
-  # or
-  # bun dev
-```
+jobs:
+deploy:
+r uns-on: ubuntu-latest
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+    steps:
+      - name: 🚀 Telegram START
+        run: |
+          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
+          -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+          -d text="🚀 GPTiti deploy STARTED"
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+      - name: 🚀 Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          PROJECT_SUBDIR: ${{ env.PROJECT_SUBDIR }}
+          APP_DIR: ${{ env.APP_DIR }}
+          RELEASES_DIR: ${{ env.RELEASES_DIR }}
+          CURRENT_LINK: ${{ env.CURRENT_LINK }}
+          ECOSYSTEM: ${{ env.ECOSYSTEM }}
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: root
+          password: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
+          script_stop: true
+          envs: PROJECT_SUBDIR,APP_DIR,RELEASES_DIR,CURRENT_LINK,ECOSYSTEM
+          script: |
+            set -e
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+            echo "Starting deploy..."
 
-## Learn More
+            TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
+            NEW_RELEASE="$RELEASES_DIR/$TIMESTAMP"
 
-To learn more about Next.js, take a look at the following resources:
+            echo "Creating release folder: $NEW_RELEASE"
+            mkdir -p "$NEW_RELEASE"
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+            echo "Cloning repo via SSH..."
+            git clone \
+              --depth 1 \
+              --branch main \
+              git@github.com:${{ github.repository }}.git \
+              "$NEW_RELEASE"
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+            if [ ! -f "$NEW_RELEASE/$PROJECT_SUBDIR/package.json" ]; then
+              echo "ERROR: package.json not found"
+              exit 1
+            fi
 
-## Deploy on Vercel
+            cd "$NEW_RELEASE/$PROJECT_SUBDIR"
 
-    The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+            echo "Linking env..."
+            ln -sfn "$APP_DIR/shared/.env.production" .env.production
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+            echo "Installing dependencies..."
+            npm ci
 
-## reusing and redact routes to backend
+            echo "Building project..."
+            npm run build
 
-усі роути написані в helpers/api.ts
-типи що використовуються в types/api.types.ts
+            echo "Switching current symlink..."
 
-приклад використання:
+            PREVIOUS_RELEASE=$(readlink -f "$CURRENT_LINK" || echo "")
 
-import { api } from "@/helpers/api";
-......
-const conversations = await api.getConversations();
+            rm -f "$CURRENT_LINK"
+            ln -sfn "$NEW_RELEASE/$PROJECT_SUBDIR" "$CURRENT_LINK"
 
-далі-обробляти дані так, як зі звичайними данними, що прийшли з того чи іншого роуту бек енду
-  далі-обробляти дані так, як зі звичайними данними, що прийшли з того чи іншого роуту бек енду
+            if [ ! -f "$CURRENT_LINK/package.json" ]; then
+              echo "ERROR: verification failed"
+              exit 1
+            fi
 
-## Socket.IO (frontend)
+            echo "Restarting PM2..."
+            pm2 startOrRestart "$ECOSYSTEM" --update-env
+            pm2 save
 
-Frontend uses `socket.io-client` (pinned) and is wired via `SocketProvider`.
+            echo "Cleaning old releases..."
+            cd "$RELEASES_DIR"
+            ls -dt */ | tail -n +6 | xargs -r rm -rf
 
-To enable the connection set these env vars (at build time):
+            echo "Deploy successful"
 
-- `NEXT_PUBLIC_BACKEND_API_URL` (default: `https://gptiti.com/api/`)
-- `NEXT_PUBLIC_SOCKET_URL` (default: the API origin, `https://gptiti.com`)
-- `NEXT_PUBLIC_SOCKET_PATH` (default: `/socket.io`; set explicitly if your reverse proxy uses a different path)
+      - name: ✅ Telegram SUCCESS
+        if: success()
+        run: |
+          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
+          -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+          -d text="✅ GPTiti deploy SUCCESS"
 
-Optional for local testing without auth:
-
-- `NEXT_PUBLIC_SOCKET_ALLOW_GUEST=true`
-
-Auth token is sent as: `socket.handshake.auth.token`.
-
----
-
-## 🛰️ Інтеграція WebSocket (тільки фронтенд)
-
-### 1. Змінні оточення для WebSocket
-
-Додайте у файл .env.local (або .env) лише ці змінні:
-
-```
-NEXT_PUBLIC_BACKEND_API_URL=https://gptiti.com/api/
-NEXT_PUBLIC_SOCKET_URL=https://gptiti.com
-NEXT_PUBLIC_SOCKET_PATH=/socket.io
-NEXT_PUBLIC_SOCKET_ALLOW_GUEST=false
-```
-
-- `NEXT_PUBLIC_SOCKET_URL` — адреса вашого WS-сервера.
-- `NEXT_PUBLIC_SOCKET_PATH` — шлях для підключення (зазвичай /socket.io).
-- `NEXT_PUBLIC_SOCKET_ALLOW_GUEST` — дозволити гостьове підключення (без авторизації).
-
----
-
-### 2. Як підписуватись на події та надсилати повідомлення через WebSocket
-
-- Для підписки на повідомлення використовуйте хук `useWs()` та метод `onMessage`:
-
-```tsx
-import { useWs } from "@/context/WsContext";
-import { useEffect } from "react";
-
-const { onMessage } = useWs();
-
-useEffect(() => {
-  const unsubscribe = onMessage((msg) => {
-    // обробка вхідного повідомлення
-    if (msg.event === "chat") {
-      // ...
-    }
-  });
-  return unsubscribe;
-}, [onMessage]);
-```
-
-- Для надсилання повідомлень використовуйте метод `emit`:
-
-```tsx
-import { useWs } from "@/context/WsContext";
-import { WsEvent } from "@/types/ws.types";
-
-const { emit } = useWs();
-
-emit({
-  event: WsEvent.TESTFRONT,
-  type: "front-test",
-  payload: { hello: "from frontend" },
-  requestId: "your-request-id",
-});
-```
-
----
-
-### 3. Приклади: як надіслати та отримати повідомлення
-
-**Приклад надсилання (emit) події:**
-
-```tsx
-emit({
-  event: WsEvent.TESTFRONT,
-  type: "front-test",
-  payload: { hello: "from frontend" },
-  requestId: "test-req-123",
-});
-```
-
-**Приклад підписки (onMessage) на подію:**
-
-```tsx
-useEffect(() => {
-  const unsub = onMessage((msg) => {
-    if (msg.event === WsEvent.TESTBACK) {
-      console.log("Відповідь від сервера:", msg);
-    }
-  });
-  return unsub;
-}, [onMessage]);
-```
-
----
-
-Вся взаємодія з WebSocket централізована через хук `useWs` та типи з `ws.types.ts`. За потреби адаптуйте приклади під свій компонент.
-
-
-### Backend domain migration
-
-Production REST API: `https://gptiti.com/api/`. The shared Axios client covers auth,
-refresh, uploads, private downloads/previews, conversations, projects and token APIs.
-Socket.IO connects to `https://gptiti.com` with transport path `/socket.io`, not an
-`/api/` namespace. The reverse proxy must route both `/api/` and `/socket.io/` to
-the backend and support WebSocket upgrades. Preserve the backend's internal route
-prefix when configuring proxy rewrites; this frontend change does not modify it.
-
-Update existing deployment variables to the values above (remove old host/path
-values), then rebuild and restart the frontend. `NEXT_PUBLIC_*` values are embedded
-at build time; changing only the running process environment is insufficient.
-Explicit overrides remain available for local development and staging. The CSP
-uses the same resolved API/socket origins as the clients.
-
-After deployment verify sign-in/refresh, a V2 streamed reply, upload, preview,
-download and history after reload. The production proxy and authenticated live
-flows must be checked on the server; local tests do not verify them.
+      - name: ❌ Telegram FAIL
+        if: failure()
+        run: |
+          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
+          -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+          -d text="❌ GPTiti deploy FAILED"
