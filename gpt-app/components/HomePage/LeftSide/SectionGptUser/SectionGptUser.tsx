@@ -1,6 +1,6 @@
 import React from "react";
 
-import Image from "next/image";
+import AccountAvatar from "./AccountAvatar";
 
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { selectIsLoggedIn, selectUser } from "@/redux/auth/selectors";
@@ -25,15 +25,9 @@ export default function SectionGptUser() {
   return (
     <section className={styles.gptUser}>
       <article className={styles.userInfo}>
-        <Image
-          className={styles.userAvatar}
-          width={27.11}
-          height={35.65}
-          src={user?.avatar || "/icons/ghost-user.svg"}
-          alt="ghost-user"
-        />
+        <AccountAvatar />
 
-        <span className={styles.gptUserEmail}>{user?.email || "Guest"}</span>
+        <span className={styles.gptUserEmail}>{isLoggedIn ? user?.email || "Account" : "Guest"}</span>
       </article>
 
       <div className={styles.logoutBtnContainer}>

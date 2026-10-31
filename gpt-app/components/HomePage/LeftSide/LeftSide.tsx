@@ -1,6 +1,7 @@
 import styles from "./LeftSide.module.css";
 import FooterLeftSide from "./FooterLeftSide/FooterLeftSide";
 import { LeftSideProps } from "@/types/types";
+import AccountAvatar from "./SectionGptUser/AccountAvatar";
 import SectionGptUser from "./SectionGptUser/SectionGptUser";
 import SectionGptChats from "./SectionGptChats/SectionGptChats";
 import SectionGptTokens from "./SectionGptTokens/SectionGptTokens";
@@ -175,18 +176,14 @@ export default function LeftSide({
             </button>
 
             <div className={styles.userIconBottom}>
-              <div
+              <button
+                type="button"
                 className={styles.userIconAvatar}
-                title="henrinkwinta@gmail.com"
+                onClick={() => setIsOpen(true)}
+                aria-label="Open account panel"
               >
-                <Image
-                  width={20}
-                  height={26}
-                  src="/icons/ghost-user.svg"
-                  alt="user"
-                  className={styles.userAvatarImage}
-                />
-              </div>
+                <AccountAvatar />
+              </button>
             </div>
           </div>
         )}

@@ -3,18 +3,19 @@
   margin-top: 24px;
   /* padding-left: 28px; */
 }
-.userAvatar {
-  border-radius: 50%;
-}
 
 .userInfo {
-  margin-right: 39px;
+  min-width: 0;
   display: flex;
   gap: 12px;
   align-items: center;
 }
 
 .gptUserEmail {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-family: var(--font-family);
   font-weight: 500;
   font-size: 16px;
