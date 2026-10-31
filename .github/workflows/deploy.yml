@@ -7,10 +7,10 @@ on:
 
 env:
   PROJECT_SUBDIR: gpt-app
-  APP_DIR: /var/www/GPTiti
-  RELEASES_DIR: /var/www/GPTiti/releases
-  CURRENT_LINK: /var/www/GPTiti/current
-  ECOSYSTEM: /var/www/GPTiti/ecosystem.config.js
+  APP_DIR: /root/server/GPTiti
+  RELEASES_DIR: /root/server/GPTiti/releases
+  CURRENT_LINK: /root/server/GPTiti/current
+  ECOSYSTEM: /root/server/GPTiti/ecosystem.config.js
 
 jobs:
   deploy:
@@ -27,17 +27,18 @@ jobs:
         uses: appleboy/ssh-action@v1.0.3
         env:
           PROJECT_SUBDIR: ${{ env.PROJECT_SUBDIR }}
+          APP_DIR: ${{ env.APP_DIR }}
           RELEASES_DIR: ${{ env.RELEASES_DIR }}
           CURRENT_LINK: ${{ env.CURRENT_LINK }}
           ECOSYSTEM: ${{ env.ECOSYSTEM }}
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: root
-          key: ${{ secrets.SERVER_SSH_KEY }}
+          password: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
           script_stop: true
-          envs: PROJECT_SUBDIR,RELEASES_DIR,CURRENT_LINK,ECOSYSTEM
+          envs: PROJECT_SUBDIR,APP_DIR,RELEASES_DIR,CURRENT_LINK,ECOSYSTEM
           script: |
-
             set -e
 
             echo "Starting deploy..."
@@ -63,7 +64,7 @@ jobs:
             cd "$NEW_RELEASE/$PROJECT_SUBDIR"
 
             echo "Linking env..."
-            ln -sfn /var/www/GPTiti/shared/.env.production .env.production
+            ln -sfn "$APP_DIR/shared/.env.production" .env.production
 
             echo "Installing dependencies..."
             npm ci
@@ -75,7 +76,7 @@ jobs:
 
             PREVIOUS_RELEASE=$(readlink -f "$CURRENT_LINK" || echo "")
 
-            rm -rf "$CURRENT_LINK"
+            rm -f "$CURRENT_LINK"
             ln -sfn "$NEW_RELEASE/$PROJECT_SUBDIR" "$CURRENT_LINK"
 
             if [ ! -f "$CURRENT_LINK/package.json" ]; then
@@ -84,7 +85,7 @@ jobs:
             fi
 
             echo "Restarting PM2..."
-            pm2 startOrRestart "$ECOSYSTEM"
+            pm2 startOrRestart "$ECOSYSTEM" --update-env
             pm2 save
 
             echo "Cleaning old releases..."
