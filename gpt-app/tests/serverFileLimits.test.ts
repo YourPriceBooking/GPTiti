@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileLimits, validateServerFiles, fileCeilings, formatLimit } from '../lib/files/limits';
+import { readFileLimits, usesBackgroundOcr, validateServerFiles, fileCeilings, formatLimit } from '../lib/files/limits';
 const fixture = () => ({ version: 1, profile: 'stage-a-storage', units: { MB: 1e6, GB: 1e9 },
   storage: { maxBytes: 2e9, maxCount: 500 },
   upload: { maxBytes: 50e6, types: {
@@ -53,4 +53,19 @@ test('upload overrides cap readers and OCR independently caps image bytes', () =
   assert.deepEqual(fileCeilings('a.pdf',readFileLimits(raw)), {upload:25e6,reading:2048,enabled:true});
   raw.processing.ocr.enabled = false;
   assert.equal(fileCeilings('a.png',readFileLimits(raw))?.reading,15e6);
+});
+test('background preparation is opt-in through a recognized server capability; old limits remain valid', () => {
+  assert.equal(readFileLimits(fixture()).preparation,undefined);
+  for (const preparation of [{version:1,async:false,kinds:['ocr']},{version:2,async:true,kinds:['ocr']},{version:1,async:true,kinds:['zip']}]) {
+    assert.equal(readFileLimits({...fixture(),preparation}).preparation?.async,false);
+  }
+  assert.equal(readFileLimits({...fixture(),preparation:{version:1,async:true,kinds:['ocr']}}).preparation?.async,true);
+});
+
+test('model OCR opt-out keeps the vision/text-layer legacy path even with the queue enabled', () => {
+  const raw = {...fixture(),preparation:{version:1,async:true,kinds:['ocr']}};
+  assert.equal(usesBackgroundOcr(readFileLimits(raw)),true);
+  raw.processing.ocr.enabled=false;
+  assert.equal(usesBackgroundOcr(readFileLimits(raw)),false);
+  assert.equal(usesBackgroundOcr(readFileLimits(fixture())),false);
 });

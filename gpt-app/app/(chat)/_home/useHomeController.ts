@@ -119,11 +119,24 @@ export function useHomeController() {
     balanceNotice,
     dismissBalanceNotice,
     fileProgress,
+    recoveredPreparation, resumePreparation: resumeSavedPreparation, discardPreparation, stopPreparation,
     fileWarnings,
     dismissFileWarnings,
     streamError,
     clearStreamError,
   } = useChatStream();
+  const resumePreparation = useCallback(async () => {
+    if (!recoveredPreparation || sendCycleInFlightRef.current) return false;
+    sendCycleInFlightRef.current = true;
+    try {
+      const accepted = await resumeSavedPreparation();
+      if (accepted) {
+        if (draft.readDraftText() === recoveredPreparation.text) draft.consumeDraft();
+        router.replace(`/chats/${recoveredPreparation.conversationId}`);
+      }
+      return accepted;
+    } finally { sendCycleInFlightRef.current = false; }
+  }, [recoveredPreparation, resumeSavedPreparation, draft, router]);
   const chooseCheaperModel = useCallback(() => {
     preserveDraftOnModelSwitch.current = true;
     dismissBalanceNotice();
@@ -421,6 +434,7 @@ export function useHomeController() {
     balanceNotice,
     dismissBalanceNotice,
     fileProgress,
+    recoveredPreparation, resumePreparation, discardPreparation, stopPreparation,
     fileWarnings,
     dismissFileWarnings,
     streamError,

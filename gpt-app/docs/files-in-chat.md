@@ -98,3 +98,22 @@ Manual checks after deployment:
 
 Validation: TypeScript, delivery test suite (including malformed profiles, exact
 boundaries, aggregate budgets, opt-outs, and API override precedence), targeted ESLint.
+
+## Background OCR preparation (backend patch 33)
+
+`GET /files/limits` opts in with `preparation.version=1`, `async=true`, `kinds` including `ocr`. PDF and PNG/JPEG/WEBP use `GET/POST /files/:id/preparation`, polling sequentially at the server interval (at least 2 seconds). ZIP always uses the existing `/prepare` endpoint. Older/disabled servers retain the synchronous flow.
+
+Send uploads the batch, then prepares it before any V2 turn is registered. The UI distinguishes queue waiting from recognition, preserves low-confidence warnings, and lets the user cancel. Cancel aborts local sending and DELETEs the current background job; it does not delete the original upload. Closing/reloading the tab only stops polling, not server recognition. Network errors never trigger automatic re-enqueue. A subsequent explicit Send/Continue may retry a failed/cancelled job only when the server says `retryable`; no retry loop follows terminal errors.
+
+After all initial uploads finish, one pending batch (prompt, original chat/model, file IDs and display metadata) is kept in account-scoped sessionStorage for this tab, up to 24 hours and upload expiry. No credentials, URLs, file bytes or OCR text are stored. On reload a recovery card shows the saved prompt/files/model; **Continue and send** revalidates limits and server access, reuses the uploaded files, and sends to the original chat only after preparation succeeds. Nothing is automatically sent on reload. Dismiss removes the local checkpoint, not the server files. If browser storage is unavailable, a notice asks the user to keep the tab open. Reload during the initial upload stage is not resumable; reattach those local files. Checkpoint removal happens when the V2 pending turn takes over delivery recovery.
+
+Manual acceptance:
+1. With backend preparation enabled, attach a scanned PDF and send. Observe queue/recognition, then one response and the usual file card.
+2. During recognition reload the same tab. Continue from the recovery card: no second file upload, one V2 send only after readiness.
+3. Cancel while queued/running. No message is admitted; Send/Continue reuses the file and respects server retry limits.
+4. Go offline while polling, then reconnect and Send/Continue. No repeated uploads or automatic charged turn.
+5. Test protected PDF, page limit, unavailable file and exhausted retries: actionable error, no V2 admission.
+6. Repeat with ZIP and with async disabled: legacy preparation still works. Test TXT/DOCX/XLSX as regressions.
+7. Sign out/in as another account: previous account's recovery card must not appear.
+
+Limits are unchanged: this PR does not increase OCR page caps or implement per-page backend checkpoints.
