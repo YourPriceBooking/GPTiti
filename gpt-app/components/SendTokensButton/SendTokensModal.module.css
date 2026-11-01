@@ -6,7 +6,7 @@
   align-items: center;
   justify-content: center;
   padding: 16px;
-  background: rgba(0, 0, 0, 0.55);
+  background: rgba(15, 28, 48, 0.32);
   animation: fadeIn 220ms ease;
 }
 
@@ -15,11 +15,11 @@
   max-height: calc(100dvh - 36px);
   overflow-y: auto;
   padding: 26px 36px 32px;
-  border: 1px solid #263954;
+  border: 1px solid #e3eaf3;
   border-radius: 20px;
-  background: #111c2e;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
-  color: #cbd5e1;
+  background: #ffffff;
+  box-shadow: 0 20px 60px rgba(15, 28, 48, 0.16);
+  color: #173252;
   font-family: var(--font-family);
 }
 
@@ -31,8 +31,8 @@
   height: 61px;
   margin: 0 auto 12px;
   border-radius: 14px;
-  background: #fff7f5;
-  color: #101820;
+  background: #edf3fb;
+  color: #173252;
 }
 
 .successIcon {
@@ -45,7 +45,7 @@
 .modal h2 {
   margin: 0;
   text-align: center;
-  color: #c8d2e2;
+  color: #102a48;
   font-size: 26px;
   font-weight: 700;
   line-height: 1.2;
@@ -53,7 +53,7 @@
 
 .description {
   margin: 5px 0 21px;
-  color: #94a3b8;
+  color: #617792;
   text-align: center;
   font-size: 13px;
   line-height: 1.5;
@@ -64,20 +64,20 @@
   justify-content: space-between;
   gap: 12px;
   padding: 0 0 10px;
-  border-bottom: 1px solid #263954;
-  color: #94a3b8;
+  border-bottom: 1px solid #e3eaf3;
+  color: #617792;
   font-size: 12px;
 }
 
 .balanceRow strong {
-  color: #c8d2e2;
+  color: #102a48;
   white-space: nowrap;
 }
 
 .label {
   display: block;
   margin: 18px 0 8px;
-  color: #a3aab8;
+  color: #526985;
   font-size: 12px;
 }
 
@@ -85,10 +85,10 @@
 .amountField {
   width: 100%;
   min-height: 43px;
-  border: 1px solid #3c506a;
+  border: 1px solid #d6e1ef;
   border-radius: 10px;
-  background: #17253b;
-  color: #cbd5e1;
+  background: #f6f9fd;
+  color: #173252;
 }
 
 .input {
@@ -99,13 +99,13 @@
 
 .input:focus,
 .amountField:focus-within {
-  border-color: #7baeff;
+  border-color: #7399c8;
   box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.17);
 }
 
 .input::placeholder,
 .amountInput::placeholder {
-  color: #8d9aac;
+  color: #788aa1;
 }
 
 .amountField {
@@ -116,7 +116,7 @@
 
 .amountInvalid,
 .amountInvalid:focus-within {
-  border-color: #ff4f63;
+  border-color: #c7374b;
   box-shadow: none;
 }
 
@@ -127,15 +127,15 @@
   padding: 0 15px;
   border: 0;
   background: transparent;
-  color: #cbd5e1;
+  color: #173252;
   outline: none;
   font-size: 14px;
 }
 
 .unit {
   padding-right: 10px;
-  border-right: 1px solid #33445d;
-  color: #94a3b8;
+  border-right: 1px solid #dce5f0;
+  color: #617792;
   font-size: 14px;
 }
 
@@ -144,8 +144,8 @@
   margin-left: 8px;
   padding: 8px 10px;
   border-radius: 8px;
-  background: #213c60;
-  color: #9ec8ff;
+  background: #e8f0fa;
+  color: #365f91;
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
@@ -155,7 +155,7 @@
 }
 
 .maxButton:hover:not(:disabled) {
-  background: #2b4d78;
+  background: #dce8f6;
 }
 
 .maxButton:active:not(:disabled) {
@@ -173,13 +173,13 @@
 .amountError {
   min-height: 17px;
   margin: 6px 0 0;
-  color: #94a3b8;
+  color: #617792;
   font-size: 11px;
   line-height: 1.4;
 }
 
 .validText {
-  color: #9cc3ee;
+  color: #376b63;
 }
 
 .check {
@@ -189,7 +189,7 @@
   height: 13px;
   margin-right: 5px;
   border-radius: 50%;
-  background: #6aa9ff;
+  background: #457c72;
   color: white;
   font-size: 9px;
   font-weight: 700;
@@ -198,7 +198,7 @@
 
 .amountError,
 .error {
-  color: #ff6075;
+  color: #bf3048;
 }
 
 .balanceError {
@@ -213,7 +213,7 @@
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: #ff6b7c;
+  background: #bf3048;
 }
 
 .balanceErrorIcon::before,
@@ -222,7 +222,7 @@
   left: 6px;
   width: 2px;
   border-radius: 2px;
-  background: #111c2e;
+  background: #ffffff;
   content: "";
 }
 
@@ -265,23 +265,23 @@
 }
 
 .secondaryButton {
-  background: #fff;
+  background: #edf3fa;
   color: #19263a;
 }
 
 .secondaryButton:hover:not(:disabled) {
   background: #f4f8ff;
-  box-shadow: 0 2px 10px rgba(255, 255, 255, 0.13);
+  box-shadow: 0 2px 10px rgba(23, 59, 100, 0.06);
 }
 
 .primaryButton {
-  background: #1c66f5;
-  color: #c8d2e2;
+  background: #173b64;
+  color: #ffffff;
 }
 
 .primaryButton:hover:not(:disabled) {
-  background: #2f78ff;
-  box-shadow: 0 3px 12px rgba(28, 102, 245, 0.25);
+  background: #244e7f;
+  box-shadow: 0 3px 12px rgba(23, 59, 100, 0.16);
 }
 
 .secondaryButton:active:not(:disabled),
@@ -292,8 +292,8 @@
 
 .primaryButton:disabled,
 .secondaryButton:disabled {
-  background: #2a3d5b;
-  color: #8597b0;
+  background: #e5edf6;
+  color: #687d97;
   cursor: not-allowed;
   box-shadow: none;
 }
@@ -303,7 +303,7 @@
   gap: 24px;
   padding: 22px 16px;
   border-radius: 13px;
-  background: #17253b;
+  background: #f6f9fd;
 }
 
 .summaryRow {
@@ -311,12 +311,12 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  color: #a3aab8;
+  color: #526985;
   font-size: 12px;
 }
 
 .summaryRow strong {
-  color: #c8d2e2;
+  color: #102a48;
   text-align: right;
   font-size: 12px;
   overflow-wrap: anywhere;
@@ -333,10 +333,10 @@
   gap: 12px;
   margin: 16px 0 0;
   padding: 14px 16px;
-  border: 1px solid #825c12;
+  border: 1px solid #ead8a7;
   border-radius: 12px;
-  background: #3b2d14;
-  color: #f4c767;
+  background: #fff8e8;
+  color: #79591f;
   font-size: 11px;
   line-height: 1.4;
 }
@@ -348,14 +348,14 @@
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: #ffd675;
-  color: #5d4110;
+  background: #f1dda9;
+  color: #79591f;
   font-weight: 700;
 }
 
 .receipt .balanceText {
   margin: 0;
-  color: #c8d2e2;
+  color: #102a48;
   text-align: center;
   font-size: 13px;
   font-weight: 700;
@@ -386,8 +386,43 @@
 
 .tokenNote {
   margin: -6px 0 20px;
-  color: #94a3b8;
+  color: #617792;
   font-size: 12px;
   line-height: 1.5;
   text-align: center;
+}
+
+.balanceLabel {
+  display: grid;
+  gap: 5px;
+}
+
+.historyLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  width: fit-content;
+  border-radius: 4px;
+  color: #365f91;
+  font-size: 12px;
+  line-height: 1.5;
+  text-decoration: none;
+  transition: color 180ms ease-out;
+}
+
+.historyLink:hover {
+  color: #173b64;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.historyLink:focus-visible {
+  outline: 2px solid #7399c8;
+  outline-offset: 3px;
+}
+
+.receiptHistory {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
 }
