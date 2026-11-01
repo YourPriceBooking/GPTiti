@@ -83,10 +83,7 @@ export default function SectionGptChats({
   const projectListId = useId();
   const projectsCount = projectList.length;
   const hasProjects = projectsCount > 0;
-  const MAX_VISIBLE_PROJECTS = 3;
-  const hasMoreProjects = projectsCount > MAX_VISIBLE_PROJECTS;
-  const hiddenProjectsCount = projectsCount - MAX_VISIBLE_PROJECTS;
-  const isProjectsInteractive = hasMoreProjects;
+  const isProjectsInteractive = hasProjects;
 
   const [openMenuChatId, setOpenMenuChatId] = useState<string | null>(null);
   const [menuPosition, setMenuPosition] = useState<MenuPosition | null>(null);
@@ -340,11 +337,125 @@ export default function SectionGptChats({
       </article>
 
       <MyProjectsButton
-        variant="shortcut"
+        variant="expandable"
         projectsCount={projectsCount}
+        expanded={showAllProjects}
+        canExpand={isProjectsInteractive}
         onOpen={handleOpenProjects}
         onCreate={handleCreateProject}
+        onToggle={handleToggleProjects}
       />
+
+      {hasProjects && showAllProjects && (
+        <div
+          className={`${styles.projectsScrollArea} ${styles.projectsScrollAreaScroll}`}
+        >
+          <ul className={styles.chatsList}>
+            {sortedProjects.map((project) => {
+              const expanded = Boolean(expandedProjects[project.id]);
+              const chatsId = `${projectListId}-chats-${project.id}`;
+              const renaming = renamingProjectId === project.id;
+              const toggleProject = () => {
+                closeMenus();
+                dispatch(toggleSidebarProject(project.id));
+              };
+
+              return (
+                <li key={project.id} className={styles.projectGroup}>
+                  <div className={`${styles.chatsListItem} ${styles.projectRow} ${project.id === activeProjectId ? styles.chatsListItemActive : ""}`}>
+                    <div
+                      className={`${styles.projectItemContent} ${styles.projectToggle}`}
+                      role={renaming ? undefined : "button"}
+                      tabIndex={renaming ? -1 : 0}
+                      aria-label={renaming ? undefined : `${expanded ? "Collapse" : "Expand"} ${project.title}`}
+                      aria-expanded={renaming ? undefined : expanded}
+                      aria-controls={renaming ? undefined : chatsId}
+                      onClick={renaming ? undefined : toggleProject}
+                      onKeyDown={(event) => {
+                        if (renaming) return;
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          toggleProject();
+                        }
+                      }}
+                    >
+                      <svg className={`${styles.projectChevron} ${expanded ? styles.projectChevronExpanded : ""}`} width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                        <path d="m4 2 4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                      <Image width={28} height={23} src="/icons/sidebar-project.svg" alt="" />
+                      <span
+                        ref={(el) => { if (el) projectTitleRefs.current[project.id] = el; }}
+                        contentEditable={renaming}
+                        suppressContentEditableWarning
+                        className={styles.chatTitle}
+                        title={project.title}
+                        onClick={renaming ? (event) => event.stopPropagation() : undefined}
+                        onBlur={(event) => {
+                          if (!renaming) return;
+                          const nextTitle = event.currentTarget.textContent?.trim();
+                          if (nextTitle && nextTitle !== project.title) renameProject?.(project.id, nextTitle);
+                          setRenamingProjectId(null);
+                          setOpenMenuProjectId(null);
+                        }}
+                        onKeyDown={(event) => {
+                          if (!renaming) return;
+                          if (event.key === "Enter") {
+                            event.preventDefault();
+                            event.currentTarget.blur();
+                          }
+                          if (event.key === "Escape") {
+                            event.preventDefault();
+                            event.currentTarget.textContent = project.title;
+                            event.currentTarget.blur();
+                          }
+                        }}
+                      >{project.title}</span>
+                    </div>
+                    <div className={styles.chatRight}>
+                      <button
+                        type="button"
+                        className={styles.projectOpenButton}
+                        aria-label={`Open project ${project.title}`}
+                        onClick={() => { closeMenus(); setActiveProject?.(project.id); }}
+                      >
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <path d="M14 4h6v6M20 4 10 14M10 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4" />
+                        </svg>
+                        <ActionTooltip label="Open project" />
+                      </button>
+                      <button
+                        type="button"
+                        className={`${styles.dotsIcon} ${styles.projectMenuTrigger}`}
+                        aria-label={`Actions for project ${project.title}`}
+                        aria-expanded={openMenuProjectId === project.id}
+                        aria-haspopup="menu"
+                        data-menu-trigger
+                        onClick={(event) => {
+                          const wasOpen = openMenuProjectId === project.id;
+                          closeMenus();
+                          if (wasOpen) return;
+                          projectTriggerRef.current = event.currentTarget;
+                          setProjectMenuPosition(menuPositionBelow(event.currentTarget));
+                          setOpenMenuProjectId(project.id);
+                        }}
+                      />
+                    </div>
+                  </div>
+                  {expanded && (
+                    <ProjectChatList
+                      id={chatsId}
+                      project={project}
+                      chats={chatList}
+                      activeChatId={activeProjectId ? null : activeChatId}
+                      onOpenChat={setActiveChatId}
+                    />
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
 
       <article
         className={styles.yourChats}
@@ -526,157 +637,6 @@ export default function SectionGptChats({
             height={15}
             src="/icons/chevron-down.svg"
             alt="toggle chats"
-          />
-        </button>
-      )}
-
-      <MyProjectsButton
-        variant="expandable"
-        projectsCount={projectsCount}
-        expanded={showAllProjects}
-        canExpand={isProjectsInteractive}
-        onOpen={handleOpenProjects}
-        onCreate={handleCreateProject}
-        onToggle={handleToggleProjects}
-      />
-
-      {hasProjects && (
-        <div
-          className={`${styles.projectsScrollArea} ${
-            (showAllProjects && hasMoreProjects) || sortedProjects.some((project) => expandedProjects[project.id])
-              ? styles.projectsScrollAreaScroll
-              : ""
-          }`}
-        >
-          <ul className={styles.chatsList}>
-            {sortedProjects.slice(0, showAllProjects ? undefined : MAX_VISIBLE_PROJECTS).map((project) => {
-              const expanded = Boolean(expandedProjects[project.id]);
-              const chatsId = `${projectListId}-chats-${project.id}`;
-              const renaming = renamingProjectId === project.id;
-              const toggleProject = () => {
-                closeMenus();
-                dispatch(toggleSidebarProject(project.id));
-              };
-
-              return (
-                <li key={project.id} className={styles.projectGroup}>
-                  <div className={`${styles.chatsListItem} ${styles.projectRow} ${project.id === activeProjectId ? styles.chatsListItemActive : ""}`}>
-                    <div
-                      className={`${styles.projectItemContent} ${styles.projectToggle}`}
-                      role={renaming ? undefined : "button"}
-                      tabIndex={renaming ? -1 : 0}
-                      aria-label={renaming ? undefined : `${expanded ? "Collapse" : "Expand"} ${project.title}`}
-                      aria-expanded={renaming ? undefined : expanded}
-                      aria-controls={renaming ? undefined : chatsId}
-                      onClick={renaming ? undefined : toggleProject}
-                      onKeyDown={(event) => {
-                        if (renaming) return;
-                        if (event.key === "Enter" || event.key === " ") {
-                          event.preventDefault();
-                          toggleProject();
-                        }
-                      }}
-                    >
-                      <svg className={`${styles.projectChevron} ${expanded ? styles.projectChevronExpanded : ""}`} width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-                        <path d="m4 2 4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                      <Image width={28} height={23} src="/icons/create-modal-project.svg" alt="" />
-                      <span
-                        ref={(el) => { if (el) projectTitleRefs.current[project.id] = el; }}
-                        contentEditable={renaming}
-                        suppressContentEditableWarning
-                        className={styles.chatTitle}
-                        title={project.title}
-                        onClick={renaming ? (event) => event.stopPropagation() : undefined}
-                        onBlur={(event) => {
-                          if (!renaming) return;
-                          const nextTitle = event.currentTarget.textContent?.trim();
-                          if (nextTitle && nextTitle !== project.title) renameProject?.(project.id, nextTitle);
-                          setRenamingProjectId(null);
-                          setOpenMenuProjectId(null);
-                        }}
-                        onKeyDown={(event) => {
-                          if (!renaming) return;
-                          if (event.key === "Enter") {
-                            event.preventDefault();
-                            event.currentTarget.blur();
-                          }
-                          if (event.key === "Escape") {
-                            event.preventDefault();
-                            event.currentTarget.textContent = project.title;
-                            event.currentTarget.blur();
-                          }
-                        }}
-                      >{project.title}</span>
-                    </div>
-                    <div className={styles.chatRight}>
-                      <button
-                        type="button"
-                        className={styles.projectOpenButton}
-                        aria-label={`Open project ${project.title}`}
-                        onClick={() => { closeMenus(); setActiveProject?.(project.id); }}
-                      >
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                          <path d="M14 4h6v6M20 4 10 14M10 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4" />
-                        </svg>
-                        <ActionTooltip label="Open project" />
-                      </button>
-                      <button
-                        type="button"
-                        className={`${styles.dotsIcon} ${styles.projectMenuTrigger}`}
-                        aria-label={`Actions for project ${project.title}`}
-                        aria-expanded={openMenuProjectId === project.id}
-                        aria-haspopup="menu"
-                        data-menu-trigger
-                        onClick={(event) => {
-                          const wasOpen = openMenuProjectId === project.id;
-                          closeMenus();
-                          if (wasOpen) return;
-                          projectTriggerRef.current = event.currentTarget;
-                          setProjectMenuPosition(menuPositionBelow(event.currentTarget));
-                          setOpenMenuProjectId(project.id);
-                        }}
-                      />
-                    </div>
-                  </div>
-                  {expanded && (
-                    <ProjectChatList
-                      id={chatsId}
-                      project={project}
-                      chats={chatList}
-                      activeChatId={activeProjectId ? null : activeChatId}
-                      onOpenChat={setActiveChatId}
-                    />
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      )}
-
-      {hasMoreProjects && (
-        <button
-          type="button"
-          className={styles.showMoreBtn}
-          onClick={() => dispatch(toggleSidebarProjectsList())}
-          aria-label={
-            showAllProjects ? "Show fewer projects" : "Show more projects"
-          }
-        >
-          {!showAllProjects && (
-            <span className={styles.showMoreDots}>
-              {Array.from({ length: hiddenProjectsCount }).map((_, i) => (
-                <span key={i} className={styles.showMoreDot} />
-              ))}
-            </span>
-          )}
-          <Image
-            className={`${styles.showMoreChevron} ${showAllProjects ? styles.showMoreChevronUp : ""}`}
-            width={15}
-            height={15}
-            src="/icons/chevron-down.svg"
-            alt="toggle projects"
           />
         </button>
       )}

@@ -43,6 +43,7 @@ const uiSlice = createSlice({
     },
     toggleSidebarProjectsList(state) {
       state.sidebarShowAllProjects = !state.sidebarShowAllProjects;
+      if (!state.sidebarShowAllProjects) state.expandedSidebarProjects = {};
     },
     setIsModalOpen(state, { payload }: PayloadAction<boolean>) {
       state.isModalOpen = payload;
