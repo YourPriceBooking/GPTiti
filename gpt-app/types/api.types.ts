@@ -114,6 +114,7 @@ export type SendTokensResponse =
   | TokenTransferErrorResponse;
 
 export interface ProjectConversation {
+  projectPinnedAt?: string | null;
   _id: string;
   user?: string;
   title: string | null;

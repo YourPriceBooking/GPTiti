@@ -409,6 +409,75 @@
   cursor: pointer;
 }
 
+.projectChatRow {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  border-radius: 9px;
+}
+
+.projectChatRow:hover,
+.projectChatRow:focus-within {
+  background: #1b2438;
+}
+
+.projectChatRow .projectChatButton {
+  flex: 1;
+  width: auto;
+}
+
+.projectChatDots {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  margin-right: 4px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #a9bedc;
+  font-size: 22px;
+  line-height: 1;
+  opacity: 0;
+  cursor: pointer;
+  transition: opacity 180ms ease-out;
+}
+
+.projectChatRow:hover .projectChatDots,
+.projectChatRow:focus-within .projectChatDots {
+  opacity: 1;
+}
+
+.projectChatDots:focus-visible {
+  outline: 1px solid #8da6cc;
+}
+
+.projectChatPopup {
+  position: fixed;
+  z-index: 3000;
+  width: max-content;
+  max-width: calc(100vw - 16px);
+  max-height: calc(100dvh - 16px);
+  overflow-y: auto;
+}
+
+.projectChatRename {
+  flex: 1;
+  min-width: 0;
+  margin: 3px 0 3px 8px;
+  padding: 5px 4px;
+  border: 1px solid #6386b2;
+  border-radius: 5px;
+  background: #121525;
+  color: #e4e6e9;
+  font: inherit;
+  font-size: 14px;
+}
+
+@media (hover: none) {
+  .projectChatDots { opacity: 1; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .projectChevron,
   .projectOpenButton,

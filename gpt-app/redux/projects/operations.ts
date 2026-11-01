@@ -161,3 +161,21 @@ export const removeProjectConversation = createAsyncThunk<
     }
   },
 );
+
+/** A project-membership pin never updates the global conversation pin. */
+export const updateProjectConversationPin = createAsyncThunk<
+  { projectId: string; conversationId: string; projectPinnedAt: string | null },
+  { projectId: string; conversationId: string; pinned: boolean },
+  { rejectValue: string }
+>("projects/updateConversationPin", async ({ projectId, conversationId, pinned }, thunkApi) => {
+  try {
+    return await api.updateProjectConversationPin(projectId, conversationId, pinned);
+  } catch (error) {
+    return thunkApi.rejectWithValue(errMessage(error, "Could not update the project pin. Please try again."));
+  }
+}, {
+  condition: ({ projectId, conversationId }, { getState }) => {
+    const state = getState() as { projects: { pinMutations: Record<string, string> } };
+    return state.projects.pinMutations[`chat:${projectId}:${conversationId}`] === undefined;
+  },
+});

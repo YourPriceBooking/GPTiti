@@ -1,10 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Chat, Project } from "@/types/types";
 import { useAppDispatch } from "@/redux/hooks";
 import { fetchProject } from "@/redux/projects/operations";
-import ChatBubbleIcon from "@/components/common/ChatBubbleIcon";
+import { sortProjectChats } from "@/lib/projects/projectChatOrder";
+import ProjectChatActions from "./ProjectChatActions";
+import { renameConversation } from "@/redux/chat/operations";
+import { renameChat } from "@/redux/chat/slice";
 import styles from "./SectionGptChats.module.css";
 
 export default function ProjectChatList({
@@ -22,6 +25,9 @@ export default function ProjectChatList({
 }) {
   const dispatch = useAppDispatch();
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+  const [renaming, setRenaming] = useState<{ id: string; title: string } | null>(null);
+  const savingRename = useRef(false);
+  const cancelledRename = useRef(false);
   const [retry, setRetry] = useState(0);
 
   // Fetch only expanded projects; never change the selected project or route.
@@ -36,10 +42,7 @@ export default function ProjectChatList({
   }, [dispatch, project.id, retry]);
 
   const conversations = project.conversationIds ?? [];
-  const sorted = [
-    ...conversations.filter((chat) => chat.pinnedAt),
-    ...conversations.filter((chat) => !chat.pinnedAt),
-  ];
+  const sorted = sortProjectChats(conversations);
 
   return (
     <div id={id} className={styles.projectChats}>
@@ -48,7 +51,34 @@ export default function ProjectChatList({
           {sorted.map((chat) => {
             const title = chat.title || chats.find((item) => item.id === chat._id)?.title || "Untitled chat";
             return (
-              <li key={chat._id}>
+              <li key={chat._id} className={`${styles.projectChatRow} ${activeChatId === chat._id ? styles.projectChatActive : ""}`}>
+                {renaming?.id === chat._id ? (
+                  <input
+                    autoFocus
+                    aria-label="Rename project chat"
+                    className={styles.projectChatRename}
+                    value={renaming.title}
+                    maxLength={60}
+                    onChange={(event) => setRenaming({ id: chat._id, title: event.target.value })}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter") event.currentTarget.blur();
+                      if (event.key === "Escape") { cancelledRename.current = true; setRenaming(null); }
+                    }}
+                    onBlur={async () => {
+                      if (cancelledRename.current || savingRename.current) return;
+                      const next = renaming.title.trim();
+                      if (!next || next === title) { setRenaming(null); return; }
+                      savingRename.current = true;
+                      const result = await dispatch(renameConversation({ id: chat._id, title: next }));
+                      savingRename.current = false;
+                      if (renameConversation.fulfilled.match(result)) {
+                        dispatch(renameChat({ chatId: chat._id, newTitle: next }));
+                        setRenaming(null);
+                        void dispatch(fetchProject(project.id));
+                      }
+                    }}
+                  />
+                ) : (
                 <button
                   type="button"
                   className={`${styles.projectChatButton} ${activeChatId === chat._id ? styles.projectChatActive : ""}`}
@@ -56,9 +86,13 @@ export default function ProjectChatList({
                   title={title}
                   onClick={() => onOpenChat(chat._id)}
                 >
-                  <ChatBubbleIcon width={17} height={17} />
                   <span>{title}</span>
                 </button>
+                )}
+                <ProjectChatActions project={project} chat={chat} onRename={() => {
+                  cancelledRename.current = false;
+                  setRenaming({ id: chat._id, title });
+                }} />
               </li>
             );
           })}

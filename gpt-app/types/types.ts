@@ -70,6 +70,7 @@ export type ChatProject = {
 export type MessagesStatus = "idle" | "loading" | "loaded" | "error";
 
 export type Chat = {
+  projectPinnedAt?: string | null;
   id: string;
   title: string | null;
   messages: Message[];
