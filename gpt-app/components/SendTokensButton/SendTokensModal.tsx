@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import axios from "axios";
 import Image from "next/image";
+import Link from "next/link";
 
 import { api } from "@/helpers/api";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
@@ -373,6 +374,15 @@ export default function SendTokensModal({ onClose }: Props) {
     requestAnimationFrame(() => emailInput.current?.focus());
   };
 
+  const historyLink = (
+    <Link href="/token-history" className={styles.historyLink} onClick={onClose}>
+      Token history
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M14 4h6v6M20 4 10 14M10 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4" />
+      </svg>
+    </Link>
+  );
+
   return (
     <div
       className={styles.backdrop}
@@ -406,6 +416,7 @@ export default function SendTokensModal({ onClose }: Props) {
                   ? "Refreshing balance…"
                   : "Balance unavailable right now."}
             </p>
+            <div className={styles.receiptHistory}>{historyLink}</div>
             <div className={styles.actions}>
               <button
                 type="button"
@@ -513,7 +524,10 @@ export default function SendTokensModal({ onClose }: Props) {
             ) : (
               <form onSubmit={continueToConfirm} noValidate>
                 <div className={styles.balanceRow}>
-                  <span>Available balance</span>
+                  <div className={styles.balanceLabel}>
+                    <span>Available balance</span>
+                    {historyLink}
+                  </div>
                   <strong>{balanceReady ? `${shownBalance.toLocaleString("en-US")} TITI` : "Syncing balance…"}</strong>
                 </div>
                 <label className={styles.label} htmlFor="transfer-email">
