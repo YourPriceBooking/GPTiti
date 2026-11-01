@@ -1,3 +1,4 @@
+import { readFileLimits } from './limits';
 import { readArchivePreview, type ArchivePreview } from './archive';
 import { readOcrPreview } from './ocr';
 import { axiosInstance } from '@/lib/axiosInstance';
@@ -43,4 +44,14 @@ export async function downloadOcr(file: ManagedFile) {
   const url = URL.createObjectURL(new Blob([res.data], { type: 'text/plain;charset=utf-8' }));
   const a = document.createElement('a'); a.href = url; a.download = file.originalName + '.ocr.txt';
   document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+export async function loadFileLimits(modelId: string, signal: AbortSignal) {
+  try {
+    const response = await axiosInstance.get('/files/limits', { params: { modelId }, signal, timeout: 15000 });
+    return readFileLimits(response.data);
+  } catch (error) {
+    if (signal.aborted) throw error;
+    throw new Error('Could not confirm current file limits for this model. Retry in Add files → ⓘ; your draft is kept.');
+  }
 }

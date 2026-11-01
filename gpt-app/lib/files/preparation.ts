@@ -1,6 +1,8 @@
 import type { UploadedFile } from '../../types/api.types';
 
 export const OCR_ERROR_MESSAGES = {
+  FILE_UPLOAD_BUSY: 'File uploads are busy. Wait a moment and send again; your draft is kept.',
+  FILE_TOO_LARGE: 'This file exceeds the current upload limit. Check Add files → ⓘ and choose a smaller file.',
   ZIP_INPUT_DISABLED: 'ZIP reading is disabled for this model. Choose another model or attach files separately.',
   ZIP_OUTPUT_DISABLED: 'ZIP creation is disabled for this model.',
   ZIP_TOO_LARGE: 'ZIP archives must be 10 MiB or smaller. Split the archive.',

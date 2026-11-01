@@ -1,5 +1,7 @@
 "use client";
 
+import { loadFileLimits } from "@/lib/files/api";
+import { validateServerFiles } from "@/lib/files/limits";
 import { selectUser } from "@/redux/auth/selectors";
 import { AttachmentPreparation, preparationErrorMessage, type PreparationProgress } from "@/lib/files/preparation";
 
@@ -644,6 +646,12 @@ export function useChatStream(): ChatStream {
       setWarningState({owner: userId, names: []});
       let preparing = true;
       try {
+        if (imageFiles.length) {
+          // Revalidate the selected model immediately before upload, including retries.
+          const limits = await loadFileLimits(modelId, controller.signal);
+          const invalid = validateServerFiles(imageFiles, limits);
+          if (invalid) throw new Error(invalid);
+        }
         const files = await preparationRef.current.run(imageFiles, modelId, {
           upload: (file) => api.uploadFile(file, controller.signal).then(response => response.file),
           prepare: (id, model) => api.prepareFile(id, model, controller.signal),
