@@ -660,6 +660,30 @@
   pointer-events: auto;
 }
 
+.projectChatRow:hover .projectChatPin,
+.projectChatRow:focus-within .projectChatPin {
+  opacity: 0.5;
+  pointer-events: auto;
+}
+
+.projectChatRow .projectChatPin:hover,
+.projectChatRow .projectChatPin:focus-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.projectChatRow .projectChatPin:disabled {
+  opacity: 0.3;
+  cursor: wait;
+}
+
+@media (hover: none) {
+  .projectChatRow .projectChatPin {
+    opacity: 0.5;
+    pointer-events: auto;
+  }
+}
+
 .dotsIcon {
   width: 28px;
   height: 24px;
