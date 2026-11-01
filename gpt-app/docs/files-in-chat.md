@@ -63,3 +63,38 @@ an older upload, and owner isolation/deleted-file errors. No format picker.
 PDF and PNG/JPEG/WEBP previews offer File / Recognized text. GET /files/:id/ocr returns the existing owner-only cache; ?download=1 returns its exact UTF-8 bytes. Missing cache (409) never triggers recognition. Copy includes all notes and page markers; page view only groups existing markers and collapses leading notes. React renders plain text, including markup, without executing it. Abort on close/change; check again retries only the read. Original Download remains available.
 
 Deploy backend patch 16 before merging. Manually verify mobile/desktop, keyboard focus/Escape, owner isolation, deleted files, absent cache, RTL text, clipboard failure, exact TXT and persistence after reload. This feature exposes saved extraction and does not improve OCR accuracy.
+
+
+## Backend limits (patch 32)
+
+The chat composer loads authenticated `GET /files/limits?modelId=...` through the
+shared API client. Response version 1 (`stage-a-storage`) separates storage/upload
+from processing and message budgets. The selected model's backend opt-outs apply;
+local model-name image/file caps no longer determine V2 attachment admission.
+The model guide's separate public marketing pages and text prompt caps are unchanged.
+
+The existing Add files → ⓘ panel shows storage quota, per-format storage and chat
+reading ceilings, combined request limits and refresh/retry. MB/GB are decimal;
+MiB/KiB are binary. Storage accepts larger files than today's readers: e.g. 50 MB
+ZIP storage versus 10 MiB ZIP reading. The chat picker rejects such a file before
+upload with both numbers, rather than offering a storage-only upload as a chat attachment.
+
+Limits are scoped to the signed-in account and selected model; old or aborted
+responses cannot replace a new scope. No limits are persisted in localStorage.
+Missing/malformed/unsupported responses block attachments but not text-only sends.
+An actual new send fetches limits again before uploading/preparing, preserving the
+existing preparation retry cache, draft, ACK correlation and recovery behavior.
+An already pending delivery retains its existing protocol/idempotency path.
+
+Manual checks after deployment:
+1. Signed in, open Add files → ⓘ: verify quota and both columns against /files/limits.
+2. Attach a small TXT, PDF, image and ZIP, send, reload and check saved files.
+3. Attach TXT over 64 KiB or ZIP over 10 MiB but below the storage ceiling:
+   explain the reading limit without uploading or clearing the draft.
+4. Switch to a model with a reader opt-out: corresponding attachments are blocked.
+5. Temporarily block /files/limits in DevTools, refresh limits: show retry;
+   text-only send still works. Unblock and retry without reloading the page.
+6. On mobile, open and pin ⓘ, scroll the guide: the table stays inside the panel.
+
+Validation: TypeScript, delivery test suite (including malformed profiles, exact
+boundaries, aggregate budgets, opt-outs, and API override precedence), targeted ESLint.

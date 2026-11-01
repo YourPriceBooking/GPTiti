@@ -17,7 +17,7 @@ import ErrorPatchImgModal, {
 import ImageEditorModal from "@/components/HomePage/common/ImageEditorModal/ImageEditorModal";
 
 import { useAppSelector } from "@/redux/hooks";
-import { selectIsLoggedIn } from "@/redux/auth/selectors";
+import { selectIsLoggedIn, selectUser } from "@/redux/auth/selectors";
 import { selectActiveChatId } from "@/redux/chat/selectors";
 import { selectActiveProjectId } from "@/redux/ui/selectors";
 import { useDictation } from "@/hooks/useDictation";
@@ -30,7 +30,10 @@ import { DictationStopIcon, DictationWaveform } from "./DictationVisuals";
 
 import { getModelLimits } from "@/config/modelLimits.config";
 import { isModelComingSoon } from "@/config/models.config";
-import { inputKind, validateInputFiles, validateTextBytes } from "@/lib/files/input";
+import { inputKind, validateTextBytes } from "@/lib/files/input";
+
+import { useFileLimits } from "@/hooks/useFileLimits";
+import { validateServerFiles } from "@/lib/files/limits";
 
 import styles from "./InputBar.module.css";
 
@@ -114,6 +117,8 @@ export default function InputBar({
   sendDisabled?: boolean;
 }) {
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
+  const userId = useAppSelector(selectUser)?.id;
+  const fileLimits = useFileLimits(selectedModel, isLoggedIn ? userId : undefined);
   const activeChatId = useAppSelector(selectActiveChatId);
   const activeProjectId = useAppSelector(selectActiveProjectId);
   const dictationScope = `${activeChatId ?? "new"}:${activeProjectId ?? "none"}:${selectedModel}`;
@@ -322,7 +327,7 @@ export default function InputBar({
     const existing = [...images.map(image => image.file), ...files.map(item => item.file)];
     const error = imagesOnly && incoming.some(file => inputKind(file) !== "image")
       ? "Choose PNG, JPG or WEBP images. Use Add files for documents, text and code."
-      : validateInputFiles([...existing, ...incoming], limits);
+      : validateServerFiles([...existing, ...incoming], fileLimits.limits);
     if (error) { setAttachmentError(error); return; }
     preparingRef.current = true;
     setIsPreparing(true);
@@ -333,7 +338,7 @@ export default function InputBar({
       }
       // Preserve scan pixels and file identity for OCR and retrying uploaded IDs.
       const processed = incoming;
-      const invalid = validateInputFiles([...existing, ...processed], limits);
+      const invalid = validateServerFiles([...existing, ...processed], fileLimits.limits);
       if (invalid) { setAttachmentError(invalid); return; }
       const newImages = processed.filter(file => inputKind(file) === "image").map(file => ({
         id: crypto.randomUUID(), url: URL.createObjectURL(file), file,
@@ -448,7 +453,7 @@ export default function InputBar({
           return;
         }
         const attachmentFiles = [...images.map(image => image.file), ...files.map(item => item.file)];
-        const invalid = validateInputFiles(attachmentFiles, limits);
+        const invalid = validateServerFiles(attachmentFiles, fileLimits.limits);
         if (invalid) { setAttachmentError(invalid); return; }
         if (files.length && !message.trim()) {
           setAttachmentError("Add a message describing what to do with these files.");
@@ -627,8 +632,9 @@ export default function InputBar({
           <AddSomethingToInput
             onImageSelect={handleImageSelect}
             onFileSelect={handleFileSelect}
-            maxImages={limits.maxImages}
-            maxImageSizeMb={limits.maxImageSizeMb}
+            fileLimits={fileLimits.limits}
+            limitsStatus={fileLimits.status}
+            onRetryLimits={fileLimits.retry}
           />
         </div>
       )}

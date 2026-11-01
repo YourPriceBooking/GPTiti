@@ -1,14 +1,17 @@
 import { useEffect, useId, useRef, useState } from 'react';
+import LiveFileLimits from './LiveFileLimits';
+import { formatLimit, type FileLimits } from '@/lib/files/limits';
 import styles from './AddSomethingToInput.module.css';
 import { FILE_ACCEPT, IMAGE_ACCEPT, TEXT_EXTENSIONS } from '@/lib/files/input';
 
-export default function AddSomethingToInput({ onImageSelect, onImageBlocked, isImageBlocked = false, onFileSelect, maxImages, maxImageSizeMb }: {
+export default function AddSomethingToInput({ onImageSelect, onImageBlocked, isImageBlocked = false, onFileSelect, fileLimits, limitsStatus, onRetryLimits }: {
   onImageSelect: (files: File[]) => void;
   onImageBlocked?: () => void;
   isImageBlocked?: boolean;
   onFileSelect: (files: File[]) => void;
-  maxImages: number;
-  maxImageSizeMb: number;
+  fileLimits: FileLimits | null;
+  limitsStatus: string;
+  onRetryLimits: () => void;
 }) {
   const imageInput = useRef<HTMLInputElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
@@ -47,6 +50,8 @@ export default function AddSomethingToInput({ onImageSelect, onImageBlocked, isI
     {info && <section id={id} className={styles.infoPanel} aria-label="Attachment guide" onFocusCapture={() => { cancelClose(); setPinned(true); }} onMouseEnter={cancelClose}>
       <header><strong>Files you can use</strong><button type="button" aria-label="Close attachment guide" onClick={() => { close(); infoButton.current?.focus(); }}>×</button></header>
       <div className={styles.infoBody} tabIndex={0}>
+        <h3>Current file limits</h3>
+        <LiveFileLimits limits={fileLimits} status={limitsStatus} retry={onRetryLimits} />
         <h3>Supported formats</h3>
         <p><b>Images:</b> PNG, JPG/JPEG, WEBP.</p>
         <p><b>Documents & spreadsheets:</b> PDF, DOCX, XLSX.</p>
@@ -54,13 +59,12 @@ export default function AddSomethingToInput({ onImageSelect, onImageBlocked, isI
         <p><b>Code:</b> {TEXT_EXTENSIONS.filter(ext => !['txt', 'md', 'csv', 'tsv', 'json', 'xml', 'yaml', 'yml', 'log'].includes(ext)).join(', ').toUpperCase()}.</p>
         <h3>ZIP archives</h3>
         <p>Add a ZIP using the same Add files button. Ask naturally: “Compare the documents in this ZIP” or “Create the results as a ZIP with a report and CSV”. No format selector is required.</p>
-        <p><b>Input:</b> up to 10 MiB compressed, 20 files, 100 entries including folders, 5 MiB per expanded file and 25 MiB expanded in total. Text/code files still have a 64 KiB limit each. Extracted ZIP content, paths and notes must fit within 128 KiB and share the conversation’s existing 128 KiB attachment budget.</p>
+        {fileLimits && <p><b>Reading a ZIP:</b> up to {formatLimit(fileLimits.processing.zip.inputBytes)} compressed, {fileLimits.processing.zip.entries} files, {fileLimits.processing.zip.records} entries including folders, {formatLimit(fileLimits.processing.zip.entryBytes)} per expanded file and {formatLimit(fileLimits.processing.zip.expandedBytes)} expanded in total. Text/code files also have the {formatLimit(fileLimits.processing.text.maxBytes)} reading limit. Extracted ZIP content, paths and notes must fit within {formatLimit(fileLimits.processing.zip.textBytes)} and share the conversation’s attachment budget. Individual reader opt-outs still apply inside ZIP.</p>}
         <p>Supported inside ZIP: the text/code formats listed above, DOCX, XLSX, PDF and PNG/JPG/WEBP. Images are read as OCR text only; the model does not see their visual content. At most two files requiring OCR and ten recognized pages per archive. Existing PDF and Office limits still apply.</p>
         <p>Password-protected archives, ZIP64, symbolic links, unsafe or duplicate paths, nested archives and unsupported files are rejected. Nothing is silently omitted, except macOS metadata (.DS_Store and __MACOSX), which is marked as ignored. Filenames must use UTF-8.</p>
         <p><b>Output:</b> one ZIP with up to ten generated text/code, SVG, PDF, DOCX or XLSX files. It cannot contain generated photos, audio or video. Preview lists paths and sizes; Download saves the full archive.</p>
         <p>Preparation is private and may take longer with scans. If it is still running, send again after a short wait; the uploaded file is reused. Prepared content is cached and included in context and pricing like other attachments. ZIP contents and scripts are never executed.</p>
-        <h3>Size & quantity</h3>
-        <ul><li>Up to 10 attachments per message, including images.</li><li>Text: 64 KiB per file. PDF/DOCX/XLSX: 5 MiB per file, up to 64 KiB of extracted text each. The server checks the extracted size.</li><li>Up to 128 KiB of combined text and extracted document content in the request, including earlier attachments still in context. Large content is rejected, not silently cut off.</li><li>PDF: up to 50 pages, including at most 10 pages that need OCR. Scanned pages are recognized automatically.</li><li>XLSX: up to 20 sheets and 10,000 stored cells, including empty cells with formatting. Additional document complexity limits apply.</li><li>{maxImages ? `Selected model: up to ${maxImages} images, up to ${Math.min(5, maxImageSizeMb)} MiB each for OCR.` : 'Images are read as text through OCR for this model; visual understanding is not available.'}</li><li>Up to 25 MiB of attachments per message. The server may enforce a lower configured limit.</li></ul>
+        <p>Additional complexity limits apply: PDF up to 50 physical pages; XLSX up to 20 sheets and 10,000 stored cells, including formatted empty cells. Larger files may fit storage but still need splitting before chat reading.</p>
         <h3>What you can ask</h3>
         <p>Read or transcribe text, summarize, translate, compare, find values, explain code, or create a new file from the attached content. Add a message describing what you need.</p>
         <h3>Getting the full text</h3>
@@ -83,7 +87,7 @@ export default function AddSomethingToInput({ onImageSelect, onImageBlocked, isI
         <p>If a calculation stops, only completed results and attached files are available. Model calls used for the task count toward its cost; sending a new request may incur additional charges. Check important results.</p>
         <h3>Text recognition (OCR)</h3>
         <p>Scanned PDFs and static PNG, JPG/JPEG and WEBP images are recognized automatically before your message is sent. No language selection is required. Original images are uploaded without automatic compression; the server may resize them for recognition.</p>
-        <p>OCR: up to 5 MiB per file, 16 million pixels per image, and no side over 10,000 pixels. Up to 64 KiB of recognized text and page markers per file; the shared 128 KiB context limit still applies. Animated images are not supported.</p>
+        <p>The current OCR file, page and text limits are shown above. Images must also fit within 16 million pixels with no side over 10,000 pixels. Animated images are not supported.</p>
         <p>Automatic recognition uses 33 writing-system models: Arabic, Armenian, Bengali, Canadian Aboriginal, Cherokee, Cyrillic, Devanagari, Ethiopic, Fraktur, Georgian, Greek, Gujarati, Gurmukhi, simplified and traditional Han, Hangul, Hebrew, Japanese, Kannada, Khmer, Lao, Latin, Malayalam, Myanmar, Oriya, Sinhala, Syriac, Tamil, Telugu, Thaana, Thai, Tibetan and Vietnamese.</p>
         <p>This covers many languages, not every language or handwriting style. The dominant writing system is detected per page; short text, mixed scripts, rotated or vertical text and unclear scans may be inaccurate. We show a warning when detection is uncertain. OCR can also mix up line order, drop characters or add digits, especially in small print, tables, stamps and handwriting. A warning is not a guarantee that every error was detected. Always verify names, dates, identifiers, quantities and amounts against the original.</p>
         <p>Preparation may take up to about 55 seconds per file. If it fails, your draft is kept: send again to retry with the same uploaded files. Removing and adding a file again starts a new upload. Recognition can be disabled for individual models by the service.</p>
