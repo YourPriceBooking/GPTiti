@@ -1,9 +1,14 @@
-import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, isAnyOf, type PayloadAction } from "@reduxjs/toolkit";
+
+import { loginUser, logoutUser, refreshUser } from "../auth/operations";
+import { refreshError } from "../auth/slice";
 
 interface UiState {
   isModalOpen: boolean;
   isCreateProjectModalOpen: boolean;
   activeProjectId: string | null;
+  expandedSidebarProjects: Record<string, boolean>;
+  sidebarShowAllProjects: boolean;
   addChatsProjectId: string | null;
   focusMode: boolean;
   isSectionVisible: boolean;
@@ -17,6 +22,8 @@ const initialState: UiState = {
   isModalOpen: false,
   isCreateProjectModalOpen: false,
   activeProjectId: null,
+  expandedSidebarProjects: {},
+  sidebarShowAllProjects: false,
   addChatsProjectId: null,
   focusMode: false,
   isSectionVisible: true,
@@ -30,6 +37,13 @@ const uiSlice = createSlice({
   name: "ui",
   initialState,
   reducers: {
+    toggleSidebarProject(state, { payload }: PayloadAction<string>) {
+      if (state.expandedSidebarProjects[payload]) delete state.expandedSidebarProjects[payload];
+      else state.expandedSidebarProjects[payload] = true;
+    },
+    toggleSidebarProjectsList(state) {
+      state.sidebarShowAllProjects = !state.sidebarShowAllProjects;
+    },
     setIsModalOpen(state, { payload }: PayloadAction<boolean>) {
       state.isModalOpen = payload;
     },
@@ -63,9 +77,20 @@ const uiSlice = createSlice({
       state.errorToast = null;
     },
   },
+  extraReducers: (builder) => {
+    builder.addMatcher(
+      isAnyOf(loginUser.fulfilled, logoutUser.fulfilled, refreshError, refreshUser.rejected),
+      (state) => {
+        state.expandedSidebarProjects = {};
+        state.sidebarShowAllProjects = false;
+      },
+    );
+  },
 });
 
 export const {
+  toggleSidebarProject,
+  toggleSidebarProjectsList,
   setIsModalOpen,
   setIsCreateProjectModalOpen,
   setActiveProjectId,
