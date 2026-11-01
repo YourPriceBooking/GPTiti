@@ -122,6 +122,7 @@ test("parses authoritative end and rejects mismatched assistant turn", () => {
         id: "server-message-1",
         role: "assistant",
         content: "Complete response",
+        computation: {status:"completed",runs:1,executionMs:1234,reason:null},
         modelId: "gpt-5.1",
         tokens: 12,
         turnId,
@@ -132,6 +133,7 @@ test("parses authoritative end and rejects mismatched assistant turn", () => {
     },
   };
   assert.equal(readChatEndEvent(raw)?.payload.assistantMessage.content, "Complete response");
+  assert.equal(readChatEndEvent(raw)?.payload.assistantMessage.computation?.runs, 1);
   assert.equal(
     readChatEndEvent({
       ...raw,
@@ -265,4 +267,12 @@ test("forward compatible errors still reject malformed envelopes", () => {
     assert.equal(readChatSendAck({ ok: false, protocolVersion: 2, error: invalid }), null);
   }
   assert.equal(readChatSendAck({ ok: false, protocolVersion: 3, error }), null);
+});
+
+
+test("status snapshots retain Python progress and ignore malformed optional metadata",()=>{
+ const ack=readChatStatusAck({ok:true,protocolVersion:2,turn:{...snapshot,computationStatus:{stage:"executing",runs:1,calls:0}}});
+ assert.ok(ack?.ok);assert.equal(ack.turn.computationStatus?.stage,"executing");
+ const bad=readChatStatusAck({ok:true,protocolVersion:2,turn:{...snapshot,computationStatus:{stage:"unknown",runs:1,calls:0}}});
+ assert.ok(bad?.ok);assert.equal(bad.turn.computationStatus,null);
 });

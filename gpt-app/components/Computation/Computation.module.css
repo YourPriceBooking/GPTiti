@@ -1,0 +1,12 @@
+.progress { display:flex; align-items:center; gap:14px; padding:18px 22px; border:1px solid #dce6ef; border-radius:20px; background:#f4f9fc; color:#23364d; margin:12px 0; }
+.progress strong,.notice strong { font-size:14px; font-weight:600; }
+.progress p { margin:4px 0 0; font-size:12px; color:#64748b; }
+.spinner { width:18px; height:18px; flex-shrink:0; border:2px solid #d6e4ef; border-top-color:#3d8b9d; border-radius:50%; animation:spin 1s linear infinite; }
+.success { display:flex; gap:7px; align-items:center; width:fit-content; padding:7px 11px; margin:14px 0; border-radius:10px; background:#edf8f2; color:#24734c; font-size:12px; }
+.notice { margin:16px 0; padding:16px 18px; border:1px solid #eadbb9; border-radius:16px; background:#fffbf2; color:#65502b; }
+.notice p { margin:7px 0 0; font-size:13px; line-height:1.6; }
+.notice details { margin-top:12px; font-size:12px; }
+.notice summary { cursor:pointer; width:fit-content; }
+.notice code { display:block; margin-top:8px; overflow-wrap:anywhere; }
+@keyframes spin { to { transform:rotate(360deg); } }
+@media(prefers-reduced-motion:reduce) { .spinner { animation:none; } }

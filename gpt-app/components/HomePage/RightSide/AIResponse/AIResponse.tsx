@@ -1,5 +1,7 @@
 "use client";
 
+import { ComputationResult } from "@/components/Computation/Computation";
+import { withoutComputationNotice, type Computation } from "@/lib/computation/status";
 import WebSources from "@/components/Web/WebSources";
 import { withoutWebFooter, type WebSource } from "@/lib/web/sources";
 import { FileCards } from "@/components/Files/FileWorkspace";
@@ -14,6 +16,7 @@ type AIResponseProps = {
   attachments?: import("@/lib/files/types").ManagedFile[];
   fileResult?: import("@/lib/files/types").FileResult | null;
   webSources?: WebSource[];
+  computation?: Computation | null;
   content: string;
   modelId?: string;
   updatedAt?: string;
@@ -26,6 +29,7 @@ export default function AIResponse({
   attachments,
   fileResult,
   webSources = [],
+  computation,
 }: AIResponseProps) {
   const updatedLabel = useMemo(() => formatActivity(updatedAt), [updatedAt]);
 
@@ -89,7 +93,8 @@ export default function AIResponse({
         </span>
       </h2>
 
-      <MarkdownContent className={styles.aiContent} content={withoutWebFooter(content, webSources)} />
+      <MarkdownContent className={styles.aiContent} content={withoutComputationNotice(withoutWebFooter(content, webSources), computation)} />
+      <ComputationResult result={computation} />
       <WebSources sources={webSources} />
       <FileCards files={attachments} result={fileResult} />
     </div>

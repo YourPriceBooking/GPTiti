@@ -1,3 +1,4 @@
+import { readComputation, readComputationStatus } from "../computation/status";
 import { readWebSources, readWebStatus } from "../web/sources";
 import { OCR_ERROR_CODES } from "../files/preparation";
 import { readFiles, readFileResult } from "../files/types";
@@ -98,6 +99,7 @@ export type ChatProtocolError = {
 
 export type AssistantMessageDTO = {
   attachments?: import("../files/types").ManagedFile[];
+  computation?: import("../computation/status").Computation | null;
   webSources?: import("../web/sources").WebSource[];
   fileResult?: import("../files/types").FileResult | null;
   id: string;
@@ -123,6 +125,7 @@ export type ChatTurnSnapshot = {
   status: ChatTurnStatus;
   attempt: number;
   lastSeq: number;
+  computationStatus?: import("../computation/status").ComputationStatus | null;
   webStatus?: import("../web/sources").WebStatus | null;
   partialContent: string;
   assistantMessage: AssistantMessageDTO | null;
@@ -320,6 +323,7 @@ const readAssistantMessage = (value: unknown): AssistantMessageDTO | null => {
     role: "assistant",
     attachments: readFiles(value.attachments),
     fileResult: readFileResult(value.fileResult),
+    computation: readComputation(value.computation),
     webSources: readWebSources(value.webSources),
     content,
     modelId,
@@ -381,6 +385,7 @@ export const readChatTurnSnapshot = (
     attempt,
     lastSeq,
     partialContent,
+    computationStatus: readComputationStatus(value.computationStatus),
     webStatus: readWebStatus(value.webStatus),    assistantMessage,
     billing,
     error,

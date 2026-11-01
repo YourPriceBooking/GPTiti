@@ -76,6 +76,11 @@ export default function AddSomethingToInput({ onImageSelect, onImageBlocked, isI
         <p>Encrypted, macro-enabled or damaged documents, embedded objects and external data sources are not supported. Uploaded PDF/DOCX/XLSX files can be downloaded; their preview is not available yet. Generated Office files keep their existing previews.</p>
         <h3>Saved recognized text</h3>
         <p>Open a file’s Preview → Recognized text to read its saved extraction page by page, copy all text or download a TXT. These actions do not call the AI model, repeat recognition or add a token charge. The saved text includes recognition notes and may contain OCR errors; compare important details with the original. If no saved extraction exists yet, send the file in a message first.</p>
+        <h3>Calculations and file processing</h3>
+        <p>Ask for calculations, data analysis, tables or charts in your own words. When available for the selected model, Python can be used automatically — no special command or language selection is needed.</p>
+        <p>For example: “Create an XLSX table of numbers and their squares, and a PNG chart.” Download finished files from the response cards. Saved files remain available when you reopen the chat.</p>
+        <p>Python runs in an isolated environment without internet access. Only files selected for the task are provided to it; uploading code does not automatically execute it. Time, memory, execution and cost limits apply. Large tasks may need to be split into smaller requests.</p>
+        <p>If a calculation stops, only completed results and attached files are available. Model calls used for the task count toward its cost; sending a new request may incur additional charges. Check important results.</p>
         <h3>Text recognition (OCR)</h3>
         <p>Scanned PDFs and static PNG, JPG/JPEG and WEBP images are recognized automatically before your message is sent. No language selection is required. Original images are uploaded without automatic compression; the server may resize them for recognition.</p>
         <p>OCR: up to 5 MiB per file, 16 million pixels per image, and no side over 10,000 pixels. Up to 64 KiB of recognized text and page markers per file; the shared 128 KiB context limit still applies. Animated images are not supported.</p>
