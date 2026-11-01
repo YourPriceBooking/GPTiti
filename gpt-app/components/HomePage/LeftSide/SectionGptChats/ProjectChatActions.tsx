@@ -2,6 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { createPortal } from "react-dom";
 import type { Project } from "@/types/types";
 import type { ProjectConversation } from "@/types/api.types";
@@ -24,12 +25,17 @@ export default function ProjectChatActions({ project, chat, onRename }: {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const projects = useAppSelector((state) => state.projects.list);
+  const pinPending = useAppSelector((state) => Boolean(state.projects.pinMutations[`chat:${project.id}:${chat._id}`]));
   const { moveToProject, removeFromProject } = useChatProjectMove();
   const [mode, setMode] = useState<"menu" | "delete" | ChatAction | null>(null);
   const [moving, setMoving] = useState(false);
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const trigger = useRef<HTMLButtonElement>(null);
   const popup = useRef<HTMLDivElement>(null);
+  const togglePin = () => {
+    setMode(null);
+    void dispatch(updateProjectConversationPin({ projectId: project.id, conversationId: chat._id, pinned: !chat.projectPinnedAt }));
+  };
 
   useLayoutEffect(() => {
     const element = popup.current;
@@ -118,6 +124,16 @@ export default function ProjectChatActions({ project, chat, onRename }: {
   return (
     <>
       <button
+        type="button"
+        className={`${styles.quickPinButton} ${styles.projectChatPin}`}
+        aria-label={chat.projectPinnedAt ? "Unpin chat from project" : "Pin chat in project"}
+        title={chat.projectPinnedAt ? "Unpin chat from project" : "Pin chat in project"}
+        disabled={pinPending}
+        onClick={(event) => { event.stopPropagation(); togglePin(); }}
+      >
+        <Image src={chat.projectPinnedAt ? "/icons/unpin.svg" : "/icons/pin.svg"} alt="" width={14} height={15} />
+      </button>
+      <button
         ref={trigger}
         type="button"
         className={styles.projectChatDots}
@@ -133,10 +149,7 @@ export default function ProjectChatActions({ project, chat, onRename }: {
               onClose={() => { if (!popup.current?.contains(document.activeElement)) setMode(null); }}
               pinScope="project"
               isPinned={Boolean(chat.projectPinnedAt)}
-              onPinToggle={() => {
-                setMode(null);
-                void dispatch(updateProjectConversationPin({ projectId: project.id, conversationId: chat._id, pinned: !chat.projectPinnedAt }));
-              }}
+              onPinToggle={togglePin}
               showCreateProject
               onCreateProject={() => { setMode(null); dispatch(setIsCreateProjectModalOpen(true)); }}
               projectTitle={project.title}
