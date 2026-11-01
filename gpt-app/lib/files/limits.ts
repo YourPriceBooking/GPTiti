@@ -2,6 +2,7 @@ import { inputKind } from './input';
 type Reader = { enabled: boolean; maxBytes: number };
 export type FileLimits = {
   version: 1;
+  preparation?: { async: boolean };
   storage: { maxBytes: number; maxCount: number };
   upload: { maxBytes: number; types: Record<string, { extensions: string[]; maxBytes: number }> };
   message: { maxAttachments: number; maxBytes: number; extractedTextBytes: number };
@@ -35,7 +36,9 @@ export function readFileLimits(value: unknown): FileLimits {
     types[key] = { extensions: t.extensions as string[], maxBytes: number(t.maxBytes) };
   }
   const ocr = object(processing.ocr), zip = object(processing.zip);
+  const prep = v.preparation === undefined ? null : object(v.preparation);
   return { version: 1,
+    preparation: prep ? { async: prep.version === 1 && prep.async === true && Array.isArray(prep.kinds) && prep.kinds.includes("ocr") } : undefined,
     storage: { maxBytes: number(storage.maxBytes), maxCount: number(storage.maxCount) },
     upload: { maxBytes: number(upload.maxBytes), types },
     message: { maxAttachments: number(message.maxAttachments), maxBytes: number(message.maxBytes), extractedTextBytes: number(message.extractedTextBytes) },
@@ -83,3 +86,6 @@ export function validateServerFiles(files: { name: string; size: number }[], lim
   if (text > limits.message.extractedTextBytes) return `Text attachments exceed ${formatLimit(limits.message.extractedTextBytes)}. Earlier attachments and extracted document content also share this limit.`;
   return null;
 }
+
+export const usesBackgroundOcr = (limits: FileLimits | null): boolean =>
+  limits?.preparation?.async === true && limits.processing.ocr.enabled;

@@ -1,6 +1,7 @@
 import type { UploadedFile } from '../../types/api.types';
 
 export const OCR_ERROR_MESSAGES = {
+  PREPARATION_INTERRUPTED: 'Recognition was interrupted by a server restart. Retry using the saved file.',
   FILE_UPLOAD_BUSY: 'File uploads are busy. Wait a moment and send again; your draft is kept.',
   FILE_TOO_LARGE: 'This file exceeds the current upload limit. Check Add files → ⓘ and choose a smaller file.',
   ZIP_INPUT_DISABLED: 'ZIP reading is disabled for this model. Choose another model or attach files separately.',
@@ -21,6 +22,9 @@ export const OCR_ERROR_MESSAGES = {
   ZIP_PROCESSING_TIMEOUT: 'Archive processing took too long. Split the archive.',
   ZIP_NOT_READY: 'Your ZIP is still preparing. Send again shortly; the uploaded ZIP will be reused.',
 
+  INVALID_PDF_DOCUMENT: 'This PDF is damaged or cannot be read. Try opening it locally and export a new PDF.',
+  PDF_PAGE_LIMIT: 'This PDF exceeds the supported page limit. Split it into smaller documents.',
+  MODEL_NOT_AVAILABLE: 'This model is no longer available. Choose another model before sending.',
   OCR_INPUT_DISABLED: 'Text recognition is disabled for this model. Choose another model or attach a text file.',
   OCR_UNAVAILABLE: 'Text recognition is temporarily unavailable. Try again later with the same attachment.',
   OCR_FILE_TOO_LARGE: 'OCR accepts files up to 5 MiB. Split or resize this file.',
@@ -63,12 +67,27 @@ export function preparationErrorMessage(error: unknown): string {
   return e?.response?.data?.message || e?.message || 'Could not prepare this attachment. Please try again.';
 }
 
-export type PreparationProgress = { phase: 'uploading' | 'recognizing' | 'unpacking'; name: string; index: number; total: number };
+export type PreparationProgress = { phase: 'uploading' | 'recognizing' | 'unpacking' | 'queued'; name: string; index: number; total: number };
 
 // File identity, not name/size, prevents reuse for different bytes. Weak keys release removed drafts.
 // This cache belongs to one signed-in session and never persists private IDs in browser storage.
 export class AttachmentPreparation {
   private uploads = new WeakMap<File, UploadedFile>();
+  async uploadAll(files: File[], upload: (file: File) => Promise<UploadedFile>, signal: AbortSignal, progress: (p: PreparationProgress) => void): Promise<UploadedFile[]> {
+    const result: UploadedFile[] = [];
+    for (const [index, file] of files.entries()) {
+      signal.throwIfAborted();
+      let stored = this.uploads.get(file);
+      if (!stored) {
+        progress({phase: 'uploading', name: file.name, index: index + 1, total: files.length});
+        stored = await upload(file);
+        this.uploads.set(file, stored);
+      }
+      signal.throwIfAborted();
+      result.push(stored);
+    }
+    return result;
+  }
   async run(files: File[], modelId: string, deps: {
     upload: (file: File) => Promise<UploadedFile>;
     prepare: (id: string, modelId: string) => Promise<FilePreparation>;

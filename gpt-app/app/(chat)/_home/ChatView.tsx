@@ -79,8 +79,19 @@ export default function ChatView({
   const feedback = <>
       {ctrl.fileProgress && <div className={styles.filePreparation} role="status" aria-live="polite">
         <span className={styles.filePreparationSpinner} aria-hidden="true" />
-        <span>{ctrl.fileProgress.phase === "unpacking" ? "Preparing ZIP archive…" : ctrl.fileProgress.phase === "recognizing" ? "Recognizing text…" : "Uploading file…"} {ctrl.fileProgress.index}/{ctrl.fileProgress.total} — {ctrl.fileProgress.name}</span>
+        <span>{ctrl.fileProgress.phase === "queued" ? "Waiting for recognition…" : ctrl.fileProgress.phase === "unpacking" ? "Preparing ZIP archive…" : ctrl.fileProgress.phase === "recognizing" ? "Recognizing text…" : "Uploading file…"} {ctrl.fileProgress.index}/{ctrl.fileProgress.total} — {ctrl.fileProgress.name}</span>
+        <button type="button" onClick={() => void ctrl.stopPreparation()}>Cancel</button>
       </div>}
+      {!ctrl.fileProgress && ctrl.recoveredPreparation && <section className={styles.ocrRecovery} aria-label="Saved file preparation">
+        <div><strong>Continue preparing your files</strong><span className={styles.ocrRecoveryBadge}>Saved in this tab</span></div>
+        <p>{ctrl.recoveredPreparation.files.map(f => f.originalName).join(' · ')}</p>
+        <blockquote>{ctrl.recoveredPreparation.text}</blockquote>
+        <p>Model: {ctrl.recoveredPreparation.modelId}. We’ll check the saved files, finish preparation and send this message to its original chat only when everything is ready. No new upload is needed.</p>
+        <div className={styles.ocrRecoveryActions}>
+          <button type="button" onClick={() => void ctrl.resumePreparation()}>Continue and send</button>
+          <button type="button" onClick={ctrl.discardPreparation}>Dismiss saved draft</button>
+        </div>
+      </section>}
       {ctrl.fileWarnings.length > 0 && <div className={styles.filePreparation} role="status">
         <span>ⓘ Text recognition may be inaccurate for {ctrl.fileWarnings.join(", ")}. Check names, numbers and important details against the original.</span>
         <button type="button" onClick={ctrl.dismissFileWarnings}>Dismiss</button>

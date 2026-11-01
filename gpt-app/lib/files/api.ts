@@ -1,3 +1,4 @@
+import { readBackgroundPreparation } from './backgroundPreparation';
 import { readFileLimits } from './limits';
 import { readArchivePreview, type ArchivePreview } from './archive';
 import { readOcrPreview } from './ocr';
@@ -54,4 +55,16 @@ export async function loadFileLimits(modelId: string, signal: AbortSignal) {
     if (signal.aborted) throw error;
     throw new Error('Could not confirm current file limits for this model. Retry in Add files → ⓘ; your draft is kept.');
   }
+}
+
+export async function getPreparation(id: string, modelId: string, signal: AbortSignal) {
+  const res = await axiosInstance.get(route(id, '/preparation'), { params: { modelId }, signal, timeout: 15000 });
+  return readBackgroundPreparation(res.data);
+}
+export async function startPreparation(id: string, modelId: string, retry: boolean, signal: AbortSignal) {
+  const res = await axiosInstance.post(route(id, '/preparation'), { modelId, retry }, { signal, timeout: 15000 });
+  return readBackgroundPreparation(res.data);
+}
+export async function cancelPreparation(id: string) {
+  await axiosInstance.delete(route(id, '/preparation'), { timeout: 15000 });
 }

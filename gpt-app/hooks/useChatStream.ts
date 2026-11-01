@@ -1,7 +1,9 @@
 "use client";
 
-import { loadFileLimits } from "@/lib/files/api";
-import { validateServerFiles } from "@/lib/files/limits";
+import { loadFileLimits, getPreparation, startPreparation, cancelPreparation } from "@/lib/files/api";
+import { prepareInBackground } from "@/lib/files/backgroundPreparation";
+import { preparationDraftKey, encodePreparationDraft, readPreparationDraft, type PreparationDraft } from "@/lib/files/preparationDraft";
+import { validateServerFiles, usesBackgroundOcr, type FileLimits } from "@/lib/files/limits";
 import { selectUser } from "@/redux/auth/selectors";
 import { AttachmentPreparation, preparationErrorMessage, type PreparationProgress } from "@/lib/files/preparation";
 
@@ -72,6 +74,7 @@ export type SendChatMessageArgs = {
   text: string;
   imageUrls: string[];
   imageFiles: File[];
+  restoredPreparation?: PreparationDraft;
 };
 
 export type ChatStream = {
@@ -82,6 +85,10 @@ export type ChatStream = {
   balanceNotice: BalanceNotice | null;
   dismissBalanceNotice: () => void;
   fileProgress: PreparationProgress | null;
+  recoveredPreparation: PreparationDraft | null;
+  resumePreparation: () => Promise<boolean>;
+  discardPreparation: () => void;
+  stopPreparation: () => Promise<void>;
   fileWarnings: string[];
   dismissFileWarnings: () => void;
   streamError: string | null;
@@ -104,6 +111,10 @@ export function useChatStream(): ChatStream {
   const { socket } = useSocket();
 
   const userId = useAppSelector(selectUser)?.id;
+  const [recoveredState, setRecoveredState] = useState<PreparationDraft | null>(null);
+  const recoveredPreparation = recoveredState?.owner === userId ? recoveredState : null;
+  const cancellingPreparation = useRef(false);
+  const activePreparationId = useRef<string | null>(null);
   const preparationRef = useRef(new AttachmentPreparation());
   const preparationAbortRef = useRef<AbortController | null>(null);
   const [fileProgress, setFileProgress] = useState<PreparationProgress | null>(null);
@@ -112,6 +123,9 @@ export function useChatStream(): ChatStream {
   const dismissFileWarnings = useCallback(() => setWarningState({names: []}), []);
   useEffect(() => {
     preparationRef.current = new AttachmentPreparation();
+    if (userId) {
+      try { setRecoveredState(readPreparationDraft(sessionStorage.getItem(preparationDraftKey(userId)), userId)); } catch { setRecoveredState(null); }
+    } else setRecoveredState(null);
     return () => { preparationAbortRef.current?.abort(); };
   }, [userId]);
 
@@ -603,7 +617,9 @@ export function useChatStream(): ChatStream {
       text,
       imageUrls,
       imageFiles,
+      restoredPreparation,
     }: SendChatMessageArgs) => {
+      if (cancellingPreparation.current || (restoredPreparation && restoredPreparation.owner !== userId)) return false;
       const localFileFingerprints = fingerprintLocalFiles(imageFiles);
       const existingDelivery = Object.values(pendingTurnsRef.current).find(
         (turn) =>
@@ -645,14 +661,46 @@ export function useChatStream(): ChatStream {
       setStreamError(null);
       setWarningState({owner: userId, names: []});
       let preparing = true;
+      const clientMessageId = restoredPreparation?.clientMessageId ?? createClientMessageId();
       try {
-        if (imageFiles.length) {
+        let limits: FileLimits | null = null;
+        if (imageFiles.length || restoredPreparation) {
           // Revalidate the selected model immediately before upload, including retries.
-          const limits = await loadFileLimits(modelId, controller.signal);
-          const invalid = validateServerFiles(imageFiles, limits);
+          limits = await loadFileLimits(modelId, controller.signal);
+          const invalid = validateServerFiles(restoredPreparation ? restoredPreparation.files.map(f => ({name: f.originalName, size: f.size})) : imageFiles, limits);
           if (invalid) throw new Error(invalid);
         }
-        const files = await preparationRef.current.run(imageFiles, modelId, {
+        const useBackground = usesBackgroundOcr(limits);
+        let files;
+        if (useBackground || restoredPreparation) {
+          files = restoredPreparation?.files ?? await preparationRef.current.uploadAll(imageFiles,
+            file => api.uploadFile(file, controller.signal).then(r => r.file), controller.signal, setFileProgress);
+          if (userId && files.length) {
+            const checkpoint = {clientMessageId, owner: userId, conversationId, modelId, text, files, createdAt: restoredPreparation?.createdAt ?? Date.now()};
+            try { sessionStorage.setItem(preparationDraftKey(userId), encodePreparationDraft(checkpoint)); }
+            catch { setStreamError('Your browser could not save recovery information. Keep this tab open until preparation finishes.'); }
+          }
+          for (const [index, file] of files.entries()) {
+            controller.signal.throwIfAborted();
+            const isZip = /\.zip$/i.test(file.originalName);
+            const isOcr = file.mimetype === 'application/pdf' || ['image/png', 'image/jpeg', 'image/webp'].includes(file.mimetype);
+            if (!file.fileId || (!isZip && !isOcr)) continue;
+            const progress = (phase: PreparationProgress['phase']) => setFileProgress({phase, name: file.originalName, index: index + 1, total: files.length});
+            progress(isZip ? 'unpacking' : 'recognizing');
+            activePreparationId.current = useBackground && isOcr ? file.fileId : null;
+            const id = file.fileId;
+            const result = useBackground && isOcr
+              ? await prepareInBackground({
+                get: () => getPreparation(id, modelId, controller.signal),
+                start: retry => startPreparation(id, modelId, retry, controller.signal),
+                progress, signal: controller.signal,
+              })
+              : await api.prepareFile(id, modelId, controller.signal);
+            controller.signal.throwIfAborted();
+            activePreparationId.current = null;
+            if (result.status === 'ready' && result.uncertain) setWarningState(current => ({owner: userId, names: [...current.names, file.originalName]}));
+          }
+        } else files = await preparationRef.current.run(imageFiles, modelId, {
           upload: (file) => api.uploadFile(file, controller.signal).then(response => response.file),
           prepare: (id, model) => api.prepareFile(id, model, controller.signal),
           progress: setFileProgress,
@@ -662,7 +710,6 @@ export function useChatStream(): ChatStream {
         controller.signal.throwIfAborted();
         setFileProgress(null);
         preparing = false;
-        const clientMessageId = createClientMessageId();
         const turn: PendingChatTurn = {
           clientMessageId,
           turnId: null,
@@ -684,6 +731,8 @@ export function useChatStream(): ChatStream {
         };
         sequenceRef.current.set(clientMessageId, { attempt: 1, lastSeq: 0 });
         dispatch(registerPendingTurn({ turn, images: imageUrls }));
+        if (userId) { try { sessionStorage.removeItem(preparationDraftKey(userId)); } catch { /* storage can be disabled */ } }
+        setRecoveredState(null);
         return await deliverPendingTurn(turn);
       } catch (error) {
         if (!controller.signal.aborted) {
@@ -694,12 +743,34 @@ export function useChatStream(): ChatStream {
       } finally {
         if (preparationAbortRef.current === controller) {
           preparationAbortRef.current = null;
+          activePreparationId.current = null;
           setFileProgress(null);
         }
       }
     },
     [deliverPendingTurn, dispatch, handleLocalError, userId],
   );
+
+  const stopPreparation = useCallback(async () => {
+    if (cancellingPreparation.current) return;
+    cancellingPreparation.current = true;
+    const id = activePreparationId.current;
+    preparationAbortRef.current?.abort();
+    if (id) {
+      try { await cancelPreparation(id); setStreamError('Sending stopped and recognition cancellation requested. Your draft and uploaded files are kept.'); }
+      catch { setStreamError('Stopped waiting, but server cancellation could not be confirmed. The saved job may still finish; send again to check it.'); }
+    } else setStreamError('Sending stopped. Your draft is kept.');
+    cancellingPreparation.current = false;
+  }, []);
+  const discardPreparation = useCallback(() => {
+    if (userId) { try { sessionStorage.removeItem(preparationDraftKey(userId)); } catch { /* storage can be disabled */ } }
+    setRecoveredState(null);
+  }, [userId]);
+  const resumePreparation = useCallback(async () => {
+    if (!recoveredPreparation) return false;
+    return sendMessage({conversationId: recoveredPreparation.conversationId, modelId: recoveredPreparation.modelId,
+      text: recoveredPreparation.text, imageUrls: [], imageFiles: [], restoredPreparation: recoveredPreparation});
+  }, [recoveredPreparation, sendMessage]);
 
   const retryLastMessage = useCallback(
     async (chatId: string) => {
@@ -796,6 +867,7 @@ export function useChatStream(): ChatStream {
     balanceNotice,
     dismissBalanceNotice,
     fileProgress,
+    recoveredPreparation, resumePreparation, discardPreparation, stopPreparation,
     fileWarnings,
     dismissFileWarnings,
     streamError,
