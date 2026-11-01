@@ -13,10 +13,12 @@ import ProjectPickerModal from "@/components/HomePage/LeftSide/ProjectPickerModa
 import ChatBubbleIcon from "@/components/common/ChatBubbleIcon";
 import type { Chat } from "@/types/types";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { updateConversationPin } from "@/redux/chat/operations";
+import { updateProjectConversationPin } from "@/redux/projects/operations";
 import { setIsCreateProjectModalOpen } from "@/redux/ui/slice";
 import { selectProjectList } from "@/redux/projects/selectors";
 import { useChatProjectMove } from "@/hooks/useChatProjectMove";
+
+import { sortProjectChats } from "@/lib/projects/projectChatOrder";
 
 import styles from "./ProjectWorkspace.module.css";
 
@@ -267,16 +269,12 @@ export default function ProjectWorkspace({
     const chat = chats.find((item) => item.id === id);
     if (chat) {
       void dispatch(
-        updateConversationPin({ id, pinned: !Boolean(chat.pinnedAt) }),
+        updateProjectConversationPin({ projectId, conversationId: id, pinned: !Boolean(chat.projectPinnedAt) }),
       );
     }
   };
 
-  const pinnedChats = chats.filter((chat) => chat.pinnedAt);
-  const sortedChats = [
-    ...pinnedChats,
-    ...chats.filter((chat) => !chat.pinnedAt),
-  ];
+  const sortedChats = sortProjectChats(chats);
 
   const openChatAction = (action: ChatAction, chatId: string) => {
     setChatAction({ action, chatId });
@@ -416,7 +414,7 @@ export default function ProjectWorkspace({
             const preview = getChatPreview(chat);
             const updated = formatRelativeTime(chat.lastMessageAt);
             const created = formatCreatedDate(chat.createdAt);
-            const isPinned = Boolean(chat.pinnedAt);
+            const isPinned = Boolean(chat.projectPinnedAt);
 
             return (
               <li
@@ -525,7 +523,8 @@ export default function ProjectWorkspace({
                   >
                     <ChatsMenu
                       onClose={() => setOpenMenuChatId(null)}
-                      isPinned={Boolean(chat.pinnedAt)}
+                      pinScope="project"
+                      isPinned={Boolean(chat.projectPinnedAt)}
                       onPinToggle={() => {
                         togglePinChat(chat.id);
                         setOpenMenuChatId(null);

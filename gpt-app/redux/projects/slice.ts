@@ -10,6 +10,7 @@ import {
   addProjectConversations,
   removeProjectConversation,
   updateProjectPin,
+  updateProjectConversationPin,
 } from "./operations";
 import { logoutUser, refreshUser } from "../auth/operations";
 import { refreshError } from "../auth/slice";
@@ -108,6 +109,25 @@ const projectsSlice = createSlice({
           );
           if (conversation) conversation.pinnedAt = payload.pinnedAt ?? null;
         }
+      })
+      .addCase(updateProjectConversationPin.pending, (state, { meta }) => {
+        state.pinMutations[`chat:${meta.arg.projectId}:${meta.arg.conversationId}`] = meta.requestId;
+      })
+      .addCase(updateProjectConversationPin.fulfilled, (state, { payload, meta }) => {
+        const key = `chat:${meta.arg.projectId}:${meta.arg.conversationId}`;
+        if (state.pinMutations[key] !== meta.requestId) return;
+        const project = state.list.find((item) => item.id === meta.arg.projectId);
+        const chat = project?.conversationIds?.find((item) => item._id === meta.arg.conversationId);
+        if (chat && payload.projectId === meta.arg.projectId && payload.conversationId === meta.arg.conversationId) {
+          chat.projectPinnedAt = payload.projectPinnedAt;
+        }
+        delete state.pinMutations[key];
+      })
+      .addCase(updateProjectConversationPin.rejected, (state, { payload, meta }) => {
+        const key = `chat:${meta.arg.projectId}:${meta.arg.conversationId}`;
+        if (state.pinMutations[key] !== meta.requestId) return;
+        delete state.pinMutations[key];
+        state.error = payload ?? "Failed to update project chat pin";
       })
       .addCase(fetchProject.fulfilled, (state, { payload }) => {
         const i = state.list.findIndex((p) => p.id === payload.id);

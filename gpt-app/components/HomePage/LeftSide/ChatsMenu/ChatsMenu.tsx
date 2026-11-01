@@ -9,6 +9,7 @@ type ItemMenuProps = {
   onClose?: () => void;
   isPinned?: boolean;
   onPinToggle?: () => void;
+  pinScope?: "global" | "project";
   showPinToggle?: boolean;
   isProject?: boolean;
   showCreateProject?: boolean;
@@ -25,6 +26,7 @@ type ItemMenuProps = {
 export default function ChatsMenu({
   isPinned,
   onPinToggle,
+  pinScope = "global",
   showPinToggle = true,
   isProject = false,
   showCreateProject = false,
@@ -73,7 +75,9 @@ export default function ChatsMenu({
             iconHeight={17}
             label={isPinned ? "Unpin" : "Pin to top"}
             subtitle={
-              isPinned
+              pinScope === "project"
+                ? isPinned ? "Return to the project’s normal order" : "Keep this chat first in this project"
+                : isPinned
                 ? `Return this ${entity} to the normal order`
                 : isProject
                   ? "Keep this project first in Projects"

@@ -44,6 +44,7 @@ export function useProjectChats() {
           createdAt: conv.createdAt ?? loaded?.createdAt,
           messages: loaded?.messages ?? [],
           messagesStatus: loaded?.messagesStatus ?? "idle",
+          projectPinnedAt: conv.projectPinnedAt ?? null,
           pinnedAt: conv.pinnedAt ?? loaded?.pinnedAt ?? null,
         };
       }),

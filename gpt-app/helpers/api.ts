@@ -120,6 +120,12 @@ export const api = {
     );
     return res.data;
   },
+  updateProjectConversationPin: async (projectId: string, conversationId: string, pinned: boolean) => {
+    const res = await axiosInstance.patch<{ projectId: string; conversationId: string; projectPinnedAt: string | null }>(
+      `/project/${projectId}/conversations/${conversationId}/pin`, { pinned },
+    );
+    return res.data;
+  },
   getConversationMessages: async (id: string, signal?: AbortSignal) => {
     const res = await axiosInstance.get<ConversationMessage[]>(
       `/conversations/${id}/messages`,
