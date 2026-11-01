@@ -1,3 +1,4 @@
+import { readComputation } from "../../lib/computation/status";
 import { readWebSources } from "../../lib/web/sources";
 import { readFiles, readFileResult } from "@/lib/files/types";
 import { createSlice, isAnyOf, type PayloadAction } from "@reduxjs/toolkit";
@@ -146,6 +147,8 @@ const reconcileSnapshot = (state: ChatState, snapshot: ChatTurnSnapshot) => {
     content: completedMessage?.content ?? snapshot.partialContent,
     attachments: completedMessage?.attachments ?? [],
     fileResult: completedMessage?.fileResult ?? null,
+    computation: completedMessage?.computation ?? null,
+    computationStatus: snapshot.status === "processing" ? snapshot.computationStatus : null,
     webSources: completedMessage?.webSources ?? [],
     webStatus: snapshot.status === "processing" ? snapshot.webStatus : null,
     modelId: completedMessage?.modelId ?? existingAssistant?.modelId ?? turn.modelId,
@@ -390,6 +393,8 @@ const chatSlice = createSlice({
           content: dto.content,
           attachments: dto.attachments ?? [],
           fileResult: dto.fileResult ?? null,
+          computation: dto.computation ?? null,
+          computationStatus: null,
           webSources: dto.webSources ?? [],
           webStatus: null,
           modelId: dto.modelId,
@@ -586,6 +591,8 @@ const chatSlice = createSlice({
           content: message.content,
           attachments: readFiles(message.attachments),
           fileResult: readFileResult(message.fileResult),
+          computation: readComputation(message.computation),
+          computationStatus: null,
           webSources: readWebSources(message.webSources),
           images: undefined,
           tokens: message.tokens,

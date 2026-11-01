@@ -437,12 +437,12 @@ export function useChatStream(): ChatStream {
     [applySnapshot, dispatch, emitSendAttempt, showProtocolError],
   );
 
-  // Browser planning has no text stream. Poll snapshots, never resend requests.
+  // Tools may start after a text preamble. Poll active snapshots, never resend requests.
   useEffect(() => {
     const timer = setInterval(() => {
       if (!socket?.connected || document.visibilityState === "hidden") return;
       for (const turn of Object.values(pendingTurnsRef.current)) {
-        if (turn.turnId && ["queued", "processing"].includes(turn.status) && !turn.partialContent && turn.lastAppliedSeq === 0) void requestTurnStatus(turn.turnId, true);
+        if (turn.turnId && ["queued", "processing"].includes(turn.status)) void requestTurnStatus(turn.turnId, true);
       }
     }, 4000);
     return () => clearInterval(timer);

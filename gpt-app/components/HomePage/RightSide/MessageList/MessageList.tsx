@@ -1,3 +1,4 @@
+import { ComputationProgress } from "@/components/Computation/Computation";
 import { WebProgress } from "@/components/Web/WebSources";
 import { FileCards } from "@/components/Files/FileWorkspace";
 import { useEffect, useRef, useState } from "react";
@@ -191,13 +192,15 @@ export default function MessageList({
         return (
           <div key={key} className={styles.aiMessage}>
             {isWaiting ? (
-              message.webStatus ? <WebProgress status={message.webStatus} /> : <TypingPlaceholder />
+              message.computationStatus ? <ComputationProgress status={message.computationStatus} /> : message.webStatus ? <WebProgress status={message.webStatus} /> : <TypingPlaceholder />
             ) : (
               <>
-                {(message.content || message.attachments?.length || message.fileResult) && (
+                {message.streaming && message.computationStatus && <ComputationProgress status={message.computationStatus} />}
+                {(message.content || message.attachments?.length || message.fileResult || message.computation) && (
                   <AIResponse
                     attachments={message.attachments}
                     fileResult={message.fileResult}
+                    computation={message.computation}
                     webSources={message.webSources}
                     content={message.content}
                     modelId={message.modelId}
