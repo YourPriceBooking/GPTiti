@@ -117,6 +117,8 @@ export default function InputBar({
   sendDisabled?: boolean;
 }) {
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
+  // Guests must be able to reach the sign-in gate without a ready chat/session.
+  const chatPreparing = isLoggedIn && sendDisabled;
   const userId = useAppSelector(selectUser)?.id;
   const fileLimits = useFileLimits(selectedModel, isLoggedIn ? userId : undefined);
   const activeChatId = useAppSelector(selectActiveChatId);
@@ -433,7 +435,7 @@ export default function InputBar({
   };
 
   const handleSend = async () => {
-    if (isComingSoon || sendDisabled || isSendingRef.current || preparingRef.current || isAiResponding)
+    if (isComingSoon || chatPreparing || isSendingRef.current || preparingRef.current || isAiResponding)
       return;
     const textarea = inputRef.current;
     if (textarea) {
@@ -441,15 +443,15 @@ export default function InputBar({
       const hasContent =
         message.trim() !== "" || images.length > 0 || files.length > 0;
       if (hasContent) {
+        if (!isLoggedIn) {
+          setIsLoginOpen(true);
+          return;
+        }
         if (
           limits.maxTextChars !== null &&
           message.length > limits.maxTextChars
         ) {
           openLimitError("textLength");
-          return;
-        }
-        if (!isLoggedIn) {
-          setIsLoginOpen(true);
           return;
         }
         const attachmentFiles = [...images.map(image => image.file), ...files.map(item => item.file)];
@@ -526,7 +528,7 @@ export default function InputBar({
   const finishDictation = async (action: "edit" | "send") => {
     if (
       voiceActionRef.current.busy ||
-      (action === "send" && (sendDisabled || isAiResponding))
+      (action === "send" && (chatPreparing || isAiResponding))
     )
       return;
     const textarea = inputRef.current;
@@ -846,7 +848,7 @@ export default function InputBar({
               disabled={
                 dictation.phase === "stopping" ||
                 dictation.phase === "transcribing" ||
-                sendDisabled ||
+                chatPreparing ||
                 isAiResponding ||
                 isSending
               }
@@ -909,7 +911,7 @@ export default function InputBar({
             <button
               type="button"
               className={`${styles.iconWrapper2} ${styles.controlButton}`}
-              disabled={sendDisabled || voiceBusy || isPreparing}
+              disabled={chatPreparing || voiceBusy || isPreparing}
               aria-label="Send message"
               onPointerEnter={(event) =>
                 fitInputTooltipToViewport(event.currentTarget)
@@ -933,7 +935,7 @@ export default function InputBar({
                 data-input-tooltip
                 role="tooltip"
               >
-                {sendDisabled ? "Preparing chat..." : "Send message"}
+                {!isLoggedIn ? "Sign in to send message" : chatPreparing ? "Preparing chat..." : "Send message"}
               </span>
             </button>
           ) : null}
