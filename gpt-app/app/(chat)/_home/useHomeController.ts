@@ -2,6 +2,7 @@
 
 import { useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { composerIdentity, isUnsentPromotedDraft } from "@/lib/chat/composerIdentity";
 
 import { useModelMode } from "@/hooks/useModelMode";
 import { useScrollDirection } from "@/hooks/useScrollDirection";
@@ -197,7 +198,8 @@ export function useHomeController() {
   const activeChatLoading =
     activeChatMessagesStatus === "idle" ||
     activeChatMessagesStatus === "loading";
-  const isNewChat = !activeChatLoading && isDraftId(activeChatId);
+  const composerKey = composerIdentity(activeChat);
+  const isNewChat = !activeChatLoading && (isDraftId(activeChatId) || isUnsentPromotedDraft(activeChat));
   const isExistingChat = !!activeChat;
   const dockHidden = (isSectionVisible && focusMode) || isOverlayOpen;
 
@@ -210,7 +212,7 @@ export function useHomeController() {
   useEffect(() => {
     dispatch(setIsSectionVisible(activeChatMessageCount === 0));
     dispatch(setFocusMode(false));
-  }, [activeChatId, activeChatMessageCount, dispatch]);
+  }, [composerKey, activeChatMessageCount, dispatch]);
 
   useEffect(() => {
     if (restoringActiveChat || activeChatMessageCount === 0) return;
