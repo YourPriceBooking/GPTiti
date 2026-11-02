@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { composerIdentity } from "@/lib/chat/composerIdentity";
 
 import FileWorkspace from "@/components/Files/FileWorkspace";
 import BalanceNoticeModal from "@/components/BalanceNotice/BalanceNoticeModal";
@@ -108,7 +109,7 @@ export default function ChatView({
   </>;
 
   return (
-    <FileWorkspace key={activeChat?.id ?? "new"}>
+    <FileWorkspace key={composerIdentity(activeChat)}>
       {ctrl.balanceNotice && (
         <BalanceNoticeModal
           notice={ctrl.balanceNotice}
