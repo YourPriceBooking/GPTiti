@@ -1,4 +1,5 @@
 import { readComputation } from "../../lib/computation/status";
+import { historyAppTokens } from "../../lib/chat/historyBilling";
 import { readWebSources } from "../../lib/web/sources";
 import { readFiles, readFileResult } from "@/lib/files/types";
 import { createSlice, isAnyOf, type PayloadAction } from "@reduxjs/toolkit";
@@ -154,7 +155,6 @@ const reconcileSnapshot = (state: ChatState, snapshot: ChatTurnSnapshot) => {
     modelId: completedMessage?.modelId ?? existingAssistant?.modelId ?? turn.modelId,
     tokens:
       snapshot.billing?.appTokensSpent ??
-      completedMessage?.tokens ??
       existingAssistant?.tokens,
     updatedAt: completedMessage?.updatedAt ?? snapshot.updatedAt,
     streaming: !isCompleted && !isFailed,
@@ -271,6 +271,7 @@ const chatSlice = createSlice({
     ) {
       const chat = state.chatList.find((item) => item.id === payload.draftId);
       if (!chat) return;
+      chat.composerKey ??= payload.draftId;
       chat.id = payload.realId;
       if (payload.title) chat.title = payload.title;
       if (payload.modelId) chat.modelId = payload.modelId;
@@ -595,7 +596,7 @@ const chatSlice = createSlice({
           computationStatus: null,
           webSources: readWebSources(message.webSources),
           images: undefined,
-          tokens: message.tokens,
+          tokens: historyAppTokens(message),
           modelId: message.modelId,
           updatedAt: message.updatedAt ?? message.createdAt,
           clientMessageId: message.clientMessageId ?? undefined,
