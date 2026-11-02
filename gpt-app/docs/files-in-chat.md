@@ -117,3 +117,14 @@ Manual acceptance:
 7. Sign out/in as another account: previous account's recovery card must not appear.
 
 Limits are unchanged: this PR does not increase OCR page caps or implement per-page backend checkpoints.
+# OCR cancellation and history billing regression checks
+
+Cancel during preparation must leave the prompt and attachments in the composer. Promoting a new local draft to a server conversation preserves the composer identity and placement until the first message is admitted. Retry uses the same File objects and the session upload cache; switching to another chat still remounts the editor.
+
+History `tokens` counts provider output tokens and must not be displayed as TITI. Use `billing.appTokensSpent`, with `meta.appTokens` as a compatibility fallback for the existing conversation endpoint. Unknown legacy charges stay hidden, and a settled zero is displayed as zero. Backend patch 34 exposes this field consistently on both history endpoints without changing billing or migrating data.
+
+Manual acceptance:
+- New chat → attach a scanned PDF → type a prompt → Send → Cancel during recognition. Prompt, attachment and Send remain available.
+- Send again: no second POST /files; preparation checks/retries the same fileId. No model turn is submitted while preparation is cancelled.
+- Repeat in an existing chat and after reopening the browser recovery card. Changing chats must not carry a draft into another chat.
+- Complete a request and compare Used before/after F5 against the saved charge, including a zero-charge response. It must not show the provider completion-token count.
