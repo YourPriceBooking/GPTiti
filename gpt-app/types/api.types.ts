@@ -35,6 +35,8 @@ export interface Conversation {
 }
 
 export interface ConversationMessage {
+  billing?: { appTokensSpent: number } | null;
+  meta?: { appTokens?: number };
   attachments?: import("@/lib/files/types").ManagedFile[];
   computation?: import("@/lib/computation/status").Computation | null;
   webSources?: import("@/lib/web/sources").WebSource[];
