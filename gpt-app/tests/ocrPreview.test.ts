@@ -11,11 +11,18 @@ test('OCR preview preserves numbers, markup, Unicode and page order exactly', ()
   assert.equal(ocrSections('plain image text')[0].text, 'plain image text');
 });
 test('OCR preview rejects malformed, oversized and mismatched payloads', () => {
-  for (const patch of [{ textBytes: 1 }, { version: 7 }, { ocrPages: -1 }, { uncertain: 'yes' }, { text: 'я'.repeat(40000), textBytes: 80000 }]) {
+  for (const patch of [{ textBytes: 1 }, { version: 7 }, { ocrPages: -1 }, { uncertain: 'yes' }, { text: 'я'.repeat(524289), textBytes: 1048578 }]) {
     assert.throws(() => readOcrPreview({ ...valid, ...patch }));
   }
 });
 test('missing recognition is actionable without starting OCR', () => {
   assert.match(ocrError({ response: { status: 409 } })!, /does not start recognition/);
   assert.equal(ocrError({ response: { status: 404 } }), null);
+});
+
+test('large saved OCR remains byte-identical for preview and copy across all pages', () => {
+  const large=Array.from({length:100},(_,i)=>`[PDF PAGE ${i+1} OF 100 — ${i<30?'OCR':'TEXT'}]\n`+'Код CANCEL-01 02.11.2026 137,50 грн\n'.repeat(30)).join('');
+  const preview=readOcrPreview({...valid,text:large,textBytes:new TextEncoder().encode(large).length,ocrPages:30});
+  assert.equal(ocrSections(preview.text).length,100);
+  assert.equal(ocrSections(preview.text).map(s=>s.text).join(''),large);
 });

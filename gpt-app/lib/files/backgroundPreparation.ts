@@ -1,8 +1,19 @@
-import { readFilePreparation, preparationErrorMessage, type FilePreparation } from './preparation';
+import { readFilePreparation, preparationErrorMessage, type FilePreparation, type PageProgress } from './preparation';
 
 export type BackgroundPreparation = FilePreparation | { status: 'not_started' } |
-  { status: 'queued' | 'running'; attempts: number; pollAfterMs: number } |
-  { status: 'failed' | 'cancelled'; attempts: number; retryable: boolean; error?: string };
+  { status: 'queued' | 'running'; attempts: number; pollAfterMs: number; progress?: PageProgress } |
+  { status: 'failed' | 'cancelled'; attempts: number; retryable: boolean; error?: string; progress?: PageProgress };
+function readPageProgress(value: unknown): PageProgress | undefined {
+  if (value === undefined) return undefined;
+  const p = value as PageProgress | null;
+  if (!p || !Number.isSafeInteger(p.totalPages) || p.totalPages < 1 || p.totalPages > 100 ||
+    !Number.isSafeInteger(p.completedPages) || p.completedPages < 0 || p.completedPages > p.totalPages ||
+    !Number.isSafeInteger(p.ocrPages) || p.ocrPages < 0 || p.ocrPages > Math.min(30, p.totalPages) ||
+    (p.failedPage !== null && (!Number.isSafeInteger(p.failedPage) || p.failedPage < 1 || p.failedPage > p.totalPages))) {
+    throw new Error('Invalid page preparation progress. Retry to check the saved job.');
+  }
+  return { completedPages: p.completedPages, totalPages: p.totalPages, ocrPages: p.ocrPages, failedPage: p.failedPage };
+}
 export function readBackgroundPreparation(value: unknown): BackgroundPreparation {
   const data = value as { success?: unknown; processing?: Record<string, unknown> } | null;
   const p = data?.processing;
@@ -11,13 +22,14 @@ export function readBackgroundPreparation(value: unknown): BackgroundPreparation
   if (p.status === 'not_started') return { status: 'not_started' };
   if (p.method !== 'local_ocr' || !Number.isInteger(p.attempts) || Number(p.attempts) < 0 || Number(p.attempts) > 3) throw new Error('Invalid preparation status.');
   const attempts = Number(p.attempts);
+  const progress = readPageProgress(p.progress);
   if (p.status === 'queued' || p.status === 'running') {
     if (!Number.isInteger(p.pollAfterMs) || Number(p.pollAfterMs) < 2000 || Number(p.pollAfterMs) > 30000) throw new Error('Invalid preparation polling interval.');
-    return { status: p.status, attempts, pollAfterMs: Number(p.pollAfterMs) };
+    return { status: p.status, attempts, pollAfterMs: Number(p.pollAfterMs), progress };
   }
   if ((p.status === 'failed' || p.status === 'cancelled') && typeof p.retryable === 'boolean' &&
     (p.status === 'cancelled' || (typeof p.error === 'string' && /^[A-Z_]{1,80}$/.test(p.error)))) {
-    return { status: p.status, attempts, retryable: p.retryable && attempts < 3, error: p.error as string | undefined };
+    return { status: p.status, attempts, retryable: p.retryable && attempts < 3, error: p.error as string | undefined, progress };
   }
   throw new Error('Invalid preparation status.');
 }
@@ -32,7 +44,7 @@ export function waitForPoll(ms: number, signal: AbortSignal): Promise<void> {
 export async function prepareInBackground(deps: {
   get: () => Promise<BackgroundPreparation>;
   start: (retry: boolean) => Promise<BackgroundPreparation>;
-  progress: (phase: 'queued' | 'recognizing') => void;
+  progress: (phase: 'queued' | 'recognizing', pages?: PageProgress) => void;
   signal: AbortSignal;
   wait?: typeof waitForPoll;
 }): Promise<FilePreparation> {
@@ -44,7 +56,7 @@ export async function prepareInBackground(deps: {
   let polls = 0;
   while (state.status === 'queued' || state.status === 'running') {
     deps.signal.throwIfAborted();
-    deps.progress(state.status === 'queued' ? 'queued' : 'recognizing');
+    deps.progress(state.status === 'queued' ? 'queued' : 'recognizing', state.progress);
     if (++polls > 450) throw new Error('Preparation is still pending on the server. Your files are saved; continue later to check again.');
     await (deps.wait ?? waitForPoll)(state.pollAfterMs, deps.signal);
     deps.signal.throwIfAborted();
@@ -53,9 +65,10 @@ export async function prepareInBackground(deps: {
   deps.signal.throwIfAborted();
   if (state.status === 'ready' || state.status === 'not_required') return state;
   if (state.status === 'failed') {
+    const saved = state.progress ? ` ${state.progress.completedPages} of ${state.progress.totalPages} pages are saved.` : '';
     const message = preparationErrorMessage({ response: { data: { error: state.error } } });
-    throw new Error(message + (state.retryable ? ' Send again to retry without uploading again.' : ' Automatic retries are unavailable. Choose another file or contact support.'));
+    throw new Error(message + saved + (state.retryable ? ' Send again to retry without uploading again.' : ' Automatic retries are unavailable. Choose another file or contact support.'));
   }
-  if (state.status === 'cancelled') throw new Error(state.retryable ? 'Recognition was cancelled. Send again to restart using the saved file.' : 'Recognition was cancelled and the retry limit was reached.');
+  if (state.status === 'cancelled') throw new Error(state.retryable ? 'Recognition was cancelled. Send again to continue using the saved file.' : 'Recognition was cancelled and the retry limit was reached.');
   throw new Error('Preparation needs to be restarted. Send again to check the saved file.');
 }

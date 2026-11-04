@@ -27,10 +27,10 @@ export const OCR_ERROR_MESSAGES = {
   MODEL_NOT_AVAILABLE: 'This model is no longer available. Choose another model before sending.',
   OCR_INPUT_DISABLED: 'Text recognition is disabled for this model. Choose another model or attach a text file.',
   OCR_UNAVAILABLE: 'Text recognition is temporarily unavailable. Try again later with the same attachment.',
-  OCR_FILE_TOO_LARGE: 'OCR accepts files up to 5 MiB. Split or resize this file.',
-  OCR_PAGE_LIMIT: 'A PDF can contain up to 10 pages that need OCR. Split the PDF.',
+  OCR_FILE_TOO_LARGE: 'This file exceeds the OCR size limit. Check Add files → ⓘ for the current PDF and image limits.',
+  OCR_PAGE_LIMIT: 'This PDF exceeds the number of pages allowed for OCR. Check Add files → ⓘ and split the PDF.',
   OCR_IMAGE_LIMIT: 'OCR images must have at most 16 million pixels and no side over 10,000 pixels. Resize the image.',
-  OCR_TEXT_TOO_LARGE: 'Recognized text exceeds 64 KiB per file. Split the document.',
+  OCR_TEXT_TOO_LARGE: 'Recognized text exceeds the processing limit. Check Add files → ⓘ and split the document.',
   OCR_NO_TEXT: 'No readable text was found in this PDF. Use a clearer scan or attach a text version.',
   OCR_INVALID_IMAGE: 'This image cannot be read. Use a valid, static PNG, JPG or WEBP.',
   OCR_FAILED: 'Text recognition failed. Try again, or use a clearer scan.',
@@ -51,8 +51,8 @@ export function readFilePreparation(value: unknown): FilePreparation {
   if (data?.success !== true || !p) throw new Error('Invalid file preparation response. Please try again.');
   if ((p.status as string) === 'not_required') return { status: 'not_required' };
   if (p.status !== 'ready' || !['local_ocr', 'zip'].includes(p.method ?? '') ||
-      !Number.isInteger(p.ocrPages) || p.ocrPages! < 0 || p.ocrPages! > 10 ||
-      !Number.isInteger(p.textBytes) || p.textBytes! < 0 || p.textBytes! > (p.method === 'zip' ? 131072 : 65536) ||
+      !Number.isInteger(p.ocrPages) || p.ocrPages! < 0 || p.ocrPages! > (p.method === 'zip' ? 10 : 30) ||
+      !Number.isInteger(p.textBytes) || p.textBytes! < 0 || p.textBytes! > (p.method === 'zip' ? 131072 : 1048576) ||
       !Array.isArray(p.scripts) || !p.scripts.every(s => typeof s === 'string') ||
       typeof p.uncertain !== 'boolean') throw new Error('Invalid file preparation response. Please try again.');
   return p as Extract<FilePreparation, {status: 'ready'}>;
@@ -67,7 +67,9 @@ export function preparationErrorMessage(error: unknown): string {
   return e?.response?.data?.message || e?.message || 'Could not prepare this attachment. Please try again.';
 }
 
-export type PreparationProgress = { phase: 'uploading' | 'recognizing' | 'unpacking' | 'queued'; name: string; index: number; total: number };
+export type PageProgress = { completedPages: number; totalPages: number; ocrPages: number; failedPage: number | null };
+
+export type PreparationProgress = { phase: 'uploading' | 'recognizing' | 'unpacking' | 'queued'; name: string; index: number; total: number; pages?: PageProgress };
 
 // File identity, not name/size, prevents reuse for different bytes. Weak keys release removed drafts.
 // This cache belongs to one signed-in session and never persists private IDs in browser storage.

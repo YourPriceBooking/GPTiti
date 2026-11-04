@@ -527,3 +527,11 @@
 .ocrRecoveryActions button { padding: 10px 14px; border-radius: 12px; border: 1px solid #cbd5e1; background: #fff; color: #405873; cursor: pointer; }
 .ocrRecoveryActions button:first-child { background: #e2f7ed; color: #176a43; border-color: #c7e9d9; }
 .ocrRecoveryActions button:focus-visible { outline: 2px solid #4788e8; outline-offset: 3px; }
+
+.filePreparationDetails { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1; }
+.filePreparationDetails strong { font-weight: 600; }
+.filePreparationDetails small { color: #536c66; font-size: 12px; }
+.filePreparationBar { display: block; width: 100%; height: 5px; margin: 4px 0; border: 0; border-radius: 999px; overflow: hidden; background: #dce7e5; accent-color: #3a7363; }
+.filePreparationBar::-webkit-progress-bar { background: #dce7e5; border-radius: 999px; }
+.filePreparationBar::-webkit-progress-value { background: #3a7363; border-radius: 999px; }
+.filePreparationBar::-moz-progress-bar { background: #3a7363; border-radius: 999px; }
