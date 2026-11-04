@@ -56,7 +56,7 @@ test('upload overrides cap readers and OCR independently caps image bytes', () =
 });
 test('background preparation is opt-in through a recognized server capability; old limits remain valid', () => {
   assert.equal(readFileLimits(fixture()).preparation,undefined);
-  for (const preparation of [{version:1,async:false,kinds:['ocr']},{version:2,async:true,kinds:['ocr']},{version:1,async:true,kinds:['zip']}]) {
+  for (const preparation of [{version:1,async:false,kinds:['ocr']},{version:3,async:true,kinds:['ocr']},{version:1,async:true,kinds:['zip']}]) {
     assert.equal(readFileLimits({...fixture(),preparation}).preparation?.async,false);
   }
   assert.equal(readFileLimits({...fixture(),preparation:{version:1,async:true,kinds:['ocr']}}).preparation?.async,true);
@@ -68,4 +68,26 @@ test('model OCR opt-out keeps the vision/text-layer legacy path even with the qu
   raw.processing.ocr.enabled=false;
   assert.equal(usesBackgroundOcr(readFileLimits(raw)),false);
   assert.equal(usesBackgroundOcr(readFileLimits(fixture())),false);
+});
+
+const pagedFixture = () => {
+  const raw = fixture();
+  return {...raw, preparation: {version:2,async:true,kinds:['ocr'],pageCheckpoints:true},
+    processing: {...raw.processing, ocr:{...raw.processing.ocr,maxBytes:25000000,maxOcrPages:30,maxPdfPages:100,maxTextBytes:1048576,imageMaxBytes:5242880}}};
+};
+test('patch 38 enables paged PDFs without raising image, aggregate or opt-out limits', () => {
+  const raw=pagedFixture(), limits=readFileLimits(raw);
+  assert.equal(usesBackgroundOcr(limits),true);
+  assert.equal(limits.preparation?.pageCheckpoints,true);
+  assert.equal(validateServerFiles([f('scan.pdf',25000000)],limits),null);
+  assert.ok(validateServerFiles([f('scan.pdf',25000001)],limits));
+  assert.equal(fileCeilings('scan.png',limits)?.reading,5242880);
+  assert.ok(validateServerFiles([f('scan.png',5242881)],limits));
+  assert.ok(validateServerFiles([f('a.pdf',15000000),f('b.pdf',15000000)],limits));
+  raw.processing.pdf.enabled=false;
+  assert.ok(validateServerFiles([f('scan.pdf',100)],readFileLimits(raw)));
+  raw.processing.pdf.enabled=true;raw.preparation.async=false;
+  assert.equal(fileCeilings('scan.pdf',readFileLimits(raw))?.reading,5242880);
+  raw.preparation.async=true;raw.processing.ocr.enabled=false;
+  assert.equal(fileCeilings('scan.pdf',readFileLimits(raw))?.reading,5242880);
 });

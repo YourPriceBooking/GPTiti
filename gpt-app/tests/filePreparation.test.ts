@@ -11,7 +11,7 @@ test('preparation rejects malformed success and uncertainty; accepts zero OCR pa
   assert.deepEqual(readFilePreparation({success: true, processing: ready}), ready);
   assert.deepEqual(readFilePreparation({success: true, processing: {status:'not_required'}}), {status:'not_required'});
   assert.equal(readFilePreparation({success: true, processing: {...ready, ocrPages: 0}}).status, 'ready');
-  for (const processing of [{...ready, uncertain: undefined}, {...ready, textBytes: Infinity}, {...ready, ocrPages: 11}, {...ready, scripts: [3]}, {status:'processing'}]) {
+  for (const processing of [{...ready, uncertain: undefined}, {...ready, textBytes: Infinity}, {...ready, ocrPages: 31}, {...ready, scripts: [3]}, {status:'processing'}]) {
     assert.throws(() => readFilePreparation({success: true, processing}));
   }
   assert.throws(() => readFilePreparation({success: false, processing: ready}));

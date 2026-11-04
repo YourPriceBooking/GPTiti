@@ -1,7 +1,7 @@
 export type OcrPreview = { kind: 'ocr'; text: string; version: number; textBytes: number; ocrPages: number; uncertain: boolean; legacy: boolean };
 export function readOcrPreview(value: unknown): OcrPreview {
   const v = value as Partial<OcrPreview> | null;
-  if (!v || v.kind !== 'ocr' || typeof v.text !== 'string' || new TextEncoder().encode(v.text).length > 65536 || ![2, 3].includes(v.version ?? 0) || typeof v.uncertain !== 'boolean' || typeof v.legacy !== 'boolean' || !Number.isInteger(v.ocrPages) || v.ocrPages! < 0 || v.ocrPages! > 10 || v.textBytes !== new TextEncoder().encode(v.text).length) throw new Error('Invalid recognized text response');
+  if (!v || v.kind !== 'ocr' || typeof v.text !== 'string' || new TextEncoder().encode(v.text).length > 1048576 || ![2, 3].includes(v.version ?? 0) || typeof v.uncertain !== 'boolean' || typeof v.legacy !== 'boolean' || !Number.isInteger(v.ocrPages) || v.ocrPages! < 0 || v.ocrPages! > 30 || v.textBytes !== new TextEncoder().encode(v.text).length) throw new Error('Invalid recognized text response');
   return v as OcrPreview;
 }
 // Presentation only. The raw string remains authoritative for copy/download.

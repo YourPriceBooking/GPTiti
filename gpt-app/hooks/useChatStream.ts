@@ -685,7 +685,7 @@ export function useChatStream(): ChatStream {
             const isZip = /\.zip$/i.test(file.originalName);
             const isOcr = file.mimetype === 'application/pdf' || ['image/png', 'image/jpeg', 'image/webp'].includes(file.mimetype);
             if (!file.fileId || (!isZip && !isOcr)) continue;
-            const progress = (phase: PreparationProgress['phase']) => setFileProgress({phase, name: file.originalName, index: index + 1, total: files.length});
+            const progress = (phase: PreparationProgress['phase'], pages?: PreparationProgress['pages']) => setFileProgress({phase, pages, name: file.originalName, index: index + 1, total: files.length});
             progress(isZip ? 'unpacking' : 'recognizing');
             activePreparationId.current = useBackground && isOcr ? file.fileId : null;
             const id = file.fileId;

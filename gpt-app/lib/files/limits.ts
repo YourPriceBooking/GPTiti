@@ -2,12 +2,12 @@ import { inputKind } from './input';
 type Reader = { enabled: boolean; maxBytes: number };
 export type FileLimits = {
   version: 1;
-  preparation?: { async: boolean };
+  preparation?: { async: boolean; pageCheckpoints: boolean };
   storage: { maxBytes: number; maxCount: number };
   upload: { maxBytes: number; types: Record<string, { extensions: string[]; maxBytes: number }> };
   message: { maxAttachments: number; maxBytes: number; extractedTextBytes: number };
   processing: { text: Reader; office: Reader; pdf: Reader;
-    ocr: Reader & { maxOcrPages: number; maxTextBytes: number };
+    ocr: Reader & { maxOcrPages: number; maxTextBytes: number; maxPdfPages?: number; imageMaxBytes?: number };
     zip: { enabled: boolean; inputBytes: number; expandedBytes: number; entryBytes: number; entries: number; records: number; textBytes: number; outputEntries: number } };
 };
 const object = (v: unknown): Record<string, unknown> => {
@@ -37,13 +37,14 @@ export function readFileLimits(value: unknown): FileLimits {
   }
   const ocr = object(processing.ocr), zip = object(processing.zip);
   const prep = v.preparation === undefined ? null : object(v.preparation);
+  if (prep?.version === 2 && prep.pageCheckpoints === true) { number(ocr.maxPdfPages); number(ocr.imageMaxBytes); }
   return { version: 1,
-    preparation: prep ? { async: prep.version === 1 && prep.async === true && Array.isArray(prep.kinds) && prep.kinds.includes("ocr") } : undefined,
+    preparation: prep ? { async: (prep.version === 1 || prep.version === 2) && prep.async === true && Array.isArray(prep.kinds) && prep.kinds.includes("ocr"), pageCheckpoints: prep.version === 2 && prep.pageCheckpoints === true } : undefined,
     storage: { maxBytes: number(storage.maxBytes), maxCount: number(storage.maxCount) },
     upload: { maxBytes: number(upload.maxBytes), types },
     message: { maxAttachments: number(message.maxAttachments), maxBytes: number(message.maxBytes), extractedTextBytes: number(message.extractedTextBytes) },
     processing: { text: reader(processing.text), office: reader(processing.office), pdf: reader(processing.pdf),
-      ocr: { ...reader(ocr), maxOcrPages: number(ocr.maxOcrPages), maxTextBytes: number(ocr.maxTextBytes) },
+      ocr: { ...reader(ocr), maxOcrPages: number(ocr.maxOcrPages), maxTextBytes: number(ocr.maxTextBytes), maxPdfPages: ocr.maxPdfPages === undefined ? undefined : number(ocr.maxPdfPages), imageMaxBytes: ocr.imageMaxBytes === undefined ? undefined : number(ocr.imageMaxBytes) },
       zip: { enabled: boolean(zip.enabled), inputBytes: number(zip.inputBytes), expandedBytes: number(zip.expandedBytes), entryBytes: number(zip.entryBytes), entries: number(zip.entries), records: number(zip.records), textBytes: number(zip.textBytes), outputEntries: number(zip.outputEntries) } },
   };
 }
@@ -62,8 +63,8 @@ export function fileCeilings(name: string, limits: FileLimits) {
   const upload = Math.min(limits.upload.maxBytes, type.maxBytes);
   const p = limits.processing;
   const selected = kind === 'zip' ? { enabled: p.zip.enabled, maxBytes: p.zip.inputBytes }
-    : kind === 'image' ? (p.ocr.enabled ? p.ocr : { enabled: true, maxBytes: upload })
-    : kind === 'pdf' ? { enabled: p.pdf.enabled, maxBytes: Math.min(p.pdf.maxBytes, p.ocr.enabled ? p.ocr.maxBytes : Infinity) }
+    : kind === 'image' ? (p.ocr.enabled ? { enabled: true, maxBytes: p.ocr.imageMaxBytes ?? p.ocr.maxBytes } : { enabled: true, maxBytes: upload })
+    : kind === 'pdf' ? { enabled: p.pdf.enabled, maxBytes: usesBackgroundOcr(limits) && limits.preparation?.pageCheckpoints ? p.ocr.maxBytes : Math.min(p.pdf.maxBytes, p.ocr.enabled ? p.ocr.maxBytes : Infinity) }
     : p[kind];
   return { upload, reading: Math.min(upload, selected.maxBytes), enabled: selected.enabled };
 }

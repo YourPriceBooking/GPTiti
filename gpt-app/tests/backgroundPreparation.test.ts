@@ -72,3 +72,33 @@ test('upload batch retry reuses completed upload identities before OCR starts', 
   assert.equal((await flow.uploadAll(files,upload,signal(),noop)).length,2);
   assert.equal(calls,3);
 });
+
+test('page checkpoints survive DTO parsing and are reported after resuming a saved job', async () => {
+  const pages={completedPages:12,totalPages:30,ocrPages:30,failedPage:null};
+  const running=readBackgroundPreparation({success:true,processing:{...queued,status:'running',method:'local_ocr',progress:pages}});
+  let gets=0;
+  const reported: unknown[]=[];
+  await prepareInBackground({signal:signal(),get:async()=>++gets===1?running:result(),start:async()=>{assert.fail('must reuse job');},
+    progress:(phase,p)=>reported.push([phase,p]),wait:async()=>{}});
+  assert.deepEqual(reported,[['recognizing',pages]]);
+  for(const change of [{completedPages:31},{totalPages:101},{ocrPages:31},{failedPage:0},{failedPage:31},{completedPages:NaN}]){
+    assert.throws(()=>readBackgroundPreparation({success:true,processing:{...queued,method:'local_ocr',progress:{...pages,...change}}}));
+  }
+});
+test('ready paged OCR accepts 30 pages and 1 MiB; ZIP bounds remain unchanged', () => {
+  assert.equal(readBackgroundPreparation({success:true,processing:{...ready,ocrPages:30,textBytes:1048576}}).status,'ready');
+  for(const change of [{ocrPages:31},{textBytes:1048577},{method:'zip',ocrPages:11},{method:'zip',textBytes:131073}])
+    assert.throws(()=>readBackgroundPreparation({success:true,processing:{...ready,...change}}));
+});
+
+test('explicit Cancel retry keeps saved page progress and starts only once', async () => {
+  const pages={completedPages:8,totalPages:30,ocrPages:30,failedPage:9};
+  let starts=0,gets=0;
+  const reports:unknown[]=[];
+  const cancelled=readBackgroundPreparation({success:true,processing:{status:'cancelled',method:'local_ocr',attempts:1,retryable:true,progress:pages}});
+  await prepareInBackground({signal:signal(),get:async()=>++gets===1?cancelled:result(),
+    start:async retry=>{assert.equal(retry,true);starts++;return {...queued,progress:pages};},
+    progress:(_,p)=>reports.push(p),wait:async()=>{}});
+  assert.equal(starts,1);
+  assert.deepEqual(reports,[pages]);
+});

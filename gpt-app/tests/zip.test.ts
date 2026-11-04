@@ -14,9 +14,9 @@ test('archive preview validates bounded metadata, strips content, rejects unsafe
  assert.equal(preview?.entries[0].path,'звіт/data.csv');assert.equal(JSON.stringify(preview).includes('PRIVATE'),false);
  for(const path of ['../secret','/etc/passwd','a\\b'])assert.equal(readArchivePreview({kind:'archive',entries:[{path,size:1,status:'read'}],truncated:false}),null);
 });
-test('ZIP preparation supports larger extracted metadata without changing OCR limits',()=>{
+test('ZIP preparation retains its own extracted text bound',()=>{
  const response={success:true,processing:{status:'ready',method:'zip',ocrPages:0,textBytes:100000,scripts:[],uncertain:false}};
- assert.equal(readFilePreparation(response).status,'ready');assert.throws(()=>readFilePreparation({...response,processing:{...response.processing,method:'local_ocr'}}));
+ assert.equal(readFilePreparation(response).status,'ready');assert.throws(()=>readFilePreparation({...response,processing:{...response.processing,textBytes:131073}}));
  assert.match(preparationErrorMessage({response:{data:{error:'ZIP_NOT_READY'}}}),/reused/);
 });
 test('preparation retry reuses ZIP upload and reports unpacking',async()=>{

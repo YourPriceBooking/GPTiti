@@ -80,7 +80,15 @@ export default function ChatView({
   const feedback = <>
       {ctrl.fileProgress && <div className={styles.filePreparation} role="status" aria-live="polite">
         <span className={styles.filePreparationSpinner} aria-hidden="true" />
-        <span>{ctrl.fileProgress.phase === "queued" ? "Waiting for recognition…" : ctrl.fileProgress.phase === "unpacking" ? "Preparing ZIP archive…" : ctrl.fileProgress.phase === "recognizing" ? "Recognizing text…" : "Uploading file…"} {ctrl.fileProgress.index}/{ctrl.fileProgress.total} — {ctrl.fileProgress.name}</span>
+        <div className={styles.filePreparationDetails}>
+          <strong>{ctrl.fileProgress.phase === "queued" ? "Waiting for recognition…" : ctrl.fileProgress.phase === "unpacking" ? "Preparing ZIP archive…" : ctrl.fileProgress.phase === "recognizing" ? "Recognizing text…" : "Uploading file…"}</strong>
+          <span>File {ctrl.fileProgress.index}/{ctrl.fileProgress.total} · {ctrl.fileProgress.name}</span>
+          {ctrl.fileProgress.pages && <>
+            <span>{ctrl.fileProgress.pages.completedPages} of {ctrl.fileProgress.pages.totalPages} pages processed</span>
+            <progress className={styles.filePreparationBar} value={ctrl.fileProgress.pages.completedPages} max={ctrl.fileProgress.pages.totalPages} aria-label="Pages processed" />
+            <small>Completed pages are saved. You can cancel and continue later.</small>
+          </>}
+        </div>
         <button type="button" onClick={() => void ctrl.stopPreparation()}>Cancel</button>
       </div>}
       {!ctrl.fileProgress && ctrl.recoveredPreparation && <section className={styles.ocrRecovery} aria-label="Saved file preparation">
