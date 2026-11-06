@@ -1,7 +1,8 @@
 "use client";
 
+import { cannotResumePreparation } from '@/lib/files/preparationFailure';
 import { loadFileLimits, getPreparation, startPreparation, cancelPreparation } from "@/lib/files/api";
-import { prepareInBackground } from "@/lib/files/backgroundPreparation";
+import { checkSavedPreparation, prepareInBackground } from "@/lib/files/backgroundPreparation";
 import { preparationDraftKey, encodePreparationDraft, readPreparationDraft, type PreparationDraft } from "@/lib/files/preparationDraft";
 import { validateServerFiles, usesBackgroundOcr, type FileLimits } from "@/lib/files/limits";
 import { selectUser } from "@/redux/auth/selectors";
@@ -123,10 +124,30 @@ export function useChatStream(): ChatStream {
   const dismissFileWarnings = useCallback(() => setWarningState({names: []}), []);
   useEffect(() => {
     preparationRef.current = new AttachmentPreparation();
+    const recovery = new AbortController();
+    const stillSaved = (clientMessageId: string) => {
+      try { return userId && readPreparationDraft(sessionStorage.getItem(preparationDraftKey(userId)), userId)?.clientMessageId === clientMessageId; }
+      catch { return false; }
+    };
+    setRecoveredState(null);
     if (userId) {
-      try { setRecoveredState(readPreparationDraft(sessionStorage.getItem(preparationDraftKey(userId)), userId)); } catch { setRecoveredState(null); }
-    } else setRecoveredState(null);
-    return () => { preparationAbortRef.current?.abort(); };
+      try {
+        const draft = readPreparationDraft(sessionStorage.getItem(preparationDraftKey(userId)), userId);
+        if (draft) {
+          const ids = draft.files.filter(f => f.mimetype === 'application/pdf' || ['image/png','image/jpeg','image/webp'].includes(f.mimetype)).map(f => f.fileId!);
+          void checkSavedPreparation(ids, id => getPreparation(id, draft.modelId, recovery.signal)).then(() => {
+            if (!recovery.signal.aborted && stillSaved(draft.clientMessageId)) setRecoveredState(draft);
+          }).catch(error => {
+            if (recovery.signal.aborted || !stillSaved(draft.clientMessageId)) return;
+            if (cannotResumePreparation(error)) {
+              try { sessionStorage.removeItem(preparationDraftKey(userId)); } catch { /* storage unavailable */ }
+              setStreamError(preparationErrorMessage(error) + ' This saved preparation cannot continue. Choose a supported file.');
+            } else setRecoveredState(draft); // Offline/unknown status is not a permanent rejection.
+          });
+        }
+      } catch { setRecoveredState(null); }
+    }
+    return () => { recovery.abort(); preparationAbortRef.current?.abort(); };
   }, [userId]);
 
   const pendingTurnsRef = useRef(pendingTurns);
@@ -736,7 +757,13 @@ export function useChatStream(): ChatStream {
         return await deliverPendingTurn(turn);
       } catch (error) {
         if (!controller.signal.aborted) {
-          if (preparing) setStreamError(preparationErrorMessage(error));
+          if (preparing) {
+            if (cannotResumePreparation(error)) {
+              if (userId) { try { sessionStorage.removeItem(preparationDraftKey(userId)); } catch { /* storage unavailable */ } }
+              setRecoveredState(null);
+            }
+            setStreamError(preparationErrorMessage(error));
+          }
           else handleLocalError(error);
         }
         return false;

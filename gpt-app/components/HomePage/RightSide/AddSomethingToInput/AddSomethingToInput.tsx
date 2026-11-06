@@ -85,6 +85,7 @@ export default function AddSomethingToInput({ onImageSelect, onImageBlocked, isI
         <p>For example: “Create an XLSX table of numbers and their squares, and a PNG chart.” Download finished files from the response cards. Saved files remain available when you reopen the chat.</p>
         <p>Python runs in an isolated environment without internet access. Only files selected for the task are provided to it; uploading code does not automatically execute it. Time, memory, execution and cost limits apply. Large tasks may need to be split into smaller requests.</p>
         <p>If a calculation stops, only completed results and attached files are available. Model calls used for the task count toward its cost; sending a new request may incur additional charges. Check important results.</p>
+        <p>You can also drag one or several files onto the message field. Review the attachments and enter your request before sending. Folders must be packaged as ZIP files first.</p>
         <h3>Text recognition (OCR)</h3>
         <p>Scanned PDFs and static PNG, JPG/JPEG and WEBP images are recognized automatically before your message is sent. No language selection is required. Original images are uploaded without automatic compression; the server may resize them for recognition.</p>
         <p>The current OCR file, page and text limits are shown above. Images must also fit within 16 million pixels with no side over 10,000 pixels. Animated images are not supported.</p>

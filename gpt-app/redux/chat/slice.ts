@@ -222,6 +222,8 @@ const chatSlice = createSlice({
         (chat) => isDraftId(chat.id) && chat.messages.length === 0,
       );
       if (emptyDraft) {
+        // Explicit New chat must reset the editor even when reusing an empty local draft.
+        emptyDraft.composerKey = makeDraftChat().id;
         state.activeChatId = emptyDraft.id;
       } else {
         const draft = makeDraftChat();
