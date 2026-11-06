@@ -29,6 +29,7 @@ export interface Conversation {
   archived?: boolean;
   project?: ConversationProject | null;
   lastMessageAt?: string;
+  lastRequestAt?: string;
   pinnedAt: string | null;
   createdAt: string;
   updatedAt?: string;
@@ -125,6 +126,7 @@ export interface ProjectConversation {
   archived?: boolean;
   project?: string;
   lastMessageAt?: string;
+  lastRequestAt?: string;
   pinnedAt: string | null;
   createdAt?: string;
   updatedAt?: string;

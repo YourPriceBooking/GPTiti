@@ -1,0 +1,124 @@
+diff --git a/src/controllers/chat/conversation/getConversations.js b/src/controllers/chat/conversation/getConversations.js
+index ec05a08..8074d69 100644
+--- a/src/controllers/chat/conversation/getConversations.js
++++ b/src/controllers/chat/conversation/getConversations.js
+@@ -9,7 +9,7 @@ const getConversation = async (req, res) => {
+       archived: false,
+     })
+       .sort(CONVERSATION_SORT)
+-      .select("_id title lastMessageAt createdAt project pinnedAt")
++      .select("_id title lastMessageAt lastRequestAt createdAt project pinnedAt")
+       .populate({
+         path: "project",
+         select: "_id title color icon pinnedAt",
+diff --git a/src/models/chatConversation.js b/src/models/chatConversation.js
+index 5eaa834..82e5080 100644
+--- a/src/models/chatConversation.js
++++ b/src/models/chatConversation.js
+@@ -39,6 +39,9 @@ const ChatConversationSchema = Schema(
+     // Independent of the global pin; cleared when project membership changes.
+     projectPinnedAt: { type: Date, default: null },
+ 
++    // Timestamp of the last accepted user turn, independent of reply completion.
++    lastRequestAt: Date,
++
+     lastMessageAt: {
+       type: Date,
+       default: Date.now,
+diff --git a/src/services/chatDeliveryV2/acceptTurn.js b/src/services/chatDeliveryV2/acceptTurn.js
+index f9b2994..4e0b2d7 100644
+--- a/src/services/chatDeliveryV2/acceptTurn.js
++++ b/src/services/chatDeliveryV2/acceptTurn.js
+@@ -138,6 +138,12 @@ const acceptTurn = async ({ userId, payload }) => {
+         }],
+         { session },
+       );
++      const activity = await ChatConversation.updateOne(
++        { _id: conversationId, user: userId, archived: false },
++        { $max: { lastRequestAt: createdTurn.createdAt } },
++        { session, timestamps: false },
++      );
++      if (!activity.matchedCount) throw protocolError("CONVERSATION_NOT_FOUND");
+       return { turn: createdTurn.toObject(), disposition: "accepted" };
+     });
+   } catch (error) {
+diff --git a/test/chatDeliveryV2/acceptDuplicate.test.js b/test/chatDeliveryV2/acceptDuplicate.test.js
+index 43c2bde..398cfdf 100644
+--- a/test/chatDeliveryV2/acceptDuplicate.test.js
++++ b/test/chatDeliveryV2/acceptDuplicate.test.js
+@@ -7,12 +7,14 @@ const utils = require('../../src/utils');
+ const ledger = require('../../src/services/tokenLedger');
+ const { buildRequestHash } = require('../../src/services/chatDeliveryV2/protocol');
+ 
+-for (const scenario of ['concurrent winner', 'retry after aborted writes', 'conflicting winner']) {
++for (const scenario of ['concurrent winner', 'retry after aborted writes', 'conflicting winner', 'new accepted turn']) {
+   test(`acceptTurn handles ${scenario} before another reservation`, async (t) => {
+     const userId = 'user';
+     const payload = { clientMessageId: 'message', conversationId: 'conversation', modelId: 'model', message: 'hello' };
+     const winner = { turnId: 'winner', requestHash: buildRequestHash({ userId, ...payload, files: [] }) };
+     if (scenario === 'conflicting winner') winner.requestHash = 'different';
++    const createdAt = new Date("2026-11-06T12:00:00Z");
++    let activityWrites = 0;
+     let reads = 0; let reserves = 0; let ended = 0; let notified = 0;
+     const query = (value) => ({ select() { return this; }, lean: async () => value });
+     t.mock.method(models.User, 'findById', () => query({ status: 'active' }));
+@@ -28,14 +30,22 @@ for (const scenario of ['concurrent winner', 'retry after aborted writes', 'conf
+     t.mock.method(mongoose, 'startSession', async () => session);
+     t.mock.method(models.ChatTurn, 'findOne', () => {
+       const index = reads++;
+-      const value = index === 0 || (scenario === 'retry after aborted writes' && index === 1) ? null : winner;
++      const value = scenario === 'new accepted turn' || index === 0 || (scenario === 'retry after aborted writes' && index === 1) ? null : winner;
+       return { session(s) { assert.equal(s, session); return this; }, lean: async () => value };
+     });
+     t.mock.method(reservations, 'reserve', async () => { reserves++; });
+     t.mock.method(utils, 'estimateCost', async () => ({ appTokens: 1 }));
+     t.mock.method(models.ChatMessage, 'find', () => ({ sort() { return this; }, limit() { return this; }, session() { return this; }, lean: async () => [] }));
+     t.mock.method(models.ChatMessage, 'create', async () => [{ _id: 'discarded-message' }]);
+-    t.mock.method(models.ChatTurn, 'create', async () => [{ toObject: () => ({ turnId: 'discarded-turn' }) }]);
++    t.mock.method(models.ChatTurn, 'create', async () => [{ createdAt, toObject: () => ({ turnId: 'created-turn', createdAt }) }]);
++    t.mock.method(models.ChatConversation, 'updateOne', async (filter, update, options) => {
++      activityWrites++;
++      assert.deepEqual(filter, { _id: payload.conversationId, user: userId, archived: false });
++      assert.deepEqual(update, { $max: { lastRequestAt: createdAt } });
++      assert.equal(options.session, session);
++      assert.equal(options.timestamps, false);
++      return { matchedCount: 1 };
++    });
+     t.mock.method(ledger, 'notifyCommitted', () => { notified++; });
+     const path = require.resolve('../../src/services/chatDeliveryV2/acceptTurn');
+     delete require.cache[path];
+@@ -45,11 +55,13 @@ for (const scenario of ['concurrent winner', 'retry after aborted writes', 'conf
+       await assert.rejects(acceptTurn({ userId, payload }), e => e.protocolError.code === 'IDEMPOTENCY_CONFLICT');
+     } else {
+       const result = await acceptTurn({ userId, payload });
+-      assert.equal(result.disposition, 'duplicate');
+-      assert.equal(result.turn.turnId, 'winner');
++      assert.equal(result.disposition, scenario === 'new accepted turn' ? 'accepted' : 'duplicate');
++      assert.equal(result.turn.turnId, scenario === 'new accepted turn' ? 'created-turn' : 'winner');
+     }
+-    assert.equal(reserves, scenario === 'retry after aborted writes' ? 1 : 0);
+-    assert.equal(notified, 0);
++    const attempts = ['retry after aborted writes', 'new accepted turn'].includes(scenario) ? 1 : 0;
++    assert.equal(reserves, attempts);
++    assert.equal(activityWrites, attempts);
++    assert.equal(notified, scenario === 'new accepted turn' ? 1 : 0);
+     assert.equal(ended, 1);
+   });
+ }
+diff --git a/test/chatDeliveryV2/integration.test.js b/test/chatDeliveryV2/integration.test.js
+index cd2761d..e8b5a72 100644
+--- a/test/chatDeliveryV2/integration.test.js
++++ b/test/chatDeliveryV2/integration.test.js
+@@ -607,6 +607,12 @@ if (!TEST_MONGO_URI) {
+     assert.equal(persistedTurn.turnId, result.turn.turnId);
+     assert.equal(persistedTurn.requestHash, result.turn.requestHash);
+ 
++    const updatedConversation = await ChatConversation.findById(conversation._id).lean();
++    assert.deepEqual(updatedConversation.lastRequestAt, persistedTurn.createdAt);
++    assert.deepEqual(updatedConversation.pinnedAt, conversation.pinnedAt);
++    assert.deepEqual(updatedConversation.projectPinnedAt, conversation.projectPinnedAt);
++    assert.deepEqual(updatedConversation.lastMessageAt, conversation.lastMessageAt);
++
+     const messages = await countTurnMessages(result.turn.turnId);
+ 
+     assert.deepEqual(messages, {

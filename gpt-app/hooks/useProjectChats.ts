@@ -17,6 +17,7 @@ import {
   selectActiveProjectId,
   selectAddChatsProjectId,
 } from "@/redux/ui/selectors";
+import { newestRequestAt } from "@/lib/projects/projectChatOrder";
 import type { Chat } from "@/types/types";
 
 export function useProjectChats() {
@@ -41,6 +42,7 @@ export function useProjectChats() {
           preview: conv.summary,
           modelId: conv.modelId ?? loaded?.modelId,
           lastMessageAt: conv.lastMessageAt ?? loaded?.lastMessageAt,
+          lastRequestAt: newestRequestAt(conv.lastRequestAt, loaded?.lastRequestAt),
           createdAt: conv.createdAt ?? loaded?.createdAt,
           messages: loaded?.messages ?? [],
           messagesStatus: loaded?.messagesStatus ?? "idle",
