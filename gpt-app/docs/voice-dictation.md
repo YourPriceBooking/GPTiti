@@ -1,6 +1,6 @@
 # Voice dictation composer
 
-This is a frontend implementation prepared for **our future backend**. No browser SpeechRecognition, third-party speech service, fake transcript, or voice-chat button is used.
+Voice dictation is connected to the authenticated Whisper backend. No browser SpeechRecognition, third-party speech service, fake transcript, or voice-chat button is used.
 
 ## Interaction
 
@@ -21,36 +21,32 @@ After updating `next.config.ts`, rebuild/restart the frontend and reload the pag
 
 If the user already blocked the microphone, the website cannot force another native prompt. Allow it through the browser's site settings and click the microphone again; also check device-level microphone permission if needed. See [Chrome microphone permissions](https://support.google.com/chrome/answer/2693767) and [the microphone Permissions-Policy directive](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Permissions-Policy/microphone).
 
-## Connect the backend later
+## Whisper backend integration
 
-The **only API integration point** is `lib/dictation/backendTranscriber.ts`. The rest of the UI consumes `TranscribeAudio(recording, signal): Promise<string>`.
+`lib/dictation/backendTranscriber.ts` uses the existing authenticated Axios client
+and `transcriptionRequest.ts` to send `POST /upload/transcriptions` relative to
+`NEXT_PUBLIC_BACKEND_API_URL` (normally `https://gptiti.com/api`). No new environment
+variable is required. An existing `NEXT_PUBLIC_DICTATION_TRANSCRIBE_PATH` overrides
+this default; remove any old placeholder value before rebuilding/deploying.
 
-Set this public build-time variable after the endpoint exists:
+The multipart body contains `file` with the actual browser audio MIME type and a
+matching filename (`dictation.webm`, `.m4a`, or `.ogg`). The browser supplies the
+multipart boundary. The response's `text` is validated; `model` is informational.
+We omit optional `language` so the backend delegates language detection to Whisper,
+without forcing Russian or the interface language. Verify detection on real
+Ukrainian, Russian and English recordings after deployment.
 
-```dotenv
-NEXT_PUBLIC_DICTATION_TRANSCRIBE_PATH=/your/actual/transcription/path
-```
+The request timeout is 330 seconds, allowing the backend's default 300-second
+recognition timeout plus transport time. Cancel propagates AbortSignal to the
+HTTP request and the existing session ignores late results. Client cancellation
+does not guarantee that backend inference stops. Failed requests (including busy
+429 responses) retain audio for the existing explicit retry/download/discard flow.
+No automatic inference retries are introduced.
 
-It is a **relative path under the existing `NEXT_PUBLIC_BACKEND_API_URL`**, not a third-party URL. The existing Axios client supplies authentication and refresh behavior. Rebuild/restart the frontend after changing a `NEXT_PUBLIC_*` variable.
-
-Without this variable, microphone capture and its visuals work; Stop/Send display “Voice transcription is coming soon…” with audio recovery actions. **No request to an invented endpoint is made and no chat message is sent.** Full transcript/Stop/Send behavior becomes functional once the backend is connected.
-
-### Proposed contract — adapt when the real backend is ready
-
-This contract is a proposal, not an existing backend endpoint:
-
-```text
-POST <NEXT_PUBLIC_DICTATION_TRANSCRIBE_PATH>
-Authorization: existing authenticated API session
-Content-Type: multipart/form-data (browser creates boundary)
-audio: binary file (dictation.webm, dictation.m4a, or dictation.ogg)
-durationMs: captured duration
-
-200 application/json
-{ "text": "Recognized words" }
-```
-
-Prefer auto-detection of the spoken language on the backend. Support the real browser MIME type: Opus/WebM, MP4/AAC for Safari, and Ogg if emitted by the browser; do not assume every recording is WebM. Validate auth, duration, size and decodability server-side. An empty/invalid transcript is surfaced as an error. Request timeout is 60 seconds, and Cancel propagates AbortSignal. If the backend uses different form fields or response shape, adapt just `backendTranscriber.ts`; no composer redesign is needed.
+Stop transcribes into the editable draft; Send during recording transcribes and
+then invokes the existing chat send flow. Existing draft text, attachments,
+authentication/refresh and recording limits remain unchanged. Production speech
+accuracy and Safari/iOS microphone behavior require real-device verification.
 
 ## Visuals and responsive behavior
 
