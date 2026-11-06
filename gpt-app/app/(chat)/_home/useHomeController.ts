@@ -152,11 +152,13 @@ export function useHomeController() {
   const { modelMode, setModelMode, modelRef } = useModelMode();
 
   const handleStartNewChat = useCallback(() => {
+    clearStreamError();
+    discardPreparation();
     clearDraft();
     dispatch(setActiveProjectId(null));
     dispatch(handleNewChat());
     router.push("/");
-  }, [clearDraft, dispatch, router]);
+  }, [clearDraft, clearStreamError, discardPreparation, dispatch, router]);
 
   const handleAddChatsToProject = useCallback(
     (projectId: string) => dispatch(setAddChatsProjectId(projectId)),

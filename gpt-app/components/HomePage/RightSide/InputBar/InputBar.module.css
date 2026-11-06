@@ -594,3 +594,11 @@
 .attachmentError, .attachmentStatus { margin: 6px 12px; font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
 .attachmentError { color: #a32d25; }
 .attachmentStatus { color: #526577; }
+
+.dropZone { position: absolute; inset: 0; z-index: 30; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px; padding: 16px; border: 2px dashed var(--flow-fill, #3e7cff); border-radius: inherit; background: #f2f7ff; color: #213b5a; pointer-events: none; text-align: center; overflow-wrap: anywhere; }
+.dropZone strong { font-size: 16px; font-weight: 600; }
+.dropZone span { font-size: 12px; line-height: 1.4; }
+@media (max-width: 480px) { .dropZone { padding: 8px; } .dropZone strong { font-size: 14px; } .dropZone span { font-size: 11px; } }
+@media (max-width: 767px) {
+  .rightControls .inputTooltip { left: auto; right: 0; transform: translateX(var(--tooltip-shift)); }
+}

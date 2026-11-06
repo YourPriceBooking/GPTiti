@@ -1,3 +1,4 @@
+import { PreparationFailure } from './preparationFailure';
 import { readFilePreparation, preparationErrorMessage, type FilePreparation, type PageProgress } from './preparation';
 
 export type BackgroundPreparation = FilePreparation | { status: 'not_started' } |
@@ -67,8 +68,20 @@ export async function prepareInBackground(deps: {
   if (state.status === 'failed') {
     const saved = state.progress ? ` ${state.progress.completedPages} of ${state.progress.totalPages} pages are saved.` : '';
     const message = preparationErrorMessage({ response: { data: { error: state.error } } });
-    throw new Error(message + saved + (state.retryable ? ' Send again to retry without uploading again.' : ' Automatic retries are unavailable. Choose another file or contact support.'));
+    throw new PreparationFailure(message + saved + (state.retryable ? ' Send again to retry without uploading again.' : ' Automatic retries are unavailable. Choose another file or contact support.'), state.retryable, state.error);
   }
-  if (state.status === 'cancelled') throw new Error(state.retryable ? 'Recognition was cancelled. Send again to continue using the saved file.' : 'Recognition was cancelled and the retry limit was reached.');
+  if (state.status === 'cancelled') throw new PreparationFailure(state.retryable ? 'Recognition was cancelled. Send again to continue using the saved file.' : 'Recognition was cancelled and the retry limit was reached.', state.retryable);
   throw new Error('Preparation needs to be restarted. Send again to check the saved file.');
+}
+
+// Status-only recovery check: never enqueue, retry, upload, or send a model request.
+export async function checkSavedPreparation(ids: string[], get: (id: string) => Promise<BackgroundPreparation>): Promise<void> {
+  for (const id of ids) {
+    const state = await get(id);
+    if ((state.status === 'failed' || state.status === 'cancelled') && !state.retryable) {
+      throw new PreparationFailure(state.status === 'failed'
+        ? preparationErrorMessage({response:{data:{error:state.error}}})
+        : 'Recognition was cancelled and the retry limit was reached.', false, state.error);
+    }
+  }
 }

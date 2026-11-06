@@ -33,6 +33,7 @@ import { isModelComingSoon } from "@/config/models.config";
 import { inputKind, validateTextBytes } from "@/lib/files/input";
 
 import { useFileLimits } from "@/hooks/useFileLimits";
+import { isFileDrag, droppedFiles } from "@/lib/files/drop";
 import { validateServerFiles } from "@/lib/files/limits";
 
 import styles from "./InputBar.module.css";
@@ -201,6 +202,28 @@ export default function InputBar({
   const isSendingRef = useRef(false);
   const preparingRef = useRef(false);
   const [isPreparing, setIsPreparing] = useState(false);
+  const [dragActive, setDragActive] = useState(false);
+  const dragDepth = useRef(0);
+  useEffect(() => {
+    const reset = () => { dragDepth.current = 0; setDragActive(false); };
+    const protect = (event: DragEvent) => {
+      if (!isFileDrag(event.dataTransfer)) return;
+      event.preventDefault();
+      if (event.type === 'drop') reset();
+      else if (!(event.target instanceof Element && event.target.closest('[data-input-bar]')) && event.dataTransfer) event.dataTransfer.dropEffect = 'none';
+    };
+    const escape = (event: KeyboardEvent) => { if (event.key === 'Escape') reset(); };
+    window.addEventListener('dragover', protect);
+    window.addEventListener('drop', protect);
+    window.addEventListener('dragend', reset);
+    window.addEventListener('blur', reset);
+    window.addEventListener('keydown', escape);
+    return () => {
+      window.removeEventListener('dragover', protect); window.removeEventListener('drop', protect);
+      window.removeEventListener('dragend', reset); window.removeEventListener('blur', reset);
+      window.removeEventListener('keydown', escape);
+    };
+  }, []);
   const [attachmentError, setAttachmentError] = useState<string | null>(null);
   const [editingImage, setEditingImage] = useState<{
     id: string;
@@ -319,12 +342,15 @@ export default function InputBar({
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     if (isSendingRef.current || voiceBusy) return;
     setVoiceNotice(null);
+    setAttachmentError(null);
     onChange(e);
     syncComposer();
   };
 
   const addAttachments = async (incoming: File[], imagesOnly = false) => {
     if (isSendingRef.current || preparingRef.current || voiceBusy || !incoming.length) return;
+    if (!isLoggedIn) { setIsLoginOpen(true); return; }
+    if (isComingSoon) return;
     setAttachmentError(null);
     const existing = [...images.map(image => image.file), ...files.map(item => item.file)];
     const error = imagesOnly && incoming.some(file => inputKind(file) !== "image")
@@ -393,6 +419,7 @@ export default function InputBar({
 
   const removeImage = (id: string) => {
     if (isSendingRef.current) return;
+    setAttachmentError(null);
     const image = images.find((img) => img.id === id);
     if (image) URL.revokeObjectURL(image.url);
 
@@ -431,6 +458,7 @@ export default function InputBar({
 
   const removeFile = (id: string) => {
     if (isSendingRef.current) return;
+    setAttachmentError(null);
     setFiles((prev) => prev.filter((f) => f.id !== id));
   };
 
@@ -616,14 +644,37 @@ export default function InputBar({
       className={`${styles.inputContainer} ${
         isMultiline && !waveVisible ? styles.multiline : ""
       } ${variant === "project" ? styles.project : ""} ${waveVisible ? styles.dictating : ""}`}
-      onDragOver={event => { if (event.dataTransfer.types.includes("Files")) event.preventDefault(); }}
-      onDrop={event => {
-        if (!event.dataTransfer.files.length) return;
+      onDragEnter={event => {
+        if (!isFileDrag(event.dataTransfer)) return;
         event.preventDefault();
-        void addAttachments(Array.from(event.dataTransfer.files));
+        dragDepth.current++;
+        setDragActive(true);
+      }}
+      onDragLeave={event => {
+        if (!isFileDrag(event.dataTransfer)) return;
+        dragDepth.current = Math.max(0, dragDepth.current - 1);
+        if (!dragDepth.current) setDragActive(false);
+      }}
+      onDragOver={event => {
+        if (!isFileDrag(event.dataTransfer)) return;
+        event.preventDefault();
+        event.dataTransfer.dropEffect = isSendingRef.current || preparingRef.current || voiceBusy || isComingSoon ? 'none' : 'copy';
+      }}
+      onDrop={event => {
+        if (!isFileDrag(event.dataTransfer)) return;
+        event.preventDefault();
+        dragDepth.current = 0;
+        setDragActive(false);
+        if (isSendingRef.current || preparingRef.current || voiceBusy || isComingSoon) return;
+        try { void addAttachments(droppedFiles(event.dataTransfer)); }
+        catch (error) { setAttachmentError((error as Error).message); }
       }}
       data-input-bar
     >
+      {dragActive && <div className={styles.dropZone} role="status">
+        <strong>{isSending || isPreparing || voiceBusy || isComingSoon ? 'Finish the current action first' : 'Drop files to attach'}</strong>
+        <span>Same formats and limits as Add files · nothing is sent automatically</span>
+      </div>}
       {showAddInput && (
         <div
           className={`${styles.modalWrapper} ${
