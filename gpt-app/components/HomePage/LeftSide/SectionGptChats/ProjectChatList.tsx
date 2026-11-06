@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Chat, Project } from "@/types/types";
 import { useAppDispatch } from "@/redux/hooks";
 import { fetchProject } from "@/redux/projects/operations";
-import { sortProjectChats } from "@/lib/projects/projectChatOrder";
+import { newestRequestAt, sortProjectChats } from "@/lib/projects/projectChatOrder";
 import ProjectChatActions from "./ProjectChatActions";
 import { renameConversation } from "@/redux/chat/operations";
 import { renameChat } from "@/redux/chat/slice";
@@ -42,7 +42,11 @@ export default function ProjectChatList({
   }, [dispatch, project.id, retry]);
 
   const conversations = project.conversationIds ?? [];
-  const sorted = sortProjectChats(conversations);
+  const chatsById = new Map(chats.map((chat) => [chat.id, chat]));
+  const sorted = sortProjectChats(conversations.map((chat) => ({
+    ...chat,
+    lastRequestAt: newestRequestAt(chat.lastRequestAt, chatsById.get(chat._id)?.lastRequestAt),
+  })));
 
   return (
     <div id={id} className={styles.projectChats}>

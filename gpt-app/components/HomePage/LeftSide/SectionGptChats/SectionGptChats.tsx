@@ -27,6 +27,7 @@ import { updateProjectPin } from "@/redux/projects/operations";
 import { selectActiveProjectId } from "@/redux/ui/selectors";
 import { toggleSidebarProject, toggleSidebarProjectsList } from "@/redux/ui/slice";
 import MyProjectsButton from "./MyProjectsButton";
+import { sortChatsByActivity } from "@/lib/projects/projectChatOrder";
 import ProjectChatList from "./ProjectChatList";
 import ActionTooltip from "@/components/common/ActionTooltip/ActionTooltip";
 
@@ -111,9 +112,7 @@ export default function SectionGptChats({
 
   const MAX_VISIBLE_CHATS = 5;
   const titledChats = chatList.filter((chat) => chat.title !== null);
-  const pinnedChats = titledChats.filter((chat) => chat.pinnedAt);
-  const unpinnedChats = titledChats.filter((chat) => !chat.pinnedAt);
-  const sortedChats = [...pinnedChats, ...unpinnedChats];
+  const sortedChats = sortChatsByActivity(titledChats, "pinnedAt");
   const pinnedProjects = projectList.filter((project) => project.pinnedAt);
   const unpinnedProjects = projectList.filter((project) => !project.pinnedAt);
   const sortedProjects = [...pinnedProjects, ...unpinnedProjects];

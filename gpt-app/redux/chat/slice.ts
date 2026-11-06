@@ -1,3 +1,4 @@
+import { newestRequestAt } from "../../lib/projects/projectChatOrder";
 import { readComputation } from "../../lib/computation/status";
 import { historyAppTokens } from "../../lib/chat/historyBilling";
 import { readWebSources } from "../../lib/web/sources";
@@ -121,6 +122,8 @@ const reconcileSnapshot = (state: ChatState, snapshot: ChatTurnSnapshot) => {
     refreshIsTyping(state);
     return;
   }
+
+  chat.lastRequestAt = newestRequestAt(chat.lastRequestAt, snapshot.createdAt);
 
   const userMessage = chat.messages.find(
     (message) =>
@@ -557,6 +560,7 @@ const chatSlice = createSlice({
             if (conversation.lastMessageAt) {
               existing.lastMessageAt = conversation.lastMessageAt;
             }
+            existing.lastRequestAt = newestRequestAt(existing.lastRequestAt, conversation.lastRequestAt);
             existing.project = toChatProject(conversation.project);
             existing.pinnedAt = conversation.pinnedAt ?? null;
             return existing;
@@ -569,6 +573,7 @@ const chatSlice = createSlice({
             modelId: conversation.modelId,
             project: toChatProject(conversation.project),
             lastMessageAt: conversation.lastMessageAt,
+            lastRequestAt: conversation.lastRequestAt,
             pinnedAt: conversation.pinnedAt ?? null,
           };
         });

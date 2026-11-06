@@ -79,6 +79,7 @@ export type Chat = {
   preview?: string;
   modelId?: string;
   lastMessageAt?: string;
+  lastRequestAt?: string;
   createdAt?: string;
   project?: ChatProject;
   pinnedAt: string | null;
