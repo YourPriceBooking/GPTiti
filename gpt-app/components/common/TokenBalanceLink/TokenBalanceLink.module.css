@@ -25,11 +25,12 @@
 }
 
 .amount {
-  font-size: 20px;
+  --amount-base-size: 20px;
+  font-size: calc(var(--amount-base-size) * var(--amount-scale, 1));
   font-weight: 700;
   line-height: 1.25;
   font-variant-numeric: tabular-nums;
-  overflow-wrap: anywhere;
+  white-space: nowrap;
 }
 
 .history,
@@ -74,7 +75,19 @@
 }
 
 .compact .amount {
-  font-size: 16px;
+  --amount-base-size: 16px;
+}
+
+.amount[data-balance-size="medium"] {
+  --amount-scale: 0.85;
+}
+
+.amount[data-balance-size="small"] {
+  --amount-scale: 0.7;
+}
+
+.amount[data-balance-size="smallest"] {
+  --amount-scale: 0.6;
 }
 
 @media (hover: hover) {
