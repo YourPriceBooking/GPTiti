@@ -28,6 +28,7 @@ import { selectActiveProjectId } from "@/redux/ui/selectors";
 import { toggleSidebarProject, toggleSidebarProjectsList } from "@/redux/ui/slice";
 import MyProjectsButton from "./MyProjectsButton";
 import { sortChatsByActivity } from "@/lib/projects/projectChatOrder";
+import ProjectNewChatButton from "./ProjectNewChatButton";
 import ProjectChatList from "./ProjectChatList";
 import ActionTooltip from "@/components/common/ActionTooltip/ActionTooltip";
 
@@ -411,6 +412,11 @@ export default function SectionGptChats({
                       >{project.title}</span>
                     </div>
                     <div className={styles.chatRight}>
+                      <ProjectNewChatButton
+                        projectId={project.id}
+                        projectTitle={project.title}
+                        onCreated={setActiveChatId}
+                      />
                       <button
                         type="button"
                         className={styles.projectOpenButton}
