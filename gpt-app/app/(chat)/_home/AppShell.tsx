@@ -3,6 +3,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 
+import MobileChatAccount from "@/components/HomePage/common/MobileChatAccount/MobileChatAccount";
 import LeftSide from "@/components/HomePage/LeftSide/LeftSide";
 import LeftSideDrawer from "@/components/HomePage/LeftSide/LeftSideDrawer/LeftSideDrawer";
 import LoginModal from "@/components/HomePage/common/LoginModal/LoginModal";
@@ -67,6 +68,12 @@ export default function AppShell({
     router.replace("/");
   }, [missingChat, missingProject, dispatch, router]);
 
+  const showMobileAccount =
+    chatLayout && !projectId && !ctrl.restoringActiveChat &&
+    (!chatId || ctrl.activeChat?.id === chatId) &&
+    !ctrl.activeChat?.messages.length &&
+    (ctrl.isNewChat || ctrl.activeChat?.messagesStatus === "loaded");
+
   const leftSideProps = {
     onNewChat: ctrl.handleStartNewChat,
     onNewProject: () => dispatch(setIsCreateProjectModalOpen(true)),
@@ -116,7 +123,9 @@ export default function AppShell({
             className={
               chatLayout ? styles.chatMenuTrigger : styles.projectMenuTrigger
             }
-          />
+          >
+            {showMobileAccount && <MobileChatAccount />}
+          </LeftSideDrawer>
           {children(ctrl)}
         </div>
       </div>
