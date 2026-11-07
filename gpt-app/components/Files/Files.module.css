@@ -57,3 +57,14 @@
 .archiveList strong { display:block; color:#334155; font-size:13px; font-weight:500; overflow-wrap:anywhere; }
 .archiveList small { display:block; color:#64748b; font-size:11px; margin-top:4px; }
 .archiveIcon { background:#eff6ff; color:#2563eb; border-radius:8px; padding:6px 9px; flex:none; }
+.ocrNotice summary,.technical summary { cursor:pointer; font-weight:600; }
+.ocrNotice summary:focus-visible,.technical summary:focus-visible { outline:2px solid #4582df; outline-offset:3px; }
+.ocrFeedback:empty { display:none; }
+.ocrCaption { margin-bottom:14px; }
+.readings { border-top:1px solid #e4eaf2; }
+.readings p,.technical p { padding:0 16px; font-size:12px; line-height:1.6; color:#64758e; }
+.reading { margin:12px; padding:12px; border:1px solid #e4eaf2; border-radius:10px; }
+.reading strong { font-size:12px; color:#64758e; }
+.reading .ocrText { padding:8px 0; }
+.technical { margin-top:16px; border:1px solid #e4eaf2; border-radius:12px; overflow:hidden; }
+.technical summary { padding:14px 16px; font-size:12px; color:#64758e; }

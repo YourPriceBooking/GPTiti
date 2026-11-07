@@ -60,7 +60,7 @@ an older upload, and owner isolation/deleted-file errors. No format picker.
 
 
 ## Saved OCR preview (backend patch 16)
-PDF and PNG/JPEG/WEBP previews offer File / Recognized text. GET /files/:id/ocr returns the existing owner-only cache; ?download=1 returns its exact UTF-8 bytes. Missing cache (409) never triggers recognition. Copy includes all notes and page markers; page view only groups existing markers and collapses leading notes. React renders plain text, including markup, without executing it. Abort on close/change; check again retries only the read. Original Download remains available.
+PDF and PNG/JPEG/WEBP previews offer File / Text. GET /files/:id/ocr returns the existing owner-only cache; ?download=1 returns its exact UTF-8 bytes. Missing cache (409) never triggers recognition. Copy includes all notes and page markers; page view only groups existing markers and collapses leading notes. React renders plain text, including markup, without executing it. Abort on close/change; check again retries only the read. Original Download remains available.
 
 Deploy backend patch 16 before merging. Manually verify mobile/desktop, keyboard focus/Escape, owner isolation, deleted files, absent cache, RTL text, clipboard failure, exact TXT and persistence after reload. This feature exposes saved extraction and does not improve OCR accuracy.
 
@@ -128,3 +128,5 @@ Manual acceptance:
 - Send again: no second POST /files; preparation checks/retries the same fileId. No model turn is submitted while preparation is cancelled.
 - Repeat in an existing chat and after reopening the browser recovery card. Changing chats must not carry a draft into another chat.
 - Complete a request and compare Used before/after F5 against the saved charge, including a zero-charge response. It must not show the provider completion-token count.
+
+The Text tab shows primary page text with expandable alternative readings. Conflicts display every supplied reading without confidence ranking. Technical details lazily render the exact saved extraction. Copy text and Download TXT retain all raw notes. The original-file download remains on the File tab.
