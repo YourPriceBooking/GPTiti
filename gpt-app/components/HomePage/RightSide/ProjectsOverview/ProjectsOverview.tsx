@@ -48,8 +48,8 @@ function FolderIcon() {
       <Image
         src="/icons/projects-overview-folder.svg"
         alt=""
-        width={38}
-        height={31}
+        width={26}
+        height={21}
       />
     </span>
   );
