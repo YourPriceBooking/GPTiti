@@ -1,0 +1,78 @@
+.root {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .root {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+    min-width: 0;
+  }
+}
+
+.signIn,
+.account {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 36px;
+  max-width: 100%;
+  padding: 3px 12px;
+  border: 1px solid #d7e2f0;
+  border-radius: 20px;
+  background: #ffffff;
+  color: #173252;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 180ms ease-out, border-color 180ms ease-out;
+}
+
+.signIn:hover,
+.account:hover {
+  background: #edf3fb;
+  border-color: #bccfe5;
+}
+
+.signIn:active,
+.account:active {
+  background: #e4edf8;
+}
+
+.signIn:focus-visible,
+.account:focus-visible {
+  outline: 2px solid #7399c8;
+  outline-offset: 2px;
+}
+
+.account {
+  padding-left: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.account > span:first-child {
+  width: 28px;
+  height: 28px;
+  flex-basis: 28px;
+  font-size: 13px;
+  background: #e8eff8;
+  color: #173252;
+}
+
+.amount {
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .signIn,
+  .account {
+    transition: none;
+  }
+}

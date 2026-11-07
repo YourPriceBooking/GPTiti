@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 
@@ -14,10 +14,12 @@ const ANIM_MS = 220;
 type LeftSideDrawerProps = LeftSideProps & {
   /** Extra classes for the mobile trigger bar theme per consumer. */
   className?: string;
+  children?: ReactNode;
 };
 
 export default function LeftSideDrawer({
   className,
+  children,
   ...leftSideProps
 }: LeftSideDrawerProps) {
   const [mounted, setMounted] = useState(false);
@@ -57,6 +59,7 @@ export default function LeftSideDrawer({
         >
           <span className={styles.menuIcon} aria-hidden="true" />
         </button>
+        {children}
       </div>
 
       {mounted &&
