@@ -381,7 +381,7 @@ export default function SectionGptChats({
                       <svg className={`${styles.projectChevron} ${expanded ? styles.projectChevronExpanded : ""}`} width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
                         <path d="m4 2 4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
-                      <Image width={28} height={23} src="/icons/sidebar-project.svg" alt="" />
+                      <Image width={22} height={18} src="/icons/sidebar-project.svg" alt="" />
                       <span
                         ref={(el) => { if (el) projectTitleRefs.current[project.id] = el; }}
                         contentEditable={renaming}

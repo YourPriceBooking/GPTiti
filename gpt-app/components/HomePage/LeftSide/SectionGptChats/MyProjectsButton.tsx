@@ -1,8 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import type { KeyboardEvent, MouseEvent } from "react";
-
+import ActionTooltip from "@/components/common/ActionTooltip/ActionTooltip";
 import styles from "./SectionGptChats.module.css";
 
 type MyProjectsButtonProps = {
@@ -24,93 +23,35 @@ export default function MyProjectsButton({
   onCreate,
   onToggle,
 }: MyProjectsButtonProps) {
-  const isShortcut = variant === "shortcut";
-  const showOpenIcon = !isShortcut && canExpand && expanded;
-
-  const handleKeyDown = (event: KeyboardEvent<HTMLElement>) => {
-    if ((event.target as HTMLElement).closest("button")) return;
-    if (event.key !== "Enter" && event.key !== " ") return;
-
-    event.preventDefault();
-    onOpen();
-  };
-
-  const handleCreate = (event: MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    onCreate?.();
-    event.currentTarget.blur();
-  };
-
-  const handleToggle = (event: MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    onToggle?.();
-    event.currentTarget.blur();
-  };
-
+  const expandable = variant === "expandable";
   return (
-    <article
-      className={`${styles.myProjectsButton} ${
-        isShortcut ? styles.myProjectsButtonShortcut : ""
-      }`}
-      onClick={onOpen}
-      role="button"
-      tabIndex={0}
-      onKeyDown={handleKeyDown}
-    >
-      <Image
-        className={isShortcut ? styles.myProjectsShortcutIcon : undefined}
-        width={36}
-        height={36}
-        src={
-          showOpenIcon
-            ? "/icons/my-projects-open.svg"
-            : "/icons/my-projects-closed.svg"
-        }
-        alt=""
-      />
-
-      <div className={styles.projectsLabelWrapper}>
-        <div className={styles.labelLeft}>
+    <article className={styles.myProjectsButton}>
+      <button
+        type="button"
+        className={styles.projectsMainButton}
+        onClick={expandable ? onToggle : onOpen}
+        aria-label={expandable ? (expanded ? "Collapse projects" : "Expand projects") : "My Projects"}
+        aria-expanded={expandable ? expanded : undefined}
+        disabled={expandable && !canExpand}
+      >
+        <Image width={36} height={36} src={expanded ? "/icons/my-projects-open.svg" : "/icons/my-projects-closed.svg"} alt="" />
+        <span className={styles.labelLeft}>
           <span className={styles.span}>My Projects</span>
-          {projectsCount > 0 && (
-            <span className={styles.badge}>{projectsCount}</span>
-          )}
-        </div>
-
-        <button
-          type="button"
-          className={styles.addProjectBtn}
-          aria-label="Start new project"
-          onClick={handleCreate}
-        >
-          <Image
-            width={12}
-            height={12}
-            src="/icons/plus-thin.svg"
-            alt=""
-          />
-        </button>
-
-        {!isShortcut && canExpand && (
-          <button
-            type="button"
-            className={styles.projectsChevron}
-            aria-label={expanded ? "Collapse projects" : "Expand projects"}
-            aria-expanded={expanded}
-            onClick={handleToggle}
-          >
-            <Image
-              className={`${styles.chevronIcon} ${
-                expanded ? styles.chevronIconOpen : ""
-              }`}
-              width={15}
-              height={15}
-              src="/icons/chevron-down.svg"
-              alt=""
-            />
-          </button>
+          {projectsCount > 0 && <span className={styles.badge}>{projectsCount}</span>}
+        </span>
+        {expandable && canExpand && (
+          <Image className={`${styles.chevronIcon} ${expanded ? styles.chevronIconOpen : ""}`} width={12} height={12} src="/icons/chevron-down.svg" alt="" />
         )}
-      </div>
+      </button>
+      <button type="button" className={`${styles.addProjectBtn} ${styles.projectsHeaderAdd}`} aria-label="Start new project" onClick={onCreate}>
+        <Image width={12} height={12} src="/icons/plus-thin.svg" alt="" />
+      </button>
+      <button type="button" className={styles.projectOpenButton} aria-label="Open projects page" onClick={onOpen}>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M14 4h6v6M20 4 10 14M10 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4" />
+        </svg>
+        <ActionTooltip label="Open projects" />
+      </button>
     </article>
   );
 }
