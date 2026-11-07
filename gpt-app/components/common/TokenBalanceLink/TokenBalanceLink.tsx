@@ -21,6 +21,8 @@ export default function TokenBalanceLink({
 }: Props) {
   const reserved = useAppSelector(selectReservedTokens);
   const available = useAppSelector(selectAvailableTokens);
+  const digits = Math.abs(Math.trunc(balance)).toString().length;
+  const amountSize = digits >= 10 ? "smallest" : digits >= 8 ? "small" : digits >= 6 ? "medium" : "regular";
   const formatted = balance.toLocaleString("en-US");
   const amount = variant === "card" ? formatted : formatted.replaceAll(",", "\u00a0");
 
@@ -39,7 +41,7 @@ export default function TokenBalanceLink({
         {variant === "card" && (
           <span className={styles.label}>Balance tokens</span>
         )}
-        <span className={styles.amount}>{amount}</span>
+        <span className={styles.amount} data-balance-size={amountSize}>{amount}</span>
         {reserved > 0 && <span className={styles.reservations} aria-live="polite" aria-atomic="true">
           <span>Reserved for requests: <strong>{reserved.toLocaleString("en-US")} TITI</strong></span>
           <span>Available: <strong>{available.toLocaleString("en-US")} TITI</strong></span>
