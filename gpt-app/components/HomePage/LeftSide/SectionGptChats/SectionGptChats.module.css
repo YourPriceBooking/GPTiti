@@ -781,3 +781,36 @@
   position: relative;
   flex-shrink: 0;
 }
+
+.projectNewChatButton {
+  position: relative;
+}
+
+.projectNewChatButton:disabled {
+  cursor: wait;
+}
+
+/* Keep space reserved so the title does not shift when actions appear. */
+@media (min-width: 768px) and (hover: hover) and (pointer: fine) {
+  .projectRow .projectOpenButton,
+  .projectRow .projectMenuTrigger {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .projectRow:hover .projectOpenButton,
+  .projectRow:hover .projectMenuTrigger,
+  .projectRow:focus-within .projectOpenButton,
+  .projectRow:focus-within .projectMenuTrigger {
+    opacity: 0.65;
+    pointer-events: auto;
+  }
+
+  .projectRow .projectOpenButton:hover,
+  .projectRow .projectOpenButton:focus-visible,
+  .projectRow .projectMenuTrigger:hover,
+  .projectRow .projectMenuTrigger:focus-visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
