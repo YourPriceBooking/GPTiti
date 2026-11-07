@@ -6,7 +6,7 @@ import { loadPreview, loadOcr, downloadOcr, downloadFile, fileError, type Previe
 import { extension, fileSize, tablePreview, type ManagedFile, type FileResult, type StructuredPreview, type PreviewCell } from '@/lib/files/types';
 import MarkdownContent from '@/components/common/MarkdownContent/MarkdownContent';
 import styles from './Files.module.css';
-import { ocrSections, ocrError, type OcrPreview } from '@/lib/files/ocr';
+import { readableOcrSections, ocrError, type OcrPreview } from '@/lib/files/ocr';
 
 const FileContext = createContext<(file: ManagedFile) => void>(() => {});
 function usePreview(file: ManagedFile, enabled = true, retry = 0) {
@@ -100,19 +100,36 @@ function RecognizedText({ file }: { file: ManagedFile }) {
   if (!data) return <div className={styles.ocrEmpty} role="status"><p>Loading saved text…</p></div>;
   return <div className={styles.ocrView}>
     <div className={styles.ocrBadge}><span aria-hidden="true">●</span> Saved extraction · No AI rewriting</div>
-    <div className={styles.ocrNotice}><strong>{data.uncertain ? 'Some text may be inaccurate' : 'Check important details'}</strong><p>Recognition can misread names, dates, numbers and line order. This is the saved extraction, not a verified copy of the original.</p>{data.legacy && <p>This text was saved with an earlier recognition version.</p>}</div>
+    <details className={styles.ocrNotice}><summary>{data.uncertain ? 'Recognized text may contain errors' : 'Check important details'}</summary><p>Recognition can misread names, dates, numbers and line order. This is the saved extraction, not a verified copy of the original.</p>{data.legacy && <p>This text was saved with an earlier recognition version.</p>}</details>
     <div className={styles.ocrTools}>
       <button className={styles.previewButton} disabled={busy} onClick={async () => {
         setBusy(true); setAction(''); try { await navigator.clipboard.writeText(data.text); setAction('Full saved text copied.'); } catch { setAction('Could not copy. Download the TXT file instead.'); } finally { setBusy(false); }
-      }}>Copy all text</button>
+      }}>Copy text</button>
       <button className={styles.download} disabled={busy} onClick={async () => {
         setBusy(true); setAction(''); try { await downloadOcr(file); setAction('TXT downloaded.'); } catch (e) { setAction(fileError(e)); } finally { setBusy(false); }
       }}>Download TXT</button>
     </div>
-    <p className={styles.ocrCaption}>Copy and TXT include the full saved text and recognition notes. No model request or extra token charge.</p>
+    <p className={styles.ocrCaption}>Copy and TXT include all recognition notes.</p>
     <div role="status" className={styles.ocrFeedback}>{action}</div>
-    <button className={styles.rawToggle} aria-pressed={raw} onClick={() => setRaw(v => !v)}>{raw ? 'Show pages' : 'Show raw text'}</button>
-    {raw ? <pre dir="auto" className={styles.ocrText}>{data.text}</pre> : ocrSections(data.text).map((section, index) => <section className={styles.ocrPage} key={index}>{section.label === 'Recognition notes' ? <details><summary>Recognition notes</summary><pre dir="auto" className={styles.ocrText}>{section.text}</pre></details> : <><h3>{section.label}</h3><pre dir="auto" className={styles.ocrText}>{section.text}</pre></>}</section>)}
+    {readableOcrSections(data.text).map((section, index) => <section className={styles.ocrPage} key={index}>
+      <h3>{section.label}</h3><pre dir="auto" className={styles.ocrText}>{section.text}</pre>
+      {section.alternatives.length > 0 && <details className={styles.readings}>
+        <summary>{section.alternatives.some(item => item.conflict) ? 'Conflicting readings' : 'Alternative readings'} · {section.alternatives.length}</summary>
+        <p>Independent OCR readings, not corrections. Compare with the original.</p>
+        {section.alternatives.map((item, i) => <div key={i} className={styles.reading}>
+          <strong>Primary reading</strong><pre dir="auto" className={styles.ocrText}>{item.original}</pre>
+          {item.readings.map((reading, j) => <div key={j}><strong>Alternative {j + 1}</strong><pre dir="auto" className={styles.ocrText}>{reading}</pre></div>)}
+          {item.conflict && <p>Recognition methods disagree. Neither reading is confirmed.</p>}
+          {item.numericDisagreement && <p>Numbers differ from the primary OCR. Check the original.</p>}
+          {item.incomplete && <p>Additional verification is incomplete.</p>}
+        </div>)}
+      </details>}
+    </section>)}
+    <details className={styles.technical} onToggle={event => setRaw(event.currentTarget.open)}>
+      <summary>Technical details</summary>
+      <p>Exact saved extraction, including recognition notes. Opening this view does not run OCR or call a model.</p>
+      {raw && <pre dir="auto" className={styles.ocrText}>{data.text}</pre>}
+    </details>
   </div>;
 }
 function PreviewPanel({ file, close }: { file: ManagedFile; close: () => void }) {
@@ -127,7 +144,7 @@ function PreviewPanel({ file, close }: { file: ManagedFile; close: () => void })
     const key = (event: KeyboardEvent) => {
       if (event.key === 'Escape') { event.preventDefault(); close(); }
       if (event.key !== 'Tab' || !window.matchMedia('(max-width: 1100px)').matches) return;
-      const buttons = ref.current?.querySelectorAll<HTMLElement>('button:not(:disabled), a[href], [tabindex="0"]');
+      const buttons = ref.current?.querySelectorAll<HTMLElement>('button:not(:disabled), a[href], [tabindex="0"], summary');
       if (!buttons?.length) return;
       const first = buttons[0], last = buttons[buttons.length - 1];
       if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
@@ -138,7 +155,7 @@ function PreviewPanel({ file, close }: { file: ManagedFile; close: () => void })
   }, [close]);
   return <aside ref={ref} className={styles.panel} role="dialog" aria-label={`Preview ${file.originalName}`}>
     <header><div><h2>{file.originalName}</h2><p>{extension(file.originalName).toUpperCase()} · {fileSize(file.size)}</p></div><button type="button" onClick={close} aria-label="Close preview" className={styles.close}>×</button></header>
-    {hasOcr && <div className={styles.previewTabs} role="group" aria-label="Preview mode"><button aria-pressed={tab === 'file'} onClick={() => setTab('file')}>File</button><button aria-pressed={tab === 'ocr'} onClick={() => setTab('ocr')}>Recognized text</button></div>}
+    {hasOcr && <div className={styles.previewTabs} role="group" aria-label="Preview mode"><button aria-pressed={tab === 'file'} onClick={() => setTab('file')}>File</button><button aria-pressed={tab === 'ocr'} onClick={() => setTab('ocr')}>Text</button></div>}
     <div className={styles.previewBody}>
       {tab === 'ocr' ? <RecognizedText file={file} /> : <>
       {!state.data && !state.error && <p role="status">Loading preview…</p>}
@@ -153,10 +170,10 @@ function PreviewPanel({ file, close }: { file: ManagedFile; close: () => void })
         </li>)}</ul>
       </div>}
       {(state.data?.kind === 'document'  || state.data?.kind === 'workbook') && <OfficePreview data={state.data} />}
-      {state.data?.kind === 'unavailable' && <div className={styles.ocrEmpty}><h3>Your original file</h3><p>Download to view the original layout.{hasOcr ? ' Open Recognized text to read the saved extraction.' : ''}</p></div>}
+      {state.data?.kind === 'unavailable' && <div className={styles.ocrEmpty}><h3>Your original file</h3><p>Download to view the original layout.{hasOcr ? ' Open Text to read the saved extraction.' : ''}</p></div>}
       </>}
     </div>
-    <footer><Download file={file} /></footer>
+    {tab === 'file' && <footer><Download file={file} /></footer>}
   </aside>;
 }
 export default function FileWorkspace({ children }: { children: ReactNode }) {
