@@ -1,4 +1,6 @@
 "use client";
+import { LIBRARY_ENABLED } from "@/lib/files/library";
+import { readLibraryDraft, writeLibraryDraft, clearLibraryDraft, subscribeLibraryDraft } from "@/lib/files/libraryDraft";
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
@@ -40,10 +42,11 @@ export function useInputDraft() {
   const syncFromValue = useCallback(
     (value: string) => {
       latestTextRef.current = value;
+      if (LIBRARY_ENABLED) writeLibraryDraft(ownerId,pathname,{text:value});
       dispatch(setHasInput(value.trim().length > 0));
       setInputCharCount(value.length);
     },
-    [dispatch],
+    [dispatch,ownerId,pathname],
   );
 
   const clipToModelLimit = useCallback(
@@ -66,6 +69,24 @@ export function useInputDraft() {
     },
     [dispatch, syncFromValue],
   );
+
+  useLayoutEffect(() => {
+    if (!LIBRARY_ENABLED || !ownerId) return;
+    const restore = () => {
+      const textarea = inputRef.current;
+      const saved = readLibraryDraft(ownerId,pathname);
+      if (textarea && !textarea.value && saved.text) {
+        textarea.value = saved.text;
+        latestTextRef.current = saved.text;
+        setInputCharCount(saved.text.length);
+        dispatch(setHasInput(!!saved.text.trim()));
+        dispatch(bumpTemplateTick());
+      }
+    };
+    const frame = requestAnimationFrame(restore);
+    const unsubscribe = subscribeLibraryDraft(restore);
+    return () => { cancelAnimationFrame(frame); unsubscribe(); };
+  }, [ownerId,pathname,dispatch,isOverlayOpen]);
 
   useLayoutEffect(() => {
     if (!ownerId) {
@@ -94,7 +115,7 @@ export function useInputDraft() {
       if (textarea.value) return;
       const saved = takeTokenHistoryDraft(ownerId, pathname);
       if (!saved) return;
-      const text = clipToModelLimit(saved.text);
+      const text = LIBRARY_ENABLED ? saved.text : clipToModelLimit(saved.text);
       textarea.value = text;
       textarea.setSelectionRange(
         Math.min(saved.selectionStart, text.length),
@@ -107,6 +128,7 @@ export function useInputDraft() {
   }, [ownerId, pathname, isOverlayOpen, clipToModelLimit, syncFromValue, dispatch]);
 
   useEffect(() => {
+    if (LIBRARY_ENABLED) return;
     const textarea = inputRef.current;
     if (!textarea) return;
     const clipped = clipToModelLimit(textarea.value);
@@ -152,12 +174,13 @@ export function useInputDraft() {
 
   const resetFields = useCallback(() => {
     clearTokenHistoryDraft();
+    if (LIBRARY_ENABLED) clearLibraryDraft(ownerId,pathname);
     latestTextRef.current = "";
     if (inputRef.current) inputRef.current.value = "";
     setInputCharCount(0);
     setInputImageCount(0);
     dispatch(setHasInput(false));
-  }, [dispatch]);
+  }, [dispatch,ownerId,pathname]);
 
   const consumeDraft = useCallback(() => {
     resetFields();

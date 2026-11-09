@@ -132,7 +132,7 @@ function RecognizedText({ file }: { file: ManagedFile }) {
     </details>
   </div>;
 }
-function PreviewPanel({ file, close }: { file: ManagedFile; close: () => void }) {
+export function PreviewPanel({ file, close }: { file: ManagedFile; close: () => void }) {
   const [retry, setRetry] = useState(0);
   const [tab, setTab] = useState<'file' | 'ocr'>('file');
   const hasOcr = ['application/pdf', 'image/png', 'image/jpeg', 'image/webp'].includes(file.mimetype);

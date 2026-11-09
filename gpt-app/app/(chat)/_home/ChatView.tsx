@@ -146,8 +146,8 @@ export default function ChatView({
             isSectionVisible={isSectionVisible}
             hasInput={ctrl.hasInput}
             onChange={ctrl.handleChange}
-            onSend={(_message, imageUrls, imageFiles) =>
-              ctrl.handleSendClick(ctrl.hasFirstRequest, imageUrls, imageFiles)
+            onSend={(_message, imageUrls, imageFiles, libraryFiles) =>
+              ctrl.handleSendClick(ctrl.hasFirstRequest, imageUrls, imageFiles, libraryFiles)
             }
             inputRef={inputRef}
             onHideSection={() => dispatch(setIsSectionVisible(false))}
@@ -220,11 +220,12 @@ export default function ChatView({
                 focusMode={false}
                 hasInput={ctrl.hasInput}
                 onChange={ctrl.handleChange}
-                onSend={async (_message, imageUrls, imageFiles) => {
+                onSend={async (_message, imageUrls, imageFiles, libraryFiles) => {
                   const accepted = await ctrl.handleSendClick(
                     ctrl.hasFirstRequest,
                     imageUrls,
                     imageFiles,
+                    libraryFiles,
                   );
                   if (accepted) dispatch(setIsOverlayOpen(false));
                   return accepted;
@@ -271,11 +272,12 @@ export default function ChatView({
                 feedback={feedback}
                 hasInput={ctrl.hasInput}
                 onChange={ctrl.handleChange}
-                onSend={async (_message, imageUrls, imageFiles) => {
+                onSend={async (_message, imageUrls, imageFiles, libraryFiles) => {
                   const accepted = await ctrl.handleSendClick(
                     ctrl.hasFirstRequest,
                     imageUrls,
                     imageFiles,
+                    libraryFiles,
                   );
                   if (accepted && !ctrl.hasFirstRequest) {
                     dispatch(setHasFirstRequest(true));

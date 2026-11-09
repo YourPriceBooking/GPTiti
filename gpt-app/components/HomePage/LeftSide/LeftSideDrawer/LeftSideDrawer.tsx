@@ -57,7 +57,7 @@ export default function LeftSideDrawer({
           onClick={openPanel}
           aria-label="Open menu"
         >
-          <span className={styles.menuIcon} aria-hidden="true" />
+          <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
         </button>
         {children}
       </div>
