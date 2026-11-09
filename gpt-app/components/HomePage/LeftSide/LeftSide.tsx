@@ -1,3 +1,4 @@
+import FilesNavLink from "@/components/Files/FilesNavLink";
 import styles from "./LeftSide.module.css";
 import FooterLeftSide from "./FooterLeftSide/FooterLeftSide";
 import { LeftSideProps } from "@/types/types";
@@ -175,6 +176,7 @@ export default function LeftSide({
               </svg>
             </button>
 
+            <FilesNavLink compact />
             <div className={styles.userIconBottom}>
               <button
                 type="button"

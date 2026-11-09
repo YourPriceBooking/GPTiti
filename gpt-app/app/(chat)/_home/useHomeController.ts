@@ -1,5 +1,7 @@
 "use client";
 
+import type { LibraryFile } from "@/lib/files/library";
+import { LIBRARY_ENABLED } from "@/lib/files/library";
 import { useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { composerIdentity, isUnsentPromotedDraft } from "@/lib/chat/composerIdentity";
@@ -103,7 +105,7 @@ export function useHomeController() {
   const preserveDraftOnModelSwitch = useRef(false);
   const { selectedModel, selectedModelGroup, selectModel: selectModelBase } = useModelSync({
     onModelSwitched: () => {
-      if (!preserveDraftOnModelSwitch.current) clearDraft();
+      if (!LIBRARY_ENABLED && !preserveDraftOnModelSwitch.current) clearDraft();
     },
   });
   const selectModel = useCallback((model: string) => {
@@ -254,13 +256,14 @@ export function useHomeController() {
       _hasFirstRequest: boolean,
       imageUrls: string[] = [],
       imageFiles: File[] = [],
+      libraryFiles: LibraryFile[] = [],
     ) => {
       if (sendCycleInFlightRef.current) return false;
       sendCycleInFlightRef.current = true;
 
       try {
         const text = draft.readDraftText();
-        if (!text && imageUrls.length === 0) return false;
+        if (!text && imageUrls.length === 0 && imageFiles.length === 0 && libraryFiles.length === 0) return false;
 
         const conversationId = await ensureConversationId(text);
         if (!conversationId) return false;
@@ -271,6 +274,7 @@ export function useHomeController() {
           text,
           imageUrls,
           imageFiles,
+          libraryFiles,
         });
         if (accepted) {
           draft.consumeDraft();
@@ -285,14 +289,14 @@ export function useHomeController() {
   );
 
   const handleProjectSend = useCallback(
-    async (imageUrls: string[] = [], imageFiles: File[] = []) => {
+    async (imageUrls: string[] = [], imageFiles: File[] = [], libraryFiles: LibraryFile[] = []) => {
       if (sendCycleInFlightRef.current) return false;
       sendCycleInFlightRef.current = true;
 
       try {
         if (!activeProjectId) return false;
         const text = draft.readDraftText();
-        if (!text && imageUrls.length === 0) return false;
+        if (!text && imageUrls.length === 0 && imageFiles.length === 0 && libraryFiles.length === 0) return false;
 
         if (!(await ensureConnectionReady())) return false;
 
@@ -337,6 +341,7 @@ export function useHomeController() {
           text,
           imageUrls,
           imageFiles,
+          libraryFiles,
         });
         if (accepted) {
           pendingProjectConversationRef.current = null;

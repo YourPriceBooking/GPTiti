@@ -120,3 +120,12 @@ export class AttachmentPreparation {
     return result;
   }
 }
+
+// Keep successful device uploads reusable across Files navigation within one account.
+// Weak keys do not retain removed local files; changing accounts discards the cache.
+let sessionOwner: string | undefined;
+let sessionPreparation = new AttachmentPreparation();
+export function accountPreparation(owner: string | undefined): AttachmentPreparation {
+  if (sessionOwner !== owner) { sessionOwner = owner; sessionPreparation = new AttachmentPreparation(); }
+  return sessionPreparation;
+}

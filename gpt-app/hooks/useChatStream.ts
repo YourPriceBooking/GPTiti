@@ -69,12 +69,18 @@ import { ensureSocketConnected } from "@/lib/socketClient";
 const TURN_ALREADY_RUNNING = "Wait for the current response to finish.";
 const INVALID_SERVER_RESPONSE = "Chat server returned an invalid response.";
 
+import { accountPreparation } from "@/lib/files/preparation";
+import { LIBRARY_ENABLED } from "@/lib/files/library";
+import { asUploadedFile, libraryInput, type LibraryFile } from "@/lib/files/library";
+import { getLibraryFile } from "@/lib/files/libraryApi";
+
 export type SendChatMessageArgs = {
   conversationId: string;
   modelId: string;
   text: string;
   imageUrls: string[];
   imageFiles: File[];
+  libraryFiles?: LibraryFile[];
   restoredPreparation?: PreparationDraft;
 };
 
@@ -123,7 +129,7 @@ export function useChatStream(): ChatStream {
   const fileWarnings = warningState.owner === userId ? warningState.names : [];
   const dismissFileWarnings = useCallback(() => setWarningState({names: []}), []);
   useEffect(() => {
-    preparationRef.current = new AttachmentPreparation();
+    preparationRef.current = LIBRARY_ENABLED ? accountPreparation(userId) : new AttachmentPreparation();
     const recovery = new AbortController();
     const stillSaved = (clientMessageId: string) => {
       try { return userId && readPreparationDraft(sessionStorage.getItem(preparationDraftKey(userId)), userId)?.clientMessageId === clientMessageId; }
@@ -639,9 +645,10 @@ export function useChatStream(): ChatStream {
       imageUrls,
       imageFiles,
       restoredPreparation,
+      libraryFiles = [],
     }: SendChatMessageArgs) => {
       if (cancellingPreparation.current || (restoredPreparation && restoredPreparation.owner !== userId)) return false;
-      const localFileFingerprints = fingerprintLocalFiles(imageFiles);
+      const localFileFingerprints = [...fingerprintLocalFiles(imageFiles), ...libraryFiles.map(f => `saved:${f.fileId}`)];
       const existingDelivery = Object.values(pendingTurnsRef.current).find(
         (turn) =>
           turn.status === "delivery_unknown" &&
@@ -685,17 +692,26 @@ export function useChatStream(): ChatStream {
       const clientMessageId = restoredPreparation?.clientMessageId ?? createClientMessageId();
       try {
         let limits: FileLimits | null = null;
-        if (imageFiles.length || restoredPreparation) {
+        if (imageFiles.length || libraryFiles.length || restoredPreparation) {
           // Revalidate the selected model immediately before upload, including retries.
           limits = await loadFileLimits(modelId, controller.signal);
-          const invalid = validateServerFiles(restoredPreparation ? restoredPreparation.files.map(f => ({name: f.originalName, size: f.size})) : imageFiles, limits);
+          const invalid = validateServerFiles(restoredPreparation ? restoredPreparation.files.map(f => ({name: f.originalName, size: f.size})) : [...imageFiles,...libraryFiles.map(libraryInput)], limits);
           if (invalid) throw new Error(invalid);
         }
         const useBackground = usesBackgroundOcr(limits);
         let files;
-        if (useBackground || restoredPreparation) {
+        if (useBackground || restoredPreparation || libraryFiles.length) {
           files = restoredPreparation?.files ?? await preparationRef.current.uploadAll(imageFiles,
             file => api.uploadFile(file, controller.signal).then(r => r.file), controller.signal, setFileProgress);
+          if (!restoredPreparation) {
+            for (const selected of libraryFiles) {
+              const latest = await getLibraryFile(selected.fileId, controller.signal);
+              if (latest.status !== 'ready' || (latest.expiresAt && Date.parse(latest.expiresAt) <= Date.now())) throw new Error(`${latest.originalName}: this file is no longer available. Remove it from your message.`);
+              if (!files.some(f => f.fileId === latest.fileId)) files.push(asUploadedFile(latest));
+            }
+          }
+          const invalidSelection = validateServerFiles(files.map(f => ({name:f.originalName,size:f.size})), limits);
+          if (invalidSelection) throw new Error(invalidSelection);
           if (userId && files.length) {
             const checkpoint = {clientMessageId, owner: userId, conversationId, modelId, text, files, createdAt: restoredPreparation?.createdAt ?? Date.now()};
             try { sessionStorage.setItem(preparationDraftKey(userId), encodePreparationDraft(checkpoint)); }
@@ -708,7 +724,7 @@ export function useChatStream(): ChatStream {
             if (!file.fileId || (!isZip && !isOcr)) continue;
             const progress = (phase: PreparationProgress['phase'], pages?: PreparationProgress['pages']) => setFileProgress({phase, pages, name: file.originalName, index: index + 1, total: files.length});
             progress(isZip ? 'unpacking' : 'recognizing');
-            activePreparationId.current = useBackground && isOcr ? file.fileId : null;
+            activePreparationId.current = useBackground && isOcr && !LIBRARY_ENABLED ? file.fileId : null;
             const id = file.fileId;
             const result = useBackground && isOcr
               ? await prepareInBackground({

@@ -27,6 +27,7 @@ type AppShellProps = {
   chatId?: string;
   projectId?: string;
   chatLayout?: boolean;
+  libraryLayout?: boolean;
   requireAuth?: boolean;
   children: (ctrl: HomeController) => ReactNode;
 };
@@ -35,6 +36,7 @@ export default function AppShell({
   chatId,
   projectId,
   chatLayout = false,
+  libraryLayout = false,
   requireAuth = false,
   children,
 }: AppShellProps) {
@@ -115,13 +117,13 @@ export default function AppShell({
 
         <div
           className={`${styles.rightSection} ${
-            chatLayout ? styles.rightSectionChat : ""
+            chatLayout || libraryLayout ? styles.rightSectionChat : ""
           }`}
         >
           <LeftSideDrawer
             {...leftSideProps}
             className={
-              chatLayout ? styles.chatMenuTrigger : styles.projectMenuTrigger
+              chatLayout || libraryLayout ? styles.chatMenuTrigger : styles.projectMenuTrigger
             }
           >
             {showMobileAccount && <MobileChatAccount />}

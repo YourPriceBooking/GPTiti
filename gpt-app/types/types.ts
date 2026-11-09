@@ -182,6 +182,7 @@ export type MainSectionRightSideProps = {
     message: string,
     imageUrls?: string[],
     imageFiles?: File[],
+    libraryFiles?: import("../lib/files/library").LibraryFile[],
   ) => Promise<boolean>;
   inputRef: React.RefObject<HTMLTextAreaElement | null>;
   onHideSection: () => void;

@@ -36,8 +36,8 @@ export default function ProjectView({ ctrl }: { ctrl: HomeController }) {
         inputProps={{
           hasInput: ctrl.hasInput,
           onChange: ctrl.handleChange,
-          onSend: (_message, imageUrls, imageFiles) =>
-            ctrl.handleProjectSend(imageUrls, imageFiles),
+          onSend: (_message, imageUrls, imageFiles, libraryFiles) =>
+            ctrl.handleProjectSend(imageUrls, imageFiles, libraryFiles),
           inputRef: inputRef,
           onHideSection: () => {},
           templateTick: ctrl.templateTick,

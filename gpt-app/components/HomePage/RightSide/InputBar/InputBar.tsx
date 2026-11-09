@@ -9,6 +9,10 @@ import {
   useCallback,
 } from "react";
 
+import { useLibraryDraft } from "@/hooks/useLibraryDraft";
+import { LIBRARY_ENABLED, libraryInput, type LibraryFile } from "@/lib/files/library";
+import LibraryPicker from "@/components/Files/LibraryPicker";
+import { attachLibraryFiles, readLibraryDraft } from "@/lib/files/libraryDraft";
 import AddSomethingToInput from "../AddSomethingToInput/AddSomethingToInput";
 import LoginModal from "@/components/HomePage/common/LoginModal/LoginModal";
 import ErrorPatchImgModal, {
@@ -104,6 +108,7 @@ export default function InputBar({
     message: string,
     imageUrls?: string[],
     imageFiles?: File[],
+    libraryFiles?: LibraryFile[],
   ) => Promise<boolean>;
   inputRef: React.RefObject<HTMLTextAreaElement | null>;
   onHideSection: () => void;
@@ -117,6 +122,9 @@ export default function InputBar({
   isAiResponding?: boolean;
   sendDisabled?: boolean;
 }) {
+  const library = useLibraryDraft();
+  const savedFiles = useMemo(() => LIBRARY_ENABLED ? library.draft.files : [], [library.draft.files]);
+  const [libraryOpen, setLibraryOpen] = useState(false);
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
   // Guests must be able to reach the sign-in gate without a ready chat/session.
   const chatPreparing = isLoggedIn && sendDisabled;
@@ -194,10 +202,20 @@ export default function InputBar({
   const [isLimitErrorOpen, setIsLimitErrorOpen] = useState(false);
   const [limitErrorKind, setLimitErrorKind] =
     useState<LimitKind>("imagesNotSupported");
-  const [images, setImages] = useState<
-    { id: string; url: string; file: File }[]
-  >([]);
-  const [files, setFiles] = useState<{ id: string; file: File }[]>([]);
+  const [localImages, setLocalImages] = useState<{id:string;url:string;file:File}[]>([]);
+  const [localFiles, setLocalFiles] = useState<{id:string;file:File}[]>([]);
+  const images = LIBRARY_ENABLED ? library.draft.local.images : localImages;
+  const files = LIBRARY_ENABLED ? library.draft.local.files : localFiles;
+  const setImages: React.Dispatch<React.SetStateAction<typeof localImages>> = action => {
+    if (!LIBRARY_ENABLED) { setLocalImages(action); return; }
+    const current = readLibraryDraft(library.owner,library.path).local;
+    library.update({local:{...current,images:typeof action === 'function' ? action(current.images) : action}});
+  };
+  const setFiles: React.Dispatch<React.SetStateAction<typeof localFiles>> = action => {
+    if (!LIBRARY_ENABLED) { setLocalFiles(action); return; }
+    const current = readLibraryDraft(library.owner,library.path).local;
+    library.update({local:{...current,files:typeof action === 'function' ? action(current.files) : action}});
+  };
   const [isSending, setIsSending] = useState(false);
   const isSendingRef = useRef(false);
   const preparingRef = useRef(false);
@@ -327,12 +345,13 @@ export default function InputBar({
   }, [showAddInput]);
 
   useEffect(() => {
-    onImagesChange?.(images.length);
-  }, [images.length, onImagesChange]);
+    onImagesChange?.(images.length + savedFiles.filter(f => f.mimetype.startsWith("image/")).length);
+  }, [images.length, savedFiles, onImagesChange]);
 
   useLayoutEffect(() => {
     const textarea = inputRef.current;
     if (!textarea) return;
+    if (LIBRARY_ENABLED && !textarea.value) textarea.value = readLibraryDraft(library.owner,library.path).text;
     onChange({
       target: textarea,
     } as React.ChangeEvent<HTMLTextAreaElement>);
@@ -352,7 +371,7 @@ export default function InputBar({
     if (!isLoggedIn) { setIsLoginOpen(true); return; }
     if (isComingSoon) return;
     setAttachmentError(null);
-    const existing = [...images.map(image => image.file), ...files.map(item => item.file)];
+    const existing = [...images.map(image => image.file), ...files.map(item => item.file), ...savedFiles.map(libraryInput)];
     const error = imagesOnly && incoming.some(file => inputKind(file) !== "image")
       ? "Choose PNG, JPG or WEBP images. Use Add files for documents, text and code."
       : validateServerFiles([...existing, ...incoming], fileLimits.limits);
@@ -469,7 +488,7 @@ export default function InputBar({
     if (textarea) {
       const message = textarea.value;
       const hasContent =
-        message.trim() !== "" || images.length > 0 || files.length > 0;
+        message.trim() !== "" || images.length > 0 || files.length > 0 || savedFiles.length > 0;
       if (hasContent) {
         if (!isLoggedIn) {
           setIsLoginOpen(true);
@@ -483,9 +502,9 @@ export default function InputBar({
           return;
         }
         const attachmentFiles = [...images.map(image => image.file), ...files.map(item => item.file)];
-        const invalid = validateServerFiles(attachmentFiles, fileLimits.limits);
+        const invalid = validateServerFiles([...attachmentFiles,...savedFiles.map(libraryInput)], fileLimits.limits);
         if (invalid) { setAttachmentError(invalid); return; }
-        if (files.length && !message.trim()) {
+        if ((files.length || savedFiles.length) && !message.trim()) {
           setAttachmentError("Add a message describing what to do with these files.");
           return;
         }
@@ -500,11 +519,13 @@ export default function InputBar({
             message,
             images.map((img) => img.url),
             attachmentFiles, // Legacy onSend argument carries all upload types through V2.
+            savedFiles,
           );
           if (!accepted) return;
           images.forEach((image) => URL.revokeObjectURL(image.url));
           setImages([]);
           setFiles([]);
+          if (LIBRARY_ENABLED) library.update({files:[],text:"",local:{images:[],files:[]},lostLocal:false});
           onHideSection();
           if (!hasFirstRequest) setHasFirstRequest(true);
           textarea.value = "";
@@ -688,12 +709,20 @@ export default function InputBar({
             fileLimits={fileLimits.limits}
             limitsStatus={fileLimits.status}
             onRetryLimits={fileLimits.retry}
+            onLibrarySelect={LIBRARY_ENABLED ? () => { setShowAddInput(false); if (!isLoggedIn) setIsLoginOpen(true); else setLibraryOpen(true); } : undefined}
           />
         </div>
       )}
 
+      {libraryOpen && library.owner && <LibraryPicker key={library.owner} owner={library.owner} modelId={selectedModel}
+        currentIds={savedFiles.map(f=>f.fileId)} current={[...images.map(f=>f.file),...files.map(f=>f.file),...savedFiles.map(libraryInput)]}
+        onClose={()=>setLibraryOpen(false)} onAdd={selected=>{attachLibraryFiles(library.owner!,library.path,selected);setLibraryOpen(false);}} />}
+      {LIBRARY_ENABLED && library.draft.lostLocal && <p className={styles.attachmentError} role="status">Some device files were not uploaded before this page reloaded. Add them again; your text and saved files are kept. <button type="button" onClick={()=>library.update({lostLocal:false})}>Dismiss</button></p>}
+      {savedFiles.length > 0 && <div className={styles.filePreviewRow}>{savedFiles.map(file=><div className={styles.fileChip} key={file.fileId}>
+        <span>{file.originalName} · {formatFileSize(file.size)}</span><button type="button" className={styles.fileChipRemove} aria-label={`Remove ${file.originalName} from message`} disabled={isSending || isPreparing} onClick={()=>library.update({files:savedFiles.filter(f=>f.fileId!==file.fileId)})}>×</button>
+      </div>)}</div>}
       {attachmentError && <p className={styles.attachmentError} role="alert">{attachmentError}</p>}
-      {(isPreparing || (isSending && (images.length > 0 || files.length > 0))) &&
+      {(isPreparing || (isSending && (images.length > 0 || files.length > 0 || savedFiles.length > 0))) &&
         <p className={styles.attachmentStatus} role="status">{isPreparing ? "Preparing attachments…" : "Preparing attachments before sending…"}</p>}
       {images.length > 0 && (
         <div className={styles.imagePreviewRow}>
@@ -958,7 +987,7 @@ export default function InputBar({
                 {isSending ? "Sending..." : "Stop answering"}
               </span>
             </div>
-          ) : hasInput || images.length > 0 || files.length > 0 ? (
+          ) : hasInput || images.length > 0 || files.length > 0 || savedFiles.length > 0 ? (
             <button
               type="button"
               className={`${styles.iconWrapper2} ${styles.controlButton}`}

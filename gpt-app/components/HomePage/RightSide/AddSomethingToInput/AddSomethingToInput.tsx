@@ -4,7 +4,8 @@ import { formatLimit, type FileLimits } from '@/lib/files/limits';
 import styles from './AddSomethingToInput.module.css';
 import { FILE_ACCEPT, IMAGE_ACCEPT, TEXT_EXTENSIONS } from '@/lib/files/input';
 
-export default function AddSomethingToInput({ onImageSelect, onImageBlocked, isImageBlocked = false, onFileSelect, fileLimits, limitsStatus, onRetryLimits }: {
+export default function AddSomethingToInput({ onImageSelect, onImageBlocked, isImageBlocked = false, onFileSelect, fileLimits, limitsStatus, onRetryLimits, onLibrarySelect }: {
+  onLibrarySelect?: () => void;
   onImageSelect: (files: File[]) => void;
   onImageBlocked?: () => void;
   isImageBlocked?: boolean;
@@ -46,6 +47,7 @@ export default function AddSomethingToInput({ onImageSelect, onImageBlocked, isI
       <svg className={styles.icon} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8" cy="8" r="1.5"/><path d="m4 18 5-5 4 4 3-4 5 5"/></svg>
       <span><strong>Add image</strong><small>PNG, JPG, WEBP</small></span>
     </button>
+    {onLibrarySelect && <button type="button" className={styles.item} onClick={onLibrarySelect}><svg className={styles.icon} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/></svg><span><strong>Add from library</strong><small>Choose your saved files</small></span></button>}
     <p className={styles.footer}>Attachment content counts toward request cost.</p>
     {info && <section id={id} className={styles.infoPanel} aria-label="Attachment guide" onFocusCapture={() => { cancelClose(); setPinned(true); }} onMouseEnter={cancelClose}>
       <header><strong>Files you can use</strong><button type="button" aria-label="Close attachment guide" onClick={() => { close(); infoButton.current?.focus(); }}>×</button></header>
