@@ -27,20 +27,6 @@ const MODEL_GUIDE_SLUG: Record<string, string> = {
   "GPT-5.5": "gpt-5-5",
   "GPT-5.4": "gpt-5-4",
   "GPT-5.4 mini": "gpt-5-4-mini",
-  "GPT-5.1": "gpt-5-1",
-  "GPT-5.1 mini": "gpt-5-1-mini",
-  "GPT-5.1 realtime": "gpt-5-1-realtime",
-  "GPT-4o": "gpt-4o",
-  "GPT-4o mini": "gpt-4o-mini",
-  "GPT-4o realtime": "gpt-4o-realtime",
-  o1: "o1",
-  "o1 mini": "o1-mini",
-  "o3 mini": "o3-mini",
-  "Smart Search": "smart-search",
-  "Voice → Text": "voice-to-text",
-  "Text → Speech": "text-to-speech",
-  "Image → Create HD": "image-create-hd",
-  "Image → Create Fast": "image-create-fast",
 };
 
 const READ_DELAY_MS = 1000;

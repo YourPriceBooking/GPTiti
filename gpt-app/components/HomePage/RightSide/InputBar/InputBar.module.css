@@ -451,8 +451,8 @@
   visibility: visible;
 }
 
-/* "Coming soon" model — dims the composer and blocks input/sending */
-.comingSoonOverlay {
+/* Unavailable model — dims the composer and blocks input/sending */
+.unavailableModelOverlay {
   position: absolute;
   inset: 0;
   display: flex;
@@ -464,7 +464,7 @@
   z-index: 6;
 }
 
-.comingSoonBadge {
+.unavailableModelBadge {
   display: inline-flex;
   align-items: center;
   flex-wrap: wrap;
@@ -478,7 +478,7 @@
   box-shadow: 0 4px 14px rgba(15, 23, 42, 0.25);
 }
 
-.comingSoonDot {
+.unavailableModelDot {
   width: 9px;
   height: 9px;
   flex-shrink: 0;
@@ -486,14 +486,14 @@
   background: #f5b301;
 }
 
-.comingSoonTitle {
+.unavailableModelTitle {
   font-family: var(--font-family);
   font-weight: 700;
   font-size: 15px;
   color: #e4e6e9;
 }
 
-.comingSoonHint {
+.unavailableModelHint {
   font-family: var(--font-family);
   font-weight: 600;
   font-size: 13px;
@@ -571,14 +571,14 @@
     gap: 0;
   }
 
-  .comingSoonBadge {
+  .unavailableModelBadge {
     gap: 4px 8px;
     padding: 8px 14px;
   }
-  .comingSoonTitle {
+  .unavailableModelTitle {
     font-size: 13px;
   }
-  .comingSoonHint {
+  .unavailableModelHint {
     font-size: 12px;
   }
 }

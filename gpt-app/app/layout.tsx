@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = buildMetadata(
-  "GPTiti — AI Chat, Image Generator & API-Powered Tools",
-  "AI tools powered by direct API access to premium GPT models. Chat, create images, convert voice, and search your data instantly with GPTiti.",
+  "GPTiti — AI Chat for Writing, Coding & Analysis",
+  "Chat with GPT-5.4-mini, GPT-5.4, and GPT-5.5 on GPTiti. Get help with writing, coding, and analysis without a monthly subscription.",
 );
 
 export default function RootLayout({

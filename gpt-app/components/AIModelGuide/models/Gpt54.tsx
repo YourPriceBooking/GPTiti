@@ -91,8 +91,6 @@ const Gpt54 = () => (
         GPT-5.4 is not optimized for cheap or high-volume usage.
       </p>
       <ul className="list-disc list-inside text-gray-700 text-lg leading-relaxed space-y-1 pl-5">
-        <li>Simple chat (use gpt-4o-mini)</li>
-        <li>Budget usage (use gpt-4o-mini)</li>
         <li>Frequent everyday tasks</li>
       </ul>
     </motion.div>
@@ -150,8 +148,6 @@ const Gpt54 = () => (
       </p>
       <ul className="list-none text-gray-700 text-lg leading-relaxed space-y-1 pl-5">
         <li className="list-disc ml-5">~6x more expensive than gpt-5.4-mini</li>
-        <li className="list-disc ml-5">~40x more expensive than gpt-4o-mini</li>
-        <li>✔️ cheaper than o1 for most tasks</li>
       </ul>
     </motion.div>
 
@@ -181,26 +177,6 @@ const Gpt54 = () => (
         <li>Much higher cost</li>
       </ul>
 
-      <p className="text-gray-700 text-lg leading-relaxed font-semibold">
-        vs gpt-4o:
-      </p>
-      <ul className="list-none text-gray-700 text-lg leading-relaxed space-y-1 pl-5">
-        <li>✔️ Significantly better performance</li>
-      </ul>
-      <ul className="list-disc list-inside text-gray-700 text-lg leading-relaxed space-y-1 pl-5">
-        <li>More expensive</li>
-      </ul>
-
-      <p className="text-gray-700 text-lg leading-relaxed font-semibold">
-        vs o1:
-      </p>
-      <ul className="list-none text-gray-700 text-lg leading-relaxed space-y-1 pl-5">
-        <li>✔️ Faster</li>
-        <li>✔️ Better general performance</li>
-      </ul>
-      <ul className="list-disc list-inside text-gray-700 text-lg leading-relaxed space-y-1 pl-5">
-        <li>Slightly less deep reasoning</li>
-      </ul>
     </motion.div>
 
     <motion.div
@@ -232,19 +208,8 @@ const Gpt54 = () => (
       </h2>
       <ul className="list-disc list-inside text-lg leading-relaxed space-y-1 pl-5">
         <li>
-          <Link
-            href="/ai-models-guide/compare-gpt-5-4-vs-o1"
-            className="text-blue-600 hover:underline"
-          >
-            GPT-5.4 vs o1
-          </Link>
-        </li>
-        <li>
-          <Link
-            href="/ai-models-guide/compare-gpt-5-4-mini-vs-gpt-4o-mini"
-            className="text-blue-600 hover:underline"
-          >
-            GPT-5.4-mini vs GPT-4o-mini
+          <Link href="/ai-models-guide/compare-gpt-5-5-vs-gpt-5-4" className="text-blue-600 hover:underline">
+            GPT-5.5 vs GPT-5.4
           </Link>
         </li>
       </ul>

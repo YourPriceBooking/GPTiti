@@ -41,13 +41,6 @@ const BestAiModelForChat = () => (
         <li>
           👉 <span className="font-semibold">Best overall:</span> GPT-5.4-mini
         </li>
-        <li>
-          👉 <span className="font-semibold">Best cheap option:</span>{" "}
-          GPT-4o-mini
-        </li>
-        <li>
-          👉 <span className="font-semibold">Best for reasoning:</span> O1
-        </li>
       </ul>
     </motion.div>
 
@@ -102,37 +95,6 @@ const BestAiModelForChat = () => (
       className="space-y-4"
     >
       <h3 className="text-lg md:text-xl font-bold text-gray-900">
-        GPT-4o-mini — Best for cheap chat
-      </h3>
-      <p className="text-gray-700 text-lg leading-relaxed">
-        GPT-4o-mini is ideal for fast and affordable everyday chat. It is the
-        best option for high-volume usage.
-      </p>
-      <ul className="list-none text-gray-700 text-lg leading-relaxed space-y-1 pl-5">
-        <li>✔️ Very cheap</li>
-        <li>✔️ Fast responses</li>
-        <li>✔️ Best for frequent use</li>
-      </ul>
-      <p className="text-gray-700 text-lg leading-relaxed">
-        👉{" "}
-        <Link
-          href="/ai-models-guide/gpt-4o-mini"
-          className="text-blue-600 hover:underline font-semibold"
-        >
-          Try GPT-4o-mini
-        </Link>
-      </p>
-    </motion.div>
-
-    <hr className="border-gray-200" />
-
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.7, ease: "easeOut" }}
-      className="space-y-4"
-    >
-      <h3 className="text-lg md:text-xl font-bold text-gray-900">
         GPT-5.4 — Best quality
       </h3>
       <p className="text-gray-700 text-lg leading-relaxed">
@@ -162,36 +124,6 @@ const BestAiModelForChat = () => (
       transition={{ duration: 0.7, ease: "easeOut" }}
       className="space-y-4"
     >
-      <h3 className="text-lg md:text-xl font-bold text-gray-900">
-        O1 — Best for complex questions
-      </h3>
-      <p className="text-gray-700 text-lg leading-relaxed">
-        O1 is designed for deep reasoning and complex problem solving. It is not
-        ideal for everyday chat but excels at difficult tasks.
-      </p>
-      <ul className="list-none text-gray-700 text-lg leading-relaxed space-y-1 pl-5">
-        <li>✔️ Deep reasoning</li>
-        <li>✔️ Complex questions</li>
-      </ul>
-      <p className="text-gray-700 text-lg leading-relaxed">
-        👉{" "}
-        <Link
-          href="/ai-models-guide/o1"
-          className="text-blue-600 hover:underline font-semibold"
-        >
-          Try O1
-        </Link>
-      </p>
-    </motion.div>
-
-    <hr className="border-gray-200" />
-
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.7, ease: "easeOut" }}
-      className="space-y-4"
-    >
       <h2 className="text-xl md:text-2xl font-bold text-gray-900">
         How to choose the right AI model
       </h2>
@@ -200,19 +132,12 @@ const BestAiModelForChat = () => (
       </p>
       <ul className="list-none text-gray-700 text-lg leading-relaxed space-y-1 pl-5">
         <li>
-          👉 For daily chat → use{" "}
-          <span className="font-semibold">GPT-4o-mini</span>
-        </li>
-        <li>
           👉 For better quality → use{" "}
           <span className="font-semibold">GPT-5.4-mini</span>
         </li>
         <li>
           👉 For the best results → use{" "}
           <span className="font-semibold">GPT-5.4</span>
-        </li>
-        <li>
-          👉 For complex tasks → use <span className="font-semibold">O1</span>
         </li>
       </ul>
     </motion.div>
@@ -260,28 +185,13 @@ const BestAiModelForChat = () => (
             GPT-5.4-mini
           </Link>
         </li>
-        <li>
-          <Link
-            href="/ai-models-guide/gpt-4o-mini"
-            className="text-blue-600 hover:underline"
-          >
-            GPT-4o-mini
-          </Link>
-        </li>
+
         <li>
           <Link
             href="/ai-models-guide/gpt-5-4"
             className="text-blue-600 hover:underline"
           >
             GPT-5.4
-          </Link>
-        </li>
-        <li>
-          <Link
-            href="/ai-models-guide/o1"
-            className="text-blue-600 hover:underline"
-          >
-            O1
           </Link>
         </li>
       </ul>
