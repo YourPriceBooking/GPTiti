@@ -38,7 +38,9 @@ export default function SectionGptTokens(props: SectionGptTokensProps) {
           />
         </div>
         <p className={styles.paragraph}>
-          approximate asking price {result?.model.tokens} {TOKENS_SUFFIX}
+          {result
+            ? `approximate asking price ${result.model.tokens} ${TOKENS_SUFFIX}`
+            : null}
         </p>
       </article>
 

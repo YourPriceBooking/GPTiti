@@ -37,7 +37,7 @@ const PLANS: Plan[] = [
     id: "p500",
     tokens: 500000,
     price: 4,
-    subtitle: "good for X–Y messages on GPT-4o-mini",
+    subtitle: "Good for everyday tasks",
     badge: null,
     saveText: null,
   },

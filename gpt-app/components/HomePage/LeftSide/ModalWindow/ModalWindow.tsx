@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 import Image from "next/image";
 import Link from "next/link";
-import { modelConfig, TOKENS_SUFFIX } from "@/config/models.config";
+import { DEFAULT_MODEL_GROUP, modelConfig, TOKENS_SUFFIX } from "@/config/models.config";
 import { getModelGroupAndItem } from "@/functions/getModelGroupAndItem";
 import { useAppSelector } from "@/redux/hooks";
 import { selectBalance } from "@/redux/tokens/selectors";
@@ -38,7 +38,10 @@ export default function ModalWindow({
     selectedModelGroup;
   const balance = useAppSelector(selectBalance);
   const [viewGroup, setViewGroup] = useState<ModelType>(
-    () => lastViewedGroup ?? appliedGroup,
+    () => {
+      const group = lastViewedGroup ?? appliedGroup;
+      return Object.hasOwn(modelConfig, group) ? group : DEFAULT_MODEL_GROUP;
+    },
   );
   const [visibleModel, setVisibleModel] = useState<string | null>(null);
   const tabsRef = useRef<HTMLDivElement>(null);
@@ -94,7 +97,7 @@ export default function ModalWindow({
       <header className={styles.header}>
         <div className={styles.headerTop}>
           <h2 id="model-picker-title" className={styles.title}>
-            Choose AI tools or a GPT model
+            Choose a GPT model
           </h2>
           <button
             type="button"

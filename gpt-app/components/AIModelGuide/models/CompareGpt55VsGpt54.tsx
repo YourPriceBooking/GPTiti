@@ -118,7 +118,7 @@ const CompareGpt55VsGpt54 = () => (
                 Simple chat or cheap tasks
               </td>
               <td className="px-4 py-2 border border-gray-200">
-                Neither — use GPT-4o-mini or GPT-5.4-mini
+                Use GPT-5.4-mini
               </td>
             </tr>
           </tbody>
@@ -549,30 +549,6 @@ const CompareGpt55VsGpt54 = () => (
         Compare with other models
       </h2>
       <ul className="list-disc list-inside text-lg leading-relaxed space-y-1 pl-5">
-        <li>
-          <Link
-            href="/ai-models-guide/compare-gpt-5-5-vs-gpt-5-4-mini"
-            className="text-blue-600 hover:underline"
-          >
-            GPT-5.5 vs GPT-5.4-mini
-          </Link>
-        </li>
-        <li>
-          <Link
-            href="/ai-models-guide/compare-gpt-5-5-vs-o1"
-            className="text-blue-600 hover:underline"
-          >
-            GPT-5.5 vs O1
-          </Link>
-        </li>
-        <li>
-          <Link
-            href="/ai-models-guide/compare-gpt-5-4-vs-o1"
-            className="text-blue-600 hover:underline"
-          >
-            GPT-5.4 vs O1
-          </Link>
-        </li>
       </ul>
     </motion.div>
 
@@ -610,22 +586,6 @@ const CompareGpt55VsGpt54 = () => (
             className="text-blue-600 hover:underline"
           >
             GPT-5.4-mini — best value for most users
-          </Link>
-        </li>
-        <li>
-          <Link
-            href="/ai-models-guide/gpt-5-1"
-            className="text-blue-600 hover:underline"
-          >
-            GPT-5.1 — strong model for work and content
-          </Link>
-        </li>
-        <li>
-          <Link
-            href="/ai-models-guide/o1"
-            className="text-blue-600 hover:underline"
-          >
-            O1 — deep reasoning model
           </Link>
         </li>
       </ul>

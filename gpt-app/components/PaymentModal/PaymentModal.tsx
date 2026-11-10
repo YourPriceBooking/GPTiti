@@ -286,7 +286,7 @@ export default function PaymentModal({ isOpen, onClose, plan }: Props) {
                   alt="check"
                 />
                 <span className={styles.cardPlanBenefitsSpan}>
-                  Access to GPT-5.1 / GPT-4o / O-series
+                  Access to GPT-5.4-mini / GPT-5.4 / GPT-5.5
                 </span>
               </li>
               <li className={styles.cardPlanBenefitsItem}>

@@ -14,41 +14,19 @@ export default function ModelsSection() {
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        Available Models and Tools
+        Available Models
       </motion.h2>
 
-      <Category
-        title="🟡 AI Tools — Smart Features"
-        color="text-yellow-500"
-        models={[
-          "Smart Search — search your data with AI",
-          "Voice → Text — convert speech to text instantly",
-          "Text → Voice — generate AI voice responses",
-          "Image → Create HD — create high-quality, detailed images with maximum accuracy",
-          "Image → Create Fast — create images faster with lower cost for everyday use",
-        ]}
-      />
       <Category
         title="🔵 GPT-5 Series — Most powerful AI models"
         color="text-blue-600"
         models={[
-          "gpt-5.4 (New)",
-          "gpt-5.4-mini (New)",
-          "gpt-5.1",
-          "gpt-5.1-mini",
-          "gpt-5.1-realtime",
+          "gpt-5.4",
+          "gpt-5.4-mini",
+          "gpt-5.5",
         ]}
       />
-      <Category
-        title="🟣 Category 2 — GPT-4o (Balanced)"
-        color="text-purple-600"
-        models={["gpt-4o", "gpt-4o-mini", "gpt-4o-realtime"]}
-      />
-      <Category
-        title="🔴 Category 3 — O-Series (Reasoning)"
-        color="text-red-600"
-        models={["o1", "o1-mini", "o3-mini"]}
-      />
+
     </motion.div>
   );
 }

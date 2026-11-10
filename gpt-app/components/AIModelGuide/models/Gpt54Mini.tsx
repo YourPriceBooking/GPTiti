@@ -31,8 +31,7 @@ const Gpt54Mini = () => (
       </h2>
       <p className="text-gray-700 text-lg leading-relaxed">
         GPT-5.4-mini is an advanced AI model designed to provide better quality
-        than basic models while remaining affordable. It is significantly more
-        capable than GPT-4o-mini, especially for structured tasks,
+        than basic models while remaining affordable. It is designed for structured tasks,
         problem-solving, and detailed responses.
       </p>
     </motion.div>
@@ -90,7 +89,6 @@ const Gpt54Mini = () => (
         simple tasks.
       </p>
       <ul className="list-disc list-inside text-gray-700 text-lg leading-relaxed space-y-1 pl-5">
-        <li>Simple chat (use GPT-4o-mini instead)</li>
         <li>High-volume cheap usage</li>
       </ul>
     </motion.div>
@@ -147,9 +145,7 @@ const Gpt54Mini = () => (
         Compared to other models:
       </p>
       <ul className="list-none text-gray-700 text-lg leading-relaxed space-y-1 pl-5">
-        <li>✔️ ~3x more powerful than GPT-4o-mini</li>
         <li>✔️ ~4x cheaper than GPT-5.4</li>
-        <li>✔️ ~10x cheaper than O1</li>
       </ul>
     </motion.div>
 
@@ -170,19 +166,8 @@ const Gpt54Mini = () => (
       </h2>
       <ul className="list-disc list-inside text-lg leading-relaxed space-y-1 pl-5">
         <li>
-          <Link
-            href="/ai-models-guide/compare-gpt-5-4-mini-vs-gpt-4o-mini"
-            className="text-blue-600 hover:underline"
-          >
-            GPT-5.4-mini vs GPT-4o-mini
-          </Link>
-        </li>
-        <li>
-          <Link
-            href="/ai-models-guide/compare-gpt-5-4-vs-o1"
-            className="text-blue-600 hover:underline"
-          >
-            GPT-5.4 vs O1
+          <Link href="/ai-models-guide/compare-gpt-5-5-vs-gpt-5-4" className="text-blue-600 hover:underline">
+            GPT-5.5 vs GPT-5.4
           </Link>
         </li>
       </ul>
@@ -202,34 +187,10 @@ const Gpt54Mini = () => (
       <ul className="list-disc list-inside text-lg leading-relaxed space-y-1 pl-5">
         <li>
           <Link
-            href="/ai-models-guide/gpt-4o-mini"
-            className="text-blue-600 hover:underline"
-          >
-            GPT-4o-mini — cheapest option
-          </Link>
-        </li>
-        <li>
-          <Link
-            href="/ai-models-guide/gpt-4o"
-            className="text-blue-600 hover:underline"
-          >
-            GPT-4o — balanced option
-          </Link>
-        </li>
-        <li>
-          <Link
             href="/ai-models-guide/gpt-5-4"
             className="text-blue-600 hover:underline"
           >
             GPT-5.4 — maximum performance
-          </Link>
-        </li>
-        <li>
-          <Link
-            href="/ai-models-guide/o1"
-            className="text-blue-600 hover:underline"
-          >
-            O1 — deep reasoning
           </Link>
         </li>
       </ul>

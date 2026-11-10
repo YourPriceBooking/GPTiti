@@ -6,6 +6,7 @@ import InputBar from "../InputBar/InputBar";
 import ChooseModelColumn from "../ChooseModelColumn/ChooseModelColumn";
 
 import styles from "./InputComposer.module.css";
+import { isSelectableModel } from "@/config/models.config";
 
 type InputComposerProps = React.ComponentProps<typeof InputBar> & {
   feedback?: React.ReactNode;
@@ -28,6 +29,7 @@ export default function InputComposer({
   ...inputBarProps
 }: InputComposerProps) {
   const isProject = inputBarProps.variant === "project";
+  const modelAvailable = isSelectableModel(inputBarProps.selectedModel);
 
   const [animReady, setAnimReady] = useState(false);
   useEffect(() => {
@@ -54,7 +56,7 @@ export default function InputComposer({
       <div
         className={`${styles.metaWrap} ${isProject ? styles.metaWrapPlain : ""}`}
       >
-        {estimateSupported ? (
+        {estimateSupported && modelAvailable ? (
           <div className={styles.metaRow}>
             <span
               className={`${styles.estimate} ${

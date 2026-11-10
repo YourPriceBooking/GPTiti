@@ -146,16 +146,6 @@ const Gpt55 = () => (
       </p>
       <ul className="list-disc list-inside text-gray-700 text-lg leading-relaxed space-y-1 pl-5">
         <li>
-          For simple everyday chat, use{" "}
-          <Link
-            href="/ai-models-guide/gpt-4o-mini"
-            className="text-blue-600 hover:underline"
-          >
-            GPT-4o-mini
-          </Link>
-          .
-        </li>
-        <li>
           For better balance between quality and cost, use{" "}
           <Link
             href="/ai-models-guide/gpt-5-4-mini"
@@ -418,27 +408,6 @@ const Gpt55 = () => (
       className="space-y-4"
     >
       <h2 className="text-xl md:text-2xl font-bold text-gray-900">
-        GPT-5.5 vs O1
-      </h2>
-      <p className="text-gray-700 text-lg leading-relaxed">
-        O1 is focused on deep reasoning. GPT-5.5 is better as a premium
-        general-purpose model that can handle reasoning, writing, coding, and
-        professional tasks in one place.
-      </p>
-      <p className="text-gray-700 text-lg leading-relaxed">
-        If your task is purely logic-heavy or reasoning-focused, O1 can be
-        useful. If you need a strong all-around premium model for work, GPT-5.5
-        is usually easier to use.
-      </p>
-    </motion.div>
-
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.7, ease: "easeOut" }}
-      className="space-y-4"
-    >
-      <h2 className="text-xl md:text-2xl font-bold text-gray-900">
         Best use cases for GPT-5.5
       </h2>
 
@@ -552,22 +521,6 @@ const Gpt55 = () => (
             GPT-5.5 vs GPT-5.4
           </Link>
         </li>
-        <li>
-          <Link
-            href="/ai-models-guide/compare-gpt-5-5-vs-gpt-5-4-mini"
-            className="text-blue-600 hover:underline"
-          >
-            GPT-5.5 vs GPT-5.4-mini
-          </Link>
-        </li>
-        <li>
-          <Link
-            href="/ai-models-guide/compare-gpt-5-5-vs-o1"
-            className="text-blue-600 hover:underline"
-          >
-            GPT-5.5 vs O1
-          </Link>
-        </li>
       </ul>
     </motion.div>
 
@@ -597,30 +550,6 @@ const Gpt55 = () => (
             className="text-blue-600 hover:underline"
           >
             GPT-5.4-mini — best value for most users
-          </Link>
-        </li>
-        <li>
-          <Link
-            href="/ai-models-guide/gpt-5-1"
-            className="text-blue-600 hover:underline"
-          >
-            GPT-5.1 — strong model for work and content
-          </Link>
-        </li>
-        <li>
-          <Link
-            href="/ai-models-guide/gpt-4o"
-            className="text-blue-600 hover:underline"
-          >
-            GPT-4o — fast balanced model
-          </Link>
-        </li>
-        <li>
-          <Link
-            href="/ai-models-guide/o1"
-            className="text-blue-600 hover:underline"
-          >
-            O1 — deep reasoning model
           </Link>
         </li>
       </ul>

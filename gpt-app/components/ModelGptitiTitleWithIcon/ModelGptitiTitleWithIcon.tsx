@@ -11,24 +11,24 @@ export default function ModelGptitiTitleWithIcon({
   return (
     <div
       ref={modelRef}
-      className={styles.modelHoverWrapper}
-      tabIndex={0}
+      className={result ? styles.modelHoverWrapper : styles.unavailable}
+      tabIndex={result ? 0 : undefined}
       onClick={(e) => {
         e.stopPropagation();
-        setIsModalOpen(true);
+        if (result) setIsModalOpen(true);
       }}
     >
       <article className={styles.titleContainer}>
         <h2 className={styles.title}>
           {result ? result.model.title : selectedModel}
         </h2>
-        <Image
+        {result && <Image
           className={styles.chevronIcon}
           width={11}
           height={6}
           src="/icons/chevron-small.svg"
           alt="chevron-small"
-        />
+        />}
       </article>
     </div>
   );

@@ -29,7 +29,7 @@ const AIModelGuide = () => {
       >
         Explore all AI models available on{" "}
         <span className="font-semibold text-blue-600">GPTiti</span>. Compare
-        GPT, O-series, and realtime models by speed, cost, and performance.
+        GPT-5.4-mini, GPT-5.4, and GPT-5.5 by speed, cost, and performance.
       </motion.p>
 
       <motion.p
@@ -48,100 +48,6 @@ const AIModelGuide = () => {
         className="space-y-4"
       >
         <ModelCompareTable />
-      </motion.div>
-
-      {/* AI Tools */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, ease: "easeOut" }}
-        className="space-y-4"
-      >
-        <h2 className="text-xl md:text-2xl font-bold text-yellow-500">
-          🟡 AI Tools — Smart Features
-        </h2>
-        <ul className="list-disc list-inside text-gray-700 text-lg leading-relaxed space-y-3 pl-5">
-          <li>
-            <Link
-              href="/ai-models-guide/smart-search"
-              className="text-blue-600 hover:underline font-medium"
-            >
-              Smart Search
-            </Link>
-            <br />
-            <span className="text-sm pl-4 text-gray-500">
-              Search your data with AI
-            </span>
-            <br />
-            <span className="text-sm pl-4">
-              <Link
-                href="/ai-models-guide/compare-smart-search-vs-chat"
-                className="text-gray-500 hover:underline"
-              >
-                Compare with Chat AI
-              </Link>
-            </span>
-          </li>
-          <li>
-            <Link
-              href="/ai-models-guide/voice-to-text"
-              className="text-blue-600 hover:underline font-medium"
-            >
-              Voice → Text
-            </Link>
-            <br />
-            <span className="text-sm pl-4 text-gray-500">
-              Convert speech to text instantly
-            </span>
-            <br />
-            <span className="text-sm pl-4">
-              <Link
-                href="/ai-models-guide/compare-voice-vs-text-input"
-                className="text-gray-500 hover:underline"
-              >
-                Compare with Text input
-              </Link>
-            </span>
-          </li>
-          <li>
-            <Link
-              href="/ai-models-guide/text-to-speech"
-              className="text-blue-600 hover:underline font-medium"
-            >
-              Text → Voice
-            </Link>
-            <br />
-            <span className="text-sm pl-4 text-gray-500">
-              Generate AI voice responses
-            </span>
-            <br />
-            <span className="text-sm pl-4">
-              <Link
-                href="/ai-models-guide/compare-voice-vs-text-output"
-                className="text-gray-500 hover:underline"
-              >
-                Compare with Text output
-              </Link>
-            </span>
-          </li>
-
-          <li>
-            <Link
-              href="/ai-models-guide/image-create-hd"
-              className="text-blue-600 hover:underline font-medium"
-            >
-              Image → Create HD
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/ai-models-guide/image-create-fast"
-              className="text-blue-600 hover:underline font-medium"
-            >
-              Image → Create Fast
-            </Link>
-          </li>
-        </ul>
       </motion.div>
 
       {/* GPT-5 Series */}
@@ -182,14 +88,6 @@ const AIModelGuide = () => {
                 Compare with GPT-5.4
               </Link>
             </span>
-            <span className="block text-sm pl-4">
-              <Link
-                href="/ai-models-guide/compare-gpt-5-5-vs-o1"
-                className="text-gray-500 hover:underline"
-              >
-                Compare with O1
-              </Link>
-            </span>
           </li>
           <li>
             <Link
@@ -199,14 +97,6 @@ const AIModelGuide = () => {
               GPT-5.4{" "}
             </Link>
             <br />
-            <span className="text-sm pl-4">
-              <Link
-                href="/ai-models-guide/compare-gpt-5-4-vs-o1"
-                className="text-gray-500 hover:underline"
-              >
-                Compare with O1
-              </Link>
-            </span>
           </li>
           <li>
             <Link
@@ -219,168 +109,16 @@ const AIModelGuide = () => {
               </span>
             </Link>
             <br />
-            <span className="text-sm pl-4">
-              <Link
-                href="/ai-models-guide/compare-gpt-5-4-mini-vs-gpt-4o-mini"
-                className="text-gray-500 hover:underline"
-              >
-                Compare with GPT-4o-mini
-              </Link>
-            </span>
-          </li>
-          <li>
-            <Link
-              href="/ai-models-guide/gpt-5-1"
-              className="text-blue-600 hover:underline font-medium"
-            >
-              GPT-5.1
-            </Link>
-            <br />
-            <span className="text-sm pl-4">
-              <Link
-                href="/ai-models-guide/compare-gpt-4o-vs-gpt-5-1"
-                className="text-gray-500 hover:underline"
-              >
-                Compare with GPT-4o
-              </Link>
-            </span>
-          </li>
-          <li>
-            <Link
-              href="/ai-models-guide/gpt-5-1-mini"
-              className="text-blue-600 hover:underline font-medium"
-            >
-              GPT-5.1-mini
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/ai-models-guide/gpt-5-1-realtime"
-              className="text-blue-600 hover:underline font-medium"
-            >
-              GPT-5.1-realtime
-            </Link>
           </li>
         </ul>
       </motion.div>
 
-      {/* GPT-4o Series */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, ease: "easeOut" }}
-        className="space-y-4"
+      <Link
+        href="/ai-models-guide/best-ai-model-for-chat"
+        className="text-sm font-bold text-[#2F6BFF] px-2.5 py-1.5 rounded-lg bg-[var(--main-white)] inline-block"
       >
-        <h2 className="text-xl md:text-2xl font-bold text-purple-600">
-          🟣 GPT-4o Series — Fast &amp; balanced
-        </h2>
-        <ul className="list-disc list-inside text-gray-700 text-lg leading-relaxed space-y-3 pl-5">
-          <li>
-            <Link
-              href="/ai-models-guide/gpt-4o"
-              className="text-blue-600 hover:underline font-medium"
-            >
-              GPT-4o
-            </Link>
-            <br />
-            <span className="text-sm pl-4">
-              <Link
-                href="/ai-models-guide/compare-gpt-4o-vs-gpt-5-1"
-                className="text-gray-500 hover:underline"
-              >
-                Compare with GPT-5.1
-              </Link>
-            </span>
-          </li>
-          <li>
-            <Link
-              href="/ai-models-guide/gpt-4o-mini"
-              className="text-blue-600 hover:underline font-medium"
-            >
-              GPT-4o-mini
-            </Link>
-            <br />
-            <span className="text-sm pl-4">
-              <Link
-                href="/ai-models-guide/compare-gpt-5-4-mini-vs-gpt-4o-mini"
-                className="text-gray-500 hover:underline"
-              >
-                Compare with GPT-5.4-mini
-              </Link>
-            </span>
-          </li>
-          <li>
-            <Link
-              href="/ai-models-guide/gpt-4o-realtime"
-              className="text-blue-600 hover:underline font-medium"
-            >
-              GPT-4o-realtime
-            </Link>
-          </li>
-        </ul>
-      </motion.div>
-
-      {/* O-Series */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, ease: "easeOut" }}
-        className="space-y-4"
-      >
-        <h2 className="text-xl md:text-2xl font-bold text-red-600">
-          🔴 O-Series — Advanced reasoning
-        </h2>
-        <ul className="list-disc list-inside text-gray-700 text-lg leading-relaxed space-y-3 pl-5">
-          <li>
-            <Link
-              href="/ai-models-guide/o1"
-              className="text-blue-600 hover:underline font-medium"
-            >
-              O1
-            </Link>
-            <br />
-            <span className="text-sm pl-4">
-              <Link
-                href="/ai-models-guide/compare-o1-vs-o3-mini"
-                className="text-gray-500 hover:underline"
-              >
-                Compare with O3-mini
-              </Link>
-            </span>
-          </li>
-          <li>
-            <Link
-              href="/ai-models-guide/o1-mini"
-              className="text-blue-600 hover:underline font-medium"
-            >
-              O1-mini
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/ai-models-guide/o3-mini"
-              className="text-blue-600 hover:underline font-medium"
-            >
-              O3-mini
-            </Link>
-            <br />
-            <span className="text-sm pl-4">
-              <Link
-                href="/ai-models-guide/compare-o1-vs-o3-mini"
-                className="text-gray-500 hover:underline"
-              >
-                Compare with O1
-              </Link>
-            </span>
-          </li>
-        </ul>
-        <Link
-          href="/ai-models-guide/best-ai-model-for-chat"
-          className="text-sm font-bold text-[#2F6BFF] px-2.5 py-1.5 rounded-lg bg-[var(--main-white)] inline-block"
-        >
-          🔥 Compare best AI models for chat →
-        </Link>
-      </motion.div>
+        🔥 Compare best AI models for chat →
+      </Link>
 
       <hr className="border-gray-200" />
 

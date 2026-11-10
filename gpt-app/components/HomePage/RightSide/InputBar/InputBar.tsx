@@ -33,7 +33,7 @@ import {
 import { DictationStopIcon, DictationWaveform } from "./DictationVisuals";
 
 import { getModelLimits } from "@/config/modelLimits.config";
-import { isModelComingSoon } from "@/config/models.config";
+import { isSelectableModel } from "@/config/models.config";
 import { inputKind, validateTextBytes } from "@/lib/files/input";
 
 import { useFileLimits } from "@/hooks/useFileLimits";
@@ -250,8 +250,8 @@ export default function InputBar({
   } | null>(null);
 
   const limits = useMemo(() => getModelLimits(selectedModel), [selectedModel]);
-  const isComingSoon = useMemo(
-    () => isModelComingSoon(selectedModel),
+  const isUnavailable = useMemo(
+    () => !isSelectableModel(selectedModel),
     [selectedModel],
   );
 
@@ -369,7 +369,7 @@ export default function InputBar({
   const addAttachments = async (incoming: File[], imagesOnly = false) => {
     if (isSendingRef.current || preparingRef.current || voiceBusy || !incoming.length) return;
     if (!isLoggedIn) { setIsLoginOpen(true); return; }
-    if (isComingSoon) return;
+    if (isUnavailable) return;
     setAttachmentError(null);
     const existing = [...images.map(image => image.file), ...files.map(item => item.file), ...savedFiles.map(libraryInput)];
     const error = imagesOnly && incoming.some(file => inputKind(file) !== "image")
@@ -482,7 +482,7 @@ export default function InputBar({
   };
 
   const handleSend = async () => {
-    if (isComingSoon || chatPreparing || isSendingRef.current || preparingRef.current || isAiResponding)
+    if (isUnavailable || chatPreparing || isSendingRef.current || preparingRef.current || isAiResponding)
       return;
     const textarea = inputRef.current;
     if (textarea) {
@@ -554,7 +554,7 @@ export default function InputBar({
       isSendingRef.current ||
       voiceBusy ||
       dictation.recording ||
-      isComingSoon ||
+      isUnavailable ||
       isAiResponding
     )
       return;
@@ -679,21 +679,21 @@ export default function InputBar({
       onDragOver={event => {
         if (!isFileDrag(event.dataTransfer)) return;
         event.preventDefault();
-        event.dataTransfer.dropEffect = isSendingRef.current || preparingRef.current || voiceBusy || isComingSoon ? 'none' : 'copy';
+        event.dataTransfer.dropEffect = isSendingRef.current || preparingRef.current || voiceBusy || isUnavailable ? 'none' : 'copy';
       }}
       onDrop={event => {
         if (!isFileDrag(event.dataTransfer)) return;
         event.preventDefault();
         dragDepth.current = 0;
         setDragActive(false);
-        if (isSendingRef.current || preparingRef.current || voiceBusy || isComingSoon) return;
+        if (isSendingRef.current || preparingRef.current || voiceBusy || isUnavailable) return;
         try { void addAttachments(droppedFiles(event.dataTransfer)); }
         catch (error) { setAttachmentError((error as Error).message); }
       }}
       data-input-bar
     >
       {dragActive && <div className={styles.dropZone} role="status">
-        <strong>{isSending || isPreparing || voiceBusy || isComingSoon ? 'Finish the current action first' : 'Drop files to attach'}</strong>
+        <strong>{isSending || isPreparing || voiceBusy || isUnavailable ? 'Finish the current action first' : 'Drop files to attach'}</strong>
         <span>Same formats and limits as Add files · nothing is sent automatically</span>
       </div>}
       {showAddInput && (
@@ -815,7 +815,7 @@ export default function InputBar({
             type="button"
             aria-label="Add files and more"
             className={styles.iconWrapper}
-            disabled={isSending || isPreparing || voiceBusy}
+            disabled={isSending || isPreparing || voiceBusy || isUnavailable}
             onPointerEnter={(event) =>
               fitInputTooltipToViewport(event.currentTarget)
             }
@@ -852,7 +852,7 @@ export default function InputBar({
             onChange={handleChange}
             onKeyDown={handleKeyDown}
             onPaste={handlePaste}
-            readOnly={isSending || voiceBusy}
+            readOnly={isSending || voiceBusy || isUnavailable}
             aria-label="Message"
             rows={1}
             maxLength={limits.maxTextChars ?? undefined}
@@ -871,7 +871,7 @@ export default function InputBar({
             disabled={
               isSending ||
               isAiResponding ||
-              isComingSoon ||
+              isUnavailable ||
               dictation.phase === "stopping" ||
               dictation.phase === "transcribing" ||
               !!dictation.recording
@@ -991,7 +991,7 @@ export default function InputBar({
             <button
               type="button"
               className={`${styles.iconWrapper2} ${styles.controlButton}`}
-              disabled={chatPreparing || voiceBusy || isPreparing}
+              disabled={chatPreparing || voiceBusy || isPreparing || isUnavailable}
               aria-label="Send message"
               onPointerEnter={(event) =>
                 fitInputTooltipToViewport(event.currentTarget)
@@ -1066,15 +1066,12 @@ export default function InputBar({
         </div>
       )}
 
-      {isComingSoon && (
-        <div className={styles.comingSoonOverlay}>
-          <div className={styles.comingSoonBadge}>
-            <span className={styles.comingSoonDot} />
-            <span className={styles.comingSoonTitle}>
-              This model is coming soon.
-            </span>
-            <span className={styles.comingSoonHint}>
-              Choose another model to continue.
+      {isUnavailable && (
+        <div className={styles.unavailableModelOverlay}>
+          <div className={styles.unavailableModelBadge}>
+            <span className={styles.unavailableModelDot} />
+            <span className={styles.unavailableModelTitle}>
+              This chat can no longer be continued.
             </span>
           </div>
         </div>
