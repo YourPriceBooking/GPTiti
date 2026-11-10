@@ -101,8 +101,7 @@ export type Project = {
   pinnedAt: string | null;
 };
 
-export type ModelType =
-  "gpt-4o" | "gpt-5.1" | "gpt-5.4" | "gpt-5.5" | "0-Series" | "AI tools";
+export type ModelType = string;
 
 export type ModelTooltip = {
   title: string;
@@ -113,7 +112,7 @@ export type ModelTooltip = {
 
 export type ModelItem = {
   title: string;
-  tokens: number;
+  tokens: number | null;
   desc: string;
   subDesc?: string;
   tooltip: ModelTooltip;

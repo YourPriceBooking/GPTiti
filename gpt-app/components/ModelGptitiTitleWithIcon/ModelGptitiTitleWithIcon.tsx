@@ -1,3 +1,5 @@
+import { useAppSelector } from "@/redux/hooks";
+import { selectCatalog } from "@/redux/model/selectors";
 import { ModelGptitiTitleWithIconProps } from "@/types/types";
 import styles from "./ModelGptitiTitleWithIcon.module.css";
 import Image from "next/image";
@@ -7,7 +9,8 @@ export default function ModelGptitiTitleWithIcon({
   selectedModel,
   setIsModalOpen,
 }: ModelGptitiTitleWithIconProps) {
-  const result = getModelGroupAndItem(selectedModel);
+  const catalog = useAppSelector(selectCatalog);
+  const result = getModelGroupAndItem(selectedModel, catalog);
   return (
     <div
       ref={modelRef}
@@ -20,7 +23,7 @@ export default function ModelGptitiTitleWithIcon({
     >
       <article className={styles.titleContainer}>
         <h2 className={styles.title}>
-          {result ? result.model.title : selectedModel}
+          {result ? result.model.label : selectedModel || "Choose model"}
         </h2>
         <Image
           className={styles.chevronIcon}

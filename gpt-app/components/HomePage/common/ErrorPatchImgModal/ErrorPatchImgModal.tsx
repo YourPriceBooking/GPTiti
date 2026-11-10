@@ -1,5 +1,7 @@
 "use client";
 
+import { useAppSelector } from "@/redux/hooks";
+import { selectCatalog } from "@/redux/model/selectors";
 import AppModal from "@/components/HomePage/common/AppModal/AppModal";
 import Image from "next/image";
 
@@ -27,7 +29,8 @@ const ErrorPatchImgModal = ({
   kind = "imagesNotSupported",
   model,
 }: ErrorPatchImgModalProps) => {
-  const { heading, body, note } = getLimitMessage(kind, model);
+  const catalog = useAppSelector(selectCatalog);
+  const { heading, body, note } = getLimitMessage(kind, model, catalog);
 
   return (
     <AppModal

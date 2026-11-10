@@ -1,0 +1,13 @@
+# Dynamic model catalog
+
+Frontend uses anonymous GET `${NEXT_PUBLIC_BACKEND_API_URL}/users/get-chat-models` with credentials omitted; no login or authorization header is needed. The default API base is https://gptiti.com/api/. It loads after browser persistence, refreshes on window focus, and supports Retry from the model picker. No model catalog is persisted and no hardcoded selectable fallback remains.
+
+The accepted DTO is `{success:true,chatModels:[...]}`. Selectable entries require `enabled:true` and `type:"model"` (type may be absent). Required fields: a unique nonempty modelId and complete nonnegative numeric limits (`maxImages,maxImageSizeMb,maxFiles,maxFileSizeMb,maxLinks,maxTextChars`; maxTextChars may be null). Labels, grouping, order, descriptions, tooltip and approximate asking price are rendered from the response. Missing price displays "Estimate unavailable". The server remains authoritative for role access, input admission and billing.
+
+Before Alex enables the four new models, populate their limits (not the schema's null default), minRole, label and optional grouping/ordering/default metadata. A malformed catalog shows an error and Retry; it does not assume image support or invent limits. Current live endpoint on 2026-11-10 returned only gpt-5.4, gpt-5.4-mini and gpt-5.5. New models appear after the backend returns them as enabled; no rebuild is needed to change catalog contents.
+
+The frontend sends the canonical modelId through the existing V2 flow. apiMode and reasoningEffort remain backend configuration, including none/low/medium settings supplied by Alex. No provider reasoning values or billing/reservation logic are changed in this PR. Existing composer token estimates remain available only for their previously supported IDs; new IDs do not inherit fabricated pricing.
+
+On first visit, default:true is preferred, then server order. A persisted selection or existing conversation with a removed model retains its ID and draft but Send is blocked until the user chooses an available model. Catalog loading/error also blocks Send. Refresh does not silently replace a selected model or clear a draft.
+
+Validation: 146 unit/delivery tests, TypeScript and production build pass. ESLint has no new warnings (existing unused metadata in marketing guide remains). Live anonymous endpoint shape was checked. Local Chromium UI smoke could not launch in this environment (socket Operation not permitted), so staging QA must cover desktop/mobile model picker, unknown newly added ID, error/retry/empty list, removed model in an existing chat, account-role switch, saved draft, library attachment limits and Send. The separate library feature flag is unchanged.

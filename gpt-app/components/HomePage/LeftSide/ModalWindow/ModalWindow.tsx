@@ -4,7 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 import Image from "next/image";
 import Link from "next/link";
-import { modelConfig, TOKENS_SUFFIX } from "@/config/models.config";
+import { selectModelConfig, selectCatalog, selectCatalogStatus } from "@/redux/model/selectors";
+import { refreshModelCatalog } from "@/app/ModelCatalog";
+import { TOKENS_SUFFIX } from "@/config/models.config";
 import { getModelGroupAndItem } from "@/functions/getModelGroupAndItem";
 import { useAppSelector } from "@/redux/hooks";
 import { selectBalance } from "@/redux/tokens/selectors";
@@ -33,13 +35,17 @@ export default function ModalWindow({
   setSelectedModel,
   setIsModalOpen,
 }: Props) {
+  const modelConfig = useAppSelector(selectModelConfig);
+  const catalog = useAppSelector(selectCatalog);
+  const status = useAppSelector(selectCatalogStatus);
   const appliedGroup =
-    (getModelGroupAndItem(selectedModel)?.group as ModelType | undefined) ??
+    (getModelGroupAndItem(selectedModel,catalog)?.group as ModelType | undefined) ??
     selectedModelGroup;
   const balance = useAppSelector(selectBalance);
-  const [viewGroup, setViewGroup] = useState<ModelType>(
+  const [requestedGroup, setViewGroup] = useState<ModelType>(
     () => lastViewedGroup ?? appliedGroup,
   );
+  const viewGroup = modelConfig[requestedGroup] ? requestedGroup : modelConfig[appliedGroup] ? appliedGroup : Object.keys(modelConfig)[0] || "";
   const [visibleModel, setVisibleModel] = useState<string | null>(null);
   const tabsRef = useRef<HTMLDivElement>(null);
   const activeTabRef = useRef<HTMLButtonElement>(null);
@@ -94,7 +100,7 @@ export default function ModalWindow({
       <header className={styles.header}>
         <div className={styles.headerTop}>
           <h2 id="model-picker-title" className={styles.title}>
-            Choose AI tools or a GPT model
+            Choose a model
           </h2>
           <button
             type="button"
@@ -141,8 +147,10 @@ export default function ModalWindow({
         role="tabpanel"
         aria-label={`${viewGroup} models`}
       >
+        {status !== "ready" && <p role="status">{status === "error" ? "Could not load models." : "Loading models…"} {status === "error" && <button type="button" onClick={refreshModelCatalog}>Retry</button>}</p>}
+        {status === "ready" && catalog.length === 0 && <p>No models are currently available. <button type="button" onClick={refreshModelCatalog}>Refresh</button></p>}
         <div className={styles.btnsContainer2}>
-          {modelConfig[viewGroup].list.map((item) => {
+          {(modelConfig[viewGroup]?.list ?? []).map((item) => {
             const isSelected = selectedModel === item.title;
             const detailsOpen = visibleModel === item.title;
             const detailsId = getDetailsId(item.title);
@@ -155,14 +163,15 @@ export default function ModalWindow({
                     styles.btn2,
                     isSelected && styles.modelActive,
                   )}
+                  disabled={status !== "ready"}
                   onClick={() => selectModel(item.title)}
                   aria-pressed={isSelected}
                 >
                   <span className={styles.mainContainerbtn2}>
-                    <span className={styles.btn2Paragraph}>{item.title}</span>
+                    <span className={styles.btn2Paragraph}>{item.label}</span>
                     <span className={styles.btn2Span1}>
                       {item.amount ? `${item.amount} ≈ ` : ""}
-                      {item.tokens.toLocaleString()} {TOKENS_SUFFIX}
+                      {item.tokens === null ? "Estimate unavailable" : `${item.tokens.toLocaleString()} ${TOKENS_SUFFIX}`}
                     </span>
                   </span>
                   <span className={styles.btn2Span2}>{item.desc}</span>

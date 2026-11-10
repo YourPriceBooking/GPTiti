@@ -1,4 +1,5 @@
 "use client";
+import { selectCatalog } from "@/redux/model/selectors";
 import { LIBRARY_ENABLED } from "@/lib/files/library";
 import { readLibraryDraft, writeLibraryDraft, clearLibraryDraft, subscribeLibraryDraft } from "@/lib/files/libraryDraft";
 
@@ -26,6 +27,7 @@ import {
 } from "@/lib/tokenHistoryDraft";
 
 export function useInputDraft() {
+  const catalog = useAppSelector(selectCatalog);
   const dispatch = useAppDispatch();
   const selectedModel = useAppSelector(selectSelectedModel);
   const isOverlayOpen = useAppSelector(selectIsOverlayOpen);
@@ -51,12 +53,12 @@ export function useInputDraft() {
 
   const clipToModelLimit = useCallback(
     (text: string) => {
-      const maxChars = getModelLimits(selectedModel).maxTextChars;
+      const maxChars = getModelLimits(selectedModel,catalog).maxTextChars;
       return maxChars !== null && text.length > maxChars
         ? text.slice(0, maxChars)
         : text;
     },
-    [selectedModel],
+    [selectedModel,catalog],
   );
 
   const applyTemplate = useCallback(

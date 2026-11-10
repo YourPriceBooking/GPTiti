@@ -1,4 +1,5 @@
 "use client";
+import { selectCatalog, selectModelAvailable, selectCatalogStatus } from "@/redux/model/selectors";
 
 import {
   useState,
@@ -33,7 +34,7 @@ import {
 import { DictationStopIcon, DictationWaveform } from "./DictationVisuals";
 
 import { getModelLimits } from "@/config/modelLimits.config";
-import { isModelComingSoon } from "@/config/models.config";
+
 import { inputKind, validateTextBytes } from "@/lib/files/input";
 
 import { useFileLimits } from "@/hooks/useFileLimits";
@@ -249,11 +250,10 @@ export default function InputBar({
     file: File;
   } | null>(null);
 
-  const limits = useMemo(() => getModelLimits(selectedModel), [selectedModel]);
-  const isComingSoon = useMemo(
-    () => isModelComingSoon(selectedModel),
-    [selectedModel],
-  );
+  const catalog = useAppSelector(selectCatalog);
+  const catalogStatus = useAppSelector(selectCatalogStatus);
+  const isComingSoon = !useAppSelector(selectModelAvailable);
+  const limits = useMemo(() => getModelLimits(selectedModel,catalog), [selectedModel,catalog]);
 
   const openLimitError = (kind: LimitKind) => {
     setLimitErrorKind(kind);
@@ -1071,10 +1071,10 @@ export default function InputBar({
           <div className={styles.comingSoonBadge}>
             <span className={styles.comingSoonDot} />
             <span className={styles.comingSoonTitle}>
-              This model is coming soon.
+              {catalogStatus === "loading" || catalogStatus === "idle" ? "Loading models…" : catalogStatus === "error" ? "Could not load models." : "This model is unavailable."}
             </span>
             <span className={styles.comingSoonHint}>
-              Choose another model to continue.
+              Open the model picker to retry or choose an available model.
             </span>
           </div>
         </div>

@@ -1,40 +1,62 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import { modelConfig } from "@/config/models.config";
-import type { ModelType } from "@/types/types";
-
+import type { CatalogModel } from "../../lib/models/catalog";
 interface ModelState {
   selectedModel: string;
-  selectedModelGroup: ModelType;
+  selectedModelGroup: string;
+  catalog: CatalogModel[];
+  catalogStatus: "idle" | "loading" | "ready" | "error";
 }
-
-const DEFAULT_GROUP: ModelType = "gpt-5.4";
-const DEFAULT_MODEL = "gpt-5.4-mini";
-
 const initialState: ModelState = {
-  selectedModel: DEFAULT_MODEL,
-  selectedModelGroup: DEFAULT_GROUP,
+  selectedModel: "",
+  selectedModelGroup: "",
+  catalog: [],
+  catalogStatus: "idle",
 };
-
-const isValidModel = (model: string) =>
-  Object.values(modelConfig).some((cfg) =>
-    cfg.list.some((item) => item.title === model),
-  );
-
-const isValidGroup = (group: string): group is ModelType =>
-  group in modelConfig;
-
-const modelSlice = createSlice({
+const slice = createSlice({
   name: "model",
   initialState,
   reducers: {
     setSelectedModel(state, { payload }: PayloadAction<string>) {
-      state.selectedModel = isValidModel(payload) ? payload : DEFAULT_MODEL;
+      const model = state.catalog.find((m) => m.title === payload);
+      if (!model) return;
+      state.selectedModel = payload;
+      state.selectedModelGroup = model.groupId;
     },
-    setSelectedModelGroup(state, { payload }: PayloadAction<ModelType>) {
-      state.selectedModelGroup = isValidGroup(payload) ? payload : DEFAULT_GROUP;
+    restoreChatModel(state, { payload }: PayloadAction<string>) {
+      state.selectedModel = payload;
+      state.selectedModelGroup =
+        state.catalog.find((m) => m.title === payload)?.groupId || "";
+    },
+    setSelectedModelGroup(state, { payload }: PayloadAction<string>) {
+      if (state.catalog.some((m) => m.groupId === payload))
+        state.selectedModelGroup = payload;
+    },
+    catalogLoading(state) {
+      state.catalogStatus = "loading";
+    },
+    catalogFailed(state) {
+      state.catalogStatus = "error";
+    },
+    catalogLoaded(state, { payload }: PayloadAction<CatalogModel[]>) {
+      state.catalog = payload;
+      state.catalogStatus = "ready";
+      if (!state.selectedModel) {
+        const m =
+          payload.find((m) => m.default && m.minRole === "user") ||
+          payload.find((m) => m.minRole === "user");
+        if (m) state.selectedModel = m.title;
+      }
+      state.selectedModelGroup =
+        payload.find((m) => m.title === state.selectedModel)?.groupId || "";
     },
   },
 });
-
-export const { setSelectedModel, setSelectedModelGroup } = modelSlice.actions;
-export const modelReducer = modelSlice.reducer;
+export const {
+  setSelectedModel,
+  setSelectedModelGroup,
+  restoreChatModel,
+  catalogLoading,
+  catalogFailed,
+  catalogLoaded,
+} = slice.actions;
+export const modelReducer = slice.reducer;

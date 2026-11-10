@@ -1,3 +1,4 @@
+import type { CatalogModel } from "../lib/models/catalog";
 import { getModelLimits } from "./modelLimits.config";
 
 export type LimitKind =
@@ -160,8 +161,8 @@ const TOOL_OVERRIDES: Record<string, OverrideMap> = {
   },
 };
 
-function valueForKind(kind: LimitKind, model: string): number {
-  const l = getModelLimits(model);
+function valueForKind(kind: LimitKind, model: string, catalog: CatalogModel[]): number {
+  const l = getModelLimits(model,catalog);
   switch (kind) {
     case "imagesCount":
       return l.maxImages;
@@ -217,8 +218,8 @@ function oSeriesOverride(kind: LimitKind, model: string): LimitMessage | null {
   return null;
 }
 
-export function getLimitMessage(kind: LimitKind, model: string): LimitMessage {
-  const value = valueForKind(kind, model);
+export function getLimitMessage(kind: LimitKind, model: string, catalog: CatalogModel[] = []): LimitMessage {
+  const value = valueForKind(kind, model,catalog);
 
   const toolOverride = TOOL_OVERRIDES[model]?.[kind];
   if (toolOverride) return toolOverride(model, value);

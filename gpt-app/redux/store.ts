@@ -44,6 +44,7 @@ const authPersistConfig = {
 const modelPersistConfig = {
   key: "model",
   storage,
+  whitelist: ["selectedModel", "selectedModelGroup"],
 };
 
 const tokensPersistConfig = {

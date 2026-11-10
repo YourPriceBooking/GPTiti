@@ -7,6 +7,7 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import { store, persistor } from "@/redux/store";
 import { env } from "@/lib/env";
 
+import ModelCatalog from "./ModelCatalog";
 import AuthBootstrap from "./AuthBootstrap";
 import SessionExpiredModal from "./SessionExpiredModal";
 import ErrorToast from "@/components/common/ErrorToast/ErrorToast";
@@ -17,6 +18,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       <PersistGate loading={null} persistor={persistor}>
         <GoogleOAuthProvider clientId={env.googleClientId}>
           <AuthBootstrap />
+          <ModelCatalog />
           {children}
           <SessionExpiredModal />
           <ErrorToast />

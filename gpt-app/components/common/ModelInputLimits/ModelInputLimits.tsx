@@ -1,4 +1,6 @@
 "use client";
+import { useAppSelector } from "@/redux/hooks";
+import { selectCatalog } from "@/redux/model/selectors";
 
 import type { ReactNode } from "react";
 
@@ -279,10 +281,11 @@ type Props = {
 };
 
 const ModelInputLimits = ({ model }: Props) => {
+  const catalog = useAppSelector(selectCatalog);
   const copy = PER_MODEL[model];
-  if (!copy) return null;
+  if (!copy || !catalog.some(m=>m.title===model)) return null;
 
-  const limits = getModelLimits(model);
+  const limits = getModelLimits(model,catalog);
   const items = copy.items(limits);
 
   return (

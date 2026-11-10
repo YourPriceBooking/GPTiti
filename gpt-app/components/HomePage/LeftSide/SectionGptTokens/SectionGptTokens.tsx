@@ -1,3 +1,4 @@
+import { selectCatalog } from "@/redux/model/selectors";
 import React from "react";
 
 import Image from "next/image";
@@ -26,7 +27,8 @@ export default function SectionGptTokens(props: SectionGptTokensProps) {
   const balance = useAppSelector(selectBalance);
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
   const [isLoginOpen, setIsLoginOpen] = React.useState(false);
-  const result = getModelGroupAndItem(selectedModel);
+  const catalog = useAppSelector(selectCatalog);
+  const result = getModelGroupAndItem(selectedModel, catalog);
   return (
     <section className={styles.gptTokens}>
       <article>
@@ -38,7 +40,7 @@ export default function SectionGptTokens(props: SectionGptTokensProps) {
           />
         </div>
         <p className={styles.paragraph}>
-          approximate asking price {result?.model.tokens} {TOKENS_SUFFIX}
+          {result?.model.tokens != null ? `approximate asking price ${result.model.tokens} ${TOKENS_SUFFIX}` : "Price estimate unavailable"}
         </p>
       </article>
 

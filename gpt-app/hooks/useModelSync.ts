@@ -1,4 +1,5 @@
 "use client";
+import { selectCatalog } from "@/redux/model/selectors";
 
 import { useCallback, useEffect } from "react";
 
@@ -14,13 +15,14 @@ import {
   selectSelectedModel,
   selectSelectedModelGroup,
 } from "@/redux/model/selectors";
-import { setSelectedModel, setSelectedModelGroup } from "@/redux/model/slice";
+import { restoreChatModel, setSelectedModel, setSelectedModelGroup } from "@/redux/model/slice";
 
 type UseModelSyncParams = {
   onModelSwitched: () => void;
 };
 
 export function useModelSync({ onModelSwitched }: UseModelSyncParams) {
+  const catalog = useAppSelector(selectCatalog);
   const dispatch = useAppDispatch();
 
   const selectedModel = useAppSelector(selectSelectedModel);
@@ -32,21 +34,21 @@ export function useModelSync({ onModelSwitched }: UseModelSyncParams) {
   useEffect(() => {
     if (!activeChatId || isDraftId(activeChatId)) return;
     if (!activeChatModelId || activeChatModelId === selectedModel) return;
-    const found = getModelGroupAndItem(activeChatModelId);
-    if (!found) return;
-    dispatch(setSelectedModel(activeChatModelId));
-    dispatch(setSelectedModelGroup(found.group));
-  }, [activeChatId, activeChatModelId, selectedModel, dispatch]);
+    const found = getModelGroupAndItem(activeChatModelId, catalog);
+    dispatch(restoreChatModel(activeChatModelId));
+    if (found) dispatch(setSelectedModelGroup(found.group));
+  }, [activeChatId, activeChatModelId, selectedModel, dispatch, catalog]);
 
   const selectModel = useCallback(
     (model: string) => {
+      if (!catalog.some(m => m.title === model)) return;
       const changed = model !== selectedModel;
       dispatch(setSelectedModel(model));
       if (!changed || activeChatMessageCount === 0) return;
       dispatch(handleNewChat());
       onModelSwitched();
     },
-    [dispatch, selectedModel, activeChatMessageCount, onModelSwitched],
+    [dispatch, selectedModel, activeChatMessageCount, onModelSwitched, catalog],
   );
 
   return { selectedModel, selectedModelGroup, selectModel };
