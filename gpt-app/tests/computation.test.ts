@@ -19,3 +19,11 @@ test('only exact structured server notices are replaced; model content remains i
  assert.match(computationExplanation(result.reason),/cost limit/);
  assert.doesNotMatch(computationExplanation('UNKNOWN_CODE'),/UNKNOWN_CODE/);
 });
+
+test('document metadata survives history parsing without claiming Python execution',()=>{
+ const result=readComputation({kind:'document',status:'completed',runs:2,executionMs:120,reason:null})!;
+ assert.equal(result.kind,'document');
+ assert.equal(readComputationStatus({kind:'document',stage:'executing',runs:1,calls:0})?.kind,'document');
+ assert.match(computationExplanation('COMPUTE_BUDGET_LIMIT',true),/next step/);
+ assert.equal(readComputation({...result,kind:'untrusted'})?.kind,undefined);
+});
