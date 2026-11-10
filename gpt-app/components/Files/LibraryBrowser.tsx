@@ -363,8 +363,8 @@ export default function LibraryBrowser({
         )}
         {limits.status === "error" && (
           <p className={styles.notice}>
-            {limits.errorMessage ?? "Could not confirm attachment limits."}{" "}
-            {limits.canRetry && <button onClick={limits.retry}>Retry limits</button>}
+            Could not confirm attachment limits.{" "}
+            <button onClick={limits.retry}>Retry limits</button>
           </p>
         )}
         {loading ? (
