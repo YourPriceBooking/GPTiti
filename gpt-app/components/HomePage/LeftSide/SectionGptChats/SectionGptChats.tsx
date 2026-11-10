@@ -1,5 +1,4 @@
 "use client";
-import FilesNavLink from "@/components/Files/FilesNavLink";
 
 import {
   useState,
@@ -317,7 +316,6 @@ export default function SectionGptChats({
           Start New Chat
         </button>
       </article>
-      <FilesNavLink />
 
       <article
         className={styles.gptNewProject}
