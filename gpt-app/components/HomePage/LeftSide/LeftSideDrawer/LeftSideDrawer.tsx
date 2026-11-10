@@ -87,6 +87,7 @@ export default function LeftSideDrawer({
 
               <LeftSide
                 {...leftSideProps}
+                onNavigate={closePanel}
                 onNewChat={() => {
                   leftSideProps.onNewChat();
                   closePanel();
