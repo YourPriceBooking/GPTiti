@@ -1,15 +1,21 @@
 .chatsScrollArea {
+  display: flex;
+  max-width: 100%;
+  overflow: visible;
+  flex-shrink: 0;
   position: relative;
-  height: 100vh;
+  height: 100dvh;
 }
 
 .container {
   position: relative;
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100dvh;
   max-width: 330px;
-  width: 100%;
+  width: 330px;
+  flex: 1;
+  min-width: 0;
   background: linear-gradient(180deg, #0b1220d2 0%, #070b13 100%);
   padding: 38px 12px 20px 12px;
   overflow-y: auto;
@@ -193,4 +199,8 @@
   .toggleButton {
     display: none;
   }
+}
+
+@media (max-width: 767px) {
+  .chatsScrollArea { width: 100% !important; }
 }
