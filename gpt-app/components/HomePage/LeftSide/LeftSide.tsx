@@ -1,13 +1,11 @@
-import FilesNavLink from "@/components/Files/FilesNavLink";
+import NavigationRail from "./NavigationRail";
 import styles from "./LeftSide.module.css";
 import FooterLeftSide from "./FooterLeftSide/FooterLeftSide";
 import { LeftSideProps } from "@/types/types";
-import AccountAvatar from "./SectionGptUser/AccountAvatar";
 import SectionGptUser from "./SectionGptUser/SectionGptUser";
 import SectionGptChats from "./SectionGptChats/SectionGptChats";
 import SectionGptTokens from "./SectionGptTokens/SectionGptTokens";
 import { useState } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { selectProjectList } from "@/redux/projects/selectors";
@@ -33,7 +31,8 @@ export default function LeftSide({
   isModalOpen,
   setIsModalOpen,
   onSelectProject,
-}: LeftSideProps) {
+  onNavigate,
+}: LeftSideProps & { onNavigate?: () => void }) {
   const [isOpen, setIsOpen] = useState(true);
 
   const dispatch = useAppDispatch();
@@ -66,31 +65,15 @@ export default function LeftSide({
   return (
     <div
       className={styles.chatsScrollArea}
-      style={{
-        width: isOpen ? "330px" : "64px",
-        transition: "width 0.3s ease-in-out",
-      }}
+      style={{ width: isOpen ? "386px" : "56px" }}
     >
-      <div className={styles.container}>
-        <button
-          type="button"
-          onClick={() => setIsOpen(!isOpen)}
-          className={styles.toggleButton}
-          aria-label={isOpen ? "Hide panel" : "Show panel"}
-        >
-          <Image
-            src="/chevron-left.svg"
-            alt=""
-            width={24}
-            height={24}
-            className={styles.chevron}
-            style={{
-              transform: !isOpen ? "rotate(180deg)" : "rotate(0deg)",
-              transition: "transform 0.3s ease",
-            }}
-          />
-        </button>
-        {isOpen ? (
+      <NavigationRail
+        expanded={isOpen}
+        onToggle={() => setIsOpen(!isOpen)}
+        onNavigate={onNavigate}
+      />
+      {isOpen && (
+        <div className={styles.container}>
           <div
             className={`${styles.panelContent} ${
               isOpen ? styles.panelContentShow : styles.panelContentHide
@@ -126,70 +109,8 @@ export default function LeftSide({
 
             <FooterLeftSide />
           </div>
-        ) : (
-          <div
-            className={`${styles.collapsedContent} ${
-              isOpen ? styles.collapsedHide : styles.collapsedShow
-            }`}
-          >
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className={styles.iconButton}
-              aria-label="Select a model"
-              title="Select a model"
-            >
-              <svg
-                width="20"
-                height="20"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"
-                />
-              </svg>
-            </button>
-
-            <button
-              onClick={onNewChat}
-              className={styles.iconButton}
-              aria-label="New chat"
-              title="New chat"
-            >
-              <svg
-                width="20"
-                height="20"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
-            </button>
-
-            <FilesNavLink compact />
-            <div className={styles.userIconBottom}>
-              <button
-                type="button"
-                className={styles.userIconAvatar}
-                onClick={() => setIsOpen(true)}
-                aria-label="Open account panel"
-              >
-                <AccountAvatar />
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
