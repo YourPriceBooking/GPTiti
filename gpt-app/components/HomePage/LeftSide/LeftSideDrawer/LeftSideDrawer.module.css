@@ -71,8 +71,8 @@
 }
 
 .modalContent {
-  width: 330px;
-  height: 100vh;
+  width: min(386px, 100vw);
+  height: 100dvh;
   background: #0a101c;
   box-shadow: 2px 0 12px rgba(0, 0, 0, 0.5);
   position: relative;
