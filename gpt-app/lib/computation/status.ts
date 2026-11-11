@@ -1,5 +1,6 @@
 export type Computation = { kind?: 'document'; status: 'completed' | 'partial'; runs: number; executionMs: number; reason: string | null };
-export type ComputationStatus = { kind?: 'document'; stage: 'preparing' | 'executing' | 'computed' | 'answering'; runs: number; calls: number };
+export type DocumentJobProgress = {state: 'queued' | 'running' | 'finalizing'; processed: number; total: number; chunks: number; restarts: number};
+export type ComputationStatus = { kind?: 'document'; stage: 'preparing' | 'executing' | 'computed' | 'answering'; runs: number; calls: number; job?: DocumentJobProgress };
 const object = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v);
 const count = (v: unknown, max: number): v is number => typeof v === 'number' && Number.isSafeInteger(v) && v >= 0 && v <= max;
 export function readComputation(v: unknown): Computation | null {
@@ -8,13 +9,24 @@ export function readComputation(v: unknown): Computation | null {
 }
 export function readComputationStatus(v: unknown): ComputationStatus | null {
   if (!object(v) || !['preparing', 'executing', 'computed', 'answering'].includes(String(v.stage)) || !count(v.runs, 5) || !count(v.calls, 6)) return null;
-  return { ...(v.kind === 'document' ? {kind: 'document' as const} : {}), stage: v.stage as ComputationStatus['stage'], runs: v.runs, calls: v.calls };
+  const j = v.job;
+  const job = object(j) && ['queued','running','finalizing'].includes(String(j.state)) && count(j.processed,1048576) && count(j.total,1048576) && j.processed <= j.total && count(j.chunks,1048576) && count(j.restarts,10000)
+    ? {state:j.state as DocumentJobProgress['state'],processed:j.processed,total:j.total,chunks:j.chunks,restarts:j.restarts} : undefined;
+  return { ...(job ? {job} : {}), ...(v.kind === 'document' ? {kind: 'document' as const} : {}), stage: v.stage as ComputationStatus['stage'], runs: v.runs, calls: v.calls };
 }
 export const computationStageLabel = (stage: ComputationStatus['stage']) => ({ preparing: 'Preparing calculation…', executing: 'Running Python…', computed: 'Preparing results…', answering: 'Preparing response…' })[stage];
 export const documentStageLabel = (stage: ComputationStatus['stage']) => ({ preparing: 'Preparing document…', executing: 'Inspecting or editing document…', computed: 'Preparing document results…', answering: 'Preparing response…' })[stage];
 export function computationExplanation(reason: string | null, document = false): string {
   if (document) {
     switch (reason) {
+      case 'USER_CANCELLED': return 'Processing was cancelled. Your original file is unchanged.';
+      case 'XLSX_UNSUPPORTED': case 'XLSX_INVALID_DOCUMENT': return 'This workbook contains unsupported or invalid Excel features.';
+      case 'XLSX_FILE_LIMIT': case 'XLSX_RESOURCE_LIMIT': case 'OFFICE_DOCUMENT_LIMIT': return 'This workbook exceeds the processing size or memory limit.';
+      case 'XLSX_SOURCE_CHANGED': case 'XLSX_INSPECTION_REQUIRED': return 'The workbook must be inspected again before editing.';
+      case 'DOCUMENT_JOB_EXPIRED': return 'The background job reached its recovery deadline. Your original file is unchanged.';
+      case 'DOCUMENT_WORKER_CRASH': case 'DOCUMENT_JOB_TIMEOUT': case 'DOCUMENT_JOB_FAILED': return 'Background processing could not finish after recovery attempts. Your original file is unchanged.';
+      case 'FILE_QUOTA_EXCEEDED': return 'There is not enough file storage to finish this copy.';
+      case 'FILE_NOT_FOUND': return 'The source file was deleted or expired before processing finished.';
       case 'COMPUTE_BUDGET_LIMIT': return 'Document processing stopped because the next step would exceed its cost limit.';
       case 'DOCX_EDIT_UNSUPPORTED': return 'This document contains features that this editing mode cannot safely preserve.';
       case 'DOCX_SOURCE_CHANGED': case 'DOCX_INSPECTION_REQUIRED': return 'The document must be inspected again before these changes can be applied.';

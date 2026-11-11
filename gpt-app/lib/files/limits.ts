@@ -6,7 +6,7 @@ export type FileLimits = {
   storage: { maxBytes: number; maxCount: number };
   upload: { maxBytes: number; types: Record<string, { extensions: string[]; maxBytes: number }> };
   message: { maxAttachments: number; maxBytes: number; extractedTextBytes: number };
-  processing: { text: Reader; office: Reader; pdf: Reader;
+  processing: { text: Reader; office: Reader; pdf: Reader; xlsx?: Reader;
     ocr: Reader & { maxOcrPages: number; maxTextBytes: number; maxPdfPages?: number; imageMaxBytes?: number };
     zip: { enabled: boolean; inputBytes: number; expandedBytes: number; entryBytes: number; entries: number; records: number; textBytes: number; outputEntries: number } };
 };
@@ -43,7 +43,7 @@ export function readFileLimits(value: unknown): FileLimits {
     storage: { maxBytes: number(storage.maxBytes), maxCount: number(storage.maxCount) },
     upload: { maxBytes: number(upload.maxBytes), types },
     message: { maxAttachments: number(message.maxAttachments), maxBytes: number(message.maxBytes), extractedTextBytes: number(message.extractedTextBytes) },
-    processing: { text: reader(processing.text), office: reader(processing.office), pdf: reader(processing.pdf),
+    processing: { ...(processing.xlsx === undefined ? {} : {xlsx:reader(processing.xlsx)}), text: reader(processing.text), office: reader(processing.office), pdf: reader(processing.pdf),
       ocr: { ...reader(ocr), maxOcrPages: number(ocr.maxOcrPages), maxTextBytes: number(ocr.maxTextBytes), maxPdfPages: ocr.maxPdfPages === undefined ? undefined : number(ocr.maxPdfPages), imageMaxBytes: ocr.imageMaxBytes === undefined ? undefined : number(ocr.imageMaxBytes) },
       zip: { enabled: boolean(zip.enabled), inputBytes: number(zip.inputBytes), expandedBytes: number(zip.expandedBytes), entryBytes: number(zip.entryBytes), entries: number(zip.entries), records: number(zip.records), textBytes: number(zip.textBytes), outputEntries: number(zip.outputEntries) } },
   };
@@ -65,7 +65,7 @@ export function fileCeilings(name: string, limits: FileLimits) {
   const selected = kind === 'zip' ? { enabled: p.zip.enabled, maxBytes: p.zip.inputBytes }
     : kind === 'image' ? (p.ocr.enabled ? { enabled: true, maxBytes: p.ocr.imageMaxBytes ?? p.ocr.maxBytes } : { enabled: true, maxBytes: upload })
     : kind === 'pdf' ? { enabled: p.pdf.enabled, maxBytes: usesBackgroundOcr(limits) && limits.preparation?.pageCheckpoints ? p.ocr.maxBytes : Math.min(p.pdf.maxBytes, p.ocr.enabled ? p.ocr.maxBytes : Infinity) }
-    : p[kind];
+    : ext === 'xlsx' && p.xlsx?.enabled ? p.xlsx : p[kind];
   return { upload, reading: Math.min(upload, selected.maxBytes), enabled: selected.enabled };
 }
 export function validateServerFiles(files: { name: string; size: number }[], limits: FileLimits | null): string | null {
