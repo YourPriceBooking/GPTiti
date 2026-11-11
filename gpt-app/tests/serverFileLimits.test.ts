@@ -91,3 +91,13 @@ test('patch 38 enables paged PDFs without raising image, aggregate or opt-out li
   raw.preparation.async=true;raw.processing.ocr.enabled=false;
   assert.equal(fileCeilings('scan.pdf',readFileLimits(raw))?.reading,5242880);
 });
+
+test('Excel background reader raises only XLSX admission; old servers and DOCX keep their limits',()=>{
+ const raw=fixture();
+ const limits=readFileLimits({...raw,processing:{...raw.processing,xlsx:{enabled:true,maxBytes:20e6}}});
+ assert.equal(validateServerFiles([f('large.xlsx',19e6)],limits),null);
+ assert.equal(fileCeilings('large.xlsx',limits)?.reading,20e6);
+ assert.equal(fileCeilings('large.docx',limits)?.reading,5*1024**2);
+ assert.match(validateServerFiles([f('large.xlsx',6e6)],readFileLimits(raw))!,/chat reading/);
+ assert.equal(fileCeilings('large.xlsx',readFileLimits({...raw,processing:{...raw.processing,xlsx:{enabled:false,maxBytes:20e6}}}))?.reading,5*1024**2);
+});

@@ -27,3 +27,12 @@ test('document metadata survives history parsing without claiming Python executi
  assert.match(computationExplanation('COMPUTE_BUDGET_LIMIT',true),/next step/);
  assert.equal(readComputation({...result,kind:'untrusted'})?.kind,undefined);
 });
+
+
+test('background progress is bounded, survives status parsing and never exposes worker identifiers',()=>{
+ const job={state:'running',processed:3500,total:10000,chunks:7,restarts:1,leaseToken:'secret',id:'private'};
+ const status=readComputationStatus({kind:'document',stage:'executing',runs:2,calls:1,job});
+ assert.deepEqual(status?.job,{state:'running',processed:3500,total:10000,chunks:7,restarts:1});
+ assert.equal(readComputationStatus({stage:'executing',runs:2,calls:1,job:{...job,processed:10001}})?.job,undefined);
+ assert.match(computationExplanation('USER_CANCELLED',true),/cancelled/);
+});
