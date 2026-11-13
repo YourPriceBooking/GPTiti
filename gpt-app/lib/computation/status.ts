@@ -1,14 +1,17 @@
 export type Computation = { kind?: 'document'; status: 'completed' | 'partial'; runs: number; executionMs: number; reason: string | null };
 export type DocumentJobProgress = {state: 'queued' | 'running' | 'finalizing'; processed: number; total: number; chunks: number; restarts: number};
 export type ComputationStatus = { kind?: 'document'; stage: 'preparing' | 'executing' | 'computed' | 'answering'; runs: number; calls: number; job?: DocumentJobProgress };
+// Match the backend's absolute DTO ceilings, not its current environment settings.
+const MAX_RUNS = 24;
+const MAX_CALLS = 32;
 const object = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v);
 const count = (v: unknown, max: number): v is number => typeof v === 'number' && Number.isSafeInteger(v) && v >= 0 && v <= max;
 export function readComputation(v: unknown): Computation | null {
-  if (!object(v) || (v.status !== 'completed' && v.status !== 'partial') || !count(v.runs, 5) || !count(v.executionMs, 600000)) return null;
+  if (!object(v) || (v.status !== 'completed' && v.status !== 'partial') || !count(v.runs, MAX_RUNS) || !count(v.executionMs, 600000)) return null;
   return { ...(v.kind === 'document' ? {kind: 'document' as const} : {}), status: v.status, runs: v.runs, executionMs: v.executionMs, reason: typeof v.reason === 'string' && /^[A-Z_]{1,64}$/.test(v.reason) ? v.reason : null };
 }
 export function readComputationStatus(v: unknown): ComputationStatus | null {
-  if (!object(v) || !['preparing', 'executing', 'computed', 'answering'].includes(String(v.stage)) || !count(v.runs, 5) || !count(v.calls, 6)) return null;
+  if (!object(v) || !['preparing', 'executing', 'computed', 'answering'].includes(String(v.stage)) || !count(v.runs, MAX_RUNS) || !count(v.calls, MAX_CALLS)) return null;
   const j = v.job;
   const job = object(j) && ['queued','running','finalizing'].includes(String(j.state)) && count(j.processed,1048576) && count(j.total,1048576) && j.processed <= j.total && count(j.chunks,1048576) && count(j.restarts,10000)
     ? {state:j.state as DocumentJobProgress['state'],processed:j.processed,total:j.total,chunks:j.chunks,restarts:j.restarts} : undefined;
