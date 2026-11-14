@@ -49,6 +49,9 @@ export default function InputComposer({
       )}
 
       {feedback}
+      {inputBarProps.stopState === "stopping" && (
+        <p className={styles.stopStatus} role="status">Stopping… Waiting for confirmation.</p>
+      )}
       <div className={styles.inputWrap}>
         <InputBar {...inputBarProps} />
       </div>
