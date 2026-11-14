@@ -9,6 +9,7 @@ export const CHAT_ACK_TIMEOUT_MS = 8_000;
 
 export const CHAT_SEND_EVENT = "chat:send" as const;
 export const CHAT_STATUS_EVENT = "chat:status" as const;
+export const CHAT_CANCEL_EVENT = "chat:cancel" as const;
 export const CHAT_RETRY_EVENT = "chat:retry" as const;
 
 export const ChatServerEvent = {
@@ -84,6 +85,7 @@ export const CHAT_ERROR_CODES = [
   "TURN_ALREADY_PROCESSING",
   "PROVIDER_UNAVAILABLE",
   "PROCESS_INTERRUPTED",
+  "USER_CANCELLED",
   "INTERNAL_ERROR",
 ] as const;
 
@@ -125,6 +127,7 @@ export type ChatTurnSnapshot = {
   status: ChatTurnStatus;
   attempt: number;
   lastSeq: number;
+  cancelRequested?: boolean;
   computationStatus?: import("../computation/status").ComputationStatus | null;
   webStatus?: import("../web/sources").WebStatus | null;
   partialContent: string;
@@ -171,6 +174,8 @@ export type ChatStatusEnvelope = ClientEnvelope<
   { turnId: string }
 >;
 
+export type ChatCancelEnvelope = ClientEnvelope<typeof CHAT_CANCEL_EVENT, { turnId: string }>;
+
 export type ChatRetryEnvelope = ClientEnvelope<
   typeof CHAT_RETRY_EVENT,
   { turnId: string }
@@ -202,6 +207,7 @@ export type ChatStatusAck =
     };
 
 export type ChatRetryAck = ChatStatusAck;
+export type ChatCancelAck = ChatStatusAck;
 
 export type ChatStreamEvent = ServerEnvelope<
   (typeof ChatServerEvent)["Stream"],
@@ -385,6 +391,7 @@ export const readChatTurnSnapshot = (
     attempt,
     lastSeq,
     partialContent,
+    ...(typeof value.cancelRequested === "boolean" && { cancelRequested: value.cancelRequested }),
     computationStatus: readComputationStatus(value.computationStatus),
     webStatus: readWebStatus(value.webStatus),    assistantMessage,
     billing,
@@ -437,6 +444,7 @@ const readTurnAck = (value: unknown): ChatStatusAck | null => {
 
 export const readChatStatusAck = readTurnAck;
 export const readChatRetryAck = readTurnAck;
+export const readChatCancelAck = readTurnAck;
 
 type EventIdentity = {
   turnId: string;
@@ -533,6 +541,13 @@ export const makeChatSendEnvelope = (
   event: CHAT_SEND_EVENT,
   type: "request",
   payload,
+});
+
+export const makeChatCancelEnvelope = (turnId: string): ChatCancelEnvelope => ({
+  protocolVersion: CHAT_PROTOCOL_VERSION,
+  event: CHAT_CANCEL_EVENT,
+  type: "request",
+  payload: { turnId },
 });
 
 export const makeChatStatusEnvelope = (turnId: string): ChatStatusEnvelope => ({
