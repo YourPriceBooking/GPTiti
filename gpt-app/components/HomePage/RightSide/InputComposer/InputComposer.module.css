@@ -98,3 +98,10 @@
     justify-content: center;
   }
 }
+
+.stopStatus {
+  margin: 0 16px 8px;
+  color: #475569;
+  font-size: 12px;
+  text-align: center;
+}
