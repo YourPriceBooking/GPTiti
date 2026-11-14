@@ -1,3 +1,4 @@
+import { isTerminalTurn, reconcileTurnSnapshot } from "../../lib/chat/chatCancellation";
 import { newestRequestAt } from "../../lib/projects/projectChatOrder";
 import { readComputation } from "../../lib/computation/status";
 import { historyAppTokens } from "../../lib/chat/historyBilling";
@@ -103,9 +104,10 @@ const updateTurnMessages = (
 
 const reconcileSnapshot = (state: ChatState, snapshot: ChatTurnSnapshot) => {
   const turn = state.pendingTurns[snapshot.clientMessageId];
-  if (!turn || turn.conversationId !== snapshot.conversationId) return;
-  if (turn.turnId && turn.turnId !== snapshot.turnId) return;
-  if (snapshot.attempt < turn.attempt) return;
+  const reconciled = reconcileTurnSnapshot(turn, snapshot);
+  if (!reconciled) return;
+  snapshot = reconciled;
+  turn.cancelRequested = snapshot.cancelRequested;
 
   turn.turnId = snapshot.turnId;
   turn.status = snapshot.status;
@@ -336,7 +338,7 @@ const chatSlice = createSlice({
       { payload }: PayloadAction<ChatStreamEvent>,
     ) {
       const turn = state.pendingTurns[payload.clientMessageId];
-      if (!turn || turn.conversationId !== payload.conversationId) return;
+      if (!turn || isTerminalTurn(turn) || turn.conversationId !== payload.conversationId) return;
       if (turn.turnId && turn.turnId !== payload.turnId) return;
       if (turn.attempt !== payload.attempt) return;
       if (payload.payload.seq <= turn.lastAppliedSeq) return;
@@ -450,7 +452,7 @@ const chatSlice = createSlice({
       }: PayloadAction<{ clientMessageId: string; message: string }>,
     ) {
       const turn = state.pendingTurns[payload.clientMessageId];
-      if (!turn) return;
+      if (!turn || isTerminalTurn(turn)) return;
       turn.status = "delivery_unknown";
       turn.retryable = true;
       turn.errorCode = "DELIVERY_UNKNOWN";
