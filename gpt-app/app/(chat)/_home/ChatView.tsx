@@ -170,6 +170,9 @@ export default function ChatView({
             estimatedTokens={ctrl.estimatedTokens}
             onChooseModel={() => dispatch(setIsModalOpen(true))}
             sendDisabled={ctrl.sendDisabled}
+            isAiResponding={ctrl.isTyping}
+            onStop={ctrl.handleStopResponse}
+            stopState={ctrl.stopState}
           />
         )}
 
@@ -300,6 +303,8 @@ export default function ChatView({
                 selectedModel={ctrl.selectedModel}
                 onImagesChange={ctrl.setInputImageCount}
                 isAiResponding={ctrl.isTyping}
+                onStop={ctrl.handleStopResponse}
+                stopState={ctrl.stopState}
                 showDisclaimer={showDisclaimer}
                 showEstimate={ctrl.showEstimate}
                 estimateSupported={ctrl.estimateSupported}
