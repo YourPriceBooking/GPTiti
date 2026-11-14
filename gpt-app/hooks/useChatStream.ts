@@ -283,6 +283,9 @@ export function useChatStream(): ChatStream {
       }
       rememberSnapshot(snapshot);
       dispatch(reconcilePendingTurn(snapshot));
+      if (snapshot.cancelRequested || isTerminalTurn(snapshot)) {
+        setStreamError(current => current === STOP_UNCONFIRMED ? null : current);
+      }
       if (snapshot.billing || isTerminalTurn(snapshot)) void dispatch(refreshCurrentBalance());
     },
     [dispatch, rememberSnapshot, signalAccepted],
