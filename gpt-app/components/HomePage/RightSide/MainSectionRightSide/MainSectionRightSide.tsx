@@ -27,6 +27,9 @@ export default function MainSectionRightSide(props: MainSectionRightSideProps) {
     estimateSupported = false,
     estimatedTokens,
     sendDisabled,
+    isAiResponding,
+    onStop,
+    stopState,
   } = props;
 
   const flow = getModelFlow(selectedModel);
@@ -141,6 +144,9 @@ export default function MainSectionRightSide(props: MainSectionRightSideProps) {
               estimatedTokens={estimatedTokens}
               onChooseModel={onChooseModel}
               sendDisabled={sendDisabled}
+              isAiResponding={isAiResponding}
+              onStop={onStop}
+              stopState={stopState}
             />
           </div>
         </>
