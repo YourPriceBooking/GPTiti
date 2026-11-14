@@ -100,6 +100,8 @@ export default function InputBar({
   placeholder = "Ask anything...",
   variant = "default",
   isAiResponding = false,
+  onStop,
+  stopState = null,
   sendDisabled = false,
 }: {
   hasInput: boolean;
@@ -120,6 +122,8 @@ export default function InputBar({
   placeholder?: string;
   variant?: "default" | "project";
   isAiResponding?: boolean;
+  onStop?: () => void;
+  stopState?: "ready" | "stopping" | null;
   sendDisabled?: boolean;
 }) {
   const library = useLibraryDraft();
@@ -958,10 +962,14 @@ export default function InputBar({
                 Send dictated message
               </span>
             </button>
-          ) : isAiResponding || isSending ? (
-            <div
-              className={styles.iconWrapper2}
-              tabIndex={0}
+          ) : isAiResponding || isSending || stopState ? (
+            <button
+              type="button"
+              className={`${styles.iconWrapper2} ${styles.controlButton}`}
+              onClick={onStop}
+              disabled={!onStop || stopState !== "ready"}
+              aria-label={stopState === "stopping" ? "Stopping response" : stopState === "ready" ? "Stop response" : "Waiting for request acceptance"}
+              aria-busy={stopState === "stopping"}
               onPointerEnter={(event) =>
                 fitInputTooltipToViewport(event.currentTarget)
               }
@@ -974,8 +982,7 @@ export default function InputBar({
                 width={35}
                 height={35}
                 viewBox="0 0 44 44"
-                role="img"
-                aria-label={isSending ? "sending" : "generating"}
+                aria-hidden="true"
               >
                 <use href="/icons/input-sprite.svg#ib-stop" />
               </svg>
@@ -984,9 +991,9 @@ export default function InputBar({
                 data-input-tooltip
                 role="tooltip"
               >
-                {isSending ? "Sending..." : "Stop answering"}
+                {stopState === "stopping" ? "Stopping..." : stopState === "ready" ? "Stop response" : "Sending..."}
               </span>
-            </div>
+            </button>
           ) : hasInput || images.length > 0 || files.length > 0 || savedFiles.length > 0 ? (
             <button
               type="button"
