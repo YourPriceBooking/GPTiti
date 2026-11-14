@@ -8,7 +8,7 @@ import { validateServerFiles, usesBackgroundOcr, type FileLimits } from "@/lib/f
 import { selectUser } from "@/redux/auth/selectors";
 import { AttachmentPreparation, preparationErrorMessage, type PreparationProgress } from "@/lib/files/preparation";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSocket } from "@/context/SocketContext";
 import { api } from "@/helpers/api";
 import {
@@ -49,6 +49,7 @@ import {
   selectPendingTurnRetryAction,
   type AckSocket,
 } from "@/lib/chat/chatDelivery";
+import { createTurnCanceller, isTerminalTurn, reconcileTurnSnapshot, selectStoppableTurn, STOP_UNCONFIRMED } from "@/lib/chat/chatCancellation";
 import { selectPendingTurns } from "@/redux/chat/selectors";
 import {
   appendPendingTurnChunk,
@@ -89,6 +90,8 @@ export type ChatStream = {
   sendMessage: (args: SendChatMessageArgs) => Promise<boolean>;
   retryLastMessage: (chatId: string) => Promise<boolean>;
   cancelLastPendingMessage: (chatId: string) => void;
+  stopResponse: (chatId: string) => Promise<boolean>;
+  getStopState: (chatId: string | null) => "ready" | "stopping" | null;
   balanceNotice: BalanceNotice | null;
   dismissBalanceNotice: () => void;
   fileProgress: PreparationProgress | null;
@@ -171,6 +174,7 @@ export function useChatStream(): ChatStream {
   const [balanceNotice, setBalanceNotice] = useState<BalanceNotice | null>(null);
   const dismissBalanceNotice = useCallback(() => setBalanceNotice(null), []);
 
+  const [stoppingTurnIds, setStoppingTurnIds] = useState<string[]>([]);
   const [streamError, setStreamError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -251,6 +255,7 @@ export function useChatStream(): ChatStream {
             status: snapshot.status,
             attempt: snapshot.attempt,
             lastAppliedSeq: snapshot.lastSeq,
+            cancelRequested: snapshot.cancelRequested,
             partialContent:
               snapshot.assistantMessage?.content ?? snapshot.partialContent,
             retryable: snapshot.error?.retryable ?? false,
@@ -268,17 +273,49 @@ export function useChatStream(): ChatStream {
 
   const applySnapshot = useCallback(
     (snapshot: ChatTurnSnapshot) => {
-      signalAccepted(snapshot.clientMessageId);
       const previous = pendingTurnsRef.current[snapshot.clientMessageId];
+      const reconciled = reconcileTurnSnapshot(previous, snapshot);
+      if (!reconciled) return;
+      snapshot = reconciled;
+      signalAccepted(snapshot.clientMessageId);
       if (snapshot.error && isBalanceError(snapshot.error) && previous?.status !== "failed") {
         setBalanceNotice({ error: snapshot.error, requestRejected: false });
       }
       rememberSnapshot(snapshot);
       dispatch(reconcilePendingTurn(snapshot));
-      if (snapshot.billing) void dispatch(refreshCurrentBalance());
+      if (snapshot.billing || isTerminalTurn(snapshot)) void dispatch(refreshCurrentBalance());
     },
     [dispatch, rememberSnapshot, signalAccepted],
   );
+
+  const cancelTurn = useMemo(() => createTurnCanceller({
+    getTurn: (turnId) => Object.values(pendingTurnsRef.current).find(turn => turn.turnId === turnId),
+    connect: async () => {
+      if (!socket) throw new Error(CHAT_CONNECTION_LOST);
+      await ensureSocketConnected(socket);
+    },
+    send: (event, envelope) => {
+      if (!socket) return Promise.reject(new Error(CHAT_CONNECTION_LOST));
+      return emitWithAck(socket as unknown as AckSocket, event, envelope, CHAT_ACK_TIMEOUT_MS);
+    },
+    applySnapshot,
+    onBusy: (turnId, busy) => setStoppingTurnIds(current =>
+      busy ? [...current, turnId] : current.filter(id => id !== turnId)),
+    onUnconfirmed: () => setStreamError(STOP_UNCONFIRMED),
+  }), [applySnapshot, socket]);
+
+  const stopResponse = useCallback((chatId: string) => {
+    const turn = selectStoppableTurn(pendingTurnsRef.current, chatId);
+    if (!turn?.turnId) return Promise.resolve(false);
+    setStreamError(null);
+    return cancelTurn(turn.turnId);
+  }, [cancelTurn]);
+
+  const getStopState = (chatId: string | null): "ready" | "stopping" | null => {
+    const turn = selectStoppableTurn(pendingTurns, chatId);
+    if (!turn?.turnId) return null;
+    return turn.cancelRequested || stoppingTurnIds.includes(turn.turnId) ? "stopping" : "ready";
+  };
 
   const showProtocolError = useCallback((error: ChatProtocolError, requestRejected = false) => {
     if (isBalanceError(error)) {
@@ -314,7 +351,7 @@ export function useChatStream(): ChatStream {
       const turn = Object.values(pendingTurnsRef.current).find(
         (candidate) => candidate.turnId === turnId,
       );
-      if (!turn) return;
+      if (!turn || isTerminalTurn(turn)) return;
       dispatch(
         markPendingTurnDeliveryUnknown({
           clientMessageId: turn.clientMessageId,
@@ -358,10 +395,9 @@ export function useChatStream(): ChatStream {
             markStatusUnknown(turnId, ack.error.message);
             return false;
           }
-          if (background) {
-            const current = pendingTurnsRef.current[ack.turn.clientMessageId];
-            if (!current || !["queued", "processing", "syncing"].includes(current.status) || current.lastAppliedSeq > ack.turn.lastSeq || current.attempt > ack.turn.attempt) return false;
-          }
+          if (ack.turn.turnId !== turnId) throw new Error(INVALID_SERVER_RESPONSE);
+          const current = pendingTurnsRef.current[ack.turn.clientMessageId];
+          if (!reconcileTurnSnapshot(current, ack.turn)) return false;
           applySnapshot(ack.turn);
           return true;
         } catch (error) {
@@ -485,7 +521,7 @@ export function useChatStream(): ChatStream {
     const timer = setInterval(() => {
       if (!socket?.connected || document.visibilityState === "hidden") return;
       for (const turn of Object.values(pendingTurnsRef.current)) {
-        if (turn.turnId && ["queued", "processing"].includes(turn.status)) void requestTurnStatus(turn.turnId, true);
+        if (turn.turnId && !isTerminalTurn(turn)) void requestTurnStatus(turn.turnId, true);
       }
     }, 4000);
     return () => clearInterval(timer);
@@ -521,7 +557,7 @@ export function useChatStream(): ChatStream {
       const event = readChatStreamEvent(raw);
       if (!event) return;
       const turn = pendingTurnsRef.current[event.clientMessageId];
-      if (!turn || !matchesPendingTurnEvent(turn, event)) return;
+      if (!turn || isTerminalTurn(turn) || !matchesPendingTurnEvent(turn, event)) return;
 
       signalAccepted(event.clientMessageId);
       const currentSequence = sequenceRef.current.get(event.clientMessageId) ?? {
@@ -580,6 +616,7 @@ export function useChatStream(): ChatStream {
       signalAccepted(event.clientMessageId);
       flushChunks();
       dispatch(failPendingTurn(event));
+      void dispatch(refreshCurrentBalance());
       if (isBalanceError(event.payload.error)) {
         setBalanceNotice({ error: event.payload.error, requestRejected: false });
       }
@@ -889,7 +926,7 @@ export function useChatStream(): ChatStream {
         .find(
           (candidate) =>
             candidate.conversationId === chatId &&
-            candidate.status === "delivery_unknown",
+            candidate.status === "delivery_unknown" && !candidate.turnId,
         );
       if (!turn) return;
       dispatch(rejectPendingTurn({ clientMessageId: turn.clientMessageId }));
@@ -907,6 +944,8 @@ export function useChatStream(): ChatStream {
     sendMessage,
     retryLastMessage,
     cancelLastPendingMessage,
+    stopResponse,
+    getStopState,
     balanceNotice,
     dismissBalanceNotice,
     fileProgress,
