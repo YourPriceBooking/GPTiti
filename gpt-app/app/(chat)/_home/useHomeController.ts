@@ -119,6 +119,8 @@ export function useHomeController() {
     sendMessage,
     retryLastMessage,
     cancelLastPendingMessage,
+    stopResponse,
+    getStopState,
     balanceNotice,
     dismissBalanceNotice,
     fileProgress,
@@ -382,6 +384,10 @@ export function useHomeController() {
     return accepted;
   }, [activeChatId, draft, retryLastMessage]);
 
+  const handleStopResponse = useCallback(() => {
+    if (activeChatId) void stopResponse(activeChatId);
+  }, [activeChatId, stopResponse]);
+
   const handleCancelPendingMessage = useCallback(() => {
     if (!activeChatId) return;
     cancelLastPendingMessage(activeChatId);
@@ -476,6 +482,8 @@ export function useHomeController() {
     handleSendClick,
     handleRetryStream,
     handleCancelPendingMessage,
+    handleStopResponse,
+    stopState: getStopState(activeChatId),
     handleProjectSend,
     handleRemoveChatFromProject: projects.unlinkConversation,
     linkConversations: projects.linkConversations,
