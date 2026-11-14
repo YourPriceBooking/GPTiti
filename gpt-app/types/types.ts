@@ -29,6 +29,7 @@ export type PendingChatTurn = {
   status: PendingChatTurnStatus;
   attempt: number;
   lastAppliedSeq: number;
+  cancelRequested?: boolean;
   partialContent: string;
   retryable: boolean;
   errorCode?: string;
@@ -196,6 +197,9 @@ export type MainSectionRightSideProps = {
   estimateSupported?: boolean;
   estimatedTokens?: number | null;
   sendDisabled?: boolean;
+  isAiResponding?: boolean;
+  onStop?: () => void;
+  stopState?: "ready" | "stopping" | null;
 };
 
 export type ModelModalOverlayProps = {
