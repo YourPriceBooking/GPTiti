@@ -214,7 +214,7 @@ export default function MessageList({
                     </span>
                     <div className={styles.streamErrorBody}>
                       <p className={styles.streamErrorTitle}>
-                        Response interrupted
+                        {message.errorCode === "USER_CANCELLED" ? "Response stopped" : "Response interrupted"}
                       </p>
                       <p className={styles.streamErrorMessage}>
                         {message.error}
@@ -230,7 +230,7 @@ export default function MessageList({
                         >
                           {isTyping ? "Retrying..." : "Retry"}
                         </button>
-                        {message.errorCode === "DELIVERY_UNKNOWN" && (
+                        {message.errorCode === "DELIVERY_UNKNOWN" && !message.turnId && (
                           <button
                             type="button"
                             className={styles.cancelPendingButton}
