@@ -134,7 +134,7 @@ export type LeftSideProps = {
   chatList: Chat[];
   setActiveChatId: (id: string) => void;
 
-  deleteChat: (id: string) => void;
+  deleteChat: (id: string, deleteFiles?: boolean) => void;
   renameChat: (id: string, newTitle: string) => void;
 
   modelRef: React.RefObject<HTMLDivElement | null>;
