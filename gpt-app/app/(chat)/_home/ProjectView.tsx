@@ -4,7 +4,7 @@ import ProjectWorkspace from "@/components/HomePage/RightSide/ProjectWorkspace/P
 
 import { removeConversation } from "@/redux/chat/operations";
 import { fetchProject } from "@/redux/projects/operations";
-import { setHasFirstRequest, setIsModalOpen } from "@/redux/ui/slice";
+import { setHasFirstRequest, setIsModalOpen, showErrorToast } from "@/redux/ui/slice";
 
 import type { HomeController } from "./useHomeController";
 import styles from "../page.module.css";
@@ -22,10 +22,12 @@ export default function ProjectView({ ctrl }: { ctrl: HomeController }) {
         chats={ctrl.projectChats}
         chatsLoaded={activeProject.conversationIds !== undefined}
         onOpenChat={ctrl.handleSelectChat}
-        onDeleteChat={(id) => {
-          void dispatch(removeConversation(id)).then((action) => {
+        onDeleteChat={(id, deleteFiles = false) => {
+          void dispatch(removeConversation({ id, deleteFiles })).then((action) => {
             if (removeConversation.fulfilled.match(action)) {
               dispatch(fetchProject(activeProject.id));
+            } else {
+              dispatch(showErrorToast(action.payload ?? "Could not delete this chat."));
             }
           });
         }}
