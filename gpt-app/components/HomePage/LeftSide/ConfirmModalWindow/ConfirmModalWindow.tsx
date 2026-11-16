@@ -1,9 +1,11 @@
+import type { ReactNode } from "react";
 import Image from "next/image";
 import styles from "./ConfirmModalWindow.module.css";
 
 export type ConfirmVariant = "delete" | "archive" | "move" | "remove";
 
 type ConfirmModalWindowProps = {
+  children?: ReactNode;
   icon: string;
   title: string;
   lines: string[];
@@ -14,6 +16,7 @@ type ConfirmModalWindowProps = {
 };
 
 export default function ConfirmModalWindow({
+  children,
   icon,
   title,
   lines,
@@ -34,6 +37,7 @@ export default function ConfirmModalWindow({
             {line}
           </p>
         ))}
+        {children}
         <div className={styles.buttonsContainer}>
           <button className={styles.cancelButton} onClick={onCancel}>
             <span className={styles.cancelButtonText}>Cancel</span>
