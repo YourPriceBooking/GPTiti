@@ -95,9 +95,10 @@ export const api = {
     const res = await axiosInstance.get<Conversation[]>("/conversations");
     return res.data;
   },
-  deleteConversation: async (id: string) => {
+  deleteConversation: async (id: string, deleteFiles = false) => {
     const res = await axiosInstance.delete<{ success: boolean }>(
       `/conversations/${id}`,
+      { params: { deleteFiles } },
     );
     return res.data;
   },
