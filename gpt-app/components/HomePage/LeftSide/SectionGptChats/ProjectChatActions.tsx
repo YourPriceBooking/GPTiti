@@ -79,8 +79,8 @@ export default function ProjectChatActions({ project, chat, onRename }: {
   const changeMode = (next: "menu" | "delete" | ChatAction) => {
     const rect = trigger.current?.getBoundingClientRect();
     if (!rect) return;
-    const width = next === "menu" ? 260 : 300;
-    const height = next === "menu" ? 390 : 230;
+    const width = next === "menu" ? 260 : next === "delete" ? 368 : 300;
+    const height = next === "menu" ? 390 : next === "delete" ? 350 : 230;
     setPosition({
       top: Math.max(8, Math.min(rect.bottom + 6, window.innerHeight - height - 8)),
       left: Math.max(8, Math.min(rect.right - width, window.innerWidth - width - 8)),
@@ -88,7 +88,7 @@ export default function ProjectChatActions({ project, chat, onRename }: {
     setMode(next);
   };
 
-  const archiveOrDelete = async () => {
+  const archiveOrDelete = async (deleteFiles = false) => {
     // The existing DELETE endpoint soft-archives the conversation on the server.
     // Wait for navigation to commit before removing the currently viewed chat;
     // otherwise the existing route guard can report a false missing-chat error.
@@ -114,10 +114,12 @@ export default function ProjectChatActions({ project, chat, onRename }: {
         return;
       }
     }
-    const result = await dispatch(removeConversation(chat._id));
+    const result = await dispatch(removeConversation({ id: chat._id, deleteFiles }));
     if (removeConversation.fulfilled.match(result)) {
       setMode(null);
       void dispatch(fetchProject(project.id));
+    } else {
+      dispatch(showErrorToast(result.payload ?? "Could not delete this chat."));
     }
   };
 
@@ -160,7 +162,7 @@ export default function ProjectChatActions({ project, chat, onRename }: {
               onRemoveFromProject={() => changeMode("remove")}
             />
           ) : mode === "delete" ? (
-            <DeleteModalWindow onCancel={() => setMode(null)} onConfirm={() => { void archiveOrDelete(); }} />
+            <DeleteModalWindow onCancel={() => setMode(null)} onConfirm={(deleteFiles) => { void archiveOrDelete(deleteFiles); }} />
           ) : (
             <ChatActionModal action={mode} onCancel={() => setMode(null)} onConfirm={() => {
               if (mode === "move") { setMode(null); setMoving(true); }
