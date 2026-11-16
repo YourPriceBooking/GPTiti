@@ -45,7 +45,7 @@ type ProjectWorkspaceProps = {
   onRenameChat?: (id: string, title: string) => void;
   onAddChatsToProject: (id: string) => void;
   onRenameProject: (id: string, title: string) => void;
-  onDeleteProject: (id: string) => void;
+  onDeleteProject: (id: string, deleteFiles?: boolean, deleteChats?: boolean) => void;
 };
 
 /**style label from an ISO timestamp. */
@@ -260,8 +260,8 @@ export default function ProjectWorkspace({
 
   const cancelProjectDelete = () => setDeletingProject(false);
 
-  const confirmProjectDelete = () => {
-    onDeleteProject(projectId);
+  const confirmProjectDelete = (deleteFiles: boolean, deleteChats = false) => {
+    onDeleteProject(projectId, deleteFiles, deleteChats);
     setDeletingProject(false);
   };
 
