@@ -41,7 +41,7 @@ type ProjectWorkspaceProps = {
   chats?: Chat[];
   chatsLoaded?: boolean;
   onOpenChat?: (id: string) => void;
-  onDeleteChat?: (id: string) => void;
+  onDeleteChat?: (id: string, deleteFiles?: boolean) => void;
   onRenameChat?: (id: string, title: string) => void;
   onAddChatsToProject: (id: string) => void;
   onRenameProject: (id: string, title: string) => void;
@@ -559,8 +559,8 @@ export default function ProjectWorkspace({
                   >
                     <DeleteModalWindow
                       onCancel={() => setDeletingChatId(null)}
-                      onConfirm={() => {
-                        onDeleteChat?.(chat.id);
+                      onConfirm={(deleteFiles) => {
+                        onDeleteChat?.(chat.id, deleteFiles);
                         setDeletingChatId(null);
                       }}
                     />
