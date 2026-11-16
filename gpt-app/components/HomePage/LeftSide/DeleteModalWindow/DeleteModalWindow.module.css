@@ -3,3 +3,6 @@
 .label input { flex: 0 0 auto; width: 16px; height: 16px; margin: 2px 0 0; accent-color: #8293a8; }
 .label input:focus-visible { outline: 2px solid #8293a8; outline-offset: 3px; }
 .warning { margin: 8px 0 0 25px; font-size: 12px; line-height: 1.5; color: #aebbcf; }
+
+.label + .label { margin-top: 12px; }
+.label:has(input:disabled) { opacity: .55; cursor: default; }
