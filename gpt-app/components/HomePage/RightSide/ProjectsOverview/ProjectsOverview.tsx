@@ -24,7 +24,7 @@ type ProjectsOverviewProps = {
   onCreateProject: () => void;
   onOpenProject: (projectId: string) => void;
   onRenameProject: (projectId: string, title: string) => void;
-  onDeleteProject: (projectId: string) => void;
+  onDeleteProject: (projectId: string, deleteFiles?: boolean, deleteChats?: boolean) => void;
   onAddChats: (projectId: string) => void;
 };
 
@@ -87,7 +87,7 @@ function ProjectRow({
   onRename: (title: string) => void;
   onDeleteRequest: () => void;
   onDeleteCancel: () => void;
-  onDeleteConfirm: () => void;
+  onDeleteConfirm: (deleteFiles: boolean, deleteChats?: boolean) => void;
   onAddChats: () => void;
 }) {
   const [draftTitle, setDraftTitle] = useState(project.title);
@@ -275,8 +275,8 @@ export default function ProjectsOverview({
         setDeletingId(project.id);
       }}
       onDeleteCancel={() => setDeletingId(null)}
-      onDeleteConfirm={() => {
-        onDeleteProject(project.id);
+      onDeleteConfirm={(deleteFiles, deleteChats) => {
+        onDeleteProject(project.id, deleteFiles, deleteChats);
         setDeletingId(null);
       }}
     />
