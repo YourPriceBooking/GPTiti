@@ -54,11 +54,12 @@ export const fetchConversationMessages = createAsyncThunk<
 /** Delete a conversation on the server, then remove it locally. */
 export const removeConversation = createAsyncThunk<
   string,
-  string,
+  string | { id: string; deleteFiles: boolean },
   { rejectValue: string }
->("chat/removeConversation", async (id, thunkApi) => {
+>("chat/removeConversation", async (arg, thunkApi) => {
+  const { id, deleteFiles } = typeof arg === "string" ? { id: arg, deleteFiles: false } : arg;
   try {
-    await api.deleteConversation(id);
+    await api.deleteConversation(id, deleteFiles);
     return id;
   } catch (e) {
     return thunkApi.rejectWithValue(
