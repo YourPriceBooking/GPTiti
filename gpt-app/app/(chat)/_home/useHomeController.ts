@@ -61,6 +61,7 @@ import {
   setIsSectionVisible,
   setActiveProjectId,
   setAddChatsProjectId,
+  showErrorToast,
 } from "@/redux/ui/slice";
 import {
   fetchProjects,
@@ -394,9 +395,11 @@ export function useHomeController() {
   }, [activeChatId, cancelLastPendingMessage]);
 
   const handleDeleteChat = useCallback(
-    (id: string) => {
+    (id: string, deleteFiles = false) => {
       if (isDraftId(id)) dispatch(deleteDraftChat(id));
-      else dispatch(removeConversation(id));
+      else void dispatch(removeConversation({ id, deleteFiles })).then(action => {
+        if (removeConversation.rejected.match(action)) dispatch(showErrorToast(action.payload ?? "Could not delete this chat."));
+      });
       if (id === activeChatId) router.push("/");
     },
     [activeChatId, dispatch, router],
