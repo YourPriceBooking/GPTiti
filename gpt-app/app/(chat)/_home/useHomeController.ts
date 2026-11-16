@@ -179,8 +179,9 @@ export function useHomeController() {
   );
 
   const handleDeleteProject = useCallback(
-    (projectId: string) => {
-      void dispatch(removeProject(projectId)).then((action) => {
+    (projectId: string, deleteFiles = false, deleteChats = false) => {
+      void dispatch(removeProject({id:projectId,deleteFiles,deleteChats})).then((action) => {
+        if (removeProject.rejected.match(action)) dispatch(showErrorToast(action.payload ?? "Could not delete project."));
         if (
           removeProject.fulfilled.match(action) &&
           activeProjectId === projectId
