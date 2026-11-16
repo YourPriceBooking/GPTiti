@@ -12,7 +12,7 @@ import { selectProjectList } from "@/redux/projects/selectors";
 import { renameProject } from "@/redux/projects/slice";
 import { removeProject, updateProject } from "@/redux/projects/operations";
 import { selectActiveProjectId } from "@/redux/ui/selectors";
-import { setActiveProjectId, setAddChatsProjectId } from "@/redux/ui/slice";
+import { showErrorToast, setActiveProjectId, setAddChatsProjectId } from "@/redux/ui/slice";
 
 export default function LeftSide({
   onNewChat,
@@ -46,8 +46,10 @@ export default function LeftSide({
     onSelectProject?.();
   };
 
-  const handleDeleteProject = (id: string) => {
-    dispatch(removeProject(id));
+  const handleDeleteProject = (id: string, deleteFiles = false, deleteChats = false) => {
+    void dispatch(removeProject({ id, deleteFiles, deleteChats })).then(action => {
+      if (removeProject.rejected.match(action)) dispatch(showErrorToast(action.payload ?? "Could not delete project."));
+    });
     if (id === activeProjectId) {
       dispatch(setActiveProjectId(null));
       router.push("/projects");
