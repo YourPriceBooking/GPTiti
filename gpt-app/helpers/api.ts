@@ -172,9 +172,10 @@ export const api = {
     );
     return res.data;
   },
-  deleteProject: async (id: string) => {
+  deleteProject: async (id: string, deleteChats = false, deleteFiles = false) => {
     const res = await axiosInstance.delete<{ success: boolean }>(
       `/project/${id}`,
+      { params: { deleteChats, deleteFiles } },
     );
     return res.data;
   },
