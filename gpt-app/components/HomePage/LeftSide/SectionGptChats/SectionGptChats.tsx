@@ -769,8 +769,8 @@ export default function SectionGptChats({
           <DeleteModalWindow
             type="project"
             onCancel={() => setDeletingProjectId(null)}
-            onConfirm={() => {
-              deleteProject?.(deletingProjectId);
+            onConfirm={(deleteFiles, deleteChats) => {
+              deleteProject?.(deletingProjectId, deleteFiles, deleteChats);
               setDeletingProjectId(null);
             }}
           />
