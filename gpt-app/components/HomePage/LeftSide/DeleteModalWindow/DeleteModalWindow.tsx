@@ -4,7 +4,7 @@ import ConfirmModalWindow from "../ConfirmModalWindow/ConfirmModalWindow";
 
 type DeleteModalWindowProps = {
   onCancel: () => void;
-  onConfirm: (deleteFiles: boolean) => void;
+  onConfirm: (deleteFiles: boolean, deleteChats?: boolean) => void;
   type?: "chat" | "project";
 };
 
@@ -13,6 +13,7 @@ export default function DeleteModalWindow({
   onConfirm,
   type = "chat",
 }: DeleteModalWindowProps) {
+  const [deleteChats, setDeleteChats] = useState(true);
   const [deleteFiles, setDeleteFiles] = useState(true);
   return (
     <ConfirmModalWindow
@@ -25,17 +26,21 @@ export default function DeleteModalWindow({
       ]}
       confirmLabel="Delete"
       onCancel={onCancel}
-      onConfirm={() => onConfirm(type === "chat" && deleteFiles)}
+      onConfirm={() => onConfirm(deleteFiles && (type === "chat" || deleteChats), type === "project" && deleteChats)}
     >
-      {type === "chat" && <div className={styles.option}>
+      <div className={styles.option}>
+        {type === "project" && <label className={styles.label}>
+          <input type="checkbox" checked={deleteChats} onChange={e => { setDeleteChats(e.target.checked); if (!e.target.checked) setDeleteFiles(false); }} />
+          <span>Also delete all chats in this project</span>
+        </label>}
         <label className={styles.label}>
-          <input type="checkbox" checked={deleteFiles} onChange={e => setDeleteFiles(e.target.checked)} aria-describedby="delete-chat-files-warning" />
-          <span>Also delete all files linked to this chat from the library</span>
+          <input type="checkbox" checked={deleteFiles} disabled={type === "project" && !deleteChats} onChange={e => setDeleteFiles(e.target.checked)} aria-describedby="delete-chat-files-warning" />
+          <span>Also delete related files from the library</span>
         </label>
         <p id="delete-chat-files-warning" className={styles.warning}>
-          {deleteFiles ? "Includes uploaded, generated and reused files. They will also become unavailable in other chats that use them. Other chats’ messages will remain." : "Files will remain in your library and other chats."}
+          {type === "project" && !deleteChats ? "Chats will move to your general chat list. Files will remain in your library." : deleteFiles ? "Includes uploaded, generated and reused files. They will also become unavailable in other chats that use them. Other chats’ messages will remain." : "Files will remain in your library and other chats."}
         </p>
-      </div>}
+      </div>
     </ConfirmModalWindow>
   );
 }
