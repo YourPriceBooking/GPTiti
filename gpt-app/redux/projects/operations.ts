@@ -1,3 +1,4 @@
+import { fetchConversations } from "../chat/operations";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { api } from "@/helpers/api";
 import type {
@@ -99,11 +100,13 @@ export const updateProject = createAsyncThunk<
 /** Delete a project on the server, then remove it locally. */
 export const removeProject = createAsyncThunk<
   string,
-  string,
+  string | { id: string; deleteChats: boolean; deleteFiles: boolean },
   { rejectValue: string }
->("projects/removeProject", async (id, thunkApi) => {
+>("projects/removeProject", async (arg, thunkApi) => {
+  const { id, deleteChats, deleteFiles } = typeof arg === "string" ? {id:arg,deleteChats:false,deleteFiles:false} : arg;
   try {
-    await api.deleteProject(id);
+    await api.deleteProject(id, deleteChats, deleteFiles);
+    void thunkApi.dispatch(fetchConversations());
     return id;
   } catch (e) {
     return thunkApi.rejectWithValue(errMessage(e, "Failed to delete project"));
