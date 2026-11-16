@@ -165,7 +165,7 @@ export type SectionGptChatsProps = Pick<
   | "renameChat"
 > & {
   setActiveProject?: (id: string) => void;
-  deleteProject?: (id: string) => void;
+  deleteProject?: (id: string, deleteFiles?: boolean, deleteChats?: boolean) => void;
   renameProject?: (id: string, title: string) => void;
   addChatsToProject?: (id: string) => void;
 };
