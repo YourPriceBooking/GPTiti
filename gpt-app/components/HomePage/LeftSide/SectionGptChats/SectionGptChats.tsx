@@ -161,9 +161,9 @@ export default function SectionGptChats({
   };
 
   const deleteModalStyle = (pos: MenuPosition): CSSProperties => ({
-    top: pos.top,
+    top: pos.top != null ? Math.max(8, Math.min(pos.top, window.innerHeight - 350)) : undefined,
     bottom: pos.bottom,
-    left: pos.left != null ? pos.left + DELETE_MODAL_SHIFT : undefined,
+    left: pos.left != null ? Math.max(8, Math.min(pos.left + DELETE_MODAL_SHIFT, window.innerWidth - 376)) : undefined,
     right:
       pos.right != null
         ? Math.max(VIEWPORT_EDGE_GAP, pos.right - DELETE_MODAL_SHIFT)
@@ -725,8 +725,8 @@ export default function SectionGptChats({
         >
           <DeleteModalWindow
             onCancel={() => setDeletingChatId(null)}
-            onConfirm={() => {
-              deleteChat(deletingChatId);
+            onConfirm={(deleteFiles) => {
+              deleteChat(deletingChatId, deleteFiles);
               setDeletingChatId(null);
             }}
           />
