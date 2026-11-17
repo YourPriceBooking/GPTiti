@@ -19,6 +19,7 @@ import { migrateModelSelection } from "./model/migrate";
 import { tokensReducer } from "./tokens/slice";
 import { uiReducer } from "./ui/slice";
 import { projectsReducer } from "./projects/slice";
+import { createAuthBoundaryMiddleware } from "./authBoundaryMiddleware";
 import { errorToastMiddleware } from "./errorToastMiddleware";
 import { setupInterceptors } from "@/lib/axiosInstance"; // ← додано
 
@@ -90,7 +91,7 @@ export const store = configureStore({
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
-    }).concat(errorToastMiddleware),
+    }).concat(createAuthBoundaryMiddleware(), errorToastMiddleware),
 });
 
 setupInterceptors(store); // ← викликаємо після створення store

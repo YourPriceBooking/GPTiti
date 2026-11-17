@@ -79,6 +79,14 @@ const uiSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
+    builder.addCase(logoutUser.fulfilled, (state) => {
+      state.activeProjectId = null;
+      state.addChatsProjectId = null;
+      state.isModalOpen = false;
+      state.isCreateProjectModalOpen = false;
+      state.isOverlayOpen = false;
+      state.hasFirstRequest = false;
+    });
     builder.addMatcher(
       isAnyOf(loginUser.fulfilled, logoutUser.fulfilled, refreshError, refreshUser.rejected),
       (state) => {

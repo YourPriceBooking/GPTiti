@@ -8,6 +8,7 @@ interface AuthState {
   isLoggedIn: boolean;
   error: string | null;
   sessionExpired: boolean;
+  isLoggingOut: boolean;
 }
 
 const initialState: AuthState = {
@@ -16,6 +17,7 @@ const initialState: AuthState = {
   isLoggedIn: false,
   error: null,
   sessionExpired: false,
+  isLoggingOut: false,
 };
 
 const authSlice = createSlice({
@@ -54,7 +56,16 @@ const authSlice = createSlice({
         state.isLoggedIn = false;
         state.sessionExpired = true;
       })
+      .addCase(logoutUser.pending, (state) => {
+        state.isLoggingOut = true;
+        state.error = null;
+      })
+      .addCase(logoutUser.rejected, (state, { payload }) => {
+        state.isLoggingOut = false;
+        state.error = payload ?? "Could not log out. Please try again.";
+      })
       .addCase(logoutUser.fulfilled, (state) => {
+        state.isLoggingOut = false;
         state.user = null;
         state.accessTokenReady = false;
         state.isLoggedIn = false;

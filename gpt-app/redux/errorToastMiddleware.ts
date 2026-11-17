@@ -1,5 +1,6 @@
 import { isRejectedWithValue, type Middleware } from "@reduxjs/toolkit";
 
+import { isLogoutPending } from "@/lib/authSession";
 import { showErrorToast } from "@/redux/ui/slice";
 
 const hasDedicatedErrorUi = (actionType: string) =>
@@ -13,6 +14,7 @@ export const errorToastMiddleware: Middleware =
 
     if (
       isRejectedWithValue(action) &&
+      !isLogoutPending() &&
       !action.meta.aborted &&
       !hasDedicatedErrorUi(action.type) &&
       typeof action.payload === "string"

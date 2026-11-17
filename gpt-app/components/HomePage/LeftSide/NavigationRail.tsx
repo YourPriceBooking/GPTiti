@@ -6,7 +6,7 @@ import { selectIsLoggedIn, selectUser } from "@/redux/auth/selectors";
 import { captureTokenHistoryDraft } from "@/lib/tokenHistoryDraft";
 import { setLibraryTarget } from "@/lib/files/libraryDraft";
 import { LIBRARY_ENABLED } from "@/lib/files/library";
-import AccountAvatar from "./SectionGptUser/AccountAvatar";
+import AccountMenu from "./AccountMenu/AccountMenu";
 import styles from "./NavigationRail.module.css";
 
 export default function NavigationRail({
@@ -102,7 +102,7 @@ export default function NavigationRail({
       </div>
       {signedIn && (
         <div className={styles.account}>
-          <AccountAvatar />
+          <AccountMenu onNavigate={onNavigate} />
         </div>
       )}
     </nav>
