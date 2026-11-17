@@ -2,40 +2,29 @@ import React from "react";
 
 import AccountAvatar from "./AccountAvatar";
 
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { selectIsLoggedIn, selectUser } from "@/redux/auth/selectors";
-import { logoutUser } from "@/redux/auth/operations";
+import { useAppSelector } from "@/redux/hooks";
+import { selectIsLoggedIn } from "@/redux/auth/selectors";
 
 import LoginModal from "@/components/HomePage/common/LoginModal/LoginModal";
 
 import styles from "./SectionGptUser.module.css";
 
 export default function SectionGptUser() {
-  const dispatch = useAppDispatch();
-
-  const user = useAppSelector(selectUser);
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
 
   const [isLoginOpen, setIsLoginOpen] = React.useState(false);
 
-  const handleLogout = async () => {
-    await dispatch(logoutUser());
-  };
+  if (isLoggedIn) return null;
 
   return (
     <section className={styles.gptUser}>
       <article className={styles.userInfo}>
         <AccountAvatar />
 
-        <span className={styles.gptUserEmail}>{isLoggedIn ? user?.email || "Account" : "Guest"}</span>
+        <span className={styles.gptUserEmail}>Guest</span>
       </article>
 
       <div className={styles.logoutBtnContainer}>
-        {isLoggedIn ? (
-          <button className={styles.logoutBtn} onClick={handleLogout}>
-            <span className={styles.logoutBtnSpan}>Log out</span>
-          </button>
-        ) : (
           <button
             className={styles.loginBtn}
             onClick={() => setIsLoginOpen(true)}
@@ -54,7 +43,6 @@ export default function SectionGptUser() {
               Continue in with Google
             </span>
           </button>
-        )}
       </div>
       <LoginModal open={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
     </section>

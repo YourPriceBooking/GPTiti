@@ -107,12 +107,12 @@ export function useInputDraft() {
   }, [ownerId, pathname]);
 
   useLayoutEffect(() => {
-    const textarea = inputRef.current;
-    if (!ownerId || !textarea) return;
+    if (!ownerId) return;
     const frame = requestAnimationFrame(() => {
-      // Wait for the uncontrolled composer to mount; Strict Mode can cancel
-      // this frame without consuming the saved draft.
-      if (textarea.value) return;
+      // The composer can mount after this parent effect when returning from
+      // account pages. Read the ref inside the frame, not before it mounts.
+      const textarea = inputRef.current;
+      if (!textarea || textarea.value) return;
       const saved = takeTokenHistoryDraft(ownerId, pathname);
       if (!saved) return;
       const text = LIBRARY_ENABLED ? saved.text : clipToModelLimit(saved.text);
