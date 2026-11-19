@@ -724,9 +724,33 @@ export default function InputBar({
         currentIds={savedFiles.map(f=>f.fileId)} current={[...images.map(f=>f.file),...files.map(f=>f.file),...savedFiles.map(libraryInput)]}
         onClose={()=>setLibraryOpen(false)} onAdd={selected=>{attachLibraryFiles(library.owner!,library.path,selected);setLibraryOpen(false);}} />}
       {LIBRARY_ENABLED && library.draft.lostLocal && <p className={styles.attachmentError} role="status">Some device files were not uploaded before this page reloaded. Add them again; your text and saved files are kept. <button type="button" onClick={()=>library.update({lostLocal:false})}>Dismiss</button></p>}
-      {savedFiles.length > 0 && <div className={styles.filePreviewRow}>{savedFiles.map(file=><div className={styles.fileChip} key={file.fileId}>
-        <span>{file.originalName} · {formatFileSize(file.size)}</span><button type="button" className={styles.fileChipRemove} aria-label={`Remove ${file.originalName} from message`} disabled={isSending || isPreparing} onClick={()=>library.update({files:savedFiles.filter(f=>f.fileId!==file.fileId)})}>×</button>
-      </div>)}</div>}
+      {savedFiles.length > 0 && (
+        <div className={styles.filePreviewRow}>
+          {savedFiles.map(file => (
+            <div key={file.fileId} className={`${styles.fileChip} ${styles.libraryChip}`}>
+              <svg className={styles.libraryChipIcon} width="22" height="22" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" aria-hidden="true">
+                <path d="M3 7V5a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" />
+              </svg>
+              <div className={styles.fileChipInfo}>
+                <span className={styles.fileChipName} title={file.originalName}>{file.originalName}</span>
+                <span className={styles.fileChipSize}>Library · {formatFileSize(file.size)}</span>
+              </div>
+              <button
+                type="button"
+                className={styles.libraryChipRemove}
+                aria-label={`Remove ${file.originalName} from message`}
+                disabled={isSending || isPreparing}
+                onClick={() => library.update({ files: savedFiles.filter(f => f.fileId !== file.fileId) })}
+              >
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="m4 4 8 8m0-8-8 8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+                </svg>
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
       {attachmentError && <p className={styles.attachmentError} role="alert">{attachmentError}</p>}
       {(isPreparing || (isSending && (images.length > 0 || files.length > 0 || savedFiles.length > 0))) &&
         <p className={styles.attachmentStatus} role="status">{isPreparing ? "Preparing attachments…" : "Preparing attachments before sending…"}</p>}
