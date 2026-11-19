@@ -38,6 +38,7 @@ import { inputKind, validateTextBytes } from "@/lib/files/input";
 
 import { useFileLimits } from "@/hooks/useFileLimits";
 import { isFileDrag, droppedFiles } from "@/lib/files/drop";
+import { pastedFiles } from "@/lib/files/paste";
 import { validateServerFiles } from "@/lib/files/limits";
 
 import styles from "./InputBar.module.css";
@@ -411,15 +412,16 @@ export default function InputBar({
       e.preventDefault();
       return;
     }
-    const items = Array.from(e.clipboardData.items);
-    const pastedImages = items
-      .filter((item) => item.kind === "file" && item.type.startsWith("image/"))
-      .map((item) => item.getAsFile())
-      .filter((f): f is File => f !== null);
-
-    if (pastedImages.length > 0) {
+    try {
+      const incoming = pastedFiles(e.clipboardData);
+      if (incoming) {
+        e.preventDefault();
+        void addAttachments(incoming);
+        return;
+      }
+    } catch (error) {
       e.preventDefault();
-      void addImageFiles(pastedImages);
+      setAttachmentError(error instanceof Error ? error.message : "Could not read the clipboard files. Try Add files.");
       return;
     }
 
