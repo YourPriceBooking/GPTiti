@@ -305,24 +305,134 @@
   bottom: -24px;
 }
 .confirm {
-  background: white !important;
-  color: #142443 !important;
-  max-width: 480px !important;
+  width: min(460px, calc(100% - 32px));
+  max-width: none;
+  max-height: calc(100dvh - 32px);
+  margin: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 20px;
+  color: #172b46;
+  background: #fff;
+  box-shadow: 0 16px 48px #14244324;
 }
-.confirm p {
-  overflow-wrap: anywhere;
-  line-height: 1.65;
+.confirm::backdrop {
+  background: #0b162966;
 }
+.confirmBody {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: inherit;
+  padding: clamp(18px, 4vw, 28px);
+  overflow-y: auto;
+}
+.confirmHeader,
 .confirmActions {
   display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.confirmHeader {
+  justify-content: space-between;
+}
+.confirmHeader h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.confirm .confirmHeader button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-color: transparent;
+  background: transparent;
+}
+.confirmFiles {
+  list-style: none;
+  margin: 0;
+  padding: 0 12px;
+  min-height: 44px;
+  max-height: 13rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-radius: 10px;
+  background: #edf4fc;
+}
+.confirmFiles li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 12px;
+  padding: 11px 0;
+  font-size: 14px;
+  line-height: 22px;
+  overflow-wrap: anywhere;
+}
+.confirmFiles li + li {
+  border-top: 1px solid #d7e3f0;
+}
+.confirmFiles small {
+  color: #506883;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.confirmWarning {
+  margin: 0;
+  color: #455c76;
+  font-size: 14px;
+  line-height: 1.55;
+}
+.confirmWarning strong {
+  display: block;
+  margin-top: 4px;
+  color: #172b46;
+  font-weight: 600;
+}
+.confirmActions {
   justify-content: flex-end;
-  gap: 10px;
-  margin-top: 24px;
+  flex-wrap: wrap;
+}
+.confirmActions button {
+  min-height: 44px;
+  font-size: 14px;
+  font-weight: 600;
 }
 .confirm .danger {
-  background: #fff0f0;
-  color: #a33232;
-  border-color: #f0cece;
+  background: #a8323e;
+  border-color: transparent;
+  color: #fff;
+}
+@media (hover: hover) {
+  .confirm button:hover:enabled {
+    background: #edf4fc;
+  }
+  .confirm .danger:hover:enabled {
+    background: #922b36;
+  }
+}
+.confirm button:active:enabled {
+  background: #dfeaf6;
+}
+.confirm .danger:active:enabled {
+  background: #7e242f;
+}
+.confirm :focus-visible {
+  outline: 2px solid #416998;
+  outline-offset: 2px;
+}
+.confirm button:disabled {
+  opacity: 0.65;
+  cursor: default;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .confirm button {
+    transition: background-color 160ms ease-out;
+  }
 }
 .dialog {
   border: 0;
