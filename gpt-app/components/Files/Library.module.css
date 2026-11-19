@@ -269,6 +269,7 @@
   margin-left: 10px;
 }
 .notice {
+  overflow-wrap: anywhere;
   color: #536b8d;
   font-size: 13px;
   line-height: 1.6;
