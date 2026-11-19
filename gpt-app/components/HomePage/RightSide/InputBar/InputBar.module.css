@@ -168,6 +168,48 @@
   background: #0f172a;
 }
 
+.libraryChip {
+  max-width: min(260px, 100%);
+  min-width: 0;
+  background: #edf4fc;
+  border-color: #dbe6f2;
+}
+
+.libraryChipIcon {
+  flex-shrink: 0;
+  color: #506883;
+}
+
+.libraryChip .fileChipName { color: #172b46; }
+.libraryChip .fileChipSize { color: #506883; }
+
+.libraryChipRemove {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 32px;
+  height: 32px;
+  margin-left: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #506883;
+  cursor: pointer;
+  transition: background-color 160ms ease-out;
+}
+
+@media (hover: hover) {
+  .libraryChipRemove:enabled:hover { background: #dce8f6; }
+}
+
+.libraryChipRemove:enabled:active { background: #cfdeee; }
+.libraryChipRemove:focus-visible { outline: 2px solid #506883; }
+.libraryChipRemove:disabled { cursor: default; opacity: 0.5; }
+
+@media (prefers-reduced-motion: reduce) {
+  .libraryChipRemove { transition: none; }
+}
+
 .composerBody {
   display: flex;
   flex-wrap: wrap;
