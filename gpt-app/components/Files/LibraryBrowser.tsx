@@ -2,13 +2,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLibraryPages } from "@/hooks/useLibraryPages";
 import { useFileLimits } from "@/hooks/useFileLimits";
-import { api } from "@/helpers/api";
 import { downloadFile } from "@/lib/files/api";
 import { preparationErrorMessage } from "@/lib/files/preparation";
 import {
   deleteLibraryFile,
   getLibraryFile,
   loadStorageLimits,
+  uploadLibraryFile,
 } from "@/lib/files/libraryApi";
 import {
   attachmentReason,
@@ -118,7 +118,12 @@ export default function LibraryBrowser({
     setBusy(true);
     setError("");
     setNotice("");
-    let completed = 0;
+    let added = 0;
+    let existing = 0;
+    let savedName = "";
+    const summary = () => existing
+      ? `${added} added · ${existing} already in your library.`
+      : `${added} file${added === 1 ? "" : "s"} added.`;
     try {
       const signal = lifetime.current!.signal;
       const storage = await loadStorageLimits(signal);
@@ -128,17 +133,21 @@ export default function LibraryBrowser({
       }
       for (const file of incoming) {
         setNotice(`Uploading ${file.name}…`);
-        await api.uploadFile(file, signal);
-        completed++;
+        const result = await uploadLibraryFile(file, signal);
+        if (result.outcome === "existing") {
+          existing++;
+          savedName = result.name;
+        } else added++;
       }
-      if (!signal.aborted)
-        setNotice(`${completed} file${completed === 1 ? "" : "s"} uploaded.`);
+      if (!signal.aborted) {
+        if (incoming.length === 1 && existing) {
+          setNotice(savedName === incoming[0].name ? "Already in your library." : `Already in your library as ${savedName}.`);
+        } else setNotice(summary());
+      }
     } catch (e) {
       if (!lifetime.current?.signal.aborted) {
         setError(preparationErrorMessage(e));
-        setNotice(
-          `${completed} uploaded. Refresh Files before retrying an interrupted upload to avoid duplicates.`,
-        );
+        setNotice(added || existing ? summary() : "");
       }
     } finally {
       operation.current = false;

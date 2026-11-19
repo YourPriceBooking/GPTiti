@@ -15,7 +15,8 @@ Paths are relative to the configured API base URL, not hardcoded to a production
 | --- | --- |
 | GET `/files?view=library&limit=40` | First page; request `cursor=nextCursor` on scroll or Load more. Pass `q,source,category,sort` for global search/filter/sort. Response: `listVersion:2`, metadata, opaque cursor or null, and account-wide quota. `maxCount:null` means byte-only storage. |
 | GET `/files?limit=100&before=<id>` | Transitional fallback on servers that still enforce the count cap and do not return listVersion 2. Only these servers require reading their whole list to filter it correctly. |
-| POST `/files` | Multipart `file`, one upload per request. Storage-only admission on Files page; no model call. |
+| POST `/files/library-upload` | Files-page upload/drop only; multipart `file`. Returns 201 with `outcome:"added"` or 200 with `outcome:"existing"` and the canonical file DTO. Match is per owner, bytes and format. No extra quota for reuse. Deploy the companion backend before this frontend; never fall back to an ambiguous second upload. |
+| POST `/files` | Existing direct chat upload; always creates an independent upload. |
 | GET `/files/:id` | Revalidate each selected ID before adding and before Send; metadata from the server is authoritative. |
 | GET `/files/limits?libraryVersion=2` | Storage admission independent of model. A numeric maxCount is still shown when an older backend enforces it. |
 | GET `/files/limits?modelId=…` | Existing effective input/processing limits. |

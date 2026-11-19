@@ -1,3 +1,4 @@
+import { isAxiosError } from "axios";
 import { axiosInstance } from "../axiosInstance";
 import { libraryCategory, readLibraryPage, type LibraryFile, type LibraryPage } from "./library";
 import { readFileLimits } from "./limits";
@@ -59,6 +60,28 @@ export async function getLibraryFile(
     nextCursor: null,
     quota: { bytes: 0, count: 0, maxBytes: 1, maxCount: 1 },
   }).files[0];
+}
+// Only Files uses this endpoint. Composer uploads keep their existing identities.
+export async function uploadLibraryFile(file: File, signal: AbortSignal) {
+  const form = new FormData();
+  form.append("file", file);
+  try {
+    const { data } = await axiosInstance.post("/files/library-upload", form, {
+      headers: { "Content-Type": "multipart/form-data" }, signal, timeout: 120_000,
+    });
+    if (data?.success !== true || !["added", "existing"].includes(data.outcome) ||
+        typeof data.file?.originalName !== "string" || !data.file.originalName) {
+      throw new Error("Could not confirm the upload. You can retry the same file.");
+    }
+    return { outcome: data.outcome as "added" | "existing", name: data.file.originalName as string };
+  } catch (error) {
+    if (isAxiosError(error)) {
+      if (error.response?.status === 404) throw new Error("Library uploads are temporarily unavailable. Please try again later.");
+      if (error.response?.data?.error === "FILE_QUOTA_EXCEEDED") throw new Error("Your library has no room for this file. Free up space and try again.");
+      if (!error.response && !signal.aborted) throw new Error("Could not confirm the upload. Check your connection and retry the same file.");
+    }
+    throw error;
+  }
 }
 export async function deleteLibraryFile(id: string) {
   if (!/^[a-f\d]{24}$/i.test(id)) throw new Error("Invalid file ID.");
