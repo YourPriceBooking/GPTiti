@@ -21,7 +21,7 @@ import {
 import { forgetLibraryFile } from "@/lib/files/libraryDraft";
 import { fileSize, extension } from "@/lib/files/types";
 import { PreviewPanel } from "./FileWorkspace";
-import AppModal from "@/components/HomePage/common/AppModal/AppModal";
+import LibraryDeleteDialog from "./LibraryDeleteDialog";
 import styles from "./Library.module.css";
 
 export default function LibraryBrowser({
@@ -522,32 +522,14 @@ export default function LibraryBrowser({
       {preview && (
         <PreviewPanel file={preview} close={() => setPreview(null)} />
       )}
-      <AppModal
-        open={deleting.length > 0}
-        onClose={() => {
-          if (!busy) setDeleting([]);
-        }}
-        title={`Delete ${deleting.length === 1 ? "file" : "files"}?`}
-        paperClassName={styles.confirm}
-      >
-        <p>{deleting.map((f) => f.originalName).join(", ")}</p>
-        <p>
-          These files will become unavailable in every chat where they were
-          used. Messages and responses will stay. This cannot be undone.
-        </p>
-        <div className={styles.confirmActions}>
-          <button disabled={busy} onClick={() => setDeleting([])}>
-            Cancel
-          </button>
-          <button
-            className={styles.danger}
-            disabled={busy}
-            onClick={() => void remove()}
-          >
-            {busy ? "Deleting…" : "Delete permanently"}
-          </button>
-        </div>
-      </AppModal>
+      {deleting.length > 0 && (
+        <LibraryDeleteDialog
+          files={deleting}
+          busy={busy}
+          onCancel={() => setDeleting([])}
+          onConfirm={remove}
+        />
+      )}
     </div>
   );
 }
