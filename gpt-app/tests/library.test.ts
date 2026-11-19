@@ -81,6 +81,15 @@ test("library boundaries reject malformed pages and preserve expiry without trus
   );
   assert.equal(asUploadedFile(parsed.files[0]).url, "");
 });
+test("byte-only quota permits more than 500 files and versioned cursors; legacy pages remain readable", () => {
+  const quota = { bytes: 501, count: 501, maxBytes: 2e9, maxCount: null };
+  const page = { files: [file], quota, listVersion: 2, nextCursor: "v2.YWJj" };
+  assert.deepEqual(readLibraryPage(page).quota, quota);
+  assert.throws(() => readLibraryPage({ ...page, listVersion: 1 }));
+  assert.throws(() => readLibraryPage({ ...page, nextCursor: "v2./foo" }));
+  assert.throws(() => readLibraryPage({ ...page, quota: { ...quota, maxCount: 0 } }));
+  assert.equal(readLibraryPage({ ...page, listVersion: 1, nextCursor: file.fileId, quota: { ...quota, maxCount: 500 } }).quota.maxCount, 500);
+});
 test("reuse is keyed by ID; storage support does not grant model support; aggregate limits include existing draft", () => {
   assert.equal(mergeLibraryFiles([file], [file]).length, 1);
   assert.equal(

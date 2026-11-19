@@ -1,11 +1,11 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useLibraryPages } from "@/hooks/useLibraryPages";
 import { useFileLimits } from "@/hooks/useFileLimits";
 import { api } from "@/helpers/api";
 import { downloadFile } from "@/lib/files/api";
 import { preparationErrorMessage } from "@/lib/files/preparation";
 import {
-  loadLibrary,
   deleteLibraryFile,
   getLibraryFile,
   loadStorageLimits,
@@ -16,7 +16,6 @@ import {
   libraryInput,
   storageUploadError,
   type LibraryFile,
-  type LibraryPage,
 } from "@/lib/files/library";
 import { forgetLibraryFile } from "@/lib/files/libraryDraft";
 import { fileSize, extension } from "@/lib/files/types";
@@ -41,19 +40,21 @@ export default function LibraryBrowser({
   onAdd: (files: LibraryFile[]) => void;
   addLabel?: string;
 }) {
-  const [data, setData] = useState<LibraryPage | null>(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [query, setQuery] = useState("");
   const [source, setSource] = useState("all");
   const [category, setCategory] = useState("all");
   const [sort, setSort] = useState("newest");
-  const [selected, setSelected] = useState<string[]>([]);
+  const [chosen, setSelected] = useState<LibraryFile[]>([]);
+  const selected = useMemo(() => new Set(chosen.map(file => file.fileId)), [chosen]);
   const [preview, setPreview] = useState<LibraryFile | null>(null);
   const [deleting, setDeleting] = useState<LibraryFile[]>([]);
   const [busy, setBusy] = useState(false);
   const [refresh, setRefresh] = useState(0);
+  const { data, loading, loadMore, pageError } = useLibraryPages(owner, refresh, { q: query, category, source, sort });
+  const section = useRef<HTMLElement>(null);
+  const more = useRef<HTMLButtonElement>(null);
   const input = useRef<HTMLInputElement>(null);
   const lifetime = useRef<AbortController | null>(null);
   const operation = useRef(false);
@@ -64,25 +65,13 @@ export default function LibraryBrowser({
     return () => controller.abort();
   }, [owner]);
   useEffect(() => {
-    const controller = new AbortController();
-    setLoading(true);
-    loadLibrary(controller.signal)
-      .then((value) => {
-        if (!controller.signal.aborted) {
-          setData(value);
-          setSelected((ids) =>
-            ids.filter((id) => value.files.some((f) => f.fileId === id)),
-          );
-        }
-      })
-      .catch((e) => {
-        if (!controller.signal.aborted) setError(preparationErrorMessage(e));
-      })
-      .finally(() => {
-        if (!controller.signal.aborted) setLoading(false);
-      });
-    return () => controller.abort();
-  }, [owner, refresh]);
+    if (!data?.nextCursor || loading || pageError || !more.current || !window.IntersectionObserver) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) loadMore();
+    }, { root: section.current, rootMargin: "0px 0px 120px" });
+    observer.observe(more.current);
+    return () => observer.disconnect();
+  }, [data?.nextCursor, loading, pageError, loadMore]);
   useEffect(() => {
     const reload = () => {
       if (!operation.current) setRefresh((n) => n + 1);
@@ -90,32 +79,9 @@ export default function LibraryBrowser({
     window.addEventListener("focus", reload);
     return () => window.removeEventListener("focus", reload);
   }, []);
-  const files = useMemo(() => data?.files ?? [], [data]);
-  const chosen = files.filter((f) => selected.includes(f.fileId));
+  const rows = data?.files ?? [];
+  const filtered = !!query || source !== "all" || category !== "all";
   const toAttach = chosen.filter((f) => !currentIds.includes(f.fileId));
-  const rows = useMemo(
-    () =>
-      files
-        .filter(
-          (f) =>
-            f.originalName
-              .toLocaleLowerCase()
-              .includes(query.toLocaleLowerCase()) &&
-            (source === "all" || f.source === source) &&
-            (category === "all" ||
-              libraryCategory(f.originalName) === category),
-        )
-        .sort((a, b) =>
-          sort === "name"
-            ? a.originalName.localeCompare(b.originalName)
-            : sort === "size"
-              ? b.size - a.size
-              : sort === "oldest"
-                ? a.fileId.localeCompare(b.fileId)
-                : b.fileId.localeCompare(a.fileId),
-        ),
-    [files, query, source, category, sort],
-  );
   const reason = (file: LibraryFile) =>
     attachmentReason(file, limits.limits, current);
   const add = async () => {
@@ -211,6 +177,7 @@ export default function LibraryBrowser({
   return (
     <div className={`${styles.workspace} ${picker ? styles.picker : ""}`}>
       <section
+        ref={section}
         className={styles.library}
         aria-label={picker ? "Choose saved files" : "Files"}
         onDragOver={(e) => {
@@ -256,7 +223,7 @@ export default function LibraryBrowser({
         {data && !picker && (
           <div className={styles.quota}>
             <span>
-              {data.quota.count} / {data.quota.maxCount} files
+              {data.quota.count.toLocaleString("en-US")}{data.quota.maxCount !== null && ` / ${data.quota.maxCount.toLocaleString("en-US")}`} {data.quota.count === 1 && data.quota.maxCount === null ? "file" : "files"}
             </span>
             <span>
               {(data.quota.bytes / 1e6).toLocaleString("en-US", {
@@ -289,6 +256,7 @@ export default function LibraryBrowser({
           </svg>
           <input
             aria-label="Search files"
+            maxLength={256}
             placeholder="Search files…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -367,20 +335,25 @@ export default function LibraryBrowser({
             <button onClick={limits.retry}>Retry limits</button>
           </p>
         )}
-        {loading ? (
+        {pageError && (
+          <div className={styles.error} role="alert">
+            {pageError} <button onClick={loadMore} disabled={loading}>Retry page</button>
+          </div>
+        )}
+        {loading && !data ? (
           <div className={styles.empty} role="status">
             Loading your files…
           </div>
-        ) : !rows.length ? (
+        ) : !rows.length && pageError ? null : !rows.length ? (
           <div className={styles.empty}>
             <span className={styles.emptyIcon}>▤</span>
             <h2>
-              {files.length
+              {filtered
                 ? "No matching files"
                 : "Your files, ready when you need them"}
             </h2>
             <p>
-              {files.length
+              {filtered
                 ? "Try another name or filter."
                 : "Upload a file here or save one through chat. Only files you choose are attached."}
             </p>
@@ -396,7 +369,7 @@ export default function LibraryBrowser({
             {rows.map((file) => {
               const attached = currentIds.includes(file.fileId);
               const blocked = picker ? reason(file) : null;
-              const checked = selected.includes(file.fileId);
+              const checked = selected.has(file.fileId);
               return (
                 <div
                   className={`${styles.row} ${checked ? styles.selected : ""}`}
@@ -410,10 +383,10 @@ export default function LibraryBrowser({
                       disabled={busy || (picker && attached) || !!blocked}
                       onChange={() => {
                         setError("");
-                        setSelected((ids) =>
+                        setSelected((items) =>
                           checked
-                            ? ids.filter((id) => id !== file.fileId)
-                            : [...ids, file.fileId],
+                            ? items.filter((item) => item.fileId !== file.fileId)
+                            : [...items, file],
                         );
                       }}
                     />
@@ -494,10 +467,15 @@ export default function LibraryBrowser({
             })}
           </div>
         )}
+        {data?.nextCursor && !pageError && (
+          <button className={styles.more} ref={more} disabled={loading} onClick={loadMore}>
+            {loading ? "Loading more files…" : "Load more files"}
+          </button>
+        )}
         <footer className={styles.selection}>
-          <span aria-live="polite">{selected.length} selected</span>
+          <span aria-live="polite">{selected.size} selected</span>
           <div>
-            {!picker && selected.length > 0 && (
+            {!picker && selected.size > 0 && (
               <button disabled={busy} onClick={() => setDeleting(chosen)}>
                 Delete
               </button>
@@ -505,7 +483,7 @@ export default function LibraryBrowser({
             <button
               className={styles.primary}
               disabled={
-                busy || loading || !!error || !toAttach.length || !limits.limits
+                busy || (loading && !data) || !!error || !toAttach.length || !limits.limits
               }
               onClick={() => void add()}
             >

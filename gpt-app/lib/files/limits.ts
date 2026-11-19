@@ -3,7 +3,7 @@ type Reader = { enabled: boolean; maxBytes: number };
 export type FileLimits = {
   version: 1;
   preparation?: { async: boolean; pageCheckpoints: boolean };
-  storage: { maxBytes: number; maxCount: number };
+  storage: { maxBytes: number; maxCount: number | null };
   upload: { maxBytes: number; types: Record<string, { extensions: string[]; maxBytes: number }> };
   message: { maxAttachments: number; maxBytes: number; extractedTextBytes: number };
   processing: { text: Reader; office: Reader; pdf: Reader; xlsx?: Reader;
@@ -40,7 +40,7 @@ export function readFileLimits(value: unknown): FileLimits {
   if (prep?.version === 2 && prep.pageCheckpoints === true) { number(ocr.maxPdfPages); number(ocr.imageMaxBytes); }
   return { version: 1,
     preparation: prep ? { async: (prep.version === 1 || prep.version === 2) && prep.async === true && Array.isArray(prep.kinds) && prep.kinds.includes("ocr"), pageCheckpoints: prep.version === 2 && prep.pageCheckpoints === true } : undefined,
-    storage: { maxBytes: number(storage.maxBytes), maxCount: number(storage.maxCount) },
+    storage: { maxBytes: number(storage.maxBytes), maxCount: storage.maxCount === null ? null : number(storage.maxCount) },
     upload: { maxBytes: number(upload.maxBytes), types },
     message: { maxAttachments: number(message.maxAttachments), maxBytes: number(message.maxBytes), extractedTextBytes: number(message.extractedTextBytes) },
     processing: { ...(processing.xlsx === undefined ? {} : {xlsx:reader(processing.xlsx)}), text: reader(processing.text), office: reader(processing.office), pdf: reader(processing.pdf),

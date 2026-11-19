@@ -13,10 +13,11 @@ Paths are relative to the configured API base URL, not hardcoded to a production
 
 | Method/path | Usage |
 | --- | --- |
-| GET `/files?limit=100&before=<id>` | Load every page, then search/filter/sort the complete list locally. Read `{files,nextCursor,quota:{bytes,count,maxBytes,maxCount}}`. Fail rather than present a partial list as complete. |
+| GET `/files?view=library&limit=40` | First page; request `cursor=nextCursor` on scroll or Load more. Pass `q,source,category,sort` for global search/filter/sort. Response: `listVersion:2`, metadata, opaque cursor or null, and account-wide quota. `maxCount:null` means byte-only storage. |
+| GET `/files?limit=100&before=<id>` | Transitional fallback on servers that still enforce the count cap and do not return listVersion 2. Only these servers require reading their whole list to filter it correctly. |
 | POST `/files` | Multipart `file`, one upload per request. Storage-only admission on Files page; no model call. |
 | GET `/files/:id` | Revalidate each selected ID before adding and before Send; metadata from the server is authoritative. |
-| GET `/files/limits` | Storage admission independent of model. |
+| GET `/files/limits?libraryVersion=2` | Storage admission independent of model. A numeric maxCount is still shown when an older backend enforces it. |
 | GET `/files/limits?modelId=…` | Existing effective input/processing limits. |
 | GET `/files/:id/preview` | Existing authenticated preview; no invented PDF renderer. Uploaded Office/PDF may show “download original”; Text shows saved OCR when available. |
 | GET `/files/:id/download` | Existing authenticated blob download. |
