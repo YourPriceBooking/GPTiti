@@ -8,7 +8,7 @@ export default function LiveFileLimits({ limits, status, retry }: { limits: File
   const rows = [['PDF', 'pdf'], ['DOCX', 'docx'], ['XLSX', 'xlsx'], ['CSV / TSV', 'csv'], ['Text / code', 'txt'], ['Images', 'png'], ['ZIP', 'zip']];
   return <div className={styles.liveLimits}>
     <button className={styles.refreshLimits} type="button" onClick={retry}>Refresh limits</button>
-    <div className={styles.storageQuota}><span>Private storage</span><strong>{formatLimit(limits.storage.maxBytes)}</strong><small>per account · up to {limits.storage.maxCount.toLocaleString('en-US')} files</small></div>
+    <div className={styles.storageQuota}><span>Private storage</span><strong>{formatLimit(limits.storage.maxBytes)}</strong><small>per account{limits.storage.maxCount !== null && ` · up to ${limits.storage.maxCount.toLocaleString('en-US')} files`}</small></div>
     <p>Storage and chat reading have different limits. This chat picker accepts files that fit both.</p>
     <table className={styles.limitsTable}><caption>Current limits for the selected model</caption><thead><tr><th>Format</th><th>Storage</th><th>Chat reading</th></tr></thead><tbody>
       {rows.map(([label, ext]) => { const caps = fileCeilings('file.' + ext, limits); return <tr key={ext}><th scope="row">{label}</th><td>{caps ? formatLimit(caps.upload) : 'Unavailable'}</td><td>{caps?.enabled ? formatLimit(caps.reading) : 'Disabled'}</td></tr>; })}

@@ -12,7 +12,7 @@ export type LibraryQuota = {
   bytes: number;
   count: number;
   maxBytes: number;
-  maxCount: number;
+  maxCount: number | null;
 };
 export type LibraryPage = {
   files: LibraryFile[];
@@ -20,7 +20,7 @@ export type LibraryPage = {
   nextCursor: string | null;
 };
 export function readLibraryPage(value: unknown): LibraryPage {
-  const v = value as Partial<LibraryPage> | null;
+  const v = value as (Partial<LibraryPage> & { listVersion?: number }) | null;
   if (!v || !Array.isArray(v.files) || !v.quota)
     throw new Error("Invalid library response.");
   const parsed = readFiles(v.files);
@@ -28,16 +28,16 @@ export function readLibraryPage(value: unknown): LibraryPage {
     throw new Error("Invalid library file metadata.");
   const q = v.quota;
   if (
-    ![q.bytes, q.count, q.maxBytes, q.maxCount].every(
+    ![q.bytes, q.count, q.maxBytes].every(
       (n) => Number.isSafeInteger(n) && n >= 0,
     ) ||
     !q.maxBytes ||
-    !q.maxCount
+    (q.maxCount !== null && (!Number.isSafeInteger(q.maxCount) || q.maxCount < 1))
   )
     throw new Error("Invalid library quota.");
   if (
     v.nextCursor !== null &&
-    (typeof v.nextCursor !== "string" || !/^[a-f\d]{24}$/i.test(v.nextCursor))
+    (typeof v.nextCursor !== "string" || !(v.listVersion === 2 ? /^v2\.[\w-]{1,8190}$/ : /^[a-f\d]{24}$/i).test(v.nextCursor))
   )
     throw new Error("Invalid library cursor.");
   return {

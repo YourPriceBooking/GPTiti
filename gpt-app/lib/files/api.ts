@@ -49,7 +49,7 @@ export async function downloadOcr(file: ManagedFile) {
 
 export async function loadFileLimits(modelId: string, signal: AbortSignal) {
   try {
-    const response = await axiosInstance.get('/files/limits', { params: { modelId }, signal, timeout: 15000 });
+    const response = await axiosInstance.get('/files/limits', { params: { modelId, libraryVersion: 2 }, signal, timeout: 15000 });
     return readFileLimits(response.data);
   } catch (error) {
     if (signal.aborted) throw error;

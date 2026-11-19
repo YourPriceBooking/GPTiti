@@ -229,6 +229,10 @@
   background: transparent;
   border-color: transparent;
 }
+.more {
+  display: block;
+  margin: 16px auto;
+}
 .selection {
   position: sticky;
   bottom: -24px;

@@ -101,3 +101,10 @@ test('Excel background reader raises only XLSX admission; old servers and DOCX k
  assert.match(validateServerFiles([f('large.xlsx',6e6)],readFileLimits(raw))!,/chat reading/);
  assert.equal(fileCeilings('large.xlsx',readFileLimits({...raw,processing:{...raw.processing,xlsx:{enabled:false,maxBytes:20e6}}}))?.reading,5*1024**2);
 });
+
+test('byte-only account quota still enforces the independent per-message attachment limit', () => {
+  const raw = fixture();
+  const profile = readFileLimits({...raw, storage:{...raw.storage, maxCount:null}});
+  assert.equal(profile.storage.maxCount,null);
+  assert.match(validateServerFiles(Array.from({length:raw.message.maxAttachments+1},()=>f('a.txt',1)),profile)!,/Attach up to/);
+});
