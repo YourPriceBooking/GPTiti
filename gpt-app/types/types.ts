@@ -102,7 +102,7 @@ export type Project = {
   pinnedAt: string | null;
 };
 
-export type ModelType = "gpt-5.4" | "gpt-5.5";
+export type ModelType = "gpt-5.4" | "gpt-5.5" | "gpt-6";
 
 export type ModelTooltip = {
   title: string;
@@ -171,6 +171,7 @@ export type SectionGptChatsProps = Pick<
 };
 
 export type MainSectionRightSideProps = {
+  onSelectModel?: (id: string) => void;
   feedback?: React.ReactNode;
   insertTemplate: (text: string) => void;
   setFocusMode: React.Dispatch<React.SetStateAction<boolean>>;

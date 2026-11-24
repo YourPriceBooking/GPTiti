@@ -8,6 +8,7 @@ import LoginModal from "@/components/HomePage/common/LoginModal/LoginModal";
 import TokenBalanceLink from "@/components/common/TokenBalanceLink/TokenBalanceLink";
 import SendTokensButton from "@/components/SendTokensButton/SendTokensButton";
 
+import { findModelCard } from "@/config/modelDiscovery";
 import { TOKENS_SUFFIX } from "@/config/models.config";
 
 import { getModelGroupAndItem } from "@/functions/getModelGroupAndItem";
@@ -39,7 +40,7 @@ export default function SectionGptTokens(props: SectionGptTokensProps) {
         </div>
         <p className={styles.paragraph}>
           {result
-            ? `approximate asking price ${result.model.tokens} ${TOKENS_SUFFIX}`
+            ? `approximate asking price ${result.model.tokens} ${TOKENS_SUFFIX}${findModelCard(selectedModel)?.demoTokens !== undefined ? " · Demo" : ""}`
             : null}
         </p>
       </article>
