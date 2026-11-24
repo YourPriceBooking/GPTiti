@@ -24,6 +24,8 @@ import { useAppSelector } from "@/redux/hooks";
 import { selectIsLoggedIn, selectUser } from "@/redux/auth/selectors";
 import { selectActiveChatId } from "@/redux/chat/selectors";
 import { selectActiveProjectId } from "@/redux/ui/selectors";
+import { findModelCard } from "@/config/modelDiscovery";
+import { useRegisterComposer } from "../NewChatModels/ComposerControls";
 import { useChatCatalog } from "@/hooks/useChatCatalog";
 import { useDictation } from "@/hooks/useDictation";
 import {
@@ -90,7 +92,7 @@ const fileExtension = (name: string) => {
 
 export default function InputBar({
   hasInput,
-  dictateButtonRef, modelAccent, onBusyChange,
+  discovery = false,
   onChange,
   onSend,
   inputRef,
@@ -108,9 +110,7 @@ export default function InputBar({
   sendDisabled = false,
 }: {
   hasInput: boolean;
-  dictateButtonRef?: React.RefObject<HTMLButtonElement | null>;
-  modelAccent?: string;
-  onBusyChange?: (busy: boolean) => void;
+  discovery?: boolean;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   onSend: (
     message: string,
@@ -265,8 +265,8 @@ export default function InputBar({
   const isUnavailable = !isSelectableModel(selectedModel) || (catalog.status === "ready" && !listed);
   // Guests always reach the normal login gate, even while the public catalog loads.
   const catalogPending = isLoggedIn && !isUnavailable && !listed;
-  useEffect(() => { onBusyChange?.(voiceBusy || isSending || isPreparing || isAiResponding); },
-    [onBusyChange, voiceBusy, isSending, isPreparing, isAiResponding]);
+  const dictateButtonRef = useRegisterComposer(voiceBusy || isSending || isPreparing || isAiResponding);
+  const modelAccent = findModelCard(selectedModel)?.accent;
 
   const openLimitError = (kind: LimitKind) => {
     setLimitErrorKind(kind);
@@ -704,7 +704,7 @@ export default function InputBar({
         try { void addAttachments(droppedFiles(event.dataTransfer)); }
         catch (error) { setAttachmentError((error as Error).message); }
       }}
-      style={modelAccent ? { "--flow-fill": modelAccent } as React.CSSProperties : undefined}
+      style={modelAccent ? { "--flow-fill": modelAccent, "--flow-bg": "color-mix(in srgb, var(--flow-fill) 12%, transparent)" } as React.CSSProperties : undefined}
       data-input-bar
     >
       {dragActive && <div className={styles.dropZone} role="status">
@@ -1120,7 +1120,7 @@ export default function InputBar({
           <div className={styles.unavailableModelBadge}>
             <span className={styles.unavailableModelDot} />
             <span className={styles.unavailableModelTitle}>
-              {dictateButtonRef ? "Select an available chat model below." : "This chat can no longer be continued."}
+              {discovery ? "Select an available chat model below." : "This chat can no longer be continued."}
             </span>
           </div>
         </div>

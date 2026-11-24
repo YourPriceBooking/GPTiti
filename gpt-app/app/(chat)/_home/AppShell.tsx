@@ -19,6 +19,7 @@ import {
   showErrorToast,
 } from "@/redux/ui/slice";
 
+import { ComposerControlsProvider } from "@/components/HomePage/RightSide/NewChatModels/ComposerControls";
 import HomeModals from "./HomeModals";
 import { useHomeController, type HomeController } from "./useHomeController";
 import styles from "../page.module.css";
@@ -96,7 +97,7 @@ export default function AppShell({
   };
 
   return (
-    <>
+    <ComposerControlsProvider>
       <HomeModals
         ctrl={ctrl}
         onProjectCreated={(createdId) => router.push(`/projects/${createdId}`)}
@@ -131,6 +132,6 @@ export default function AppShell({
           {children(ctrl)}
         </div>
       </div>
-    </>
+    </ComposerControlsProvider>
   );
 }

@@ -9,6 +9,7 @@ export default function MainSectionRightSide(props: MainSectionRightSideProps) {
   const {
     feedback,
     onSelectModel,
+    onChooseModel,
     insertTemplate,
     setFocusMode,
     isSectionVisible,
@@ -128,35 +129,30 @@ export default function MainSectionRightSide(props: MainSectionRightSideProps) {
               <p className={styles.focusSubtitle}>{flow.subtitle}</p>
             </div>
             {onSelectModel && (
-              <NewChatModels selected={selectedModel} onSelect={onSelectModel}>
-                {({ dictateButtonRef, accent, openPicker, onBusyChange }) => (
-                  <InputComposer
-                    dictateButtonRef={dictateButtonRef}
-                    modelAccent={accent}
-                    onBusyChange={onBusyChange}
-                    discovery
-                    feedback={feedback}
-                    showDisclaimer
-                    hasInput={hasInput}
-                    onChange={onChange}
-                    onSend={onSend}
-                    inputRef={inputRef}
-                    onHideSection={onHideSection}
-                    templateTick={templateTick}
-                    setHasFirstRequest={setHasFirstRequest}
-                    hasFirstRequest={hasFirstRequest}
-                    selectedModel={selectedModel}
-                    onImagesChange={onImagesChange}
-                    showEstimate={showEstimate}
-                    estimateSupported={estimateSupported}
-                    estimatedTokens={estimatedTokens}
-                    onChooseModel={openPicker}
-                    sendDisabled={sendDisabled}
-                    isAiResponding={isAiResponding}
-                    onStop={onStop}
-                    stopState={stopState}
-                  />
-                )}
+              <NewChatModels selected={selectedModel} onSelect={onSelectModel} openPicker={onChooseModel}>
+                <InputComposer
+                  discovery
+                  feedback={feedback}
+                  showDisclaimer
+                  hasInput={hasInput}
+                  onChange={onChange}
+                  onSend={onSend}
+                  inputRef={inputRef}
+                  onHideSection={onHideSection}
+                  templateTick={templateTick}
+                  setHasFirstRequest={setHasFirstRequest}
+                  hasFirstRequest={hasFirstRequest}
+                  selectedModel={selectedModel}
+                  onImagesChange={onImagesChange}
+                  showEstimate={showEstimate}
+                  estimateSupported={estimateSupported}
+                  estimatedTokens={estimatedTokens}
+                  onChooseModel={onChooseModel}
+                  sendDisabled={sendDisabled}
+                  isAiResponding={isAiResponding}
+                  onStop={onStop}
+                  stopState={stopState}
+                />
               </NewChatModels>
             )}
           </div>

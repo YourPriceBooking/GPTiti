@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useId, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from "react";
-import { discoveryGroups, findModelCard, modelCards, type ModelCard, type DiscoveryGroup } from "@/config/modelDiscovery";
+import { useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { discoveryGroups, modelCards, type ModelCard, type DiscoveryGroup } from "@/config/modelDiscovery";
 import { getModelGroupAndItem } from "@/functions/getModelGroupAndItem";
 import { useChatCatalog } from "@/hooks/useChatCatalog";
+import { useComposerControls } from "./ComposerControls";
 import { ModelGlyph } from "./ModelGlyph";
 import styles from "./NewChatModels.module.css";
 
@@ -54,61 +55,85 @@ function Choice({ card, selected, onPick, busy }: {
   </div>;
 }
 
-type Bindings = { dictateButtonRef: RefObject<HTMLButtonElement | null>; accent?: string; openPicker: () => void; onBusyChange: (busy: boolean) => void };
-export default function NewChatModels({ selected, onSelect, children }: {
-  selected: string; onSelect: (id: string) => void; children: (bindings: Bindings) => ReactNode;
-}) {
+type Selection = { selected: string; onSelect: (id: string) => void };
+
+function useModelChoices({ selected, onSelect }: Selection, onPick?: () => void) {
   const catalog = useChatCatalog();
+  const controls = useComposerControls();
   const chat = modelCards.filter(card => card.group === "Chat" && catalog.ids.includes(card.id));
-  const mic = useRef<HTMLButtonElement>(null);
+  const pick = (card: ModelCard) => {
+    if (controls?.busy) return;
+    if (card.id === "dictation") {
+      const mic = controls?.mic;
+      if (!mic || mic.disabled || mic.getAttribute("aria-label") !== "Dictate") return;
+      onPick?.();
+      mic.click();
+    } else if (catalog.ids.includes(card.id)) {
+      // Selection may need the currently open picker's draft-preservation state.
+      onSelect(card.id);
+      onPick?.();
+    }
+  };
+  const choices = (cards: ModelCard[]) => cards.map(card =>
+    <Choice key={card.id} card={card} selected={selected} onPick={pick}
+      busy={!!controls?.busy || (card.id === "dictation" && (!controls || controls.mic.disabled))} />);
+  return { catalog, chat, choices };
+}
+
+function ModelGroups({ catalog, chat, choices, query = "", category = "All" }:
+  ReturnType<typeof useModelChoices> & { query?: string; category?: DiscoveryGroup | "All" }) {
+  const term = query.trim().toLowerCase();
+  const regions = discoveryGroups.flatMap(group => {
+    if (category !== "All" && category !== group) return [];
+    const cards = (group === "Chat" ? chat : modelCards.filter(c => c.group === group))
+      .filter(card => !term || (card.name + " " + card.subtitle).toLowerCase().includes(term));
+    if (!cards.length && (term || group !== "Chat")) return [];
+    return [<section key={group} aria-label={group} className={styles.group}>
+      <h3>{group}</h3>
+      {group === "Chat" && catalog.status === "error" && <p role="status">Couldn’t refresh the model list. <button type="button" onClick={catalog.retry}>Retry</button></p>}
+      {group === "Chat" && !chat.length && catalog.status !== "error" && <p role="status">{catalog.status === "loading" ? "Loading models…" : "No chat models are available."}</p>}
+      <div className={styles.grid}>{choices(cards)}</div>
+    </section>];
+  });
+  return regions.length ? regions : <p role="status">No matching models.</p>;
+}
+
+export default function NewChatModels({ selected, onSelect, openPicker, children }:
+  Selection & { openPicker: () => void; children: ReactNode }) {
+  const list = useModelChoices({ selected, onSelect });
+  return <>
+    {!!list.chat.length && <section aria-label="Quick model selection" className={styles.quick}>{list.choices(list.chat.slice(0, 3))}</section>}
+    {children}
+    <div className={styles.library}>
+      <div className={styles.heading}><div><h2>Explore models</h2><p>Average request cost in TITI. Demo marks sample amounts.</p></div><button type="button" onClick={openPicker}>All models</button></div>
+      <ModelGroups {...list} />
+    </div>
+  </>;
+}
+
+export function AllModelsDialog({ selected, onSelect, onClose }: Selection & { onClose: () => void }) {
   const dialog = useRef<HTMLDialogElement>(null);
-  const [busy, setBusy] = useState(false);
   const title = useId();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<DiscoveryGroup | "All">("All");
-  const pick = (card: ModelCard) => {
-    if (busy) return;
-    if (dialog.current?.open) dialog.current.close();
-    if (card.id === "dictation") { if (mic.current?.getAttribute("aria-label") === "Dictate") mic.current.click(); }
-    else if (catalog.ids.includes(card.id)) onSelect(card.id);
-  };
-  const choices = (cards: ModelCard[]) => cards.map(card =>
-    <Choice key={card.id} card={card} selected={selected} onPick={pick} busy={busy} />);
-  const groups = (inDialog = false) => {
-    const term = inDialog ? query.trim().toLowerCase() : "";
-    const regions = discoveryGroups.flatMap(group => {
-      if (inDialog && category !== "All" && category !== group) return [];
-      const cards = (group === "Chat" ? chat : modelCards.filter(c => c.group === group))
-        .filter(card => !term || (card.name + " " + card.subtitle).toLowerCase().includes(term));
-      if (!cards.length && (term || group !== "Chat")) return [];
-      return [<section key={group} aria-label={group} className={styles.group}>
-        <h3>{group}</h3>
-        {group === "Chat" && catalog.status === "error" && <p role="status">Couldn’t refresh the model list. <button type="button" onClick={catalog.retry}>Retry</button></p>}
-        {group === "Chat" && !chat.length && catalog.status !== "error" && <p role="status">{catalog.status === "loading" ? "Loading models…" : "No chat models are available."}</p>}
-        <div className={styles.grid}>{choices(cards)}</div>
-      </section>];
-    });
-    return regions.length ? regions : <p role="status">No matching models.</p>;
-  };
-  const openPicker = () => { setQuery(""); setCategory("All"); dialog.current?.showModal(); };
-  return <>
-    {!!chat.length && <section aria-label="Quick model selection" className={styles.quick}>{choices(chat.slice(0, 3))}</section>}
-    {children({ dictateButtonRef: mic, accent: findModelCard(selected)?.accent, openPicker, onBusyChange: setBusy })}
-    <div className={styles.library}>
-      <div className={styles.heading}><div><h2>Explore models</h2><p>Average request cost in TITI. Demo marks sample amounts.</p></div><button type="button" onClick={openPicker}>All models</button></div>
-      {groups()}
-    </div>
-    <dialog ref={dialog} className={styles.dialog} aria-labelledby={title} onClick={e => {
+  const list = useModelChoices({ selected, onSelect }, onClose);
+  useLayoutEffect(() => {
+    const el = dialog.current;
+    el?.showModal();
+    return () => { el?.close(); };
+  }, []);
+  return (
+    <dialog ref={dialog} className={styles.dialog} aria-labelledby={title} onCancel={e => { e.preventDefault(); onClose(); }} onClick={e => {
       if (e.target === e.currentTarget) {
         const r = e.currentTarget.getBoundingClientRect();
-        if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) e.currentTarget.close();
+        if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) onClose();
       }
     }}>
-      <div className={styles.heading}><h2 id={title}>Choose a model</h2><button type="button" aria-label="Close model picker" onClick={() => dialog.current?.close()}>✕</button></div>
+      <div className={styles.heading}><h2 id={title}>Choose a model</h2><button type="button" aria-label="Close model picker" onClick={onClose}>✕</button></div>
       <input type="search" className={styles.search} aria-label="Search models" placeholder="Search models" value={query} onChange={e => setQuery(e.target.value)} />
       <div className={styles.filters} aria-label="Filter models">{(["All", ...discoveryGroups] as const).map(g =>
         <button key={g} type="button" aria-pressed={g === category} onClick={() => setCategory(g)}>{g}</button>)}</div>
-      {groups(true)}
+      <ModelGroups {...list} query={query} category={category} />
     </dialog>
-  </>;
+  );
 }
