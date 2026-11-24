@@ -22,6 +22,16 @@ test('reads stage A contract and keeps upload and reading bounds distinct', () =
   assert.match(validateServerFiles([f('a.txt', 65537)], limits)!, /64 KiB/);
   assert.match(validateServerFiles([f('a.csv', 1e6)], limits)!, /20 MB.*64 KiB/);
 });
+test('chat and saved library references accept the inclusive 50 MB server profile', () => {
+  const raw = fixture();
+  raw.processing.zip.inputBytes = raw.message.maxBytes = 50_000_000;
+  raw.processing.zip.expandedBytes = 100_000_000;
+  const limits = readFileLimits(raw);
+  assert.equal(validateServerFiles([f('single.zip', 50_000_000)], limits), null);
+  assert.equal(validateServerFiles([f('one.zip', 20_000_000), f('two.zip', 30_000_000)], limits), null);
+  assert.match(validateServerFiles([f('one.zip', 20_000_000), f('two.zip', 30_000_001)], limits)!, /50 MB per message/);
+  assert.match(validateServerFiles([f('single.zip', 50_000_001)], limits)!, /50 MB/);
+});
 test('server overrides control count, aggregate and reader opt-outs without model-name defaults', () => {
   const raw = fixture(); raw.message.maxAttachments = 2; raw.message.maxBytes = 100; raw.message.extractedTextBytes = 50;
   let limits = readFileLimits(raw);
