@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useChatCatalog } from "@/hooks/useChatCatalog";
+import { findModelCard } from "@/config/modelDiscovery";
 import clsx from "clsx";
 import Image from "next/image";
 import Link from "next/link";
@@ -33,6 +35,7 @@ export default function ModalWindow({
   setSelectedModel,
   setIsModalOpen,
 }: Props) {
+  const catalog = useChatCatalog();
   const appliedGroup =
     (getModelGroupAndItem(selectedModel)?.group as ModelType | undefined) ??
     selectedModelGroup;
@@ -145,7 +148,10 @@ export default function ModalWindow({
         aria-label={`${viewGroup} models`}
       >
         <div className={styles.btnsContainer2}>
-          {modelConfig[viewGroup].list.map((item) => {
+          {!modelConfig[viewGroup].list.some(item => catalog.ids.includes(item.title)) && <p role="status">
+            {catalog.status === "loading" ? "Loading models…" : catalog.status === "error" ? <>Couldn’t refresh models. <button type="button" onClick={catalog.retry}>Retry</button></> : "No available models in this group."}
+          </p>}
+          {modelConfig[viewGroup].list.filter(item => catalog.ids.includes(item.title)).map((item) => {
             const isSelected = selectedModel === item.title;
             const detailsOpen = visibleModel === item.title;
             const detailsId = getDetailsId(item.title);
@@ -165,7 +171,7 @@ export default function ModalWindow({
                     <span className={styles.btn2Paragraph}>{item.title}</span>
                     <span className={styles.btn2Span1}>
                       {item.amount ? `${item.amount} ≈ ` : ""}
-                      {item.tokens.toLocaleString()} {TOKENS_SUFFIX}
+                      {item.tokens.toLocaleString()} {TOKENS_SUFFIX}{findModelCard(item.title)?.demoTokens !== undefined && " · Demo"}
                     </span>
                   </span>
                   <span className={styles.btn2Span2}>{item.desc}</span>

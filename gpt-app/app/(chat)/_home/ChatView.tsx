@@ -163,6 +163,7 @@ export default function ChatView({
             }}
             hasFirstRequest={ctrl.hasFirstRequest}
             isOverlay={false}
+            onSelectModel={ctrl.handleSelectModel}
             selectedModel={ctrl.selectedModel}
             onImagesChange={ctrl.setInputImageCount}
             showEstimate={ctrl.showEstimate}

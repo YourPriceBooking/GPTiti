@@ -8,6 +8,8 @@ import ChooseModelColumn from "../ChooseModelColumn/ChooseModelColumn";
 import styles from "./InputComposer.module.css";
 import { isSelectableModel } from "@/config/models.config";
 
+import { findModelCard } from "@/config/modelDiscovery";
+
 type InputComposerProps = React.ComponentProps<typeof InputBar> & {
   feedback?: React.ReactNode;
   showEstimate: boolean;
@@ -15,11 +17,13 @@ type InputComposerProps = React.ComponentProps<typeof InputBar> & {
   estimatedTokens?: number | null;
   onChooseModel: () => void;
   showDisclaimer?: boolean;
+  discovery?: boolean;
   showModelSelection?: boolean;
 };
 
 export default function InputComposer({
   feedback,
+  discovery = false,
   showEstimate,
   estimateSupported,
   estimatedTokens,
@@ -30,6 +34,8 @@ export default function InputComposer({
 }: InputComposerProps) {
   const isProject = inputBarProps.variant === "project";
   const modelAvailable = isSelectableModel(inputBarProps.selectedModel);
+
+  const demo = discovery && !estimateSupported ? findModelCard(inputBarProps.selectedModel)?.demoTokens : undefined;
 
   const [animReady, setAnimReady] = useState(false);
   useEffect(() => {
@@ -42,7 +48,7 @@ export default function InputComposer({
       className={`${styles.composer} ${animReady ? "" : styles.noAnimation}`}
     >
       {showDisclaimer && (
-        <span className={styles.disclaimer}>
+        <span className={discovery ? styles.discoveryDisclaimer : styles.disclaimer}>
           AI systems may make mistakes, so we recommend verifying important
           information.
         </span>
@@ -59,7 +65,7 @@ export default function InputComposer({
       <div
         className={`${styles.metaWrap} ${isProject ? styles.metaWrapPlain : ""}`}
       >
-        {estimateSupported && modelAvailable ? (
+        {(estimateSupported || demo !== undefined) && modelAvailable ? (
           <div className={styles.metaRow}>
             <span
               className={`${styles.estimate} ${
@@ -67,7 +73,7 @@ export default function InputComposer({
               } ${showEstimate ? "" : styles.estimateHidden}`}
             >
               ≈ Estimated cost: ~
-              {(estimatedTokens ?? 0).toLocaleString("en-US")} tokens
+              {(estimatedTokens ?? demo ?? 0).toLocaleString("en-US")} tokens{demo !== undefined && " · Demo"}
             </span>
             {showModelSelection && (
               <ChooseModelColumn

@@ -1,4 +1,5 @@
 import type { ModelType, ModelConfig } from "@/types/types";
+import { modelCards } from "./modelDiscovery";
 export const TOKENS_SUFFIX = "tokens*";
 export const modelConfig: Record<ModelType, ModelConfig> = {
   "gpt-5.4": {
@@ -46,6 +47,11 @@ export const modelConfig: Record<ModelType, ModelConfig> = {
         },
       },
     ],
+  },
+  "gpt-6": {
+    list: modelCards.filter(card => card.group === "Chat" && card.demoTokens !== undefined)
+      .map(card => ({ title: card.id, tokens: card.demoTokens!, desc: card.subtitle,
+        tooltip: { title: card.name, intro: card.detail, pros: [], cons: [] } })),
   },
 };
 

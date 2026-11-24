@@ -1,4 +1,5 @@
 import styles from "./MainSectionRightSide.module.css";
+import NewChatModels from "../NewChatModels/NewChatModels";
 import Image from "next/image";
 import { MainSectionRightSideProps } from "@/types/types";
 import InputComposer from "@/components/HomePage/RightSide/InputComposer/InputComposer";
@@ -7,6 +8,7 @@ import { getModelFlow } from "@/config/modelFlows.config";
 export default function MainSectionRightSide(props: MainSectionRightSideProps) {
   const {
     feedback,
+    onSelectModel,
     insertTemplate,
     setFocusMode,
     isSectionVisible,
@@ -23,7 +25,6 @@ export default function MainSectionRightSide(props: MainSectionRightSideProps) {
     selectedModel,
     onImagesChange,
     showEstimate,
-    onChooseModel,
     estimateSupported = false,
     estimatedTokens,
     sendDisabled,
@@ -126,28 +127,38 @@ export default function MainSectionRightSide(props: MainSectionRightSideProps) {
               <h2 className={styles.focusTitle}>{flow.header}</h2>
               <p className={styles.focusSubtitle}>{flow.subtitle}</p>
             </div>
-            <InputComposer
-              feedback={feedback}
-              showDisclaimer
-              hasInput={hasInput}
-              onChange={onChange}
-              onSend={onSend}
-              inputRef={inputRef}
-              onHideSection={onHideSection}
-              templateTick={templateTick}
-              setHasFirstRequest={setHasFirstRequest}
-              hasFirstRequest={hasFirstRequest}
-              selectedModel={selectedModel}
-              onImagesChange={onImagesChange}
-              showEstimate={showEstimate}
-              estimateSupported={estimateSupported}
-              estimatedTokens={estimatedTokens}
-              onChooseModel={onChooseModel}
-              sendDisabled={sendDisabled}
-              isAiResponding={isAiResponding}
-              onStop={onStop}
-              stopState={stopState}
-            />
+            {onSelectModel && (
+              <NewChatModels selected={selectedModel} onSelect={onSelectModel}>
+                {({ dictateButtonRef, accent, openPicker, onBusyChange }) => (
+                  <InputComposer
+                    dictateButtonRef={dictateButtonRef}
+                    modelAccent={accent}
+                    onBusyChange={onBusyChange}
+                    discovery
+                    feedback={feedback}
+                    showDisclaimer
+                    hasInput={hasInput}
+                    onChange={onChange}
+                    onSend={onSend}
+                    inputRef={inputRef}
+                    onHideSection={onHideSection}
+                    templateTick={templateTick}
+                    setHasFirstRequest={setHasFirstRequest}
+                    hasFirstRequest={hasFirstRequest}
+                    selectedModel={selectedModel}
+                    onImagesChange={onImagesChange}
+                    showEstimate={showEstimate}
+                    estimateSupported={estimateSupported}
+                    estimatedTokens={estimatedTokens}
+                    onChooseModel={openPicker}
+                    sendDisabled={sendDisabled}
+                    isAiResponding={isAiResponding}
+                    onStop={onStop}
+                    stopState={stopState}
+                  />
+                )}
+              </NewChatModels>
+            )}
           </div>
         </>
       )}

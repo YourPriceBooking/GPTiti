@@ -48,7 +48,10 @@ export function useModelSync({ onModelSwitched }: UseModelSyncParams) {
   const selectModel = useCallback(
     (model: string) => {
       const changed = model !== selectedModel;
+      const match = getModelGroupAndItem(model);
+      if (!match) return;
       dispatch(setSelectedModel(model));
+      dispatch(setSelectedModelGroup(match.group));
       if (!changed || (activeChatMessageCount === 0 && !unavailableChatModel)) return;
       dispatch(handleNewChat());
       onModelSwitched();

@@ -5,6 +5,7 @@ import { readLibraryDraft, writeLibraryDraft, clearLibraryDraft, subscribeLibrar
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 
+import { findModelCard } from "@/config/modelDiscovery";
 import { getModelLimits } from "@/config/modelLimits.config";
 import {
   getEstimatedTokens,
@@ -206,7 +207,7 @@ export function useInputDraft() {
     clearDraft,
     setInputImageCount,
     estimatedTokens,
-    showEstimate: estimatedTokens !== null,
+    showEstimate: estimatedTokens !== null || (findModelCard(selectedModel)?.demoTokens !== undefined && (inputCharCount > 0 || inputImageCount > 0)),
     estimateSupported: modelSupportsEstimate(selectedModel),
   };
 }

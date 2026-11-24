@@ -24,6 +24,7 @@ import { useAppSelector } from "@/redux/hooks";
 import { selectIsLoggedIn, selectUser } from "@/redux/auth/selectors";
 import { selectActiveChatId } from "@/redux/chat/selectors";
 import { selectActiveProjectId } from "@/redux/ui/selectors";
+import { useChatCatalog } from "@/hooks/useChatCatalog";
 import { useDictation } from "@/hooks/useDictation";
 import {
   MAX_DICTATION_MS,
@@ -89,6 +90,7 @@ const fileExtension = (name: string) => {
 
 export default function InputBar({
   hasInput,
+  dictateButtonRef, modelAccent, onBusyChange,
   onChange,
   onSend,
   inputRef,
@@ -106,6 +108,9 @@ export default function InputBar({
   sendDisabled = false,
 }: {
   hasInput: boolean;
+  dictateButtonRef?: React.RefObject<HTMLButtonElement | null>;
+  modelAccent?: string;
+  onBusyChange?: (busy: boolean) => void;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   onSend: (
     message: string,
@@ -255,10 +260,13 @@ export default function InputBar({
   } | null>(null);
 
   const limits = useMemo(() => getModelLimits(selectedModel), [selectedModel]);
-  const isUnavailable = useMemo(
-    () => !isSelectableModel(selectedModel),
-    [selectedModel],
-  );
+  const catalog = useChatCatalog();
+  const listed = catalog.ids.includes(selectedModel);
+  const isUnavailable = !isSelectableModel(selectedModel) || (catalog.status === "ready" && !listed);
+  // Guests always reach the normal login gate, even while the public catalog loads.
+  const catalogPending = isLoggedIn && !isUnavailable && !listed;
+  useEffect(() => { onBusyChange?.(voiceBusy || isSending || isPreparing || isAiResponding); },
+    [onBusyChange, voiceBusy, isSending, isPreparing, isAiResponding]);
 
   const openLimitError = (kind: LimitKind) => {
     setLimitErrorKind(kind);
@@ -488,7 +496,7 @@ export default function InputBar({
   };
 
   const handleSend = async () => {
-    if (isUnavailable || chatPreparing || isSendingRef.current || preparingRef.current || isAiResponding)
+    if (isUnavailable || catalogPending || chatPreparing || isSendingRef.current || preparingRef.current || isAiResponding)
       return;
     const textarea = inputRef.current;
     if (textarea) {
@@ -696,6 +704,7 @@ export default function InputBar({
         try { void addAttachments(droppedFiles(event.dataTransfer)); }
         catch (error) { setAttachmentError((error as Error).message); }
       }}
+      style={modelAccent ? { "--flow-fill": modelAccent } as React.CSSProperties : undefined}
       data-input-bar
     >
       {dragActive && <div className={styles.dropZone} role="status">
@@ -897,6 +906,7 @@ export default function InputBar({
         <div className={styles.rightControls} ref={rightControlsRef}>
           <button
             type="button"
+            ref={dictateButtonRef}
             className={`${styles.iconWrapper1} ${styles.controlButton}`}
             disabled={
               isSending ||
@@ -935,7 +945,10 @@ export default function InputBar({
                 viewBox="0 0 35 35"
                 aria-hidden="true"
               >
-                <use href="/icons/input-sprite.svg#ib-microphone" />
+                {modelAccent ? <g transform="translate(5.5 5.5)" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="8.75" y="2.5" width="6.5" height="12" rx="3.25" />
+                  <path d="M5.5 10.75v.9a6.5 6.5 0 0 0 13 0v-.9M12 18.2v3.3m-3.2 0h6.4" />
+                </g> : <use href="/icons/input-sprite.svg#ib-microphone" />}
               </svg>
             )}
             <span
@@ -1024,7 +1037,7 @@ export default function InputBar({
             <button
               type="button"
               className={`${styles.iconWrapper2} ${styles.controlButton}`}
-              disabled={chatPreparing || voiceBusy || isPreparing || isUnavailable}
+              disabled={chatPreparing || catalogPending || voiceBusy || isPreparing || isUnavailable}
               aria-label="Send message"
               onPointerEnter={(event) =>
                 fitInputTooltipToViewport(event.currentTarget)
@@ -1099,12 +1112,15 @@ export default function InputBar({
         </div>
       )}
 
+      {catalogPending && catalog.status === "error" && <p className={styles.attachmentStatus} role="status">
+        Couldn’t verify model availability. <button type="button" onClick={catalog.retry}>Retry</button>
+      </p>}
       {isUnavailable && (
         <div className={styles.unavailableModelOverlay}>
           <div className={styles.unavailableModelBadge}>
             <span className={styles.unavailableModelDot} />
             <span className={styles.unavailableModelTitle}>
-              This chat can no longer be continued.
+              {dictateButtonRef ? "Select an available chat model below." : "This chat can no longer be continued."}
             </span>
           </div>
         </div>
