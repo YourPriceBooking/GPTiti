@@ -59,7 +59,7 @@ export default function InputComposer({
         <p className={styles.stopStatus} role="status">Stopping… Waiting for confirmation.</p>
       )}
       <div className={styles.inputWrap}>
-        <InputBar {...inputBarProps} />
+        <InputBar {...inputBarProps} discovery={discovery} />
       </div>
 
       <div

@@ -1,10 +1,9 @@
 "use client";
 
-import ModelModalOverlay from "@/components/ModelModalOverlay/ModelModalOverlay";
+import { AllModelsDialog } from "@/components/HomePage/RightSide/NewChatModels/NewChatModels";
 import CreateProjectModalOverlay from "@/components/HomePage/LeftSide/CreateProjectModalWindow/CreateProjectModalOverlay";
 import AddChatsModalOverlay from "@/components/HomePage/LeftSide/AddChatsModalWindow/AddChatsModalOverlay";
 
-import { setSelectedModelGroup } from "@/redux/model/slice";
 import {
   setIsModalOpen,
   setIsCreateProjectModalOpen,
@@ -28,14 +27,11 @@ export default function HomeModals({
 
   return (
     <>
-      <ModelModalOverlay
-        isModalOpen={ctrl.isModalOpen}
-        setIsModalOpen={(open) => dispatch(setIsModalOpen(open))}
-        selectedModel={ctrl.selectedModel}
-        setSelectedModel={ctrl.handleSelectModel}
-        selectedModelGroup={ctrl.selectedModelGroup}
-        setSelectedModelGroup={(g) => dispatch(setSelectedModelGroup(g))}
-      />
+      {ctrl.isModalOpen && <AllModelsDialog
+        selected={ctrl.selectedModel}
+        onSelect={ctrl.handleSelectModel}
+        onClose={() => dispatch(setIsModalOpen(false))}
+      />}
 
       <CreateProjectModalOverlay
         isOpen={ctrl.isCreateProjectModalOpen}
