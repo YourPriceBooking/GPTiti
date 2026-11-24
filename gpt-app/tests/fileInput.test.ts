@@ -43,7 +43,7 @@ test('Office files use their own 5 MiB limit and stay available on text-only mod
 test('mixed Office attachments still share count, total-size and image restrictions', () => {
   assert.equal(validateInputFiles([file('a.docx'), file('b.xlsx'), file('c.csv'), file('d.png')], limits), null);
   assert.ok(validateInputFiles(Array.from({length: 11}, () => file('a.docx')), limits));
-  assert.ok(validateInputFiles(Array.from({length: 6}, () => file('a.xlsx', OFFICE_FILE_BYTES)), limits));
+  assert.ok(validateInputFiles(Array.from({length: 10}, () => file('a.xlsx', OFFICE_FILE_BYTES)), limits));
   assert.equal(validateInputFiles([file('a.docx'), file('b.png')], {maxImages: 0, maxImageSizeMb: 0}), null);
 });
 
@@ -63,7 +63,8 @@ test('PDF shares aggregate limits with documents and images', () => {
   assert.equal(validateInputFiles([file('a.pdf'), file('b.png')], { maxImages: 0, maxImageSizeMb: 0 }), null);
   assert.ok(validateInputFiles(Array.from({length: 11}, () => file('a.pdf')), limits));
   assert.equal(validateInputFiles(Array.from({length: 5}, () => file('a.pdf', PDF_FILE_BYTES)), limits), null);
-  assert.match(validateInputFiles([...Array.from({length: 5}, () => file('a.pdf', PDF_FILE_BYTES)), file('b.docx')], limits)!, /25 MiB/);
+  assert.equal(validateInputFiles([file('a.zip', 25_000_000), file('b.zip', 25_000_000)], limits), null);
+  assert.match(validateInputFiles([file('a.zip', 25_000_000), file('b.zip', 25_000_001)], limits)!, /50 MB/);
 });
 
 test('OCR images respect 5 MiB even when vision allows more, and are readable on text-only models', () => {

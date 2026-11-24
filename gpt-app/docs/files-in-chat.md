@@ -75,9 +75,9 @@ The model guide's separate public marketing pages and text prompt caps are uncha
 
 The existing Add files → ⓘ panel shows storage quota, per-format storage and chat
 reading ceilings, combined request limits and refresh/retry. MB/GB are decimal;
-MiB/KiB are binary. Storage accepts larger files than today's readers: e.g. 50 MB
-ZIP storage versus 10 MiB ZIP reading. The chat picker rejects such a file before
-upload with both numbers, rather than offering a storage-only upload as a chat attachment.
+MiB/KiB are binary. The current server profile allows 50 MB per ZIP and 50 MB of attachments per message.
+The picker uses the values returned by the server, including during a staged rollout.
+Some formats have a lower reading limit than their upload limit.
 
 Limits are scoped to the signed-in account and selected model; old or aborted
 responses cannot replace a new scope. No limits are persisted in localStorage.
@@ -89,8 +89,8 @@ An already pending delivery retains its existing protocol/idempotency path.
 Manual checks after deployment:
 1. Signed in, open Add files → ⓘ: verify quota and both columns against /files/limits.
 2. Attach a small TXT, PDF, image and ZIP, send, reload and check saved files.
-3. Attach TXT over 64 KiB or ZIP over 10 MiB but below the storage ceiling:
-   explain the reading limit without uploading or clearing the draft.
+3. Attach a valid 50,000,000-byte ZIP and verify preparation succeeds. Add one byte
+   over the aggregate limit with another attachment and verify the draft is kept.
 4. Switch to a model with a reader opt-out: corresponding attachments are blocked.
 5. Temporarily block /files/limits in DevTools, refresh limits: show retry;
    text-only send still works. Unblock and retry without reloading the page.

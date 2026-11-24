@@ -7,7 +7,8 @@ import type {UploadedFile} from '../types/api.types';
 test('ZIP uses Add files and its own compressed limit',()=>{
  assert.ok(FILE_ACCEPT.split(',').includes('.zip'));assert.equal(inputKind({name:'folder.ZIP',size:100}),'zip');
  const limits={maxImages:0,maxImageSizeMb:5};assert.equal(validateInputFiles([{name:'archive.zip',size:8*1024**2}],limits),null);
- assert.match(validateInputFiles([{name:'archive.zip',size:11*1024**2}],limits)!,/10 MiB/);
+ assert.equal(validateInputFiles([{name:'archive.zip',size:50_000_000}],limits),null);
+ assert.match(validateInputFiles([{name:'archive.zip',size:50_000_001}],limits)!,/50 MB/);
 });
 test('archive preview validates bounded metadata, strips content, rejects unsafe paths',()=>{
  const preview=readArchivePreview({kind:'archive',entries:[{path:'звіт/data.csv',size:42,status:'read',content:'PRIVATE'}],truncated:false});

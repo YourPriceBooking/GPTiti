@@ -1,6 +1,6 @@
 export const TEXT_EXTENSIONS = 'txt md csv tsv json xml yaml yml html css js jsx ts tsx py sql sh java c cpp h go rs rb php log'.split(' ');
 export const ZIP_EXTENSIONS = ['zip'];
-export const ZIP_FILE_BYTES = 10 * 1024 * 1024;
+export const ZIP_FILE_BYTES = 50_000_000;
 export const OFFICE_EXTENSIONS = ['docx', 'xlsx'];
 export const PDF_FILE_BYTES = 5 * 1024 * 1024;
 export const PDF_EXTENSIONS = ['pdf'];
@@ -10,7 +10,7 @@ export const IMAGE_ACCEPT = IMAGE_EXTENSIONS.map(ext => '.' + ext).join(',');
 export const FILE_ACCEPT = [...TEXT_EXTENSIONS, ...IMAGE_EXTENSIONS, ...OFFICE_EXTENSIONS, ...PDF_EXTENSIONS, ...ZIP_EXTENSIONS].map(ext => '.' + ext).join(',');
 export const TEXT_FILE_BYTES = 64 * 1024;
 export const TEXT_CONTEXT_BYTES = 128 * 1024;
-export const TOTAL_FILE_BYTES = 25 * 1024 * 1024;
+export const TOTAL_FILE_BYTES = 50_000_000;
 export const MAX_ATTACHMENTS = 10;
 type InputFile = { name: string; size: number };
 export const inputKind = (file: InputFile) => {
@@ -29,7 +29,7 @@ export function validateInputFiles(files: InputFile[], limits: { maxImages: numb
       if (file.size > TEXT_FILE_BYTES) return `${file.name}: text files must be 64 KiB or smaller. Split the file before attaching it.`;
       textBytes += file.size;
     } else if (kind === 'zip') {
-      if (file.size > ZIP_FILE_BYTES) return `${file.name}: ZIP archives must be 10 MiB or smaller. Split the archive.`;
+      if (file.size > ZIP_FILE_BYTES) return `${file.name}: ZIP archives must be 50 MB or smaller. Split the archive.`;
     } else if (kind === 'pdf') {
       if (file.size > PDF_FILE_BYTES) return `${file.name}: PDF files must be 5 MiB or smaller. Split the document before attaching it.`;
       // Page count, text layer and extracted content limits are checked by the server.
@@ -44,7 +44,7 @@ export function validateInputFiles(files: InputFile[], limits: { maxImages: numb
   }
   if (limits.maxImages > 0 && images > limits.maxImages) return `The selected model allows up to ${limits.maxImages} images.`;
   if (textBytes > TEXT_CONTEXT_BYTES) return 'Text attachments exceed 128 KiB. Use smaller files. Earlier attachments in this chat also count toward the server’s context limit.';
-  if (totalBytes > TOTAL_FILE_BYTES) return 'Attachments exceed the 25 MiB total limit. Use smaller files.';
+  if (totalBytes > TOTAL_FILE_BYTES) return 'Attachments exceed the 50 MB total limit. Use smaller files.';
   return null;
 }
 export function validateTextBytes(bytes: ArrayBuffer): string | null {
