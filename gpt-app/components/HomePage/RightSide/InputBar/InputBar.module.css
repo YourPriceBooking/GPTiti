@@ -15,6 +15,44 @@
   border-color: color-mix(in srgb, var(--flow-fill) 20%, transparent);
 }
 
+.currentModel {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 6px 12px 0;
+  padding: 0 10px;
+  min-height: 30px;
+  max-width: calc(100% - 24px);
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: #506176;
+  font: 500 0.8125rem/1.3 var(--font-family);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.modelDot {
+  width: 6px;
+  height: 6px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--flow-fill, #506176);
+}
+
+.currentModel:focus-visible { outline: 2px solid var(--flow-fill, #506176); }
+.currentModel:disabled { cursor: default; }
+.currentModel ~ .composerBody { padding-top: 0; }
+
+@media (hover: hover) {
+  .currentModel:enabled:hover { background: #edf2f7; }
+}
+
+@media (pointer: coarse) {
+  .currentModel { min-height: 44px; margin-top: 2px; }
+}
+
 /* Project workspace variant — fixed accent, independent of the chat flow theme */
 .inputContainer.project {
   --flow-fill: #3e7cff;
