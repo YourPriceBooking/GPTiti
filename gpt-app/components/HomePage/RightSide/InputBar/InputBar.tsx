@@ -93,6 +93,7 @@ const fileExtension = (name: string) => {
 export default function InputBar({
   hasInput,
   discovery = false,
+  onOpenModelPicker,
   onChange,
   onSend,
   inputRef,
@@ -111,6 +112,7 @@ export default function InputBar({
 }: {
   hasInput: boolean;
   discovery?: boolean;
+  onOpenModelPicker?: () => void;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   onSend: (
     message: string,
@@ -266,7 +268,8 @@ export default function InputBar({
   // Guests always reach the normal login gate, even while the public catalog loads.
   const catalogPending = isLoggedIn && !isUnavailable && !listed;
   const dictateButtonRef = useRegisterComposer(voiceBusy || isSending || isPreparing || isAiResponding);
-  const modelAccent = findModelCard(selectedModel)?.accent;
+  const modelCard = findModelCard(selectedModel);
+  const modelAccent = modelCard?.accent;
 
   const openLimitError = (kind: LimitKind) => {
     setLimitErrorKind(kind);
@@ -707,6 +710,22 @@ export default function InputBar({
       style={modelAccent ? { "--flow-fill": modelAccent, "--flow-bg": "color-mix(in srgb, var(--flow-fill) 12%, transparent)" } as React.CSSProperties : undefined}
       data-input-bar
     >
+      {onOpenModelPicker && !isUnavailable && (
+        <button
+          type="button"
+          className={styles.currentModel}
+          aria-haspopup="dialog"
+          aria-label={`Current model: ${modelCard?.name ?? selectedModel}. Choose a model`}
+          disabled={voiceBusy || isSending || isPreparing || isAiResponding}
+          onClick={onOpenModelPicker}
+        >
+          <span className={styles.modelDot} aria-hidden="true" />
+          <span>{modelCard?.name ?? selectedModel}</span>
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+            <path d="m3 4.5 3 3 3-3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+      )}
       {dragActive && <div className={styles.dropZone} role="status">
         <strong>{isSending || isPreparing || voiceBusy || isUnavailable ? 'Finish the current action first' : 'Drop files to attach'}</strong>
         <span>Same formats and limits as Add files · nothing is sent automatically</span>

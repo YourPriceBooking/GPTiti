@@ -59,7 +59,11 @@ export default function InputComposer({
         <p className={styles.stopStatus} role="status">Stopping… Waiting for confirmation.</p>
       )}
       <div className={styles.inputWrap}>
-        <InputBar {...inputBarProps} discovery={discovery} />
+        <InputBar
+          {...inputBarProps}
+          discovery={discovery}
+          onOpenModelPicker={discovery && showModelSelection ? onChooseModel : undefined}
+        />
       </div>
 
       <div
@@ -75,7 +79,7 @@ export default function InputComposer({
               ≈ Estimated cost: ~
               {(estimatedTokens ?? demo ?? 0).toLocaleString("en-US")} tokens{demo !== undefined && " · Demo"}
             </span>
-            {showModelSelection && (
+            {showModelSelection && !discovery && (
               <ChooseModelColumn
                 selectedModel={inputBarProps.selectedModel}
                 showEstimate={showEstimate}
