@@ -123,3 +123,13 @@ test("sources survive end, recovery and history merge", () => {
     sources,
   );
 });
+
+test("reading progress survives history parsing and validates continuation IDs", () => {
+  const id = "12345678-1234-4678-9234-123456789abc";
+  const source = { id: "web-1", status: "ready", url: "https://example.com", truncated: true };
+  const parse = (reading: unknown) => readWebSources([{ ...source, reading }])[0].reading;
+  assert.deepEqual(parse({ read: 3, selected: 5, total: 5, canContinue: true, continueId: id }),
+    { read: 3, selected: 5, total: 5, continueId: id });
+  assert.equal(parse({read: 6, selected: 5, total: 5}), undefined);
+  assert.equal(parse({read: 3, selected: 3, total: 8, canContinue: false, continueId: id})?.continueId, undefined);
+});

@@ -15,6 +15,7 @@ type MessageListProps = {
   messages: Message[];
   isTyping?: boolean;
   onRetry: () => void;
+  onContinueReading: (id: string, modelId: string) => void;
   onCancelPending: () => void;
 };
 
@@ -176,6 +177,7 @@ export default function MessageList({
   isTyping = false,
   onRetry,
   onCancelPending,
+  onContinueReading,
 }: MessageListProps) {
   return (
     <div className={styles.messageList}>
@@ -188,6 +190,8 @@ export default function MessageList({
           return <UserMessage key={key} message={message} />;
         }
 
+        const continuation = message.webSources?.find(s => s.reading?.continueId)?.reading?.continueId;
+        const alreadyContinued = continuation && messages.some(m => m.role === "user" && m.clientMessageId === continuation);
         const isWaiting = message.streaming && message.content.length === 0;
         return (
           <div key={key} className={styles.aiMessage}>
@@ -206,6 +210,12 @@ export default function MessageList({
                     modelId={message.modelId}
                     updatedAt={message.updatedAt}
                   />
+                )}
+                {continuation && !alreadyContinued && message.modelId && !message.error && (
+                  <button type="button" className={styles.retryButton} disabled={isTyping || message.streaming}
+                    onClick={() => onContinueReading(continuation, message.modelId!)}>
+                    Continue reading
+                  </button>
                 )}
                 {message.error && (
                   <div className={styles.streamError} role="alert">
