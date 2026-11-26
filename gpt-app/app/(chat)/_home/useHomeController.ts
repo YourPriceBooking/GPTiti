@@ -255,6 +255,17 @@ export function useHomeController() {
     [dispatch, activeChatId, selectedModel],
   );
 
+  const continueReading = useCallback(async (continueReadingId: string, modelId: string) => {
+    if (!activeChatId || isDraftId(activeChatId) || sendCycleInFlightRef.current) return;
+    sendCycleInFlightRef.current = true;
+    try {
+      await sendMessage({ conversationId: activeChatId, continueReadingId, modelId,
+        text: "Continue reading", imageUrls: [], imageFiles: [] });
+    } finally {
+      sendCycleInFlightRef.current = false;
+    }
+  }, [activeChatId, sendMessage]);
+
   const handleSendClick = useCallback(
     async (
       _hasFirstRequest: boolean,
@@ -484,6 +495,7 @@ export function useHomeController() {
     handleDeleteChat,
     handleRenameChat,
     handleSendClick,
+    continueReading,
     handleRetryStream,
     handleCancelPendingMessage,
     handleStopResponse,

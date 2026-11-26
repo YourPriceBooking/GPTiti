@@ -5,6 +5,7 @@ export type WebSource = {
   requestedUrl: string;
   title?: string;
   truncated: boolean;
+  reading?: { read: number; selected: number; total: number; continueId?: string };
   error?: string;
 };
 export type WebStatus = { stage: string; completed: number; total: number };
@@ -32,6 +33,15 @@ export function readWebSources(value: unknown): WebSource[] {
     const url = safeWebUrl(v.url),
       requestedUrl = safeWebUrl(v.requestedUrl) ?? url;
     if (!requestedUrl || (v.status === "ready" && !url)) return [];
+    const p = v.reading;
+    const validCount = (x: unknown): x is number => typeof x === "number" && Number.isSafeInteger(x) && x >= 0;
+    const reading = object(p) && validCount(p.read) && validCount(p.selected) && validCount(p.total)
+      && p.read <= p.selected && p.selected <= p.total ? {
+        read: p.read, selected: p.selected, total: p.total,
+        continueId: p.canContinue === true && typeof p.continueId === "string"
+          && /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(p.continueId)
+          ? p.continueId : undefined,
+      } : undefined;
     return [
       {
         id: v.id,
@@ -40,6 +50,7 @@ export function readWebSources(value: unknown): WebSource[] {
         requestedUrl,
         title: typeof v.title === "string" ? v.title.slice(0, 300) : undefined,
         truncated: v.truncated === true,
+        ...(reading ? { reading } : {}),
         error:
           typeof v.error === "string" && /^[A-Z0-9_]+$/.test(v.error)
             ? v.error

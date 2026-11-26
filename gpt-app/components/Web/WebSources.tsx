@@ -73,6 +73,7 @@ export default function WebSources({ sources }: { sources: WebSource[] }) {
                       ? "Partially read"
                       : "Page text read"}
                 </span>
+                {source.reading && <span>{source.reading.read} of {source.reading.total} text parts read</span>}
                 {visits > 1 && <span>{visits} observations</span>}
               </div>
               {!ready && (

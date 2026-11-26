@@ -83,6 +83,7 @@ export type SendChatMessageArgs = {
   imageFiles: File[];
   libraryFiles?: LibraryFile[];
   restoredPreparation?: PreparationDraft;
+  continueReadingId?: string;
 };
 
 export type ChatStream = {
@@ -685,6 +686,7 @@ export function useChatStream(): ChatStream {
       imageUrls,
       imageFiles,
       restoredPreparation,
+      continueReadingId,
       libraryFiles = [],
     }: SendChatMessageArgs) => {
       if (cancellingPreparation.current || (restoredPreparation && restoredPreparation.owner !== userId)) return false;
@@ -729,7 +731,7 @@ export function useChatStream(): ChatStream {
       setStreamError(null);
       setWarningState({owner: userId, names: []});
       let preparing = true;
-      const clientMessageId = restoredPreparation?.clientMessageId ?? createClientMessageId();
+      const clientMessageId = restoredPreparation?.clientMessageId ?? continueReadingId ?? createClientMessageId();
       try {
         let limits: FileLimits | null = null;
         if (imageFiles.length || libraryFiles.length || restoredPreparation) {
