@@ -380,12 +380,6 @@
   flex-shrink: 0;
 }
 
-.projectChatButton span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .projectChatButton:hover,
 .projectChatActive {
   color: #ffffff;
@@ -729,6 +723,11 @@
   border-radius: 6px;
   padding: 2px 4px;
   cursor: text;
+}
+
+.chatMain > .chatTitle[contenteditable="true"] {
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 @media (max-width: 767px) and (min-width: 320px) {
