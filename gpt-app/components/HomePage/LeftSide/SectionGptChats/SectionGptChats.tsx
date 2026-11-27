@@ -30,7 +30,7 @@ import MyProjectsButton from "./MyProjectsButton";
 import { sortChatsByActivity } from "@/lib/projects/projectChatOrder";
 import ProjectNewChatButton from "./ProjectNewChatButton";
 import ProjectChatList from "./ProjectChatList";
-import SidebarChatTitle from "./SidebarChatTitle";
+import SidebarTitle from "./SidebarTitle";
 import ActionTooltip from "@/components/common/ActionTooltip/ActionTooltip";
 
 const NARROW_VIEWPORT = 640;
@@ -138,7 +138,7 @@ export default function SectionGptChats({
   const menuRef = useRef<HTMLDivElement | null>(null);
   const projectMenuRef = useRef<HTMLDivElement | null>(null);
   const editingChatTitleRef = useRef<HTMLSpanElement>(null);
-  const projectTitleRefs = useRef<Record<string, HTMLSpanElement | null>>({});
+  const editingProjectTitleRef = useRef<HTMLSpanElement>(null);
   // The dots buttons the open menus were launched from, so the menus can
   // follow them while the chats/projects list scrolls.
   const chatTriggerRef = useRef<HTMLElement | null>(null);
@@ -289,7 +289,7 @@ export default function SectionGptChats({
   useEffect(() => {
     if (!renamingProjectId) return;
 
-    const el = projectTitleRefs.current[renamingProjectId];
+    const el = editingProjectTitleRef.current;
     if (!el) return;
 
     el.focus();
@@ -384,33 +384,30 @@ export default function SectionGptChats({
                         <path d="m4 2 4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                       <Image width={22} height={18} src="/icons/sidebar-project.svg" alt="" />
-                      <span
-                        ref={(el) => { if (el) projectTitleRefs.current[project.id] = el; }}
-                        contentEditable={renaming}
-                        suppressContentEditableWarning
-                        className={styles.chatTitle}
-                        title={project.title}
-                        onClick={renaming ? (event) => event.stopPropagation() : undefined}
-                        onBlur={(event) => {
-                          if (!renaming) return;
-                          const nextTitle = event.currentTarget.textContent?.trim();
-                          if (nextTitle && nextTitle !== project.title) renameProject?.(project.id, nextTitle);
-                          setRenamingProjectId(null);
-                          setOpenMenuProjectId(null);
-                        }}
-                        onKeyDown={(event) => {
-                          if (!renaming) return;
-                          if (event.key === "Enter") {
-                            event.preventDefault();
-                            event.currentTarget.blur();
-                          }
-                          if (event.key === "Escape") {
-                            event.preventDefault();
-                            event.currentTarget.textContent = project.title;
-                            event.currentTarget.blur();
-                          }
-                        }}
-                      >{project.title}</span>
+                      {renaming ? (
+                        <span
+                          ref={editingProjectTitleRef}
+                          contentEditable
+                          suppressContentEditableWarning
+                          className={styles.chatTitle}
+                          onClick={(event) => event.stopPropagation()}
+                          onBlur={(event) => {
+                            const nextTitle = event.currentTarget.textContent?.trim();
+                            if (nextTitle && nextTitle !== project.title) renameProject?.(project.id, nextTitle);
+                            setRenamingProjectId(null);
+                            setOpenMenuProjectId(null);
+                          }}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter" || event.key === "Escape") {
+                              event.preventDefault();
+                              if (event.key === "Escape") event.currentTarget.textContent = project.title;
+                              event.currentTarget.blur();
+                            }
+                          }}
+                        >{project.title}</span>
+                      ) : (
+                        <SidebarTitle title={project.title} className={styles.chatTitle} />
+                      )}
                     </div>
                     <div className={styles.chatRight}>
                       <ProjectNewChatButton
@@ -539,7 +536,7 @@ export default function SectionGptChats({
                         {chat.title}
                       </span>
                     ) : (
-                      <SidebarChatTitle title={chat.title ?? ""} className={styles.chatTitle} />
+                      <SidebarTitle title={chat.title ?? ""} className={styles.chatTitle} />
                     )}
 
                     {project && (
@@ -566,9 +563,7 @@ export default function SectionGptChats({
                           <path d="M7 17 17 7" />
                           <path d="M8 7h9v9" />
                         </svg>
-                        <span className={styles.chatProjectName}>
-                          {project.title}
-                        </span>
+                        <SidebarTitle title={project.title} className={styles.chatProjectName} />
                       </button>
                     )}
                   </div>

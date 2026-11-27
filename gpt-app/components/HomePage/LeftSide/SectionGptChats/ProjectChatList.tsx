@@ -6,7 +6,7 @@ import { useAppDispatch } from "@/redux/hooks";
 import { fetchProject } from "@/redux/projects/operations";
 import { newestRequestAt, sortProjectChats } from "@/lib/projects/projectChatOrder";
 import ProjectChatActions from "./ProjectChatActions";
-import SidebarChatTitle from "./SidebarChatTitle";
+import SidebarTitle from "./SidebarTitle";
 import { renameConversation } from "@/redux/chat/operations";
 import { renameChat } from "@/redux/chat/slice";
 import styles from "./SectionGptChats.module.css";
@@ -90,7 +90,7 @@ export default function ProjectChatList({
                   aria-current={activeChatId === chat._id ? "page" : undefined}
                   onClick={() => onOpenChat(chat._id)}
                 >
-                  <SidebarChatTitle title={title} />
+                  <SidebarTitle title={title} />
                 </button>
                 )}
                 <ProjectChatActions project={project} chat={chat} onRename={() => {
