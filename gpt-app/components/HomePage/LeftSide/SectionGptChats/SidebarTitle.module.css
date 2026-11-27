@@ -9,25 +9,35 @@
   container-type: inline-size;
 }
 
-.text,
-.scrolling {
+.text {
   display: block;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
+/* Finish immediately if the device or motion preference changes during a return. */
+.returning {
+  animation: returnTitle 0s ease-in-out;
+}
+
 @media (min-width: 768px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-  .viewport:hover > .scrolling {
-    animation-name: readTitle;
-    animation-delay: 700ms;
-    animation-timing-function: linear;
-    animation-fill-mode: forwards;
+  .scrolling {
+    animation: readTitle var(--title-motion-duration) linear forwards;
+  }
+
+  .returning {
+    animation-duration: var(--title-motion-duration);
   }
 }
 
-/* Keep the ellipsis during the delay. Once moving, stop flush with the visible edge. */
+/* Natural track width keeps the last word visible until the return finishes. */
 @keyframes readTitle {
   from { width: max-content; transform: translateX(0); }
   to { width: max-content; transform: translateX(min(0px, calc(100cqi - 100%))); }
+}
+
+@keyframes returnTitle {
+  from { width: max-content; transform: translateX(var(--title-return-from)); }
+  to { width: max-content; transform: translateX(0); }
 }
