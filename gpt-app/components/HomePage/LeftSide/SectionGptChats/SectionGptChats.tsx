@@ -30,6 +30,7 @@ import MyProjectsButton from "./MyProjectsButton";
 import { sortChatsByActivity } from "@/lib/projects/projectChatOrder";
 import ProjectNewChatButton from "./ProjectNewChatButton";
 import ProjectChatList from "./ProjectChatList";
+import SidebarChatTitle from "./SidebarChatTitle";
 import ActionTooltip from "@/components/common/ActionTooltip/ActionTooltip";
 
 const NARROW_VIEWPORT = 640;
@@ -136,7 +137,7 @@ export default function SectionGptChats({
   };
   const menuRef = useRef<HTMLDivElement | null>(null);
   const projectMenuRef = useRef<HTMLDivElement | null>(null);
-  const titleRefs = useRef<Record<string, HTMLSpanElement | null>>({});
+  const editingChatTitleRef = useRef<HTMLSpanElement>(null);
   const projectTitleRefs = useRef<Record<string, HTMLSpanElement | null>>({});
   // The dots buttons the open menus were launched from, so the menus can
   // follow them while the chats/projects list scrolls.
@@ -270,7 +271,7 @@ export default function SectionGptChats({
   useEffect(() => {
     if (!renamingChatId) return;
 
-    const el = titleRefs.current[renamingChatId];
+    const el = editingChatTitleRef.current;
     if (!el) return;
 
     el.focus();
@@ -521,26 +522,25 @@ export default function SectionGptChats({
                   onClick={() => setActiveChatId(chat.id)}
                 >
                   <div className={styles.chatMain}>
-                    <span
-                      ref={(el) => {
-                        if (el) titleRefs.current[chat.id] = el;
-                      }}
-                      contentEditable={renamingChatId === chat.id}
-                      suppressContentEditableWarning
-                      className={styles.chatTitle}
-                      onBlur={(e) => {
-                        const newTitle = e.currentTarget.textContent?.trim();
-                        if (newTitle && newTitle !== chat.title) {
-                          renameChat(chat.id, newTitle);
-                        }
-                        setRenamingChatId(null);
-                        setOpenMenuChatId(null);
-                      }}
-                    >
-                      {chat.title && chat.title.length > 18
-                        ? chat.title.slice(0, 18) + "..."
-                        : chat.title}
-                    </span>
+                    {renamingChatId === chat.id ? (
+                      <span
+                        ref={editingChatTitleRef}
+                        contentEditable
+                        suppressContentEditableWarning
+                        className={styles.chatTitle}
+                        onClick={(event) => event.stopPropagation()}
+                        onBlur={(event) => {
+                          const newTitle = event.currentTarget.textContent?.trim();
+                          if (newTitle && newTitle !== chat.title) renameChat(chat.id, newTitle);
+                          setRenamingChatId(null);
+                          setOpenMenuChatId(null);
+                        }}
+                      >
+                        {chat.title}
+                      </span>
+                    ) : (
+                      <SidebarChatTitle title={chat.title ?? ""} className={styles.chatTitle} />
+                    )}
 
                     {project && (
                       <button
